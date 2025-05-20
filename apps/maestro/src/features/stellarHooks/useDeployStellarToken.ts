@@ -3,12 +3,11 @@ import { useState } from "react";
 import type { StellarWalletsKit as BaseStellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 import { rpc, scValToNative, Transaction, xdr } from "@stellar/stellar-sdk";
 
-import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
-
 import { stellarChainConfig } from "~/config/chains";
 import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import { trpc } from "~/lib/trpc";
+import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
 
 // Extended interface to include methods we use that may not be in the original type definition
 interface StellarWalletsKit extends BaseStellarWalletsKit {
@@ -32,30 +31,28 @@ export interface DeployTokenParams {
   onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void;
 }
 
-export interface DeployTokenResult {
+export interface DeployTokenResultStellar {
   hash: string;
   status: string;
   tokenId: string;
   tokenAddress: string;
   tokenManagerAddress: string;
   tokenManagerType: string;
-  remote?: {
-    hash: string;
-    status: string;
-  };
 }
 
 export function useDeployStellarToken() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [data, setData] = useState<DeployTokenResult | null>(null);
+  const [data, setData] = useState<DeployTokenResultStellar | null>(null);
 
   // Use the Stellar transaction polling hook
   const { pollTransaction } = useStellarTransactionPoller();
 
-  const { mutateAsync: getDeployTokenTxBytes } = trpc.stellar.getDeployTokenTxBytes.useMutation();
+  const { mutateAsync: getDeployTokenTxBytes } =
+    trpc.stellar.getDeployTokenTxBytes.useMutation();
 
-  const { mutateAsync: getDeployRemoteTokensTxBytes } = trpc.stellar.getDeployRemoteTokensTxBytes.useMutation();
+  const { mutateAsync: getDeployRemoteTokensTxBytes } =
+    trpc.stellar.getDeployRemoteTokensTxBytes.useMutation();
 
   const deployStellarToken = async ({
     kit,
@@ -68,7 +65,7 @@ export function useDeployStellarToken() {
     destinationChainIds,
     gasValues,
     onStatusUpdate,
-  }: DeployTokenParams): Promise<DeployTokenResult> => {
+  }: DeployTokenParams): Promise<DeployTokenResultStellar> => {
     // Check if the kit is available
     if (!kit) {
       throw new Error("StellarWalletsKit not provided");
@@ -398,22 +395,18 @@ export function useDeployStellarToken() {
 
           // Poll to check the transaction status using the polling hook
           // Transaction pending, starting polling
-          
-          const pollingResult = await pollTransaction(
-            server,
-            txHash,
-            {
-              onStatusUpdate: (status) => {
-                if (status.type === "polling") {
-                  onStatusUpdate?.({ 
-                    type: "deploying", 
-                    txHash: txHash 
-                  });
-                }
+
+          const pollingResult = await pollTransaction(server, txHash, {
+            onStatusUpdate: (status) => {
+              if (status.type === "polling") {
+                onStatusUpdate?.({
+                  type: "deploying",
+                  txHash: txHash,
+                });
               }
-            }
-          );
-          
+            },
+          });
+
           if (pollingResult.status === "SUCCESS") {
             remoteDeployResult = {
               hash: txHash,
@@ -431,7 +424,7 @@ export function useDeployStellarToken() {
 
       // 7. Return the complete result
       // If there's a remote deployment, use the remote transaction hash as the main hash
-      const result: DeployTokenResult = {
+      const result: DeployTokenResultStellar = {
         hash: remoteDeployResult
           ? remoteDeployResult.hash
           : initialResponse.hash,

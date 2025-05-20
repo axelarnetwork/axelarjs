@@ -14,13 +14,16 @@ import { rpc } from "stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import type { Context } from "~/server/context";
-import { STELLAR_HORIZON_URL, STELLAR_NETWORK_PASSPHRASE } from "./config";
+import { 
+  STELLAR_HORIZON_URL, 
+  STELLAR_NETWORK_PASSPHRASE, 
+  XLM_ASSET_ADDRESS as gasTokenAddress,
+  STELLAR_ITS_CONTRACT_ID as stellarITContractId,
+  SOROBAN_RPC_URL as sorobanRpcUrl 
+} from "./config";
 
-export const gasTokenAddress =
-  "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
-export const stellarITContractId =
-  "CCXT3EAQ7GPQTJWENU62SIFBQ3D4JMNQSB77KRPTGBJ7ZWBYESZQBZRK";
-export const sorobanRpcUrl = "https://soroban-testnet.stellar.org";
+// Export these constants for backward compatibility
+export { gasTokenAddress, stellarITContractId, sorobanRpcUrl };
 
 export function hexToScVal(hexString: string) {
   const result = nativeToScVal(Buffer.from(ethers.utils.arrayify(hexString)), {

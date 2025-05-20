@@ -5,6 +5,7 @@ import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 
+import { useSendStellarToken } from "~/features/stellarHooks";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
@@ -12,7 +13,6 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
-import { useSendStellarToken } from "~/features/stellarHooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -37,8 +37,7 @@ export function useInterchainTransferMutation(
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
   const { address } = useAccount();
-  
-  // Hook for sending Stellar tokens
+
   const { sendToken: sendStellarToken } = useSendStellarToken();
 
   const { writeContractAsync: transferAsync } =
@@ -49,8 +48,6 @@ export function useInterchainTransferMutation(
       console.log("error in getSendTokenTx", error.message);
     },
   });
-
-
 
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
@@ -105,7 +102,6 @@ export function useInterchainTransferMutation(
           });
           txHash = receipt.digest;
         } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
-          // Use the dedicated hook for sending Stellar tokens
           const result = await sendStellarToken.mutateAsync({
             caller: address,
             tokenId: tokenId,
@@ -114,7 +110,7 @@ export function useInterchainTransferMutation(
             amount: Number(bnAmount.toString()),
             gasValue: Number(config.gas.toString()) || 0,
           });
-          
+
           txHash = result.hash;
         } else {
           txHash = await transferAsync({

@@ -13,6 +13,7 @@ import React, {
 import { parseUnits } from "viem";
 import { WriteContractData } from "wagmi/query";
 
+import type { DeployTokenResultStellar } from "~/features/stellarHooks";
 import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
 import {
@@ -29,15 +30,6 @@ import { NextButton } from "~/ui/compounds/MultiStepForm";
 import { useDeployAndRegisterRemoteInterchainTokenMutation } from "../../hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 import { useStep2ChainSelectionState } from "./DeployAndRegister.state";
-
-interface StellarDeploymentResult {
-  hash: string;
-  status: string;
-  tokenId: string;
-  tokenAddress: string;
-  tokenManagerAddress: string;
-  tokenManagerType: string;
-}
 
 export const Step2: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -139,7 +131,7 @@ export const Step2: FC = () => {
 
       if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
         try {
-          const result = (await txPromise) as StellarDeploymentResult;
+          const result = (await txPromise) as DeployTokenResultStellar;
           if (result && result.hash && result.tokenAddress) {
             if (rootState.selectedChains.length >= 0) {
               addTransaction({
@@ -185,7 +177,6 @@ export const Step2: FC = () => {
               tokenAddress: result.tokenAddress,
             });
             if (rootState.selectedChains.length > 0) {
-              console.log("sui result", result);
               addTransaction({
                 status: "submitted",
                 suiTx: result,

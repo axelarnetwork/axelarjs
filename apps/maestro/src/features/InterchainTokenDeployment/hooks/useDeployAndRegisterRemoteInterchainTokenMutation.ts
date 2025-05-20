@@ -283,13 +283,12 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const recordDeploymentDraft = useCallback(async () => {
-    // Skip recording deployment draft for Stellar chains
-    if (chainId === STELLAR_CHAIN_ID) {
-      console.log("Skipping recordDeploymentDraft for Stellar chain");
-      return;
-    }
-
-    if (input && tokenAddress && !input.sourceChainId.includes("sui")) {
+    if (
+      input &&
+      tokenAddress &&
+      !input.sourceChainId.includes("sui") &&
+      !input.sourceChainId.includes("stellar")
+    ) {
       return await recordDeploymentAsync({
         kind: "interchain",
         tokenId: tokenId as string,
@@ -318,8 +317,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     await recordDeploymentDraft();
     if (chainId === STELLAR_CHAIN_ID && input) {
-      // Handle Stellar deployment
-      console.log("Stellar deployment started");
       try {
         const gasValues =
           input?.remoteDeploymentGasFees?.gasFees?.map((x) => BigInt(x.fee)) ??
@@ -331,7 +328,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           );
         }
 
-        // Passamos o kit como any para evitar problemas de tipagem
         const result = await deployStellarToken({
           kit: kit as any,
           tokenName: input.tokenName,
@@ -376,7 +372,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         throw error;
       }
     } else if (chainId === SUI_CHAIN_ID && input) {
-      // Handle Sui deployment
       const gasValues =
         input?.remoteDeploymentGasFees?.gasFees?.map((x) => x.fee) ?? [];
       const result = await deployToken({
