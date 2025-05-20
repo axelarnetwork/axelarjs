@@ -3,6 +3,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "~/server/trpc";
 import { buildDeployRemoteInterchainTokensTransaction } from "./utils/remoteTokenDeployments";
 import { buildDeployInterchainTokenTransaction } from "./utils/tokenDeployments";
+import { buildInterchainTransferTransaction } from "./utils/interchainTransfer";
 
 export const stellarRouter = router({
   // Endpoint to get transaction bytes for deploying a token on Stellar
@@ -62,6 +63,34 @@ export const stellarRouter = router({
           gasTokenAddress: input.gasTokenAddress,
           itsContractAddress: input.itsContractAddress,
         });
+
+      return {
+        transactionXDR,
+      };
+    }),
+
+  // Endpoint to get transaction bytes for interchain token transfer
+  getSendTokenTxBytes: publicProcedure
+    .input(
+      z.object({
+        caller: z.string(), // Caller address
+        tokenId: z.string(), // Token ID
+        destinationChain: z.string(), // Destination chain name
+        destinationAddress: z.string(), // Destination address
+        amount: z.number(), // Amount to transfer
+        gasValue: z.number(), // Gas payment value
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Use the utility function to build the interchain transfer transaction
+      const { transactionXDR } = await buildInterchainTransferTransaction({
+        caller: input.caller,
+        tokenId: input.tokenId,
+        destinationChain: input.destinationChain,
+        destinationAddress: input.destinationAddress,
+        amount: input.amount,
+        gasValue: input.gasValue,
+      });
 
       return {
         transactionXDR,

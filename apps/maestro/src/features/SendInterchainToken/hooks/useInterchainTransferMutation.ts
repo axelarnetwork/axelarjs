@@ -1,7 +1,6 @@
 import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
-import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
@@ -11,10 +10,9 @@ import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/Inter
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
-import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
-import { stellarInterchainTransfer } from "~/server/routers/stellar/utils/interchainTransfer";
+import { useSendStellarToken } from "~/features/stellarHooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -37,11 +35,11 @@ export function useInterchainTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
   const [txState, setTxState] = useTransactionState();
-  const { kit } = useStellarKit();
-
   const chainId = useChainId();
-
   const { address } = useAccount();
+  
+  // Hook for sending Stellar tokens
+  const { sendToken: sendStellarToken } = useSendStellarToken();
 
   const { writeContractAsync: transferAsync } =
     useWriteInterchainTokenInterchainTransfer();
@@ -51,6 +49,8 @@ export function useInterchainTransferMutation(
       console.log("error in getSendTokenTx", error.message);
     },
   });
+
+
 
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
@@ -105,15 +105,17 @@ export function useInterchainTransferMutation(
           });
           txHash = receipt.digest;
         } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
-          ({ hash: txHash } = await stellarInterchainTransfer({
+          // Use the dedicated hook for sending Stellar tokens
+          const result = await sendStellarToken.mutateAsync({
             caller: address,
             tokenId: tokenId,
             destinationChain: config.destinationChainName,
             destinationAddress: destinationAddress,
             amount: Number(bnAmount.toString()),
-            kit: kit as StellarWalletsKit,
             gasValue: Number(config.gas.toString()) || 0,
-          }));
+          });
+          
+          txHash = result.hash;
         } else {
           txHash = await transferAsync({
             address: config.tokenAddress as `0x${string}`,
