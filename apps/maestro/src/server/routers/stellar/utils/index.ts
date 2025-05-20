@@ -14,15 +14,14 @@ import { rpc } from "stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import type { Context } from "~/server/context";
-import { 
-  STELLAR_HORIZON_URL, 
-  STELLAR_NETWORK_PASSPHRASE, 
-  GAS_TOKEN_ADDRESS as gasTokenAddress,
+import {
+  XLM_ASSET_ADDRESS as gasTokenAddress,
+  SOROBAN_RPC_URL as sorobanRpcUrl,
+  STELLAR_HORIZON_URL,
+  STELLAR_NETWORK_PASSPHRASE,
   STELLAR_ITS_CONTRACT_ID as stellarITContractId,
-  SOROBAN_RPC_URL as sorobanRpcUrl 
 } from "./config";
 
-// Export these constants for backward compatibility
 export { gasTokenAddress, stellarITContractId, sorobanRpcUrl };
 
 export function hexToScVal(hexString: string) {

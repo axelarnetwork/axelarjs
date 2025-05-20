@@ -9,7 +9,6 @@ import type { DeployAndRegisterTransactionState } from "~/features/InterchainTok
 import { trpc } from "~/lib/trpc";
 import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
 
-// Extended interface to include methods we use that may not be in the original type definition
 interface StellarWalletsKit extends BaseStellarWalletsKit {
   getPublicKey(): Promise<string>;
   signTransaction(
