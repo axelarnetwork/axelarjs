@@ -8,6 +8,7 @@ import {
   useBalance as useWagmiBalance,
 } from "wagmi";
 
+import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
 import { STELLAR_HORIZON_URL } from "~/server/routers/stellar/utils/config";
 import { useAccount } from "./useAccount";
 
@@ -61,20 +62,22 @@ export function useBalance(): BalanceResult | undefined {
     }
     if (suiBalance) {
       const value = BigInt(suiBalance.totalBalance);
+      const { decimals, symbol } = suiChainConfig.nativeCurrency;
       return {
         value,
-        formatted: formatUnits(value, 9), // SUI has 9 decimals
-        symbol: "SUI",
-        decimals: 9,
+        formatted: formatUnits(value, decimals),
+        symbol,
+        decimals,
       };
     }
     if (stellarBalance) {
       const value = BigInt(Math.floor(Number(stellarBalance) * 1e7));
+      const { decimals, symbol } = stellarChainConfig.nativeCurrency;
       return {
         value,
-        formatted: formatUnits(value, 7), // Stellar has 7 decimals
-        symbol: "XLM",
-        decimals: 7,
+        formatted: formatUnits(value, decimals),
+        symbol,
+        decimals,
       };
     }
     return undefined;
