@@ -71,8 +71,8 @@ export function useBalance(): BalanceResult | undefined {
       };
     }
     if (stellarBalance) {
-      const value = BigInt(Math.floor(Number(stellarBalance) * 1e7));
       const { decimals, symbol } = stellarChainConfig.nativeCurrency;
+      const value = BigInt(Math.floor(Number(stellarBalance) * 10 ** decimals));
       return {
         value,
         formatted: formatUnits(value, decimals),
