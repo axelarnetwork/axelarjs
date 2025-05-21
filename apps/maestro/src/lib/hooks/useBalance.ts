@@ -43,7 +43,7 @@ export function useBalance(): BalanceResult | undefined {
   );
 
   useEffect(() => {
-    if (chainName === "Stellar" && address) {
+    if (chainName === stellarChainConfig.name && address) {
       const fetchBalance = async () => {
         const server = new Horizon.Server(STELLAR_HORIZON_URL);
         const account = await server.loadAccount(address);
