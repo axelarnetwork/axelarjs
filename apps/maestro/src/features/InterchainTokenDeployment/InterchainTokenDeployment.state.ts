@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
 import { z } from "zod";
 
+import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
 import {
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
@@ -105,11 +106,17 @@ function useInterchainTokenDeploymentState(
       tokenDetailsForm.setValue("salt", salt);
 
       if (chainId === SUI_CHAIN_ID) {
-        tokenDetailsForm.setValue("tokenDecimals", 9);
+        tokenDetailsForm.setValue(
+          "tokenDecimals",
+          suiChainConfig.nativeCurrency.decimals
+        );
       }
 
       if (chainId === STELLAR_CHAIN_ID) {
-        tokenDetailsForm.setValue("tokenDecimals", 7);
+        tokenDetailsForm.setValue(
+          "tokenDecimals",
+          stellarChainConfig.nativeCurrency.decimals
+        );
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,7 +169,10 @@ function useInterchainTokenDeploymentState(
           tokenDetailsForm.reset(initialState.tokenDetails);
 
           if (chainId === SUI_CHAIN_ID) {
-            tokenDetailsForm.setValue("tokenDecimals", 9);
+            tokenDetailsForm.setValue(
+              "tokenDecimals",
+              suiChainConfig.nativeCurrency.decimals
+            );
           }
 
           tokenDetailsForm.setValue("salt", generateRandomHash());
