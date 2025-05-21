@@ -1,7 +1,6 @@
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback } from "react";
 
-import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 import { rpc, Transaction } from "@stellar/stellar-sdk";
 
 import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
@@ -11,6 +10,7 @@ import { STELLAR_RPC_URL } from "~/server/routers/stellar/utils/config";
 
 interface MintStellarTokensParams {
   amount: string;
+  contractAddress: string;
   toAddress?: string;
 }
 
@@ -21,7 +21,6 @@ export default function useMintStellarTokens() {
   const { mutateAsync: getMintTx } =
     trpc.stellar.getMintTokenTxBytes.useMutation({
       onError(error) {
-        console.log("error in getMintTx", error.message);
         toast.error(`Failed to prepare mint transaction: ${error.message}`);
       },
     });

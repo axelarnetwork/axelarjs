@@ -1,15 +1,12 @@
-import {
-  Address,
-  nativeToScVal,
-  xdr,
-} from "@stellar/stellar-sdk";
+import { Address, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import { createContractTransaction, fetchStellarAccount } from "./transactions";
 
 // Endereço do contrato hardcodado para o mint de tokens
-export const MINT_CONTRACT_ADDRESS = "CDRKERYPGPIIDE6HBZAPXDNNZXSIJOJNDLNURHT34S3MFQR6JFAFCFXV";
+export const MINT_CONTRACT_ADDRESS =
+  "CAOUTBGYGR3OYX3XC5GMDL447WFW7QFLW3ISJUCX4YGO65USFHAUBLGQ";
 
 /**
  * Interface for the result of building a token mint transaction
@@ -43,8 +40,9 @@ export async function buildMintTokenTransaction({
   networkPassphrase?: string;
 }): Promise<{ transactionXDR: string }> {
   const actualRpcUrl = rpcUrl || stellarChainConfig.rpcUrls.default.http[0];
-  const actualNetworkPassphrase = networkPassphrase || NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
-  
+  const actualNetworkPassphrase =
+    networkPassphrase || NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
+
   const account = await fetchStellarAccount(caller);
 
   const args: xdr.ScVal[] = [

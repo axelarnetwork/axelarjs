@@ -53,19 +53,23 @@ export async function buildDeployInterchainTokenTransaction({
   rpcUrl?: string;
   networkPassphrase?: string;
 }): Promise<{ transactionXDR: string }> {
-  const actualMinterAddress = minterAddress || caller;
   const actualRpcUrl = rpcUrl || stellarChainConfig.rpcUrls.default.http[0];
   const actualNetworkPassphrase = networkPassphrase || NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
   
   const account = await fetchStellarAccount(caller);
 
-  const args: xdr.ScVal[] = [
+  // Preparar os argumentos base
+  const baseArgs: xdr.ScVal[] = [
     addressToScVal(caller),
     hexToScVal(salt),
     tokenMetadataToScVal(decimals, tokenName, tokenSymbol),
     nativeToScVal(initialSupply.toString(), { type: "i128" }),
-    addressToScVal(actualMinterAddress),
   ];
+  
+  // Adicionar o minter apenas se minterAddress estiver disponível
+  const args = minterAddress
+    ? [...baseArgs, addressToScVal(minterAddress)]
+    : [...baseArgs, xdr.ScVal.scvVoid()]; // Usar void quando não houver minterAddress
 
   return createContractTransaction({
     contractAddress: STELLAR_ITS_CONTRACT_ID,
