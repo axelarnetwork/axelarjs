@@ -49,7 +49,6 @@ export const XLM_ASSET_ADDRESS = XLMAssetAddresses[NEXT_PUBLIC_NETWORK_ENV];
 
 export const STELLAR_RPC_URL = STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV];
 
-// Use the Soroban RPC URLs directly from @axelarjs/core
 export const SOROBAN_RPC_URL = STELLAR_RPC_URLS[NEXT_PUBLIC_NETWORK_ENV];
 
 export const STELLAR_MULTICALL_CONTRACT_ID =

@@ -1,22 +1,12 @@
 import { Buffer } from "buffer";
-import {
-  Address,
-  BASE_FEE,
-  Contract,
-  nativeToScVal,
-  rpc,
-  TransactionBuilder,
-  xdr,
-} from "@stellar/stellar-sdk";
+import { Address, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 
-import { stellarChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import {
   STELLAR_ITS_CONTRACT_ID,
   STELLAR_MULTICALL_CONTRACT_ID,
   XLM_ASSET_ADDRESS,
 } from "./config";
-import { fetchStellarAccount } from "./transactions";
+import { createContractTransaction, fetchStellarAccount } from "./transactions";
 
 // Interface for the result of building a remote deployment transaction
 export interface BuildRemoteDeploymentResult {
@@ -35,8 +25,6 @@ export async function buildDeployRemoteInterchainTokensTransaction({
   itsContractAddress = STELLAR_ITS_CONTRACT_ID,
   multicallContractAddress = STELLAR_MULTICALL_CONTRACT_ID,
   gasTokenAddress = XLM_ASSET_ADDRESS,
-  rpcUrl,
-  networkPassphrase,
   minterAddress,
 }: {
   caller: string;
@@ -46,8 +34,6 @@ export async function buildDeployRemoteInterchainTokensTransaction({
   itsContractAddress?: string;
   multicallContractAddress?: string;
   gasTokenAddress?: string;
-  rpcUrl?: string;
-  networkPassphrase?: string;
   minterAddress?: string;
 }): Promise<{ transactionXDR: string }> {
   if (destinationChainIds.length !== gasValues.length) {
@@ -60,9 +46,6 @@ export async function buildDeployRemoteInterchainTokensTransaction({
   }
 
   const effectiveMinter = minterAddress || caller;
-  const actualRpcUrl = rpcUrl || stellarChainConfig.rpcUrls.default.http[0];
-  const actualNetworkPassphrase =
-    networkPassphrase || NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
 
   const account = await fetchStellarAccount(caller);
 
@@ -153,21 +136,11 @@ export async function buildDeployRemoteInterchainTokensTransaction({
   // Final arguments for the multicall
   const multicallArgs = xdr.ScVal.scvVec(callArgs);
 
-  const server = new rpc.Server(actualRpcUrl);
-
-  const multicallContract = new Contract(multicallContractAddress);
-
-  const txBuilder = new TransactionBuilder(account, {
-    fee: BASE_FEE,
-    networkPassphrase: actualNetworkPassphrase,
-  })
-    .addOperation(multicallContract.call("multicall", multicallArgs))
-    .setTimeout(0);
-
-  const builtTx = txBuilder.build();
-  // Prepare the transaction to get the correct fee and footprint
-  const preparedTx = await server.prepareTransaction(builtTx);
-  const transactionXDR = preparedTx.toEnvelope().toXDR("base64");
-
-  return { transactionXDR };
+  // Use the createContractTransaction utility function instead of manual transaction creation
+  return createContractTransaction({
+    contractAddress: multicallContractAddress,
+    method: "multicall",
+    account,
+    args: [multicallArgs],
+  });
 }
