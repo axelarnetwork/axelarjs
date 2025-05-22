@@ -150,16 +150,17 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     txState,
   ]);
 
+  const txCompleteCallback: Record<string, () => Promise<void>> = {
+    [suiChainConfig.id]: onSuiTxComplete,
+    [stellarChainConfig.id]: onStellarTxComplete,
+  };
+
   useEffect(
     () => {
       if (txState.status !== "submitted") return;
-      if (props.originChainId === suiChainConfig.id) {
-        onSuiTxComplete().catch((error) => {
-          logger.error("Failed to record remote token deployment", error);
-          toast.error("Failed to record remote token deployment");
-        });
-      } else if (props.originChainId === stellarChainConfig.id) {
-        onStellarTxComplete().catch((error) => {
+      const callback = txCompleteCallback[props.originChainId ?? ""];
+      if (callback) {
+        callback().catch((error: Error) => {
           logger.error("Failed to record remote token deployment", error);
           toast.error("Failed to record remote token deployment");
         });
