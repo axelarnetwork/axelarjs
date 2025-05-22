@@ -114,7 +114,7 @@ export const Step2: FC = () => {
       const txPromise = deployInterchainTokenAsync().catch((e) => {
         // Handle user rejection from any wallet
         if (e.message?.toLowerCase().includes("reject")) {
-          toast.error("Transaction rejected by user");
+          toast.error("Transaction rejected by user.");
           rootActions.setTxState({
             type: "idle",
           });
@@ -143,13 +143,10 @@ export const Step2: FC = () => {
             }
             return;
           } else {
-            console.error("Stellar deployment result incomplete", result);
-            toast.error(
-              "Stellar deployment failed: Incomplete data from deployment function."
-            );
             rootActions.setTxState({
               type: "idle",
             });
+            throw new Error("Stellar deployment result incomplete.");
           }
         } catch (e: any) {
           console.error(

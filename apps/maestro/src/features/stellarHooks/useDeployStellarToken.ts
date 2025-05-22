@@ -76,7 +76,7 @@ export function useDeployStellarToken() {
     onStatusUpdate?.({
       type: "pending_approval",
       step: 1,
-      totalSteps: destinationChainIds.length + 1,
+      totalSteps: destinationChainIds.length > 0 ? 2 : 1,
     });
 
     try {
@@ -327,7 +327,7 @@ export function useDeployStellarToken() {
         onStatusUpdate?.({
           type: "pending_approval",
           step: 2,
-          totalSteps: destinationChainIds.length + 1,
+          totalSteps: 2,
         });
         remoteDeployResult = await registerRemoteInterchainTokenOnStellar({
           salt,
