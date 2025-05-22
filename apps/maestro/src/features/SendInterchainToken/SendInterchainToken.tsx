@@ -314,6 +314,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               disabled
               compact
               selectedChain={props.sourceChain}
+              hideRPCHealthIndicator={true}
               hideLabel={false}
               chainIconClassName="-translate-x-1.5"
               triggerClassName="w-full md:w-auto rounded-full"
@@ -324,6 +325,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <ChainsDropdown
               compact
               hideLabel={false}
+              hideRPCHealthIndicator={true}
               selectedChain={state.selectedToChain}
               chains={state.eligibleTargetChains}
               disabled={

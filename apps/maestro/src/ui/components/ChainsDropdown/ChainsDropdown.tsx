@@ -80,6 +80,7 @@ type Props = {
   size?: keyof typeof ICON_SIZES;
   chainType?: "evm" | "vm";
   excludeChainIds?: number[];
+  hideRPCHealthIndicator?: boolean;
 };
 
 type HealthStatus = "up" | "down" | "timeout" | "unknown";
@@ -288,7 +289,7 @@ const ChainsDropdown: FC<Props> = (props) => {
           tabIndex={props.compact ? -1 : 0}
         >
           <ChainIconComponent {...props} />
-          {selectedChainForHealth && (
+          {selectedChainForHealth && !props.hideRPCHealthIndicator && (
             <HealthDot status={status} isLoading={isLoading} />
           )}
         </Dropdown.Trigger>
