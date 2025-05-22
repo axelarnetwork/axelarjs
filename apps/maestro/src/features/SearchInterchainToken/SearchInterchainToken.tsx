@@ -128,8 +128,8 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           name="tokenAddress"
           placeholder={
             defaultChain?.name
-              ? `Search for ERC-20 token address on ${chainName}`
-              : "Search for ERC-20 token address"
+              ? `Search for any token address on ${chainName}`
+              : "Search for any token address"
           }
           value={search}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
