@@ -175,6 +175,13 @@ function useInterchainTokenDeploymentState(
             );
           }
 
+          if (chainId === STELLAR_CHAIN_ID) {
+            tokenDetailsForm.setValue(
+              "tokenDecimals",
+              stellarChainConfig.nativeCurrency.decimals
+            );
+          }
+
           tokenDetailsForm.setValue("salt", generateRandomHash());
           // tokenDetailsForm.setValue("minter", address);
         });
