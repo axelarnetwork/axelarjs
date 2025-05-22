@@ -73,7 +73,11 @@ export function useDeployStellarToken() {
     }
 
     // First step: deploy the token on Stellar
-    onStatusUpdate?.({ type: "pending_approval", step: 1, totalSteps: 2 });
+    onStatusUpdate?.({
+      type: "pending_approval",
+      step: 1,
+      totalSteps: destinationChainIds.length + 1,
+    });
 
     try {
       // 1. Get transaction bytes for token deployment
@@ -301,14 +305,14 @@ export function useDeployStellarToken() {
       ) {
         // Build a detailed error message showing which data is missing
         const missingData = [];
-        if (!tokenId) missingData.push('tokenId');
-        if (!tokenAddress) missingData.push('tokenAddress');
-        if (!tokenManagerAddress) missingData.push('tokenManagerAddress');
-        if (!tokenManagerType) missingData.push('tokenManagerType');
-        
+        if (!tokenId) missingData.push("tokenId");
+        if (!tokenAddress) missingData.push("tokenAddress");
+        if (!tokenManagerAddress) missingData.push("tokenManagerAddress");
+        if (!tokenManagerType) missingData.push("tokenManagerType");
+
         throw new Error(
-          `Failed to extract critical token data from transaction: ${missingData.join(', ')} missing. ` +
-          `Transaction hash: ${initialResponse.hash}`
+          `Failed to extract critical token data from transaction: ${missingData.join(", ")} missing. ` +
+            `Transaction hash: ${initialResponse.hash}`
         );
       }
 
@@ -320,7 +324,11 @@ export function useDeployStellarToken() {
       // 6. If there are destinationChainIds, do remote deployment
       let remoteDeployResult;
       if (destinationChainIds.length > 0) {
-        onStatusUpdate?.({ type: "pending_approval", step: 2, totalSteps: 2 });
+        onStatusUpdate?.({
+          type: "pending_approval",
+          step: 2,
+          totalSteps: destinationChainIds.length + 1,
+        });
         remoteDeployResult = await registerRemoteInterchainTokenOnStellar({
           salt,
           destinationChainIds,
