@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { StellarWalletsKit as BaseStellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
+import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 import { rpc, scValToNative, Transaction, xdr } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
@@ -9,14 +9,6 @@ import type { DeployAndRegisterTransactionState } from "~/features/InterchainTok
 import { trpc } from "~/lib/trpc";
 import { useRegisterRemoteInterchainTokenOnStellar } from "../RegisterRemoteTokens/hooks/useRegisterRemoteInterchainTokenOnStellar";
 import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
-
-interface StellarWalletsKit extends BaseStellarWalletsKit {
-  getPublicKey(): Promise<string>;
-  signTransaction(
-    xdr: string,
-    options: { networkPassphrase: string }
-  ): Promise<{ signedTxXdr: string }>;
-}
 
 export interface DeployTokenParams {
   kit: StellarWalletsKit;
@@ -45,7 +37,6 @@ export function useDeployStellarToken() {
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<DeployTokenResultStellar | null>(null);
 
-  // Use the Stellar transaction polling hook
   const { pollTransaction } = useStellarTransactionPoller();
 
   const { mutateAsync: getDeployTokenTxBytes } =
@@ -67,12 +58,10 @@ export function useDeployStellarToken() {
     gasValues,
     onStatusUpdate,
   }: DeployTokenParams): Promise<DeployTokenResultStellar> => {
-    // Check if the kit is available
     if (!kit) {
       throw new Error("StellarWalletsKit not provided");
     }
 
-    // Check if the user is connected and get the public key
     let publicKey: string;
     try {
       publicKey = (await kit.getAddress()).address;
@@ -80,7 +69,6 @@ export function useDeployStellarToken() {
         throw new Error("Stellar wallet not connected");
       }
     } catch (error) {
-      // Error getting public key
       throw new Error("Failed to get Stellar wallet public key");
     }
 
@@ -113,11 +101,9 @@ export function useDeployStellarToken() {
         NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE
       );
 
-      // Não enviamos o txHash aqui porque ainda não temos o hash da transação
       const initialResponse = await server.sendTransaction(tx);
 
       if (initialResponse.status === "PENDING") {
-        // Deploying with hash
         onStatusUpdate?.({
           type: "deploying",
           txHash: initialResponse.hash,
@@ -130,11 +116,8 @@ export function useDeployStellarToken() {
         initialResponse.status === "TRY_AGAIN_LATER"
       ) {
         const errorMessage = `Stellar transaction submission failed with status: ${initialResponse.status}. Error: ${JSON.stringify(initialResponse.errorResult)}`;
-        // Error in transaction submission
         throw new Error(errorMessage);
       }
-
-      // 4. Wait for transaction confirmation using the polling hook
 
       const pollingResult = await pollTransaction(
         server,
@@ -231,7 +214,6 @@ export function useDeployStellarToken() {
                     // Found tokenAddress in interchain_token_deployed event
                   } catch (error) {
                     // Error extracting tokenAddress
-                    // Se falhar, use o valor hexadecimal bruto do endereço
                     try {
                       const addressBytes = topic2.address().contractId();
                       if (addressBytes) {
@@ -263,7 +245,6 @@ export function useDeployStellarToken() {
                     // Found tokenManagerAddress in token_manager_deployed event
                   } catch (error) {
                     // Error extracting tokenManagerAddress
-                    // Se falhar, use o valor hexadecimal bruto do endereço
                     try {
                       const addressBytes = topic3.address().contractId();
                       if (addressBytes) {
@@ -296,14 +277,12 @@ export function useDeployStellarToken() {
                 }
               }
 
-              // If we found all the required information, we can stop
               if (
                 tokenId &&
                 tokenAddress &&
                 tokenManagerAddress &&
                 tokenManagerType
               ) {
-                // Found all required token information, stopping event processing
                 break;
               }
             }
@@ -313,24 +292,24 @@ export function useDeployStellarToken() {
         }
       }
 
-      // If we couldn't extract all the necessary information, use fallback values
+      // If we couldn't extract all the necessary information, throw an error
       if (
         !tokenId ||
         !tokenAddress ||
         !tokenManagerAddress ||
         !tokenManagerType
       ) {
-        // Could not extract all token information from transaction, using fallback values
-
-        // Use salt as tokenId if we couldn't extract it from the result
-        if (!tokenId) tokenId = salt;
-
-        // Generate unique values based on the transaction hash for other fields
-        const txHash = initialResponse.hash.substring(0, 10);
-        if (!tokenAddress) tokenAddress = `TOKEN_${txHash}`;
-        if (!tokenManagerAddress)
-          tokenManagerAddress = `TOKEN_MANAGER_${txHash}`;
-        if (!tokenManagerType) tokenManagerType = "mint_burn";
+        // Build a detailed error message showing which data is missing
+        const missingData = [];
+        if (!tokenId) missingData.push('tokenId');
+        if (!tokenAddress) missingData.push('tokenAddress');
+        if (!tokenManagerAddress) missingData.push('tokenManagerAddress');
+        if (!tokenManagerType) missingData.push('tokenManagerType');
+        
+        throw new Error(
+          `Failed to extract critical token data from transaction: ${missingData.join(', ')} missing. ` +
+          `Transaction hash: ${initialResponse.hash}`
+        );
       }
 
       // Format tokenId with 0x prefix if it doesn't have it yet
