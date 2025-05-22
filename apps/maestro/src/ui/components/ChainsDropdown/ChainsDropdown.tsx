@@ -80,6 +80,7 @@ type Props = {
   size?: keyof typeof ICON_SIZES;
   chainType?: "evm" | "vm";
   excludeChainIds?: number[];
+  hideRPCHealthIndicator?: boolean;
 };
 
 type HealthStatus = "up" | "down" | "timeout" | "unknown";
@@ -114,11 +115,11 @@ const HealthDot: FC<{
     }
     $position="right"
   >
-    <span className="relative ml-2 inline-block align-middle">
+    <span className="relative ml-1 inline-block align-middle">
       <Badge
         $variant={STATUS_COLORS[status]}
         $size="xs"
-        className={cn("-translate-x-1.5 text-xs", {
+        className={cn("mt-0.5 text-xs", {
           "animate-pulse": !["error", "executed"].includes(status),
         })}
         aria-label={`status: ${STATUS_LABELS[status]}`}
@@ -266,6 +267,11 @@ const ChainsDropdown: FC<Props> = (props) => {
     }
   };
 
+  const selectedChainForHealth = props.selectedChain || selectedChain;
+  const { status, isLoading } = useSingleRpcHealthStatus(
+    selectedChainForHealth?.chain_name
+  );
+
   return (
     <Dropdown $align="end">
       {props.renderTrigger?.() ?? (
@@ -283,6 +289,9 @@ const ChainsDropdown: FC<Props> = (props) => {
           tabIndex={props.compact ? -1 : 0}
         >
           <ChainIconComponent {...props} />
+          {selectedChainForHealth && !props.hideRPCHealthIndicator && (
+            <HealthDot status={status} isLoading={isLoading} />
+          )}
         </Dropdown.Trigger>
       )}
 
