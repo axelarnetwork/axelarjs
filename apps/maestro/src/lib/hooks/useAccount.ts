@@ -17,7 +17,7 @@ import { useEVMChainConfigsQuery } from "../../services/axelarscan/hooks";
 export { STELLAR_CONNECTION_CHANGE };
 
 interface CombinedAccountInfo {
-  address: `0x${string}`;
+  address: string;
   isConnected: boolean;
   isDisconnected: boolean;
   chain?: Chain;
@@ -25,6 +25,7 @@ interface CombinedAccountInfo {
   chainName?: string;
   isWrongSuiNetwork?: boolean;
   isWrongStellarNetwork?: boolean;
+  isLoadingStellar?: boolean;
 }
 
 export function useAccount(): CombinedAccountInfo {
@@ -32,6 +33,7 @@ export function useAccount(): CombinedAccountInfo {
   const mystenAccount = useMystenAccount();
   const [stellarAccount, setStellarAccount] = useState<string | null>(null);
   const [stellarNetwork, setStellarNetwork] = useState<string | null>(null);
+  const [isLoadingStellar, setIsLoadingStellar] = useState(true);
 
   const { data: evmChains } = useEVMChainConfigsQuery();
   const APP_SUI_NETWORK =
@@ -40,11 +42,19 @@ export function useAccount(): CombinedAccountInfo {
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "PUBLIC" : "TESTNET";
   const checkFreighterStatus = useCallback(async () => {
     const isStellarConnected = getStellarConnectionState() ?? false;
-    if (stellarAccount && isStellarConnected) return;
-    if (!isStellarConnected) {
-      setStellarAccount(null);
+    if (stellarAccount && isStellarConnected) {
+      setIsLoadingStellar(false);
       return;
     }
+
+    if (!isStellarConnected) {
+      setStellarAccount(null);
+      setIsLoadingStellar(false);
+      return;
+    }
+
+    // Get the stellar account and network if stellar is connected
+    setIsLoadingStellar(true);
     try {
       const connected = await isConnected();
       if (connected) {
@@ -58,6 +68,8 @@ export function useAccount(): CombinedAccountInfo {
     } catch (error) {
       console.error("[Stellar] Error checking Freighter status:", error);
       setStellarAccount(null);
+    } finally {
+      setIsLoadingStellar(false);
     }
   }, [stellarAccount, setStellarAccount]);
 
@@ -107,5 +119,6 @@ export function useAccount(): CombinedAccountInfo {
       isStellarConnected &&
       !!stellarNetwork &&
       APP_STELLAR_NETWORK !== stellarNetwork,
+    isLoadingStellar,
   };
 }
