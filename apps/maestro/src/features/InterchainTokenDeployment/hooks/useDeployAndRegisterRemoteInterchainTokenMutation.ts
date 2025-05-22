@@ -408,13 +408,9 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     kit,
     multicall,
     config,
-    config.onStatusUpdate,
     prepareMulticall?.request,
     recordDeploymentDraft,
-    STELLAR_CHAIN_ID,
     deployStellarToken,
-    isReady,
-    SUI_CHAIN_ID,
   ]);
 
   const write = useCallback(() => {
