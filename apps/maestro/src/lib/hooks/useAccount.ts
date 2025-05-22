@@ -17,7 +17,7 @@ import { useEVMChainConfigsQuery } from "../../services/axelarscan/hooks";
 export { STELLAR_CONNECTION_CHANGE };
 
 interface CombinedAccountInfo {
-  address: string;
+  address: `0x${string}`;
   isConnected: boolean;
   isDisconnected: boolean;
   chain?: Chain;
