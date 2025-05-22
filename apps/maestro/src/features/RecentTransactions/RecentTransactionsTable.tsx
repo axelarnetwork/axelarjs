@@ -53,7 +53,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery(
     {
       contractMethod,
-      senderAddress,
+      senderAddress: senderAddress ?? "",
       pageSize: maxTransactions,
       page,
     },
@@ -65,7 +65,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   const { data: prevPageTxns } = trpc.gmp.getRecentTransactions.useQuery(
     {
       contractMethod,
-      senderAddress,
+      senderAddress: senderAddress ?? "",
       pageSize: maxTransactions,
       page: page > 0 ? page - 1 : 0,
     },
@@ -76,7 +76,7 @@ export const RecentTransactionsTable: FC<Props> = ({
 
   const { data: nextPageTxns } = trpc.gmp.getRecentTransactions.useQuery({
     contractMethod,
-    senderAddress,
+    senderAddress: senderAddress ?? "",
     pageSize: maxTransactions,
     page: page + 1,
   });

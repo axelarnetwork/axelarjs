@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";
-import { getAddress, isConnected } from "@stellar/freighter-api";
+import { getAddress, getNetwork, isConnected } from "@stellar/freighter-api";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
 
@@ -24,35 +24,52 @@ interface CombinedAccountInfo {
   isEvmChain: boolean;
   chainName?: string;
   isWrongSuiNetwork?: boolean;
+  isWrongStellarNetwork?: boolean;
+  isLoadingStellar?: boolean;
 }
 
 export function useAccount(): CombinedAccountInfo {
   const wagmiAccount = useWagmiAccount();
   const mystenAccount = useMystenAccount();
   const [stellarAccount, setStellarAccount] = useState<string | null>(null);
+  const [stellarNetwork, setStellarNetwork] = useState<string | null>(null);
+  const [isLoadingStellar, setIsLoadingStellar] = useState(true);
 
   const { data: evmChains } = useEVMChainConfigsQuery();
   const APP_SUI_NETWORK =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "sui:mainnet" : "sui:testnet";
-
+  const APP_STELLAR_NETWORK =
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "PUBLIC" : "TESTNET";
   const checkFreighterStatus = useCallback(async () => {
     const isStellarConnected = getStellarConnectionState() ?? false;
-    if (stellarAccount && isStellarConnected) return;
-    if (!isStellarConnected) {
-      setStellarAccount(null);
+    if (stellarAccount && isStellarConnected) {
+      setIsLoadingStellar(false);
       return;
     }
+
+    if (!isStellarConnected) {
+      setStellarAccount(null);
+      setIsLoadingStellar(false);
+      return;
+    }
+
+    // Get the stellar account and network if stellar is connected
+    setIsLoadingStellar(true);
     try {
       const connected = await isConnected();
       if (connected) {
         const publicKey = await getAddress();
         setStellarAccount(publicKey.address);
+        const network = await getNetwork();
+        setStellarNetwork(network.network);
       } else {
         setStellarAccount(null);
       }
     } catch (error) {
       console.error("[Stellar] Error checking Freighter status:", error);
       setStellarAccount(null);
+    } finally {
+      setIsLoadingStellar(false);
     }
   }, [stellarAccount, setStellarAccount]);
 
@@ -98,5 +115,10 @@ export function useAccount(): CombinedAccountInfo {
       undefined,
     isWrongSuiNetwork:
       isMystenConnected && mystenAccount?.chains[0] !== APP_SUI_NETWORK,
+    isWrongStellarNetwork:
+      isStellarConnected &&
+      !!stellarNetwork &&
+      APP_STELLAR_NETWORK !== stellarNetwork,
+    isLoadingStellar,
   };
 }

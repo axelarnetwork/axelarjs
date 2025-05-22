@@ -14,7 +14,15 @@ import { rpc } from "stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import type { Context } from "~/server/context";
-import { STELLAR_HORIZON_URL, STELLAR_NETWORK_PASSPHRASE } from "./config";
+import {
+  XLM_ASSET_ADDRESS as gasTokenAddress,
+  SOROBAN_RPC_URL as sorobanRpcUrl,
+  STELLAR_HORIZON_URL,
+  STELLAR_NETWORK_PASSPHRASE,
+  STELLAR_ITS_CONTRACT_ID as stellarITContractId,
+} from "./config";
+
+export { gasTokenAddress, stellarITContractId, sorobanRpcUrl };
 
 export function hexToScVal(hexString: string) {
   const result = nativeToScVal(Buffer.from(ethers.utils.arrayify(hexString)), {
@@ -123,7 +131,7 @@ export async function getStellarContractMetadata(
   const sourceAccount =
     "GDJEBNB5KVJ3CJE2WNQFJFEO75IT3CUAUOWRVGATXQDBZ7DMCU3MHNWO";
 
-  const rpcServer = new rpc.Server(rpcUrl, { allowHttp: true });
+  const rpcServer = new rpc.Server(rpcUrl);
   const account = await rpcServer.getAccount(sourceAccount);
   const contract = new Contract(contractId);
 

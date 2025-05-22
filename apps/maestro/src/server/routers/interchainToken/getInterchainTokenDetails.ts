@@ -1,9 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { suiChainConfig } from "~/config/chains";
+import { stellarChainConfig, suiChainConfig } from "~/config/chains";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
-import { SUI_CHAIN_ID } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
@@ -71,7 +71,9 @@ export const getInterchainTokenDetails = publicProcedure
     const axelarChainId =
       input.chainId === SUI_CHAIN_ID
         ? suiChainConfig.axelarChainId
-        : configs.info.id;
+        : input.chainId === STELLAR_CHAIN_ID
+          ? stellarChainConfig.axelarChainId
+          : configs.info.id;
     // if (!configs) {
     //   throw new TRPCError({
     //     code: "NOT_FOUND",

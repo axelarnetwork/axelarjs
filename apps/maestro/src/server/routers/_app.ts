@@ -11,6 +11,7 @@ import { messagesRouter } from "./messages";
 import { nativeTokensRouter } from "./nativeTokens";
 import { openaiRouter } from "./openai";
 import { suiRouter } from "./sui";
+import { stellarRouter } from "./stellar";
 import { healthcheckRouter } from "./healthcheck";
 
 export const appRouter = router({
@@ -28,6 +29,7 @@ export const appRouter = router({
   messages: messagesRouter,
   accounts: accountsRouter,
   sui: suiRouter,
+  stellar: stellarRouter,
   healthcheck: healthcheckRouter,
 });
 
