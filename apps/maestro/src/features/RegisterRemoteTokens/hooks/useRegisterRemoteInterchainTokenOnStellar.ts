@@ -20,9 +20,7 @@ export const useRegisterRemoteInterchainTokenOnStellar = () => {
     trpc.stellar.getDeployRemoteTokensTxBytes.useMutation();
   const { kit } = useStellarKit();
   const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
-  const server = new rpc.Server(rpcUrl, {
-    allowHttp: rpcUrl.startsWith("http://"),
-  });
+  const server = new rpc.Server(rpcUrl);
   const { pollTransaction } = useStellarTransactionPoller();
   const { address: publicKey } = useAccount();
 

@@ -131,7 +131,7 @@ export async function getStellarContractMetadata(
   const sourceAccount =
     "GDJEBNB5KVJ3CJE2WNQFJFEO75IT3CUAUOWRVGATXQDBZ7DMCU3MHNWO";
 
-  const rpcServer = new rpc.Server(rpcUrl, { allowHttp: true });
+  const rpcServer = new rpc.Server(rpcUrl);
   const account = await rpcServer.getAccount(sourceAccount);
   const contract = new Contract(contractId);
 

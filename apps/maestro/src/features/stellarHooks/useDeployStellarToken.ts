@@ -106,9 +106,7 @@ export function useDeployStellarToken() {
 
       // 3. Submit the transaction
       const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
-      const server = new rpc.Server(rpcUrl, {
-        allowHttp: rpcUrl.startsWith("http://"),
-      });
+      const server = new rpc.Server(rpcUrl);
 
       const tx = new Transaction(
         signedTxXdr,
