@@ -153,10 +153,7 @@ export async function buildDeployRemoteInterchainTokensTransaction({
   // Final arguments for the multicall
   const multicallArgs = xdr.ScVal.scvVec(callArgs);
 
-  // Create the transaction builder directly, following the working code pattern
-  const server = new rpc.Server(actualRpcUrl, {
-    allowHttp: actualRpcUrl.startsWith("http://"),
-  });
+  const server = new rpc.Server(actualRpcUrl);
 
   const multicallContract = new Contract(multicallContractAddress);
 
@@ -165,7 +162,7 @@ export async function buildDeployRemoteInterchainTokensTransaction({
     networkPassphrase: actualNetworkPassphrase,
   })
     .addOperation(multicallContract.call("multicall", multicallArgs))
-    .setTimeout(300); // Set timeout to 5 minutes
+    .setTimeout(0);
 
   const builtTx = txBuilder.build();
   // Prepare the transaction to get the correct fee and footprint

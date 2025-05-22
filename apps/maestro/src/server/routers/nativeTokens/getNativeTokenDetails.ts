@@ -5,7 +5,11 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { ExtendedWagmiChainConfig } from "~/config/chains";
+import {
+  ExtendedWagmiChainConfig,
+  stellarChainConfig,
+  suiChainConfig,
+} from "~/config/chains";
 import {
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
@@ -29,6 +33,7 @@ const overrides: Record<string, Record<string, string>> = {
 
 async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
   const metadata = await queryCoinMetadata(tokenAddress);
+  const { name: chainName, axelarChainId, axelarChainName } = suiChainConfig;
 
   if (!metadata) {
     throw new TRPCError({
@@ -44,9 +49,9 @@ async function getSuiTokenDetails(tokenAddress: string, chainId: number) {
     owner: undefined,
     pendingOwner: null,
     chainId: chainId,
-    chainName: "Sui",
-    axelarChainId: "sui",
-    axelarChainName: "sui",
+    chainName,
+    axelarChainId,
+    axelarChainName,
   };
 }
 
@@ -55,6 +60,11 @@ export const getStellarTokenDetails = async (
   ctx: Context
 ) => {
   const chainConfig = await getStellarChainConfig(ctx);
+  const {
+    name: chainName,
+    axelarChainId,
+    axelarChainName,
+  } = stellarChainConfig;
   let name: string;
   let symbol: string;
 
@@ -74,9 +84,9 @@ export const getStellarTokenDetails = async (
     symbol,
     decimals: 7,
     chainId: chainConfig.id,
-    chainName: chainConfig.displayName,
-    axelarChainId: chainConfig.id,
-    axelarChainName: "stellar",
+    chainName,
+    axelarChainId,
+    axelarChainName,
     tokenAddress,
   };
 };

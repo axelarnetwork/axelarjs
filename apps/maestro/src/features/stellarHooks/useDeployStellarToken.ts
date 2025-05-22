@@ -7,6 +7,7 @@ import { stellarChainConfig } from "~/config/chains";
 import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import { trpc } from "~/lib/trpc";
+import { useRegisterRemoteInterchainTokenOnStellar } from "../RegisterRemoteTokens/hooks/useRegisterRemoteInterchainTokenOnStellar";
 import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
 
 interface StellarWalletsKit extends BaseStellarWalletsKit {
@@ -50,8 +51,9 @@ export function useDeployStellarToken() {
   const { mutateAsync: getDeployTokenTxBytes } =
     trpc.stellar.getDeployTokenTxBytes.useMutation();
 
-  const { mutateAsync: getDeployRemoteTokensTxBytes } =
-    trpc.stellar.getDeployRemoteTokensTxBytes.useMutation();
+  const {
+    registerRemoteInterchainToken: registerRemoteInterchainTokenOnStellar,
+  } = useRegisterRemoteInterchainTokenOnStellar();
 
   const deployStellarToken = async ({
     kit,
@@ -104,9 +106,7 @@ export function useDeployStellarToken() {
 
       // 3. Submit the transaction
       const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
-      const server = new rpc.Server(rpcUrl, {
-        allowHttp: rpcUrl.startsWith("http://"),
-      });
+      const server = new rpc.Server(rpcUrl);
 
       const tx = new Transaction(
         signedTxXdr,
@@ -342,91 +342,18 @@ export function useDeployStellarToken() {
       let remoteDeployResult;
       if (destinationChainIds.length > 0) {
         onStatusUpdate?.({ type: "pending_approval", step: 2, totalSteps: 2 });
-
-        try {
-          // Get transaction bytes for remote deployment
-          const { transactionXDR: remoteTxXDR } =
-            await getDeployRemoteTokensTxBytes({
-              caller: publicKey,
-              salt,
-              destinationChainIds,
-              gasValues: gasValues.map((v) => v.toString()),
-              minterAddress: minterAddress || publicKey,
-            });
-
-          // Sign the transaction
-          const { signedTxXdr: signedRemoteTxXdr } = await kit.signTransaction(
-            remoteTxXDR,
-            {
-              networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
-            }
-          );
-
-          // Submit the transaction
-          const remoteTx = new Transaction(
-            signedRemoteTxXdr,
-            NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE
-          );
-
-          // Get the transaction hash before sending it (will be used as GMP ID)
-          const txHash = remoteTx.hash().toString("hex");
-
-          onStatusUpdate?.({
-            type: "deploying",
-            txHash: txHash,
-          });
-
-          // Submitting multicall transaction
-
-          const remoteResponse = await server.sendTransaction(remoteTx);
-          // Remote transaction submitted
-
-          // Check if the transaction was accepted for processing
-          if (
-            remoteResponse.status === "ERROR" ||
-            remoteResponse.status === "DUPLICATE" ||
-            remoteResponse.status === "TRY_AGAIN_LATER"
-          ) {
-            const errorMessage = `Stellar remote deployment failed with status: ${remoteResponse.status}. Error: ${JSON.stringify(remoteResponse.errorResult)}`;
-            // Error in remote transaction submission
-            throw new Error(errorMessage);
-          }
-
-          // Poll to check the transaction status using the polling hook
-          // Transaction pending, starting polling
-
-          const pollingResult = await pollTransaction(server, txHash, {
-            onStatusUpdate: (status) => {
-              if (status.type === "polling") {
-                onStatusUpdate?.({
-                  type: "deploying",
-                  txHash: txHash,
-                });
-              }
-            },
-          });
-
-          if (pollingResult.status === "SUCCESS") {
-            remoteDeployResult = {
-              hash: txHash,
-              status: "SUCCESS",
-            };
-          } else {
-            throw pollingResult.error;
-          }
-        } catch (error) {
-          // Remote deployment error
-          onStatusUpdate?.({ type: "idle" });
-          throw error;
-        }
+        remoteDeployResult = await registerRemoteInterchainTokenOnStellar({
+          salt,
+          destinationChainIds,
+          gasValues,
+          onStatusUpdate,
+        });
       }
 
       // 7. Return the complete result
       // If there's a remote deployment, use the remote transaction hash as the main hash
       const result: DeployTokenResultStellar = {
-        hash: remoteDeployResult
-          ? remoteDeployResult.hash
-          : initialResponse.hash,
+        hash: remoteDeployResult ? remoteDeployResult : initialResponse.hash,
         status: "SUCCESS",
         tokenId,
         tokenAddress,
