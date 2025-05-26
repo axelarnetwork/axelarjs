@@ -83,7 +83,7 @@ export function useSendStellarToken() {
 
         // Sign the transaction
         const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
-          networkPassphrase: STELLAR_NETWORK_PASSPHRASE || "",
+          networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
         });
 
         // Submit the transaction
@@ -91,10 +91,7 @@ export function useSendStellarToken() {
           allowHttp: STELLAR_RPC_URL.startsWith("http://"),
         });
 
-        const tx = new Transaction(
-          signedTxXdr,
-          STELLAR_NETWORK_PASSPHRASE || ""
-        );
+        const tx = new Transaction(signedTxXdr, STELLAR_NETWORK_PASSPHRASE);
 
         const initialResponse = await server.sendTransaction(tx);
 
