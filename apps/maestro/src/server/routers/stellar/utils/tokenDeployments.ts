@@ -1,12 +1,7 @@
-import {
-  Address,
-  nativeToScVal,
-  xdr,
-} from "@stellar/stellar-sdk";
+import { Address, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
-import { STELLAR_ITS_CONTRACT_ID } from "./config";
+import { STELLAR_ITS_CONTRACT_ID, STELLAR_NETWORK_PASSPHRASE } from "./config";
 import {
   createContractTransaction,
   fetchStellarAccount,
@@ -55,8 +50,9 @@ export async function buildDeployInterchainTokenTransaction({
 }): Promise<{ transactionXDR: string }> {
   const actualMinterAddress = minterAddress || caller;
   const actualRpcUrl = rpcUrl || stellarChainConfig.rpcUrls.default.http[0];
-  const actualNetworkPassphrase = networkPassphrase || NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE;
-  
+  const actualNetworkPassphrase =
+    networkPassphrase || STELLAR_NETWORK_PASSPHRASE;
+
   const account = await fetchStellarAccount(caller);
 
   const args: xdr.ScVal[] = [
@@ -76,5 +72,3 @@ export async function buildDeployInterchainTokenTransaction({
     networkPassphrase: actualNetworkPassphrase,
   });
 }
-
-

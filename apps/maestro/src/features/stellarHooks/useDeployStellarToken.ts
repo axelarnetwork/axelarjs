@@ -4,9 +4,9 @@ import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 import { rpc, scValToNative, Transaction, xdr } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import { trpc } from "~/lib/trpc";
+import { STELLAR_NETWORK_PASSPHRASE } from "~/server/routers/stellar/utils/config";
 import { useRegisterRemoteInterchainTokenOnStellar } from "../RegisterRemoteTokens/hooks/useRegisterRemoteInterchainTokenOnStellar";
 import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
 
@@ -93,17 +93,14 @@ export function useDeployStellarToken() {
 
       // 2. Sign the transaction
       const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
-        networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+        networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
       });
 
       // 3. Submit the transaction
       const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
       const server = new rpc.Server(rpcUrl);
 
-      const tx = new Transaction(
-        signedTxXdr,
-        NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE
-      );
+      const tx = new Transaction(signedTxXdr, STELLAR_NETWORK_PASSPHRASE);
 
       const initialResponse = await server.sendTransaction(tx);
 
