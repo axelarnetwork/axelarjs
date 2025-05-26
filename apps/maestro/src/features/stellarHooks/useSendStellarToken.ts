@@ -1,12 +1,15 @@
-import { useMutation } from '@tanstack/react-query';
-import { rpc, Transaction } from '@stellar/stellar-sdk';
+import { rpc, Transaction } from "@stellar/stellar-sdk";
+import { useMutation } from "@tanstack/react-query";
 
-import { useStellarKit } from '~/lib/providers/StellarWalletKitProvider';
-import { useStellarTransactionPoller } from './useStellarTransactionPoller';
-import { trpc } from '~/lib/trpc';
-import { STELLAR_RPC_URL } from '~/server/routers/stellar/utils/config';
-import { useTransactionState } from '~/lib/hooks/useTransactionState';
-import { useChainId } from '~/lib/hooks';
+import { useChainId } from "~/lib/hooks";
+import { useTransactionState } from "~/lib/hooks/useTransactionState";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
+import { trpc } from "~/lib/trpc";
+import {
+  STELLAR_NETWORK_PASSPHRASE,
+  STELLAR_RPC_URL,
+} from "~/server/routers/stellar/utils/config";
+import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
 
 export interface SendStellarTokenParams {
   tokenId: string;
@@ -35,11 +38,12 @@ export function useSendStellarToken() {
   const chainId = useChainId();
 
   // Get the transaction bytes from the backend
-  const { mutateAsync: getSendTokenTxBytes } = trpc.stellar.getSendTokenTxBytes.useMutation({
-    onError(error) {
-      console.log('Error in getSendTokenTxBytes:', error);
-    },
-  });
+  const { mutateAsync: getSendTokenTxBytes } =
+    trpc.stellar.getSendTokenTxBytes.useMutation({
+      onError(error) {
+        console.log("Error in getSendTokenTxBytes:", error);
+      },
+    });
 
   /**
    * Send a Stellar token to another chain
@@ -49,13 +53,21 @@ export function useSendStellarToken() {
     Error,
     SendStellarTokenParams & { caller: string } & SendStellarTokenOptions
   >({
-    mutationFn: async ({ caller, tokenId, destinationChain, destinationAddress, amount, gasValue, onStatusUpdate }) => {
+    mutationFn: async ({
+      caller,
+      tokenId,
+      destinationChain,
+      destinationAddress,
+      amount,
+      gasValue,
+      onStatusUpdate,
+    }) => {
       if (!kit) {
-        throw new Error('Stellar wallet kit is not available');
+        throw new Error("Stellar wallet kit is not available");
       }
 
       setTxState({
-        status: 'awaiting_approval',
+        status: "awaiting_approval",
       });
 
       try {
@@ -71,73 +83,79 @@ export function useSendStellarToken() {
 
         // Sign the transaction
         const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
-          networkPassphrase: process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE || '',
+          networkPassphrase: STELLAR_NETWORK_PASSPHRASE || "",
         });
 
         // Submit the transaction
         const server = new rpc.Server(STELLAR_RPC_URL, {
-          allowHttp: STELLAR_RPC_URL.startsWith('http://'),
+          allowHttp: STELLAR_RPC_URL.startsWith("http://"),
         });
-        
+
         const tx = new Transaction(
           signedTxXdr,
-          process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE || ''
+          STELLAR_NETWORK_PASSPHRASE || ""
         );
-        
+
         const initialResponse = await server.sendTransaction(tx);
-        
-        if (initialResponse.status === 'PENDING' && initialResponse.hash) {
+
+        if (initialResponse.status === "PENDING" && initialResponse.hash) {
           const txHash = initialResponse.hash;
-          
+
           setTxState({
-            status: 'submitted',
+            status: "submitted",
             hash: txHash,
             chainId,
           });
-          
+
           // Start polling for the transaction status
           const result = await pollTransaction(server, txHash, {
             onStatusUpdate: (status) => {
               // Forward status updates to the caller
               onStatusUpdate?.(status);
-              
+
               // Update the transaction state based on polling status
-              if (status.type === 'polling' && status.txHash) {
-                console.log(`Polling attempt ${status.attempt}/${status.totalAttempts} for ${status.txHash}`);
+              if (status.type === "polling" && status.txHash) {
+                console.log(
+                  `Polling attempt ${status.attempt}/${status.totalAttempts} for ${status.txHash}`
+                );
               }
             },
           });
-          
-          if (result.status === 'SUCCESS') {
+
+          if (result.status === "SUCCESS") {
             setTxState({
-              status: 'confirmed',
+              status: "confirmed",
               hash: txHash,
             });
             return { hash: txHash };
-          } else if (result.status === 'FAILED') {
-            const error = result.error || new Error('Transaction failed');
+          } else if (result.status === "FAILED") {
+            const error = result.error || new Error("Transaction failed");
             setTxState({
-              status: 'reverted',
+              status: "reverted",
               error,
             });
             throw error;
           } else {
             setTxState({
-              status: 'reverted',
-              error: new Error('Transaction timed out'),
+              status: "reverted",
+              error: new Error("Transaction timed out"),
             });
-            throw new Error('Transaction timed out');
+            throw new Error("Transaction timed out");
           }
         } else {
           setTxState({
-            status: 'reverted',
-            error: new Error(`Transaction submission failed with status: ${initialResponse.status}`),
+            status: "reverted",
+            error: new Error(
+              `Transaction submission failed with status: ${initialResponse.status}`
+            ),
           });
-          throw new Error(`Transaction submission failed with status: ${initialResponse.status}`);
+          throw new Error(
+            `Transaction submission failed with status: ${initialResponse.status}`
+          );
         }
       } catch (error) {
         setTxState({
-          status: 'reverted',
+          status: "reverted",
           error: error instanceof Error ? error : new Error(String(error)),
         });
         throw error;
@@ -149,7 +167,7 @@ export function useSendStellarToken() {
     sendToken,
     txState,
     reset: () => {
-      setTxState({ status: 'idle' });
+      setTxState({ status: "idle" });
       sendToken.reset();
     },
   };

@@ -1,12 +1,12 @@
 import { rpc, Transaction } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import { useStellarTransactionPoller } from "~/features/stellarHooks/useStellarTransactionPoller";
 import { useAccount } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
+import { STELLAR_NETWORK_PASSPHRASE } from "~/server/routers/stellar/utils/config";
 
 export type RegisterRemoteInterchainTokenOnStellarInput = {
   salt: string;
@@ -48,14 +48,14 @@ export const useRegisterRemoteInterchainTokenOnStellar = () => {
       const { signedTxXdr: signedRemoteTxXdr } = await kit.signTransaction(
         remoteTxXDR,
         {
-          networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+          networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
         }
       );
 
       // Submit the transaction
       const remoteTx = new Transaction(
         signedRemoteTxXdr,
-        NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE
+        STELLAR_NETWORK_PASSPHRASE
       );
 
       // Get the transaction hash before sending it (will be used as GMP ID)

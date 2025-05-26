@@ -4,13 +4,13 @@ import { scValToNative } from "stellar-sdk";
 import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import type { StellarTokenContractClient } from "~/lib/clients/stellarClient";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { isValidStellarTokenAddress } from "~/lib/utils/validation";
 import { getStellarChainConfig } from "~/server/routers/stellar/utils";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
+import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
@@ -100,7 +100,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       const rpcUrl = chainConfig.config.rpc[0];
       const ITSStellarContractClient = (await Client.from({
         contractId: input.tokenAddress,
-        networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+        networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
         rpcUrl: rpcUrl,
       })) as unknown as StellarTokenContractClient;
 

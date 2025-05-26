@@ -6,7 +6,6 @@ import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
 import type { ExtendedWagmiChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
 import { suiClient } from "~/lib/clients/suiClient";
 import { InterchainToken, RemoteInterchainToken } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
@@ -14,6 +13,7 @@ import { hexLiteral } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 import { formatTokenId, getStellarChainConfig } from "../stellar/utils";
+import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import {
   getCoinAddressFromType,
   getSuiEventsByTxHash,
@@ -480,7 +480,7 @@ export async function getStellarTokenRegistrationDetails(
     // Create a network-configured Stellar contract client
     const ITSStellarContractClient = (await Client.from({
       contractId: chainConfig.config.contracts.InterchainTokenService.address,
-      networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+      networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
       rpcUrl: rpcUrl,
     })) as unknown as StellarITSContractClient;
 
@@ -498,7 +498,7 @@ export async function getStellarTokenRegistrationDetails(
     // Check if the token contract exists
     const tokenStellarContractClient = (await Client.from({
       contractId: tokenAddress,
-      networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
+      networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
       rpcUrl: rpcUrl,
     }).catch(() => null)) as unknown as StellarITSContractClient;
 
