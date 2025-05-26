@@ -13,4 +13,3 @@ Publishable npm packages
 | 🔧 [utils](/packages/utils)                               | framework-agnostic utilities and helper functions                                |
 | 🏦 [deposit-address](/packages/deposit-address)           | generate deposit addresses to transfer funds from and to axelar-supported chains |
 | 🛟 [transaction-recovery](/packages/transaction-recovery) | recover GMP transactions, transfers, add gas & more                              |
-
