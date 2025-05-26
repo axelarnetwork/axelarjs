@@ -19,6 +19,7 @@ import {
   SOROBAN_RPC_URL as sorobanRpcUrl,
   STELLAR_HORIZON_URL,
   STELLAR_NETWORK_PASSPHRASE,
+  STELLAR_SOURCE_ACCOUNT,
   STELLAR_ITS_CONTRACT_ID as stellarITContractId,
 } from "./config";
 
@@ -127,12 +128,8 @@ export async function getStellarContractMetadata(
   contractId: string,
   rpcUrl: string
 ) {
-  // Any Stellar account can be used as a source account
-  const sourceAccount =
-    "GDJEBNB5KVJ3CJE2WNQFJFEO75IT3CUAUOWRVGATXQDBZ7DMCU3MHNWO";
-
   const rpcServer = new rpc.Server(rpcUrl);
-  const account = await rpcServer.getAccount(sourceAccount);
+  const account = await rpcServer.getAccount(STELLAR_SOURCE_ACCOUNT);
   const contract = new Contract(contractId);
 
   // Try to fetch standard metadata
