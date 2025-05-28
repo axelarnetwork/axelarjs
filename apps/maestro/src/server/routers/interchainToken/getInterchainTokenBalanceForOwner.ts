@@ -58,9 +58,6 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         coinType: input.tokenAddress,
       });
 
-      // Get the coin metadata
-      const metadata = await queryCoinMetadata(input.tokenAddress);
-
       const InterchainTokenServiceV0 =
         chainConfig.config.contracts?.InterchainTokenService.objects
           .InterchainTokenServicev0;
@@ -75,7 +72,14 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         InterchainTokenServiceV0
       );
 
-      const decimals = metadata?.decimals ?? coinInfo?.decimals;
+      let decimals = coinInfo?.decimals;
+      // Get the coin metadata
+
+      await queryCoinMetadata(input.tokenAddress)
+        .then((metadata) => (decimals = metadata?.decimals))
+        .catch((e) => {
+          console.log("error in queryCoinMetadata", e);
+        });
 
       const isOperator = input.owner === coinInfo?.operator;
       const isDistributor = input.owner === coinInfo?.distributor;
@@ -91,6 +95,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         hasOperatorRole: isOperator,
         hasFlowLimiterRole: isOperator,
       };
+
       return result;
     }
 
