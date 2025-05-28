@@ -68,13 +68,11 @@ export function useInterchainTransferMutation(
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
     mutationFn: async ({ amount, tokenId, destinationAddress, decimals }) => {
-      if (
-        !(decimals && address && config.gas && tokenId && destinationAddress)
-      ) {
+      if (!(address && config.gas && tokenId && destinationAddress)) {
         return;
       }
 
-      const bnAmount = parseUnits(amount, decimals);
+      const bnAmount = parseUnits(amount, decimals || 0);
       try {
         setTxState({
           status: "awaiting_approval",
