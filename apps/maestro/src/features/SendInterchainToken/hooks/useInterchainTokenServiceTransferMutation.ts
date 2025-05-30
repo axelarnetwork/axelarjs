@@ -127,6 +127,7 @@ export function useInterchainTokenServiceTransferMutation(
     address,
     chainId,
     config.destinationChainName,
+    config.destinationAddress,
     config.gas,
     config.tokenId,
     interchainTransferAsync,
