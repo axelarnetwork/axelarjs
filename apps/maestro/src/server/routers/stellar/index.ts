@@ -1,9 +1,10 @@
 import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
+import { buildRegisterCanonicalTokenTransaction } from "./utils/canonicalTokenRegistration";
+import { buildInterchainTransferTransaction } from "./utils/interchainTransfer";
 import { buildDeployRemoteInterchainTokensTransaction } from "./utils/remoteTokenDeployments";
 import { buildDeployInterchainTokenTransaction } from "./utils/tokenDeployments";
-import { buildInterchainTransferTransaction } from "./utils/interchainTransfer";
 
 export const stellarRouter = router({
   // Endpoint to get transaction bytes for deploying a token on Stellar
@@ -90,6 +91,36 @@ export const stellarRouter = router({
         destinationAddress: input.destinationAddress,
         amount: input.amount,
         gasValue: input.gasValue,
+      });
+
+      return {
+        transactionXDR,
+      };
+    }),
+
+  // Endpoint to get transaction bytes for registering a canonical token on Stellar
+  getRegisterCanonicalTokenTxBytes: publicProcedure
+    .input(
+      z.object({
+        caller: z.string(), // Caller address
+        tokenAddress: z.string(), // Token address to register
+        destinationChainIds: z.array(z.string()),
+        gasValues: z.array(z.string()), // Array of bigint as strings
+        multicallContractAddress: z.string().optional(),
+        gasTokenAddress: z.string().optional(),
+        itsContractAddress: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Use the utility function to build the canonical token registration transaction
+      const { transactionXDR } = await buildRegisterCanonicalTokenTransaction({
+        caller: input.caller,
+        tokenAddress: input.tokenAddress,
+        destinationChainIds: input.destinationChainIds,
+        gasValues: input.gasValues,
+        multicallContractAddress: input.multicallContractAddress,
+        gasTokenAddress: input.gasTokenAddress,
+        itsContractAddress: input.itsContractAddress,
       });
 
       return {

@@ -7,6 +7,7 @@ import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
 import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
+import { useRegisterCanonicalTokenOnStellar } from "~/features/stellarHooks";
 import {
   useReadInterchainTokenFactoryCanonicalInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
@@ -16,7 +17,7 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import { SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
@@ -47,6 +48,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const { combinedComputed } = useAllChainConfigsQuery();
   const { registerCanonicalToken } = useRegisterCanonicalToken();
+  const { registerCanonicalToken: registerCanonicalTokenOnStellar } = useRegisterCanonicalTokenOnStellar();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -254,6 +256,43 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         });
         return result;
       }
+    }
+
+    // Handle Stellar canonical token registration
+    if (chainId === STELLAR_CHAIN_ID && input) {
+      const gasValues = input.remoteDeploymentGasFees;
+      const result = await registerCanonicalTokenOnStellar({
+        tokenAddress: input.tokenAddress,
+        destinationChains: input.destinationChainIds,
+        gasValues,
+        onStatusUpdate: (status) => {
+          // Handle status updates with proper type casting
+          if (config.onStatusUpdate) {
+            config.onStatusUpdate(status as any);
+          }
+        },
+      });
+      
+      if (result?.hash) {
+        // For Stellar, we use the hash as the deploymentMessageId
+        const deploymentMessageId = result.deploymentMessageId || `${result.hash}-0`;
+        
+        setRecordDeploymentArgs({
+          kind: "canonical",
+          deploymentMessageId,
+          tokenId: "", // Will be determined by the backend
+          deployerAddress,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          tokenDecimals: input.decimals,
+          tokenManagerType: result.tokenManagerType,
+          axelarChainId: input.sourceChainId,
+          destinationAxelarChainIds: input.destinationChainIds,
+          tokenAddress: input.tokenAddress,
+          tokenManagerAddress: result.tokenManagerAddress,
+        });
+        return result;
+      }
     } else {
       invariant(
         data?.request !== undefined,
@@ -269,6 +308,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     deployerAddress,
     input,
     registerCanonicalToken,
+    registerCanonicalTokenOnStellar,
+    config,
   ]);
 
   const write = useCallback(() => {

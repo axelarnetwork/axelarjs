@@ -124,6 +124,7 @@ export async function createContractTransaction({
   let preparedTransaction;
   try {
     preparedTransaction = await server.prepareTransaction(builtTransaction);
+    console.log({ preparedTransaction });
   } catch (error) {
     console.error("Error preparing transaction:", error);
     throw error;
@@ -136,4 +137,75 @@ export async function createContractTransaction({
     transactionXDR,
     preparedTransaction,
   };
+}
+
+export async function simulateCall({
+  contractAddress,
+  method,
+  account,
+  args,
+  rpcUrl = STELLAR_RPC_URL,
+  networkPassphrase = STELLAR_NETWORK_PASSPHRASE,
+}: {
+  contractAddress: string;
+  method: string;
+  account: Account;
+  args: xdr.ScVal[];
+  rpcUrl?: string;
+  networkPassphrase?: string;
+}): Promise<{
+  simulateResult: any;
+}> {
+  // Create a Contract instance
+  const contract = new Contract(contractAddress);
+
+  // Create RPC server instance for preparing the transaction
+  const server = new rpc.Server(rpcUrl, {
+    allowHttp: rpcUrl.includes("localhost") || rpcUrl.includes("127.0.0.1"),
+  });
+
+  // Create the operation using the contract.call method
+  const operation = contract.call(method, ...args);
+
+  // Build the transaction
+  const builtTransaction = new TransactionBuilder(account, {
+    fee: BASE_FEE,
+    networkPassphrase,
+  })
+    .addOperation(operation)
+    .setTimeout(0)
+    .build();
+
+  // Get the XDR before preparing
+  // const xdrBeforePrepare = builtTransaction.toEnvelope().toXDR("base64");
+
+  // Prepare the transaction (simulate and discover storage footprint)
+  let simulateResult: any;
+  try {
+    simulateResult = await server.simulateTransaction(builtTransaction);
+    simulateResult = simulateResult.result.retval;
+  } catch (error) {
+    console.error("Error simulating transaction:", error);
+    throw error;
+  }
+
+  return {
+    simulateResult,
+  };
+}
+
+export async function checkIfTokenContractExists(contractAddress: string) {
+  const server = new rpc.Server(STELLAR_RPC_URL);
+  try {
+    console.log("Checking if contract exists", contractAddress);
+
+    await server.getContractData(
+      contractAddress,
+      xdr.ScVal.scvLedgerKeyContractInstance()
+    );
+    return true;
+  } catch (e) {
+    console.log("Error checking if contract exists", e);
+    return false;
+  }
 }

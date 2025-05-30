@@ -7,7 +7,6 @@ import Link from "next/link";
 import { TransactionExecutionError } from "viem";
 
 import {
-  STELLAR_CHAIN_ID,
   useAccount,
   useChainFromRoute,
   useSwitchChain,
@@ -43,7 +42,7 @@ const CanonicalTokenDeployment: FC = () => {
     axelarChainId: routeChain?.axelarChainId,
   });
   const { switchChain } = useSwitchChain();
-  const isStellarChain = routeChain?.id === STELLAR_CHAIN_ID;
+  // Agora suportamos registro de tokens canônicos em Stellar
 
   const handleSwitchChain = useCallback(() => {
     try {
@@ -119,7 +118,6 @@ const CanonicalTokenDeployment: FC = () => {
   return (
     <MultiStepDialog
       triggerLabel="Register interchain token"
-      disabled={isStellarChain}
       steps={["Token details", "Register & Deploy", "Review"]}
       step={state.step}
       showBackButton={showBackButton}
