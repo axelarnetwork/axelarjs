@@ -3,17 +3,13 @@ import { useState } from "react";
 import { rpc, Transaction } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
-import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment";
+import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import { useStellarTransactionPoller } from "~/features/stellarHooks/useStellarTransactionPoller";
-import { useAccount } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { STELLAR_NETWORK_PASSPHRASE } from "~/server/routers/stellar/utils/config";
 
-/**
- * Parameters for registering a canonical token on Stellar.
- */
 export type RegisterCanonicalTokenOnStellarParams = {
   tokenAddress: string;
   destinationChains: string[];
@@ -25,36 +21,24 @@ export type RegisterCanonicalTokenOnStellarResult = {
   hash: string;
   status: string;
   tokenManagerAddress: string;
-  tokenManagerType: "lock_unlock"; // Fixed as lock_unlock for canonical tokens
+  tokenManagerType: "lock_unlock";
   deploymentMessageId?: string;
 };
 
-/**
- * Hook to register a canonical token on Stellar and deploy it to remote chains via ITS.
- *
- * This hook prepares and executes a transaction that:
- * 1. Registers an existing Stellar token with the Interchain Token Service (ITS).
- * 2. Deploys the interchain token representation to the specified `destinationChains`.
- *
- * @returns An object containing:
- *  - `registerCanonicalToken`: An async function to trigger the registration process.
- *  - `isConnected`: Whether a Stellar wallet is connected.
- */
-export default function useRegisterCanonicalTokenOnStellar() {
+export function useRegisterCanonicalTokenOnStellar() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [data, setData] = useState<RegisterCanonicalTokenOnStellarResult | null>(null);
-  
+  const [data, setData] =
+    useState<RegisterCanonicalTokenOnStellarResult | null>(null);
+
   const { kit } = useStellarKit();
-  const { address: publicKey } = useAccount();
   const { actions } = useCanonicalTokenDeploymentStateContainer();
   const { pollTransaction } = useStellarTransactionPoller();
-  
+
   const { mutateAsync: getRegisterCanonicalTokenTxBytes } =
     trpc.stellar.getRegisterCanonicalTokenTxBytes.useMutation();
-  
-  const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
-  const server = new rpc.Server(rpcUrl);
+
+  // Servidor RPC Stellar será inicializado dentro da função
 
   const registerCanonicalToken = async ({
     tokenAddress,
@@ -63,25 +47,31 @@ export default function useRegisterCanonicalTokenOnStellar() {
     onStatusUpdate,
   }: RegisterCanonicalTokenOnStellarParams): Promise<RegisterCanonicalTokenOnStellarResult> => {
     if (!kit) {
-      throw new Error("Wallet not connected");
+      throw new Error("StellarWalletsKit not provided");
     }
-    
-    if (!publicKey) {
+
+    let publicKey: string;
+    try {
+      publicKey = (await kit.getAddress()).address;
+      if (!publicKey) {
+        throw new Error("Stellar wallet not connected");
+      }
+    } catch (error) {
       throw new Error("Failed to get Stellar wallet public key");
     }
 
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Set initial state before starting
       actions.setTxState({ type: "pending_approval" });
-      onStatusUpdate?.({ 
+      onStatusUpdate?.({
         type: "pending_approval",
         step: 1,
         totalSteps: destinationChains.length > 0 ? 2 : 1,
       });
-      
+
       // Get transaction bytes for canonical token registration
       const { transactionXDR } = await getRegisterCanonicalTokenTxBytes({
         caller: publicKey,
@@ -89,70 +79,83 @@ export default function useRegisterCanonicalTokenOnStellar() {
         destinationChainIds: destinationChains,
         gasValues: gasValues.map((v) => v.toString()),
       });
-      
+
       // Sign the transaction
       const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
         networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
       });
-      
+
       // Submit the transaction
+      const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
+      const server = new rpc.Server(rpcUrl);
       const tx = new Transaction(signedTxXdr, STELLAR_NETWORK_PASSPHRASE);
-      
+
       // Get the transaction hash before sending it (will be used as GMP ID)
       const txHash = tx.hash().toString("hex");
-      
+
+      // Update status to deploying before sending transaction
       onStatusUpdate?.({
         type: "deploying",
         txHash: txHash,
       });
-      
-      const response = await server.sendTransaction(tx);
-      
+
+      const initialResponse = await server.sendTransaction(tx);
+
       // Check if the transaction was accepted for processing
       if (
-        response.status === "ERROR" ||
-        response.status === "DUPLICATE" ||
-        response.status === "TRY_AGAIN_LATER"
+        initialResponse.status === "ERROR" ||
+        initialResponse.status === "DUPLICATE" ||
+        initialResponse.status === "TRY_AGAIN_LATER"
       ) {
-        const errorMessage = `Stellar canonical token registration failed with status: ${response.status}. Error: ${JSON.stringify(response.errorResult)}`;
+        const errorMessage = `Stellar canonical token registration failed with status: ${initialResponse.status}. Error: ${JSON.stringify(initialResponse.errorResult)}`;
         throw new Error(errorMessage);
       }
-      
+
+      if (initialResponse.status === "PENDING") {
+        onStatusUpdate?.({
+          type: "deploying",
+          txHash: initialResponse.hash,
+        });
+      }
+
       // Poll to check the transaction status
-      const pollingResult = await pollTransaction(server, txHash, {
-        onStatusUpdate: (status) => {
-          if (status.type === "polling") {
-            onStatusUpdate?.({
-              type: "deploying",
-              txHash: txHash,
-            });
-          }
-        },
-      });
-      
+      const pollingResult = await pollTransaction(
+        server,
+        initialResponse.hash,
+        {
+          onStatusUpdate: (status) => {
+            if (status.type === "polling") {
+              onStatusUpdate?.({
+                type: "deploying",
+                txHash: initialResponse.hash,
+              });
+            }
+          },
+        }
+      );
+
       if (pollingResult.status !== "SUCCESS") {
         throw pollingResult.error;
       }
-      
+
       // Transaction was successful
       const result: RegisterCanonicalTokenOnStellarResult = {
-        hash: txHash,
+        hash: initialResponse.hash,
         status: "SUCCESS",
-        tokenManagerAddress: tokenAddress, // Using tokenAddress as tokenManagerAddress
-        tokenManagerType: "lock_unlock", // Default type for canonical tokens
-        deploymentMessageId: destinationChains.length > 0 ? `${txHash}-0` : undefined,
+        tokenManagerAddress: tokenAddress,
+        tokenManagerType: "lock_unlock",
+        deploymentMessageId:
+          destinationChains.length > 0 ? `${initialResponse.hash}` : undefined,
       };
-      
+
       setData(result);
       return result;
-    } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error));
-      setError(err);
-      actions.setTxState({
-        type: "idle",
-      });
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      setError(error);
+      actions.setTxState({ type: "idle" });
       onStatusUpdate?.({ type: "idle" });
-      throw err;
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -160,9 +163,10 @@ export default function useRegisterCanonicalTokenOnStellar() {
 
   return {
     registerCanonicalToken,
-    isConnected: !!kit && !!publicKey,
     isLoading,
     error,
     data,
   };
 }
+
+export default useRegisterCanonicalTokenOnStellar;
