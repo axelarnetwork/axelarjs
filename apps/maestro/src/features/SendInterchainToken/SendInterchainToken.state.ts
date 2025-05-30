@@ -140,6 +140,7 @@ export function useSendInterchainTokenState(props: {
     tokenId: props.tokenId,
     destinationChainName: selectedToChain?.id,
     sourceChainName: props.sourceChain.id,
+    destinationAddress: props.destinationAddress,
     gas,
   });
 

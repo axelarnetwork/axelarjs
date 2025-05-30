@@ -25,6 +25,7 @@ export type UseSendInterchainTokenConfig = {
   tokenId: `0x${string}`;
   sourceChainName: string;
   destinationChainName: string;
+  destinationAddress?: string;
   gas?: bigint;
 };
 
@@ -70,7 +71,7 @@ export function useInterchainTokenServiceTransferMutation(
   const approvedAmountRef = useRef(0n);
 
   const handleInterchainTransfer = useCallback(
-    async (destinationAddress: string) => {
+    async (destinationAddress?: string) => {
       try {
         setTxState({
           status: "awaiting_approval",
@@ -139,7 +140,7 @@ export function useInterchainTokenServiceTransferMutation(
   useEffect(
     () => {
       if (approveERC20Recepit && !interchainTransferTxHash) {
-        handleInterchainTransfer().catch((error) => {
+        handleInterchainTransfer(config.destinationAddress).catch((error) => {
           logger.error("Failed to send token:", error);
         });
       }
