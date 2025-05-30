@@ -8,7 +8,6 @@ import {
   XLM_ASSET_ADDRESS,
 } from "./config";
 import {
-  checkIfContractExists,
   checkIfTokenContractExists,
   createContractTransaction,
   fetchStellarAccount,
@@ -51,7 +50,7 @@ export async function buildRegisterCanonicalTokenTransaction({
     );
   }
 
-  const account = await fetchStellarAccount(caller);
+  let account = await fetchStellarAccount(caller);
 
   // Get tokenId
   let tokenId = "";
@@ -62,7 +61,6 @@ export async function buildRegisterCanonicalTokenTransaction({
       account,
       args: [_addressToScVal(tokenAddress)],
     });
-
     // Convert the bytes to a hex string
     if (simulateResult._arm === "bytes" && simulateResult._value) {
       const buffer = simulateResult._value as Buffer;
@@ -104,8 +102,13 @@ export async function buildRegisterCanonicalTokenTransaction({
   // Build arguments for the multicall
   const callArgs: xdr.ScVal[] = [];
 
+  if (isTokenRegistered) {
+    throw new Error("Token is already registered");
+  }
+
   // First call: register_canonical_token (only if not already registered)
   if (!isTokenRegistered) {
+    console.log("added register canonical token to multicall");
     const registerCanonicalArgs: xdr.ScVal[] = [_addressToScVal(tokenAddress)];
 
     const registerCallArgsVec = xdr.ScVal.scvVec(registerCanonicalArgs);
@@ -132,82 +135,66 @@ export async function buildRegisterCanonicalTokenTransaction({
     callArgs.push(xdr.ScVal.scvMap(registerCallArgsMapEntries));
   }
 
-  // If we have remote deployments, we need to use multicall
-  if (destinationChainIds.length > 0) {
-    // Add deploy_remote_interchain_token calls for each destination chain
-    for (let i = 0; i < destinationChainIds.length; i++) {
-      const destinationChainId = destinationChainIds[i];
-      const gasValue = gasValues[i];
+  // Add deploy_remote_interchain_token calls for each destination chain
+  for (let i = 0; i < destinationChainIds.length; i++) {
+    const destinationChainId = destinationChainIds[i];
+    const gasValue = gasValues[i];
 
-      // Build the gas payment for this destination
-      const gasPaymentScVal = _buildGasPaymentMapScVal(
-        gasTokenAddress,
-        gasValue
-      );
+    // Build the gas payment for this destination
+    const gasPaymentScVal = _buildGasPaymentMapScVal(gasTokenAddress, gasValue);
 
-      // Add arguments for deploy_remote_interchain_token in the correct order
-      const deployRemoteArgs: xdr.ScVal[] = [
-        _addressToScVal(caller),
-        hexToScVal(`0x${tokenId}`), // Usar tokenId como bytes com o formato correto
-        _stringToScVal(destinationChainId),
-        gasPaymentScVal,
-      ];
+    // Add arguments for deploy_remote_canonical_token in the correct order
+    // deploy_remote_canonical_token(token_address: address, destination_chain: string, spender: address, gas_token: option<Token>)
+    const deployRemoteArgs: xdr.ScVal[] = [
+      _addressToScVal(tokenAddress), // token_address: address do token canônico
+      _stringToScVal(destinationChainId), // destination_chain: string
+      _addressToScVal(caller), // spender: address
+      gasPaymentScVal, // gas_token: option<Token>
+    ];
 
-      // Create the struct for the contract call
-      const callArgsVec = xdr.ScVal.scvVec(deployRemoteArgs);
+    // Create the struct for the contract call
+    const callArgsVec = xdr.ScVal.scvVec(deployRemoteArgs);
 
-      const callArgsMapEntries: xdr.ScMapEntry[] = [
-        new xdr.ScMapEntry({
-          key: _symbolToScVal("approver"),
-          val: _addressToScVal(caller),
-        }),
-        new xdr.ScMapEntry({
-          key: _symbolToScVal("args"),
-          val: callArgsVec,
-        }),
-        new xdr.ScMapEntry({
-          key: _symbolToScVal("contract"),
-          val: _addressToScVal(itsContractAddress),
-        }),
-        new xdr.ScMapEntry({
-          key: _symbolToScVal("function"),
-          val: _symbolToScVal("deploy_remote_canonical_token"),
-        }),
-      ];
+    const callArgsMapEntries: xdr.ScMapEntry[] = [
+      new xdr.ScMapEntry({
+        key: _symbolToScVal("approver"),
+        val: _addressToScVal(caller),
+      }),
+      new xdr.ScMapEntry({
+        key: _symbolToScVal("args"),
+        val: callArgsVec,
+      }),
+      new xdr.ScMapEntry({
+        key: _symbolToScVal("contract"),
+        val: _addressToScVal(itsContractAddress),
+      }),
+      new xdr.ScMapEntry({
+        key: _symbolToScVal("function"),
+        val: _symbolToScVal("deploy_remote_canonical_token"),
+      }),
+    ];
 
-      callArgs.push(xdr.ScVal.scvMap(callArgsMapEntries));
-    }
-
-    // If we don't have any calls to make (token already registered and no remote deployments)
-    if (callArgs.length === 0) {
-      throw new Error(
-        "Token is already registered and no remote deployments requested"
-      );
-    }
-
-    // Final arguments for the multicall
-    const multicallArgs = xdr.ScVal.scvVec(callArgs);
-
-    // Use the createContractTransaction utility function
-    return createContractTransaction({
-      contractAddress: multicallContractAddress,
-      method: "multicall",
-      account,
-      args: [multicallArgs],
-    });
-  } else {
-    // If no remote deployments, just register the canonical token (if not already registered)
-    if (isTokenRegistered) {
-      throw new Error("Token is already registered");
-    }
-
-    return createContractTransaction({
-      contractAddress: itsContractAddress,
-      method: "register_canonical_token",
-      account,
-      args: [_addressToScVal(tokenAddress)],
-    });
+    callArgs.push(xdr.ScVal.scvMap(callArgsMapEntries));
   }
+
+  // If we don't have any calls to make (token already registered and no remote deployments)
+  if (callArgs.length === 0) {
+    throw new Error(
+      "Token is already registered and no remote deployments requested"
+    );
+  }
+
+  // Final arguments for the multicall
+  const multicallArgs = xdr.ScVal.scvVec(callArgs);
+
+  account = await fetchStellarAccount(caller);
+  // Use the createContractTransaction utility function
+  return createContractTransaction({
+    contractAddress: multicallContractAddress,
+    method: "multicall",
+    account,
+    args: [multicallArgs],
+  });
 }
 
 // Helper functions for ScVal creation
