@@ -1,10 +1,11 @@
 // import { Buffer } from "buffer"; // Commented out as it's not currently used
-import { Address, nativeToScVal, xdr } from "@stellar/stellar-sdk";
+import { Address, Asset, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 
 import { hexToScVal } from ".";
 import {
   STELLAR_ITS_CONTRACT_ID,
   STELLAR_MULTICALL_CONTRACT_ID,
+  STELLAR_NETWORK_PASSPHRASE,
   XLM_ASSET_ADDRESS,
 } from "./config";
 import {
@@ -51,6 +52,23 @@ export async function buildRegisterCanonicalTokenTransaction({
   }
 
   let account = await fetchStellarAccount(caller);
+  // Build arguments for the multicall
+  const callArgs: xdr.ScVal[] = [];
+
+  let tokenContractAddress = "";
+
+  if (tokenAddress.includes("-")) {
+    const [assetCode, issuer] = tokenAddress.split("-");
+
+    const stellarAsset = new Asset(assetCode, issuer);
+    tokenContractAddress = stellarAsset.contractId(STELLAR_NETWORK_PASSPHRASE);
+  }
+
+  // check if asset have a contract
+  const exists = await checkIfTokenContractExists(tokenContractAddress);
+  if (!exists) {
+    throw new Error("Token contract does not exist");
+  }
 
   // Get tokenId
   let tokenId = "";
@@ -87,29 +105,29 @@ export async function buildRegisterCanonicalTokenTransaction({
         const contractAddress = Address.contract(
           simulateResult._value._value
         ).toString();
-        console.log("Token registrado:", contractAddress);
+        console.log("possible tokenId, checking if exists:", contractAddress);
 
         const exists = await checkIfTokenContractExists(contractAddress);
         isTokenRegistered = exists;
+        console.log("isTokenRegistered", isTokenRegistered);
       }
     } catch (error: any) {
       console.log("Error checking if token is registered:", error);
     }
   }
 
-  console.log("tokenId:", tokenId);
-
-  // Build arguments for the multicall
-  const callArgs: xdr.ScVal[] = [];
-
   if (isTokenRegistered) {
-    throw new Error("Token is already registered");
+    console.log(
+      "Token is already registered on ITS, skip to remote deployment"
+    );
   }
 
   // First call: register_canonical_token (only if not already registered)
   if (!isTokenRegistered) {
     console.log("added register canonical token to multicall");
-    const registerCanonicalArgs: xdr.ScVal[] = [_addressToScVal(tokenAddress)];
+    const registerCanonicalArgs: xdr.ScVal[] = [
+      _addressToScVal(tokenContractAddress),
+    ];
 
     const registerCallArgsVec = xdr.ScVal.scvVec(registerCanonicalArgs);
 
@@ -184,17 +202,18 @@ export async function buildRegisterCanonicalTokenTransaction({
     );
   }
 
-  // Final arguments for the multicall
-  const multicallArgs = xdr.ScVal.scvVec(callArgs);
-
+  // Atualizar a conta com os dados mais recentes
   account = await fetchStellarAccount(caller);
-  // Use the createContractTransaction utility function
-  return createContractTransaction({
+
+  // Create the transaction
+  const { transactionXDR } = await createContractTransaction({
     contractAddress: multicallContractAddress,
     method: "multicall",
     account,
-    args: [multicallArgs],
+    args: [xdr.ScVal.scvVec(callArgs)],
   });
+
+  return { transactionXDR };
 }
 
 // Helper functions for ScVal creation

@@ -4,6 +4,7 @@ import { publicProcedure, router } from "~/server/trpc";
 import { buildRegisterCanonicalTokenTransaction } from "./utils/canonicalTokenRegistration";
 import { buildInterchainTransferTransaction } from "./utils/interchainTransfer";
 import { buildDeployRemoteInterchainTokensTransaction } from "./utils/remoteTokenDeployments";
+import { createStellarAssetContractTransaction } from "./utils/stellarAssetContract";
 import { buildDeployInterchainTokenTransaction } from "./utils/tokenDeployments";
 
 export const stellarRouter = router({
@@ -125,6 +126,30 @@ export const stellarRouter = router({
 
       return {
         transactionXDR,
+      };
+    }),
+
+  // Endpoint to get transaction bytes for deploying a Stellar Asset Contract
+  getStellarAssetContractTxBytes: publicProcedure
+    .input(
+      z.object({
+        caller: z.string(), // Caller address
+        assetCode: z.string(), // Asset code (e.g., "USDC")
+        issuer: z.string(), // Asset issuer address
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Use the utility function to build the Stellar Asset Contract transaction
+      const { transactionXDR, contractId, exists } = await createStellarAssetContractTransaction({
+        caller: input.caller,
+        assetCode: input.assetCode,
+        issuer: input.issuer,
+      });
+
+      return {
+        transactionXDR,
+        contractId,
+        exists,
       };
     }),
 });

@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 import {
   Account,
+  Asset,
   BASE_FEE,
   Contract,
   nativeToScVal,
@@ -84,6 +85,7 @@ export async function createContractTransaction({
   method,
   account,
   args,
+  createStellarTokenContract,
   rpcUrl = STELLAR_RPC_URL,
   networkPassphrase = STELLAR_NETWORK_PASSPHRASE,
 }: {
@@ -91,6 +93,7 @@ export async function createContractTransaction({
   method: string;
   account: Account;
   args: xdr.ScVal[];
+  createStellarTokenContract?: Asset;
   rpcUrl?: string;
   networkPassphrase?: string;
 }): Promise<{
@@ -109,16 +112,17 @@ export async function createContractTransaction({
   const operation = contract.call(method, ...args);
 
   // Build the transaction
-  const builtTransaction = new TransactionBuilder(account, {
+  console.log({ createStellarTokenContract });
+  const txBuilder = new TransactionBuilder(account, {
     fee: BASE_FEE,
     networkPassphrase,
-  })
-    .addOperation(operation)
-    .setTimeout(0)
-    .build();
+  }).addOperation(operation);
+
+  const builtTransaction = txBuilder.setTimeout(0).build();
 
   // Get the XDR before preparing
-  // const xdrBeforePrepare = builtTransaction.toEnvelope().toXDR("base64");
+  const xdrBeforePrepare = builtTransaction.toEnvelope().toXDR("base64");
+  console.log({ xdrBeforePrepare });
 
   // Prepare the transaction (simulate and discover storage footprint)
   let preparedTransaction;
@@ -195,6 +199,21 @@ export async function simulateCall({
 }
 
 export async function checkIfTokenContractExists(contractAddress: string) {
+  const server = new rpc.Server(STELLAR_RPC_URL);
+  try {
+    console.log("Checking if contract exists", contractAddress);
+
+    await server.getContractData(
+      contractAddress,
+      xdr.ScVal.scvLedgerKeyContractInstance()
+    );
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function deployTokenSmartContract(contractAddress: string) {
   const server = new rpc.Server(STELLAR_RPC_URL);
   try {
     console.log("Checking if contract exists", contractAddress);
