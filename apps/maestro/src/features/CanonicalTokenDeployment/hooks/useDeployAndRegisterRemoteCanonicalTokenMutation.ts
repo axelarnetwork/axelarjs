@@ -6,8 +6,8 @@ import { reduce } from "rambda";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import { useRegisterStellarTokenWithContractDeployment } from "~/features/stellarHooks";
 import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
-import { useRegisterCanonicalTokenOnStellar } from "~/features/stellarHooks";
 import {
   useReadInterchainTokenFactoryCanonicalInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
@@ -17,7 +17,13 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+  useChainId,
+} from "~/lib/hooks";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
@@ -48,7 +54,9 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const { combinedComputed } = useAllChainConfigsQuery();
   const { registerCanonicalToken } = useRegisterCanonicalToken();
-  const { registerCanonicalToken: registerCanonicalTokenOnStellar } = useRegisterCanonicalTokenOnStellar();
+  const { registerTokenWithContractDeployment } =
+    useRegisterStellarTokenWithContractDeployment();
+  const { kit } = useStellarKit();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -258,40 +266,47 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       }
     }
 
-    // Handle Stellar canonical token registration
+    // Handle Stellar canonical token deployment with two-transaction flow
     if (chainId === STELLAR_CHAIN_ID && input) {
-      const gasValues = input.remoteDeploymentGasFees;
-      const result = await registerCanonicalTokenOnStellar({
+      if (!kit) {
+        throw new Error("Stellar wallet not connected");
+      }
+
+      // Use the two-transaction flow for Stellar token deployment
+      // tokenAddress can be in format tokenSymbol-Issuer or contract address
+      const result = await registerTokenWithContractDeployment({
+        kit,
         tokenAddress: input.tokenAddress,
         destinationChains: input.destinationChainIds,
-        gasValues,
+        gasValues: input.remoteDeploymentGasFees,
         onStatusUpdate: (status) => {
-          // Handle status updates with proper type casting
+          // Forward status updates to the UI
           if (config.onStatusUpdate) {
-            config.onStatusUpdate(status as any);
+            config.onStatusUpdate(status);
           }
         },
       });
-      
-      if (result?.hash) {
+
+      if (result?.tokenRegistration?.hash) {
         // For Stellar, we use the hash as the deploymentMessageId
-        const deploymentMessageId = result.deploymentMessageId || `${result.hash}-0`;
-        
+        const deploymentMessageId =
+          result.tokenRegistration.deploymentMessageId;
+
         setRecordDeploymentArgs({
           kind: "canonical",
           deploymentMessageId,
-          tokenId: "", // Will be determined by the backend
+          tokenId: result.tokenRegistration.tokenId,
           deployerAddress,
           tokenName: input.tokenName,
           tokenSymbol: input.tokenSymbol,
           tokenDecimals: input.decimals,
-          tokenManagerType: result.tokenManagerType,
+          tokenManagerType: result.tokenRegistration.tokenManagerType,
           axelarChainId: input.sourceChainId,
           destinationAxelarChainIds: input.destinationChainIds,
           tokenAddress: input.tokenAddress,
-          tokenManagerAddress: result.tokenManagerAddress,
+          tokenManagerAddress: result.tokenRegistration.tokenManagerAddress,
         });
-        return result;
+        return result.tokenRegistration;
       }
     } else {
       invariant(
@@ -308,7 +323,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     deployerAddress,
     input,
     registerCanonicalToken,
-    registerCanonicalTokenOnStellar,
+    registerTokenWithContractDeployment,
+    kit,
     config,
   ]);
 

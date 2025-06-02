@@ -3,8 +3,10 @@ import { useState } from "react";
 import { rpc, scValToNative, Transaction, xdr } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
-import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment";
-import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
+import {
+  useCanonicalTokenDeploymentStateContainer,
+  type DeployAndRegisterTransactionState,
+} from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useStellarTransactionPoller } from "~/features/stellarHooks/useStellarTransactionPoller";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
@@ -19,8 +21,9 @@ export type RegisterCanonicalTokenOnStellarParams = {
 
 export type RegisterCanonicalTokenOnStellarResult = {
   hash: string;
-  status: string;
+  status: "SUCCESS" | "ERROR";
   tokenId: string;
+  tokenAddress?: string;
   tokenManagerAddress: string;
   tokenManagerType: "lock_unlock";
   deploymentMessageId?: string;
@@ -130,7 +133,10 @@ export function useRegisterCanonicalTokenOnStellar() {
 
       const getTxResponse = await server.getTransaction(initialResponse.hash);
 
+      console.log("getTxResponse", getTxResponse);
+
       let tokenId: string | undefined;
+      let extractedTokenAddress: string | undefined;
       let extractedTokenManagerAddress: string | undefined;
       let tokenManagerType = "lock_unlock" as const; // Default for canonical tokens
 
@@ -138,22 +144,8 @@ export function useRegisterCanonicalTokenOnStellar() {
       const txResponseWithMeta = getTxResponse as any;
       if (txResponseWithMeta.resultMetaXdr) {
         try {
-          // Extract tokenId from the transaction return value
+          // Extract data from events
           const transactionMeta = txResponseWithMeta.resultMetaXdr;
-          const returnValue = transactionMeta
-            .v3()
-            ?.sorobanMeta()
-            ?.returnValue();
-
-          if (
-            returnValue &&
-            returnValue.switch() === xdr.ScValType.scvBytes()
-          ) {
-            tokenId = returnValue.bytes().toString("hex");
-            // Extracted tokenId from transaction return value
-          }
-
-          // Extract tokenManagerAddress from events
           const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
           const events = sorobanMeta?.events();
 
@@ -180,6 +172,41 @@ export function useRegisterCanonicalTokenOnStellar() {
                 // tokenAddress is at index 2
                 // tokenManagerAddress is at index 3
                 // tokenManagerType is at index 4
+
+                // Extract tokenId from event
+                const topic1 = eventTopics[1]; // tokenId
+                if (
+                  !tokenId &&
+                  topic1 &&
+                  topic1.switch() === xdr.ScValType.scvBytes()
+                ) {
+                  try {
+                    tokenId = topic1.bytes().toString("hex");
+                    console.log("Extracted tokenId from event:", tokenId);
+                  } catch (error) {
+                    console.error(
+                      "Error extracting tokenId from event:",
+                      error
+                    );
+                  }
+                }
+
+                // Extract tokenAddress from event
+                const topic2 = eventTopics[2]; // tokenAddress
+                if (!extractedTokenAddress && topic2) {
+                  try {
+                    extractedTokenAddress = scValToNative(topic2);
+                    console.log(
+                      "Extracted tokenAddress from event:",
+                      extractedTokenAddress
+                    );
+                  } catch (error) {
+                    console.error(
+                      "Error extracting tokenAddress from event:",
+                      error
+                    );
+                  }
+                }
 
                 const topic3 = eventTopics[3]; // tokenManagerAddress
                 const topic4 = eventTopics[4]; // tokenManagerType
@@ -235,6 +262,7 @@ export function useRegisterCanonicalTokenOnStellar() {
       // Verificar se conseguimos extrair todos os dados necessários dos eventos
       const missingData = [];
       if (!tokenId) missingData.push("tokenId");
+      if (!extractedTokenAddress) missingData.push("tokenAddress");
       if (!extractedTokenManagerAddress)
         missingData.push("tokenManagerAddress");
 
@@ -251,20 +279,15 @@ export function useRegisterCanonicalTokenOnStellar() {
         hash: initialResponse.hash,
         status: "SUCCESS",
         tokenId: tokenId!,
+        tokenAddress: extractedTokenAddress!,
         tokenManagerAddress: extractedTokenManagerAddress!,
         tokenManagerType: tokenManagerType,
-        deploymentMessageId:
-          destinationChains.length > 0 ? `${initialResponse.hash}` : undefined,
+        deploymentMessageId: initialResponse.hash,
       };
 
+      console.log("Final result with tokenAddress:", result);
       setData(result);
       return result;
-    } catch (e) {
-      const error = e instanceof Error ? e : new Error(String(e));
-      setError(error);
-      actions.setTxState({ type: "idle" });
-      onStatusUpdate?.({ type: "idle" });
-      throw error;
     } finally {
       setIsLoading(false);
     }

@@ -16,9 +16,13 @@ import { WriteContractData } from "wagmi/query";
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { RegisterCanonicalTokenResult } from "~/features/suiHooks/useRegisterCanonicalToken";
-// We're using the unified approach through deployCanonicalTokenAsync
 import { useTransactionsContainer } from "~/features/Transactions";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useBalance,
+  useChainId,
+} from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -49,6 +53,8 @@ export const Step3: FC = () => {
     [state.remoteDeploymentGasFees?.gasFees]
   );
 
+  // Hook for deploying canonical tokens
+
   const { writeAsync: deployCanonicalTokenAsync } =
     useDeployAndRegisterRemoteCanonicalTokenMutation(
       {
@@ -74,7 +80,7 @@ export const Step3: FC = () => {
         sourceChainId: sourceChain?.id ?? "",
       }
     );
-    
+
   // The useDeployAndRegisterRemoteCanonicalTokenMutation hook handles all chain-specific logic
 
   const [, { addTransaction }] = useTransactionsContainer();
@@ -89,7 +95,11 @@ export const Step3: FC = () => {
           !state.isEstimatingGasFees &&
           !state.hasGasFeesEstimationError);
 
-      if ((!deployCanonicalTokenAsync && sourceChain?.chain_id !== STELLAR_CHAIN_ID) || !hasGasfees) {
+      if (
+        (!deployCanonicalTokenAsync &&
+          sourceChain?.chain_id !== STELLAR_CHAIN_ID) ||
+        !hasGasfees
+      ) {
         console.warn("gas prices not loaded");
         return;
       }
@@ -100,10 +110,10 @@ export const Step3: FC = () => {
       rootActions.setTxState({
         type: "pending_approval",
       });
-      
+
       // The useDeployAndRegisterRemoteCanonicalTokenMutation hook handles chain-specific logic
       // including Sui and Stellar special cases
-      
+
       // For EVM and Sui chains
       const txPromise = deployCanonicalTokenAsync().catch((e) => {
         // Handle user rejection from any wallet
@@ -158,35 +168,69 @@ export const Step3: FC = () => {
           });
         }
       }
-      
-      // Stellar is handled separately above
+
+      // Handle Stellar token deployment with the two-transaction flow
+      if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
+        try {
+          const result = (await txPromise) as RegisterCanonicalTokenResult;
+          if (result) {
+            rootActions.setTxState({
+              type: "deployed",
+              tokenAddress: rootState.tokenDetails.tokenAddress,
+              txHash: result.digest,
+            });
+
+            if (rootState.selectedChains.length > 0) {
+              addTransaction({
+                status: "submitted",
+                hash: result.digest,
+                chainId: sourceChain.chain_id,
+                txType: "INTERCHAIN_DEPLOYMENT",
+              });
+            }
+            return;
+          } else {
+            rootActions.setTxState({
+              type: "idle",
+            });
+          }
+        } catch (e: any) {
+          toast.error(e.message);
+          rootActions.setTxState({
+            type: "idle",
+          });
+        }
+      }
 
       // For EVM chains, handle the transaction result
       if (txPromise) {
         try {
-          await handleTransactionResult(txPromise as Promise<WriteContractData>, {
-            onSuccess(txHash) {
-              rootActions.setTxState({
-                type: "deploying",
-                txHash: txHash,
-              });
-              
-              if (validDestinationChainIds.length > 0) {
-                addTransaction({
-                  status: "submitted",
-                  hash: txHash,
-                  chainId: sourceChain.chain_id,
-                  txType: "INTERCHAIN_DEPLOYMENT",
+          await handleTransactionResult(
+            txPromise as Promise<WriteContractData>,
+            {
+              onSuccess(txHash) {
+                rootActions.setTxState({
+                  type: "deploying",
+                  txHash: txHash,
                 });
-              }
-            },
-            onTransactionError(txError) {
-              rootActions.setTxState({
-                type: "idle",
-              });
-              toast.error(txError.shortMessage);
-            },
-          });
+
+                if (validDestinationChainIds.length > 0) {
+                  addTransaction({
+                    status: "submitted",
+                    hash: txHash,
+                    chainId: sourceChain.chain_id,
+                    txType: "INTERCHAIN_DEPLOYMENT",
+                  });
+                }
+              },
+              onTransactionError(txError) {
+                rootActions.setTxState({
+                  type: "idle",
+                });
+                toast.error(txError.shortMessage);
+              },
+            }
+          );
         } catch (e: any) {
           toast.error(e.message);
           rootActions.setTxState({
@@ -207,8 +251,6 @@ export const Step3: FC = () => {
       validDestinationChainIds,
       rootState.tokenDetails.tokenAddress,
       addTransaction,
-      // registerCanonicalTokenOnStellar is no longer needed as a dependency
-      // since we're using the unified approach through deployCanonicalTokenAsync
     ]
   );
 

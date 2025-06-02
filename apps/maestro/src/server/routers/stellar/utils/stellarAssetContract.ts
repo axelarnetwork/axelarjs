@@ -1,9 +1,16 @@
-import { Asset, BASE_FEE, Operation, TransactionBuilder } from "stellar-sdk";
-import { rpc } from "stellar-sdk";
+import {
+  Asset,
+  BASE_FEE,
+  Operation,
+  rpc,
+  TransactionBuilder,
+} from "stellar-sdk";
 
-import { fetchStellarAccount } from "./transactions";
 import { STELLAR_NETWORK_PASSPHRASE, STELLAR_RPC_URL } from "./config";
-import { checkIfTokenContractExists } from "./transactions";
+import {
+  checkIfTokenContractExists,
+  fetchStellarAccount,
+} from "./transactions";
 
 /**
  * Creates a transaction to deploy a Stellar Asset Contract for a given asset
@@ -25,15 +32,20 @@ export async function createStellarAssetContractTransaction({
   contractId: string;
   exists: boolean;
 }> {
-  // Create the asset
-  const asset = new Asset(assetCode, issuer);
-  
   // Get the contract ID
-  const contractId = asset.contractId(STELLAR_NETWORK_PASSPHRASE);
-  
+  let contractId;
+
+  if (assetCode.startsWith("C")) {
+    contractId = assetCode;
+  } else {
+    contractId = new Asset(assetCode, issuer).contractId(
+      STELLAR_NETWORK_PASSPHRASE
+    );
+  }
+
   // Check if the contract already exists
   const exists = await checkIfTokenContractExists(contractId);
-  
+
   // If the contract already exists, return early
   if (exists) {
     return {
@@ -42,35 +54,34 @@ export async function createStellarAssetContractTransaction({
       exists: true,
     };
   }
-  
+
   // Get the account
   const account = await fetchStellarAccount(caller);
-  
+
   // Create RPC server instance for preparing the transaction
-  const server = new rpc.Server(STELLAR_RPC_URL, {
-    allowHttp: STELLAR_RPC_URL.includes("localhost") || STELLAR_RPC_URL.includes("127.0.0.1"),
-  });
-  
+  const server = new rpc.Server(STELLAR_RPC_URL);
+
   // Build the transaction
   const txBuilder = new TransactionBuilder(account, {
     fee: BASE_FEE,
     networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
   });
-  
+
   // Add the operation to create the Stellar Asset Contract
   txBuilder.addOperation(
     Operation.createStellarAssetContract({
-      asset: asset,
+      asset: new Asset(assetCode, issuer),
     })
   );
-  
+
   const builtTransaction = txBuilder.setTimeout(0).build();
-  
+
   // Prepare the transaction (simulate and discover storage footprint)
   try {
-    const preparedTransaction = await server.prepareTransaction(builtTransaction);
+    const preparedTransaction =
+      await server.prepareTransaction(builtTransaction);
     const transactionXDR = preparedTransaction.toXDR();
-    
+
     return {
       transactionXDR,
       contractId,

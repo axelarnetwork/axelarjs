@@ -55,7 +55,7 @@ export async function buildRegisterCanonicalTokenTransaction({
   // Build arguments for the multicall
   const callArgs: xdr.ScVal[] = [];
 
-  let tokenContractAddress = "";
+  let tokenContractAddress = tokenAddress;
 
   if (tokenAddress.includes("-")) {
     const [assetCode, issuer] = tokenAddress.split("-");
@@ -67,7 +67,7 @@ export async function buildRegisterCanonicalTokenTransaction({
   // check if asset have a contract
   const exists = await checkIfTokenContractExists(tokenContractAddress);
   if (!exists) {
-    throw new Error("Token contract does not exist");
+    throw new Error("Asset dont have a smartcontract");
   }
 
   // Get tokenId
@@ -77,7 +77,7 @@ export async function buildRegisterCanonicalTokenTransaction({
       contractAddress: itsContractAddress,
       method: "canonical_interchain_token_id",
       account,
-      args: [_addressToScVal(tokenAddress)],
+      args: [_addressToScVal(tokenContractAddress)],
     });
     // Convert the bytes to a hex string
     if (simulateResult._arm === "bytes" && simulateResult._value) {
@@ -158,16 +158,14 @@ export async function buildRegisterCanonicalTokenTransaction({
     const destinationChainId = destinationChainIds[i];
     const gasValue = gasValues[i];
 
-    // Build the gas payment for this destination
     const gasPaymentScVal = _buildGasPaymentMapScVal(gasTokenAddress, gasValue);
 
-    // Add arguments for deploy_remote_canonical_token in the correct order
     // deploy_remote_canonical_token(token_address: address, destination_chain: string, spender: address, gas_token: option<Token>)
     const deployRemoteArgs: xdr.ScVal[] = [
-      _addressToScVal(tokenAddress), // token_address: address do token canônico
-      _stringToScVal(destinationChainId), // destination_chain: string
-      _addressToScVal(caller), // spender: address
-      gasPaymentScVal, // gas_token: option<Token>
+      _addressToScVal(tokenContractAddress),
+      _stringToScVal(destinationChainId),
+      _addressToScVal(caller),
+      gasPaymentScVal,
     ];
 
     // Create the struct for the contract call

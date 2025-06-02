@@ -2,15 +2,13 @@ import { useState } from "react";
 
 import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 
-import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
+import type { DeployAndRegisterTransactionState } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployStellarTokenSmartContract } from "./useDeployStellarTokenSmartContract";
 import { useRegisterCanonicalTokenOnStellar } from "./useRegisterCanonicalTokenOnStellar";
 
 export interface RegisterStellarTokenWithContractParams {
   kit: StellarWalletsKit;
-  tokenAddress: string;
-  assetCode: string;
-  issuer: string;
+  tokenAddress: string; // Can be in format tokenSymbol-Issuer or contract address
   destinationChains: string[];
   gasValues: bigint[];
   onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void;
@@ -43,11 +41,11 @@ export function useRegisterStellarTokenWithContractDeployment() {
     useDeployStellarTokenSmartContract();
   const { registerCanonicalToken } = useRegisterCanonicalTokenOnStellar();
 
+  // Using the parseTokenAddress function defined below
+
   const registerTokenWithContractDeployment = async ({
     kit,
     tokenAddress,
-    assetCode,
-    issuer,
     destinationChains,
     gasValues,
     onStatusUpdate,
@@ -55,6 +53,9 @@ export function useRegisterStellarTokenWithContractDeployment() {
     if (!kit) {
       throw new Error("StellarWalletsKit not provided");
     }
+
+    // Parse the token address to get assetCode and issuer
+    const { assetCode, issuer } = parseTokenAddress(tokenAddress);
 
     setIsLoading(true);
     setError(null);
@@ -67,17 +68,21 @@ export function useRegisterStellarTokenWithContractDeployment() {
         issuer,
         onStatusUpdate: (status) => {
           // Update the status with adjusted step counts
-          if (
-            status.type === "pending_approval" &&
-            status.step !== undefined &&
-            status.totalSteps !== undefined
-          ) {
+          if (status.type === "pending_approval") {
             onStatusUpdate?.({
-              ...status,
+              type: "pending_approval",
+              step: 1,
+              totalSteps: 2,
+            });
+          } else if (status.type === "deploying") {
+            onStatusUpdate?.({
+              type: "deploying",
+              txHash: status.txHash,
               step: 1,
               totalSteps: 2,
             });
           } else {
+            // For other status types like idle or deployed
             onStatusUpdate?.(status);
           }
         },
@@ -91,17 +96,21 @@ export function useRegisterStellarTokenWithContractDeployment() {
         gasValues,
         onStatusUpdate: (status) => {
           // Update the status with adjusted step counts
-          if (
-            status.type === "pending_approval" &&
-            status.step !== undefined &&
-            status.totalSteps !== undefined
-          ) {
+          if (status.type === "pending_approval") {
             onStatusUpdate?.({
-              ...status,
-              step: contractDeploymentResult.exists ? 2 : 1,
-              totalSteps: contractDeploymentResult.exists ? 2 : 1,
+              type: "pending_approval",
+              step: 2,
+              totalSteps: 2,
+            });
+          } else if (status.type === "deploying" && status.txHash) {
+            onStatusUpdate?.({
+              type: "deploying",
+              txHash: status.txHash,
+              step: contractDeploymentResult.exists ? 1 : 2,
+              totalSteps: contractDeploymentResult.exists ? 1 : 2,
             });
           } else {
+            // For other status types like idle or deployed
             onStatusUpdate?.(status);
           }
         },
@@ -127,17 +136,27 @@ export function useRegisterStellarTokenWithContractDeployment() {
 
   /**
    * Helper function to parse a token address into asset code and issuer
-   * @param tokenAddress The token address in the format "CODE:ISSUER"
+   * @param tokenAddress The token address in the format "CODE-ISSUER" or a contract address starting with "C"
    */
   const parseTokenAddress = (
     tokenAddress: string
   ): { assetCode: string; issuer: string } => {
     try {
-      // Parse the token address in the format "CODE:ISSUER"
-      const parts = tokenAddress.split(":");
+      // If it's a contract address (starts with 'C')
+      if (tokenAddress.startsWith("C")) {
+        // For contract addresses, we'll use the contract address as the asset code
+        // The actual handling would depend on how contract addresses are processed
+        return {
+          assetCode: tokenAddress,
+          issuer: "",
+        };
+      }
+
+      // Otherwise, try to parse as tokenSymbol-Issuer format
+      const parts = tokenAddress.split("-");
       if (parts.length !== 2) {
         throw new Error(
-          `Invalid token address format: ${tokenAddress}. Expected format: "CODE:ISSUER"`
+          `Invalid token address format: ${tokenAddress}. Expected format: "CODE-ISSUER" or contract address starting with "C"`
         );
       }
 
@@ -146,7 +165,7 @@ export function useRegisterStellarTokenWithContractDeployment() {
       // Validate the parts
       if (!assetCode || !issuer) {
         throw new Error(
-          `Invalid token address format: ${tokenAddress}. Expected format: "CODE:ISSUER"`
+          `Invalid token address format: ${tokenAddress}. Expected format: "CODE-ISSUER" or contract address starting with "C"`
         );
       }
 

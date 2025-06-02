@@ -12,10 +12,16 @@ export type DeployAndRegisterTransactionState =
     }
   | {
       type: "pending_approval";
+      // For multi-step transactions like Stellar's two-transaction flow
+      step?: number;
+      totalSteps?: number;
     }
   | {
       type: "deploying";
       txHash: string;
+      // For multi-step transactions like Stellar's two-transaction flow
+      step?: number;
+      totalSteps?: number;
     }
   | {
       type: "deployed";

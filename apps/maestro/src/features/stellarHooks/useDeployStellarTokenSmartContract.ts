@@ -4,15 +4,16 @@ import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 import { rpc, Transaction } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
-import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
+import type { DeployAndRegisterTransactionState } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { trpc } from "~/lib/trpc";
 import { STELLAR_NETWORK_PASSPHRASE } from "~/server/routers/stellar/utils/config";
 import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
 
 export interface DeployStellarAssetContractParams {
   kit: StellarWalletsKit;
-  assetCode: string;
-  issuer: string;
+  tokenAddress?: string; // Can be in format tokenSymbol-Issuer or contract address starting with "C"
+  assetCode?: string; // Optional if tokenAddress is provided
+  issuer?: string; // Optional if tokenAddress is provided
   onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void;
 }
 
@@ -67,6 +68,8 @@ export function useDeployStellarTokenSmartContract() {
           assetCode,
           issuer,
         });
+
+      console.log({ contractId, exists });
 
       // If the contract already exists, return early with success
       if (exists) {
