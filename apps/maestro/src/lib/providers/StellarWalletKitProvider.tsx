@@ -8,6 +8,8 @@ import {
 
 import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 
+import { STELLAR_NETWORK_PASSPHRASE } from "~/server/routers/stellar/utils/config";
+
 type StellarKitContextType = {
   kit: StellarWalletsKit | null;
   isLoading: boolean;
@@ -29,15 +31,11 @@ export function StellarWalletKitProvider({
   useEffect(() => {
     const initKit = async () => {
       try {
-        const {
-          StellarWalletsKit,
-          WalletNetwork,
-          FREIGHTER_ID,
-          FreighterModule,
-        } = await import("@creit.tech/stellar-wallets-kit");
+        const { StellarWalletsKit, FREIGHTER_ID, FreighterModule } =
+          await import("@creit.tech/stellar-wallets-kit");
 
         const newKit = new StellarWalletsKit({
-          network: WalletNetwork.TESTNET,
+          network: STELLAR_NETWORK_PASSPHRASE,
           selectedWalletId: FREIGHTER_ID,
           modalTheme: {
             bgColor: "#1D232A",

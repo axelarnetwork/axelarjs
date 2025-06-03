@@ -54,9 +54,15 @@ export function useSendInterchainTokenState(props: {
   const isApprovalRequired = useMemo(
     () =>
       props.kind === "canonical" &&
+      props.sourceChain.chain_type === "evm" &&
       interchainToken.chainId !== undefined &&
       interchainToken.chainId === props.originTokenChainId,
-    [interchainToken.chainId, props.kind, props.originTokenChainId]
+    [
+      interchainToken.chainId,
+      props.kind,
+      props.originTokenChainId,
+      props.sourceChain.chain_type,
+    ]
   );
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
@@ -134,6 +140,7 @@ export function useSendInterchainTokenState(props: {
     tokenId: props.tokenId,
     destinationChainName: selectedToChain?.id,
     sourceChainName: props.sourceChain.id,
+    destinationAddress: props.destinationAddress,
     gas,
   });
 
