@@ -85,7 +85,6 @@ export async function createContractTransaction({
   method,
   account,
   args,
-  createStellarTokenContract,
   rpcUrl = STELLAR_RPC_URL,
   networkPassphrase = STELLAR_NETWORK_PASSPHRASE,
 }: {
@@ -93,7 +92,6 @@ export async function createContractTransaction({
   method: string;
   account: Account;
   args: xdr.ScVal[];
-  createStellarTokenContract?: Asset;
   rpcUrl?: string;
   networkPassphrase?: string;
 }): Promise<{
@@ -112,7 +110,6 @@ export async function createContractTransaction({
   const operation = contract.call(method, ...args);
 
   // Build the transaction
-  console.log({ createStellarTokenContract });
   const txBuilder = new TransactionBuilder(account, {
     fee: BASE_FEE,
     networkPassphrase,
@@ -121,14 +118,13 @@ export async function createContractTransaction({
   const builtTransaction = txBuilder.setTimeout(0).build();
 
   // Get the XDR before preparing
-  const xdrBeforePrepare = builtTransaction.toEnvelope().toXDR("base64");
-  console.log({ xdrBeforePrepare });
+  // const xdrBeforePrepare = builtTransaction.toEnvelope().toXDR("base64");
+  // console.log({ xdrBeforePrepare });
 
   // Prepare the transaction (simulate and discover storage footprint)
   let preparedTransaction;
   try {
     preparedTransaction = await server.prepareTransaction(builtTransaction);
-    console.log({ preparedTransaction });
   } catch (error) {
     console.error("Error preparing transaction:", error);
     throw error;

@@ -169,17 +169,11 @@ export const Step3: FC = () => {
         }
       }
 
-      // Handle Stellar token deployment with the two-transaction flow
+      // Handle Stellar token deployment
       if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
         try {
           const result = (await txPromise) as RegisterCanonicalTokenResult;
           if (result) {
-            rootActions.setTxState({
-              type: "deployed",
-              tokenAddress: rootState.tokenDetails.tokenAddress,
-              txHash: result.digest,
-            });
-
             if (rootState.selectedChains.length > 0) {
               addTransaction({
                 status: "submitted",
@@ -187,12 +181,13 @@ export const Step3: FC = () => {
                 chainId: sourceChain.chain_id,
                 txType: "INTERCHAIN_DEPLOYMENT",
               });
+              return;
             }
-            return;
           } else {
             rootActions.setTxState({
               type: "idle",
             });
+            throw new Error("Stellar deployment result incomplete.");
           }
         } catch (e: any) {
           toast.error(e.message);
@@ -200,6 +195,7 @@ export const Step3: FC = () => {
             type: "idle",
           });
         }
+        return;
       }
 
       // For EVM chains, handle the transaction result
