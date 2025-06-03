@@ -1,4 +1,3 @@
-// import { Buffer } from "buffer"; // Commented out as it's not currently used
 import { Address, Asset, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 
 import { hexToScVal } from ".";
@@ -14,11 +13,6 @@ import {
   fetchStellarAccount,
   simulateCall,
 } from "./transactions";
-
-// Interface for the result of building a canonical token registration transaction
-export interface BuildCanonicalRegistrationResult {
-  transactionXDR: string;
-}
 
 /**
  * Builds the transaction for registering a canonical token on Stellar and optionally deploying it to remote chains.
@@ -41,7 +35,6 @@ export async function buildRegisterCanonicalTokenTransaction({
   multicallContractAddress?: string;
   gasTokenAddress?: string;
 }): Promise<{ transactionXDR: string }> {
-  // Validate inputs
   if (
     destinationChainIds.length !== gasValues.length &&
     destinationChainIds.length > 0
@@ -93,10 +86,11 @@ export async function buildRegisterCanonicalTokenTransaction({
   let isTokenRegistered = false;
   if (tokenId) {
     try {
+      const method = "token_manager_address";
       console.log("Checking if token is registered");
       const { simulateResult } = await simulateCall({
         contractAddress: itsContractAddress,
-        method: "interchain_token_address",
+        method,
         account,
         args: [hexToScVal(`0x${tokenId}`)],
       });
@@ -105,7 +99,12 @@ export async function buildRegisterCanonicalTokenTransaction({
         const contractAddress = Address.contract(
           simulateResult._value._value
         ).toString();
-        console.log("possible tokenId, checking if exists:", contractAddress);
+        console.log(
+          "possible tokenId, checking if: ",
+          method,
+          " exists:",
+          contractAddress
+        );
 
         const exists = await checkIfTokenContractExists(contractAddress);
         isTokenRegistered = exists;

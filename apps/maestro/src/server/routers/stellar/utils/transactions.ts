@@ -1,7 +1,6 @@
 import { createHash } from "crypto";
 import {
   Account,
-  Asset,
   BASE_FEE,
   Contract,
   nativeToScVal,
@@ -203,24 +202,10 @@ export async function checkIfTokenContractExists(contractAddress: string) {
       contractAddress,
       xdr.ScVal.scvLedgerKeyContractInstance()
     );
+    console.log("Contract exists: ", contractAddress);
     return true;
   } catch (e) {
-    return false;
-  }
-}
-
-export async function deployTokenSmartContract(contractAddress: string) {
-  const server = new rpc.Server(STELLAR_RPC_URL);
-  try {
-    console.log("Checking if contract exists", contractAddress);
-
-    await server.getContractData(
-      contractAddress,
-      xdr.ScVal.scvLedgerKeyContractInstance()
-    );
-    return true;
-  } catch (e) {
-    console.log("Error checking if contract exists", e);
+    console.log("Contract does not exist: ", contractAddress);
     return false;
   }
 }

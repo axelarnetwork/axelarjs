@@ -81,8 +81,6 @@ export const Step3: FC = () => {
       }
     );
 
-  // The useDeployAndRegisterRemoteCanonicalTokenMutation hook handles all chain-specific logic
-
   const [, { addTransaction }] = useTransactionsContainer();
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -111,10 +109,6 @@ export const Step3: FC = () => {
         type: "pending_approval",
       });
 
-      // The useDeployAndRegisterRemoteCanonicalTokenMutation hook handles chain-specific logic
-      // including Sui and Stellar special cases
-
-      // For EVM and Sui chains
       const txPromise = deployCanonicalTokenAsync().catch((e) => {
         // Handle user rejection from any wallet
         if (e.message?.toLowerCase().includes("reject")) {
@@ -190,7 +184,8 @@ export const Step3: FC = () => {
             throw new Error("Stellar deployment result incomplete.");
           }
         } catch (e: any) {
-          toast.error(e.message);
+          console.log("errorror", e);
+          toast.error(e.message || "Stellar deployment failed");
           rootActions.setTxState({
             type: "idle",
           });

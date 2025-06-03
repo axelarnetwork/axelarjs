@@ -288,13 +288,11 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       });
 
       if (result?.tokenRegistration?.hash) {
-        // For Stellar, we use the hash as the deploymentMessageId
-        const deploymentMessageId =
-          result.tokenRegistration.deploymentMessageId;
-
         setRecordDeploymentArgs({
           kind: "canonical",
-          deploymentMessageId,
+          deploymentMessageId:
+            result?.tokenRegistration?.deploymentMessageId ||
+            result?.tokenRegistration?.hash,
           tokenId: result.tokenRegistration.tokenId,
           deployerAddress,
           tokenName: input.tokenName,
