@@ -69,8 +69,6 @@ export function useRegisterCanonicalTokenOnStellar() {
       actions.setTxState({ type: "pending_approval" });
       onStatusUpdate?.({
         type: "pending_approval",
-        step: 1,
-        totalSteps: destinationChains.length > 0 ? 2 : 1,
       });
 
       const { transactionXDR } = await getRegisterCanonicalTokenTxBytes({
@@ -133,8 +131,6 @@ export function useRegisterCanonicalTokenOnStellar() {
 
       const getTxResponse = await server.getTransaction(initialResponse.hash);
 
-      console.log("getTxResponse", getTxResponse);
-
       let tokenId: string | undefined;
       let extractedTokenAddress: string | undefined;
       let extractedTokenManagerAddress: string | undefined;
@@ -148,8 +144,6 @@ export function useRegisterCanonicalTokenOnStellar() {
           const transactionMeta = txResponseWithMeta.resultMetaXdr;
           const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
           const events = sorobanMeta?.events();
-
-          console.log("Events:", events);
 
           if (events && events.length > 0) {
             for (const event of events) {
@@ -259,14 +253,14 @@ export function useRegisterCanonicalTokenOnStellar() {
         tokenId = `0x${tokenId}`;
       }
 
-      // Verificar se conseguimos extrair todos os dados necessários dos eventos
+      // Check if we have all the data we need
       const missingData = [];
       if (!tokenId) missingData.push("tokenId");
       if (!extractedTokenAddress) missingData.push("tokenAddress");
       if (!extractedTokenManagerAddress)
         missingData.push("tokenManagerAddress");
 
-      // Se algum dado estiver faltando, lançar um erro detalhado
+      // If any data is missing, throw a detailed error
       if (missingData.length > 0) {
         throw new Error(
           `Failed to extract critical token data from transaction events: ${missingData.join(", ")} missing. ` +
@@ -285,7 +279,6 @@ export function useRegisterCanonicalTokenOnStellar() {
         deploymentMessageId: initialResponse.hash,
       };
 
-      console.log("Final result with tokenAddress:", result);
       setData(result);
       return result;
     } finally {

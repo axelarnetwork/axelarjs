@@ -53,8 +53,6 @@ export const Step3: FC = () => {
     [state.remoteDeploymentGasFees?.gasFees]
   );
 
-  // Hook for deploying canonical tokens
-
   const { writeAsync: deployCanonicalTokenAsync } =
     useDeployAndRegisterRemoteCanonicalTokenMutation(
       {

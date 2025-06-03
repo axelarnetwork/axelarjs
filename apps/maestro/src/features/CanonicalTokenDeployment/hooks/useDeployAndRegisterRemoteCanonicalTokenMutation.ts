@@ -272,7 +272,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         throw new Error("Stellar wallet not connected");
       }
 
-      // Use the two-transaction flow for Stellar token deployment
       // tokenAddress can be in format tokenSymbol-Issuer or contract address
       const result = await registerTokenWithContractDeployment({
         kit,

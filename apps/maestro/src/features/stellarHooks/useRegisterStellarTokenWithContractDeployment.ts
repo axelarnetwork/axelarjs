@@ -67,19 +67,14 @@ export function useRegisterStellarTokenWithContractDeployment() {
         assetCode,
         issuer,
         onStatusUpdate: (status) => {
-          // Update the status with adjusted step counts
           if (status.type === "pending_approval") {
             onStatusUpdate?.({
               type: "pending_approval",
-              step: 1,
-              totalSteps: 2,
             });
           } else if (status.type === "deploying") {
             onStatusUpdate?.({
               type: "deploying",
               txHash: status.txHash,
-              step: 1,
-              totalSteps: 2,
             });
           } else {
             // For other status types like idle or deployed
@@ -89,25 +84,19 @@ export function useRegisterStellarTokenWithContractDeployment() {
       });
 
       // Step 2: Register the token
-      // Adjust the step count for the token registration
       const tokenRegistrationResult = await registerCanonicalToken({
         tokenAddress,
         destinationChains,
         gasValues,
         onStatusUpdate: (status) => {
-          // Update the status with adjusted step counts
           if (status.type === "pending_approval") {
             onStatusUpdate?.({
               type: "pending_approval",
-              step: 2,
-              totalSteps: 2,
             });
           } else if (status.type === "deploying" && status.txHash) {
             onStatusUpdate?.({
               type: "deploying",
               txHash: status.txHash,
-              step: contractDeploymentResult.exists ? 1 : 2,
-              totalSteps: contractDeploymentResult.exists ? 1 : 2,
             });
           } else {
             // For other status types like idle or deployed

@@ -87,8 +87,6 @@ export function useDeployStellarTokenSmartContract() {
       // Notify that we're waiting for user approval
       onStatusUpdate?.({
         type: "pending_approval",
-        step: 1,
-        totalSteps: 1,
       });
 
       // 2. Sign the transaction

@@ -6,11 +6,7 @@ import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 
-import {
-  useAccount,
-  useChainFromRoute,
-  useSwitchChain,
-} from "~/lib/hooks";
+import { useAccount, useChainFromRoute, useSwitchChain } from "~/lib/hooks";
 import { useGetChainsConfig } from "~/services/axelarConfigs/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { MultiStepDialog, StepLoading } from "~/ui/compounds/MultiStepForm";
@@ -42,7 +38,6 @@ const CanonicalTokenDeployment: FC = () => {
     axelarChainId: routeChain?.axelarChainId,
   });
   const { switchChain } = useSwitchChain();
-  // Agora suportamos registro de tokens canônicos em Stellar
 
   const handleSwitchChain = useCallback(() => {
     try {

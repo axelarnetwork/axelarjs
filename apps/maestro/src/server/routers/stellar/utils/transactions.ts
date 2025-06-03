@@ -101,9 +101,7 @@ export async function createContractTransaction({
   const contract = new Contract(contractAddress);
 
   // Create RPC server instance for preparing the transaction
-  const server = new rpc.Server(rpcUrl, {
-    allowHttp: rpcUrl.includes("localhost") || rpcUrl.includes("127.0.0.1"),
-  });
+  const server = new rpc.Server(rpcUrl);
 
   // Create the operation using the contract.call method
   const operation = contract.call(method, ...args);
@@ -159,9 +157,7 @@ export async function simulateCall({
   const contract = new Contract(contractAddress);
 
   // Create RPC server instance for preparing the transaction
-  const server = new rpc.Server(rpcUrl, {
-    allowHttp: rpcUrl.includes("localhost") || rpcUrl.includes("127.0.0.1"),
-  });
+  const server = new rpc.Server(rpcUrl);
 
   // Create the operation using the contract.call method
   const operation = contract.call(method, ...args);
