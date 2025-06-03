@@ -1,5 +1,7 @@
 import { STELLAR_RPC_URLS } from "@axelarjs/core";
 
+import type { WalletNetwork } from "@creit.tech/stellar-wallets-kit";
+
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 
 export const HORIZON_URLS = {
@@ -46,8 +48,9 @@ export const STELLAR_MULTICALL_CONTRACT_IDS = {
     "CDY327IFXISX2WW6OFCCHM5VVQ2W3DFT2LPEWOFERSRFLWGPH3RLZVMK",
 };
 
-export const STELLAR_NETWORK_PASSPHRASE =
-  STELLAR_NETWORK_PASSPHRASES[NEXT_PUBLIC_NETWORK_ENV];
+export const STELLAR_NETWORK_PASSPHRASE = STELLAR_NETWORK_PASSPHRASES[
+  NEXT_PUBLIC_NETWORK_ENV
+] as WalletNetwork;
 
 export const STELLAR_SOURCE_ACCOUNT =
   STELLAR_SOURCE_ACCOUNTS[NEXT_PUBLIC_NETWORK_ENV];
