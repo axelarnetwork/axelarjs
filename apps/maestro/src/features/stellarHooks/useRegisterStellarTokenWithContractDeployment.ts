@@ -33,9 +33,6 @@ export function useRegisterStellarTokenWithContractDeployment() {
 
   const { registerCanonicalToken } = useRegisterCanonicalTokenOnStellar();
 
-  // We still keep the parseTokenAddress function for utility purposes
-  // but it's no longer used in the main flow since the backend handles the parsing
-
   const registerTokenWithContractDeployment = async ({
     kit,
     tokenAddress,
