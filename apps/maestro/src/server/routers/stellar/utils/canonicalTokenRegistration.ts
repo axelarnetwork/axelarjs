@@ -136,11 +136,9 @@ export async function buildRegisterCanonicalTokenTransaction({
           simulateResult._value._value
         ).toString();
 
-        // Check if the token contract exists
         const exists = await checkIfTokenContractExists(contractAddress);
 
-        // Check if the token is registered
-        isTokenRegistered = exists; // We use the exists check as our token registration check
+        isTokenRegistered = exists;
       }
     } catch (error: any) {
       console.log("Error checking if token is registered:", error);
