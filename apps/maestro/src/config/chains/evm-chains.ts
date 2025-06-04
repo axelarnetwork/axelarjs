@@ -117,12 +117,6 @@ const xrplEvm = defineChain({
       apiUrl: "https://explorer.xrplevm.org/api/v2",
     },
   },
-  contracts: {
-    multicall3: {
-      address: "0x82Cc144D7d0AD4B1c27cb41420e82b82Ad6e9B31",
-      blockCreated: 492302,
-    },
-  },
   testnet: false,
 });
 
