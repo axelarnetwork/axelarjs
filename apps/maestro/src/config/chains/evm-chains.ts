@@ -677,7 +677,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainId: "berachain",
     axelarChainName: "berachain",
     supportWagmi: true,
-    environment: ENVIRONMENTS.devnet,
+    environment: ENVIRONMENTS.testnet,
   },
 ] as const;
 
