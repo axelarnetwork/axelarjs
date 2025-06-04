@@ -21,12 +21,7 @@ import { TransactionExecutionError } from "viem";
 
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
-import {
-  STELLAR_CHAIN_ID,
-  useAccount,
-  useChainId,
-  useSwitchChain,
-} from "~/lib/hooks";
+import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -153,8 +148,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             </Tooltip>
           )}
           {props.isOriginToken &&
-          (balance?.isTokenMinter || balance?.isTokenOwner) &&
-          chainId !== STELLAR_CHAIN_ID ? (
+          (balance?.isTokenMinter || balance?.isTokenOwner) ? (
             <ManageInterchainToken
               trigger={
                 <Button
