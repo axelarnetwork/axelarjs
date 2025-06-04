@@ -5,6 +5,7 @@ import {
   STELLAR_ITS_CONTRACT_ID,
   STELLAR_MULTICALL_CONTRACT_ID,
   STELLAR_NETWORK_PASSPHRASE,
+  STELLAR_SCA_FACTORY_CONTRACT_ID,
   XLM_ASSET_ADDRESS,
 } from "./config";
 import {
@@ -55,12 +56,49 @@ export async function buildRegisterCanonicalTokenTransaction({
 
     const stellarAsset = new Asset(assetCode, issuer);
     tokenContractAddress = stellarAsset.contractId(STELLAR_NETWORK_PASSPHRASE);
+  } else if (!tokenAddress.startsWith("C")) {
+    throw new Error("Invalid token address");
   }
 
-  // check if asset have a contract
+  // Check if asset has a contract
   const exists = await checkIfTokenContractExists(tokenContractAddress);
-  if (!exists) {
-    throw new Error("Asset dont have a smartcontract");
+
+  // If the asset doesn't have a contract, we'll add the SCA creation to the multicall
+  if (!exists && tokenAddress.includes("-")) {
+    const [assetCode, issuer] = tokenAddress.split("-");
+    const stellarAsset = new Asset(assetCode, issuer);
+
+    const assetScVal = assetToScVal(stellarAsset);
+
+    const createSCAArgs: xdr.ScVal[] = [assetScVal];
+
+    const createSCACallArgsVec = xdr.ScVal.scvVec(createSCAArgs);
+
+    const createSCACallArgsMapEntries: xdr.ScMapEntry[] = [
+      new xdr.ScMapEntry({
+        key: _symbolToScVal("approver"),
+        val: _addressToScVal(caller),
+      }),
+      new xdr.ScMapEntry({
+        key: _symbolToScVal("args"),
+        val: createSCACallArgsVec,
+      }),
+      new xdr.ScMapEntry({
+        key: _symbolToScVal("contract"),
+        val: _addressToScVal(STELLAR_SCA_FACTORY_CONTRACT_ID),
+      }),
+      new xdr.ScMapEntry({
+        key: _symbolToScVal("function"),
+        val: _symbolToScVal("create_stellar_asset_contract"),
+      }),
+    ];
+
+    // Add the SCA creation call to the multicall arguments
+    callArgs.push(xdr.ScVal.scvMap(createSCACallArgsMapEntries));
+  } else if (!exists) {
+    throw new Error(
+      "Asset doesn't have a smart contract and is not in CODE-ISSUER format"
+    );
   }
 
   // Get tokenId
@@ -76,7 +114,6 @@ export async function buildRegisterCanonicalTokenTransaction({
     if (simulateResult._arm === "bytes" && simulateResult._value) {
       const buffer = simulateResult._value as Buffer;
       tokenId = buffer.toString("hex");
-      console.log("Token ID (hex):", tokenId);
     }
   } catch (error: any) {
     console.log("Error checking token ID:", error);
@@ -87,7 +124,6 @@ export async function buildRegisterCanonicalTokenTransaction({
   if (tokenId) {
     try {
       const method = "token_manager_address";
-      console.log("Checking if token is registered");
       const { simulateResult } = await simulateCall({
         contractAddress: itsContractAddress,
         method,
@@ -99,31 +135,18 @@ export async function buildRegisterCanonicalTokenTransaction({
         const contractAddress = Address.contract(
           simulateResult._value._value
         ).toString();
-        console.log(
-          "possible tokenId, checking if: ",
-          method,
-          " exists:",
-          contractAddress
-        );
 
         const exists = await checkIfTokenContractExists(contractAddress);
+
         isTokenRegistered = exists;
-        console.log("isTokenRegistered", isTokenRegistered);
       }
     } catch (error: any) {
       console.log("Error checking if token is registered:", error);
     }
   }
 
-  if (isTokenRegistered) {
-    console.log(
-      "Token is already registered on ITS, skip to remote deployment"
-    );
-  }
-
   // First call: register_canonical_token (only if not already registered)
   if (!isTokenRegistered) {
-    console.log("added register canonical token to multicall");
     const registerCanonicalArgs: xdr.ScVal[] = [
       _addressToScVal(tokenContractAddress),
     ];
@@ -192,14 +215,13 @@ export async function buildRegisterCanonicalTokenTransaction({
     callArgs.push(xdr.ScVal.scvMap(callArgsMapEntries));
   }
 
-  // If we don't have any calls to make (token already registered and no remote deployments)
+  // If we don't have any calls to make (token already registered, contract exists, and no remote deployments)
   if (callArgs.length === 0) {
     throw new Error(
       "Token is already registered and no remote deployments requested"
     );
   }
 
-  // Atualizar a conta com os dados mais recentes
   account = await fetchStellarAccount(caller);
 
   // Create the transaction
@@ -249,4 +271,11 @@ function _buildGasPaymentMapScVal(
     }),
   ];
   return xdr.ScVal.scvMap(mapEntries);
+}
+
+function assetToScVal(asset: Asset): any {
+  return nativeToScVal(
+    Buffer.from(asset.toXDRObject().toXDR("base64"), "base64"),
+    { type: "bytes" }
+  );
 }

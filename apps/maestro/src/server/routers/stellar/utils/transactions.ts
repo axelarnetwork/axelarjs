@@ -192,13 +192,10 @@ export async function simulateCall({
 export async function checkIfTokenContractExists(contractAddress: string) {
   const server = new rpc.Server(STELLAR_RPC_URL);
   try {
-    console.log("Checking if contract exists", contractAddress);
-
     await server.getContractData(
       contractAddress,
       xdr.ScVal.scvLedgerKeyContractInstance()
     );
-    console.log("Contract exists: ", contractAddress);
     return true;
   } catch (e) {
     console.log("Contract does not exist: ", contractAddress);

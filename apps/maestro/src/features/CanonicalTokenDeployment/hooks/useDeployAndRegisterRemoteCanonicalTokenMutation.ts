@@ -266,7 +266,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       }
     }
 
-    // Handle Stellar canonical token deployment with two-transaction flow
     if (chainId === STELLAR_CHAIN_ID && input) {
       if (!kit) {
         throw new Error("Stellar wallet not connected");
@@ -300,7 +299,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
           tokenManagerType: result.tokenRegistration.tokenManagerType,
           axelarChainId: input.sourceChainId,
           destinationAxelarChainIds: input.destinationChainIds,
-          tokenAddress: input.tokenAddress,
+          tokenAddress: result.tokenRegistration.tokenAddress,
           tokenManagerAddress: result.tokenRegistration.tokenManagerAddress,
         });
         return result.tokenRegistration;
