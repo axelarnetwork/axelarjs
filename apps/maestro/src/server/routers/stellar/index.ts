@@ -135,6 +135,7 @@ export const stellarRouter = router({
       z.object({
         caller: z.string(), // Caller address
         toAddress: z.string(), // Recipient address
+        tokenAddress: z.string(), // Token address to mint
         amount: z.string(), // Amount to mint as string
       })
     )
@@ -143,6 +144,7 @@ export const stellarRouter = router({
       const { transactionXDR } = await buildMintTokenTransaction({
         caller: input.caller,
         toAddress: input.toAddress,
+        tokenAddress: input.tokenAddress,
         amount: input.amount,
       });
 

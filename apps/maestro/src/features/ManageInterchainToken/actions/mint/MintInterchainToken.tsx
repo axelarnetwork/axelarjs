@@ -6,8 +6,8 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { parseUnits, TransactionExecutionError } from "viem";
 
-import useMintTokens from "~/features/suiHooks/useMintTokens";
 import useMintStellarTokens from "~/features/stellarHooks/useMintStellarTokens";
+import useMintTokens from "~/features/suiHooks/useMintTokens";
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
@@ -66,16 +66,18 @@ export const MintInterchainToken: FC = () => {
       } else if (chainId === STELLAR_CHAIN_ID) {
         const result = await mintStellarTokens({
           amount: adjustedAmount.toString(),
+          tokenAddress: tokenAddress,
           toAddress: accountAddress,
         });
-        
+
         if (result.hash) {
           setTxState({
-            status: "submitted",
+            status: "confirmed",
             hash: result.hash,
             chainId,
           });
-          toast.success("Successfully submitted mint transaction");
+
+          toast.success("Successfully minted interchain tokens");
         }
       } else {
         const txHash = await mintTokenAsync({

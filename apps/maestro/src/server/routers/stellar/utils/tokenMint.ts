@@ -2,7 +2,11 @@ import { Address, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import { STELLAR_NETWORK_PASSPHRASE } from "./config";
-import { createContractTransaction, fetchStellarAccount } from "./transactions";
+import {
+  createContractTransaction,
+  fetchStellarAccount,
+  simulateCall,
+} from "./transactions";
 
 // Endereço do contrato hardcodado para o mint de tokens
 export const MINT_CONTRACT_ADDRESS =
@@ -29,12 +33,14 @@ function addressToScVal(addressString: string): xdr.ScVal {
 export async function buildMintTokenTransaction({
   caller,
   toAddress,
+  tokenAddress,
   amount,
   rpcUrl,
   networkPassphrase,
 }: {
   caller: string;
   toAddress: string;
+  tokenAddress: string;
   amount: string | bigint;
   rpcUrl?: string;
   networkPassphrase?: string;
@@ -43,18 +49,49 @@ export async function buildMintTokenTransaction({
   const actualNetworkPassphrase =
     networkPassphrase || STELLAR_NETWORK_PASSPHRASE;
 
-  const account = await fetchStellarAccount(caller);
+  let account = await fetchStellarAccount(caller);
+
+  // Check if the caller is an authorized minter (just for logging purposes)
+  const isMinterArgs: xdr.ScVal[] = [addressToScVal(caller)];
+
+  try {
+    const { simulateResult } = await simulateCall({
+      contractAddress: tokenAddress,
+      method: "is_minter",
+      account,
+      args: isMinterArgs,
+    });
+
+    if (simulateResult._switch && simulateResult._switch.name === "scvBool") {
+      const isMinter = simulateResult._value === true;
+
+      if (!isMinter) {
+        throw new Error("Caller is not an authorized minter");
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+
   const args: xdr.ScVal[] = [
+    addressToScVal(caller),
     addressToScVal(toAddress),
     nativeToScVal(amount.toString(), { type: "i128" }),
   ];
 
-  return createContractTransaction({
-    contractAddress: MINT_CONTRACT_ADDRESS,
-    method: "mint",
+  account = await fetchStellarAccount(caller);
+
+  const { transactionXDR } = await createContractTransaction({
+    contractAddress: tokenAddress,
+    method: "mint_from",
     account,
     args,
     rpcUrl: actualRpcUrl,
     networkPassphrase: actualNetworkPassphrase,
   });
+
+  return {
+    transactionXDR,
+  };
 }

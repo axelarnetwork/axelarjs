@@ -1,14 +1,20 @@
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback } from "react";
+
 import { rpc, Transaction } from "@stellar/stellar-sdk";
-import { NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE } from "~/config/env";
+
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
-import { STELLAR_RPC_URL } from "~/server/routers/stellar/utils/config";
+import {
+  STELLAR_NETWORK_PASSPHRASE,
+  STELLAR_RPC_URL,
+} from "~/server/routers/stellar/utils/config";
 
 interface MintStellarTokensParams {
   amount: string;
+  tokenAddress: string;
   toAddress?: string;
+  onSuccess?: () => void;
 }
 
 export default function useMintStellarTokens() {
@@ -18,12 +24,16 @@ export default function useMintStellarTokens() {
     trpc.stellar.getMintTokenTxBytes.useMutation({
       onError(error) {
         console.log("error in getMintTx", error.message);
-        toast.error(`Failed to prepare mint transaction: ${error.message}`);
       },
     });
 
   const mintTokens = useCallback(
-    async ({ amount, toAddress }: MintStellarTokensParams) => {
+    async ({
+      amount,
+      tokenAddress,
+      toAddress,
+      onSuccess,
+    }: MintStellarTokensParams) => {
       if (!kit) {
         throw new Error("Stellar wallet not connected");
       }
@@ -45,16 +55,14 @@ export default function useMintStellarTokens() {
         const { transactionXDR } = await getMintTx({
           caller: publicKey,
           toAddress: recipient,
+          tokenAddress: tokenAddress,
           amount,
         });
 
         // Sign the transaction
-        const { signedTxXdr } = await kit.signTransaction(
-          transactionXDR,
-          {
-            networkPassphrase: NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE || "",
-          }
-        );
+        const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
+          networkPassphrase: STELLAR_NETWORK_PASSPHRASE || "",
+        });
 
         // Submit the transaction
         const server = new rpc.Server(STELLAR_RPC_URL, {
@@ -63,7 +71,7 @@ export default function useMintStellarTokens() {
 
         const tx = new Transaction(
           signedTxXdr,
-          NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE || ""
+          STELLAR_NETWORK_PASSPHRASE || ""
         );
 
         const result = await server.sendTransaction(tx);
@@ -71,13 +79,27 @@ export default function useMintStellarTokens() {
         // Invalidate all balance queries to refresh the UI
         await utils.interchainToken.getInterchainTokenBalanceForOwner.invalidate();
 
+        // Call onSuccess callback if provided
+        if (onSuccess) {
+          onSuccess();
+        }
+
         return {
           hash: result.hash,
           status: "success",
         };
       } catch (error) {
         console.error("Failed to mint Stellar tokens:", error);
-        toast.error(`Failed to mint tokens: ${(error as Error).message}`);
+
+        // Mostrar uma mensagem de erro mais amigável para o usuário
+        if ((error as Error).message.includes("not an authorized minter")) {
+          toast.error(
+            "You are not authorized to mint this token. Only designated minters can mint tokens."
+          );
+        } else {
+          toast.error(`Failed to mint tokens: ${(error as Error).message}`);
+        }
+
         throw error;
       }
     },
