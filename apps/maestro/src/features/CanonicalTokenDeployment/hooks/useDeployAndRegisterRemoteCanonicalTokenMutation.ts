@@ -266,7 +266,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       }
     }
 
-    // Handle Stellar canonical token deployment with the new single-step flow (SCA creation + token registration in one multicall)
     if (chainId === STELLAR_CHAIN_ID && input) {
       if (!kit) {
         throw new Error("Stellar wallet not connected");
