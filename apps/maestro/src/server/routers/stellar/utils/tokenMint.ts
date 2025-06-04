@@ -51,7 +51,6 @@ export async function buildMintTokenTransaction({
 
   let account = await fetchStellarAccount(caller);
 
-  // Check if the caller is an authorized minter (just for logging purposes)
   const isMinterArgs: xdr.ScVal[] = [addressToScVal(caller)];
 
   try {

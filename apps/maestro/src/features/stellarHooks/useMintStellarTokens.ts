@@ -91,7 +91,6 @@ export default function useMintStellarTokens() {
       } catch (error) {
         console.error("Failed to mint Stellar tokens:", error);
 
-        // Mostrar uma mensagem de erro mais amigável para o usuário
         if ((error as Error).message.includes("not an authorized minter")) {
           toast.error(
             "You are not authorized to mint this token. Only designated minters can mint tokens."
