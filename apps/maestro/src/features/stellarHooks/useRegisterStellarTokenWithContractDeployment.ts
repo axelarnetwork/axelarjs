@@ -92,55 +92,8 @@ export function useRegisterStellarTokenWithContractDeployment() {
     }
   };
 
-  /**
-   * Helper function to parse a token address into asset code and issuer
-   * @param tokenAddress The token address in the format "CODE-ISSUER" or a contract address starting with "C"
-   */
-  const parseTokenAddress = (
-    tokenAddress: string
-  ): { assetCode: string; issuer: string } => {
-    try {
-      // If it's a contract address (starts with 'C')
-      if (tokenAddress.startsWith("C")) {
-        // For contract addresses, we'll use the contract address as the asset code
-        // The actual handling would depend on how contract addresses are processed
-        return {
-          assetCode: tokenAddress,
-          issuer: "",
-        };
-      }
-
-      // Otherwise, try to parse as tokenSymbol-Issuer format
-      const parts = tokenAddress.split("-");
-      if (parts.length !== 2) {
-        throw new Error(
-          `Invalid token address format: ${tokenAddress}. Expected format: "CODE-ISSUER" or contract address starting with "C"`
-        );
-      }
-
-      const [assetCode, issuer] = parts;
-
-      // Validate the parts
-      if (!assetCode || !issuer) {
-        throw new Error(
-          `Invalid token address format: ${tokenAddress}. Expected format: "CODE-ISSUER" or contract address starting with "C"`
-        );
-      }
-
-      return {
-        assetCode,
-        issuer,
-      };
-    } catch (error) {
-      throw new Error(
-        `Invalid token address format: ${tokenAddress}. Expected format: "CODE:ISSUER"`
-      );
-    }
-  };
-
   return {
     registerTokenWithContractDeployment,
-    parseTokenAddress,
     isLoading,
     error,
     data,
