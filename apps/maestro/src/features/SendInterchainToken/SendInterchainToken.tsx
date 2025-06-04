@@ -54,16 +54,6 @@ type Props = {
 
 export const SendInterchainToken: FC<Props> = (props) => {
   const { address } = useAccount();
-  const [state, actions] = useSendInterchainTokenState({
-    tokenAddress: props.tokenAddress,
-    tokenId: props.tokenId,
-    sourceChain: props.sourceChain,
-    isModalOpen: props.isOpen,
-    kind: props.kind,
-    originTokenAddress: props.originTokenAddress,
-    originTokenChainId: props.originTokenChainId,
-  });
-
   const {
     register,
     handleSubmit,
@@ -74,6 +64,19 @@ export const SendInterchainToken: FC<Props> = (props) => {
   } = useForm<FormState>({
     mode: "onChange",
     reValidateMode: "onChange",
+  });
+
+  const destinationAddress = watch("destinationAddress");
+
+  const [state, actions] = useSendInterchainTokenState({
+    tokenAddress: props.tokenAddress,
+    tokenId: props.tokenId,
+    sourceChain: props.sourceChain,
+    isModalOpen: props.isOpen,
+    kind: props.kind,
+    destinationAddress,
+    originTokenAddress: props.originTokenAddress,
+    originTokenChainId: props.originTokenChainId,
   });
 
   const amountToTransfer = watch("amountToTransfer");
