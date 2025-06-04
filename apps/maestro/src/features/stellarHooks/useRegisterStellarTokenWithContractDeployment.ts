@@ -51,12 +51,6 @@ export function useRegisterStellarTokenWithContractDeployment() {
     setError(null);
 
     try {
-      // With the new approach, we can directly register the token
-      // The backend will handle SCA creation in the multicall if needed
-      console.log(
-        "Using new single-step flow with SCA creation in multicall if needed"
-      );
-
       const tokenRegistrationResult = await registerCanonicalToken({
         tokenAddress,
         destinationChains,
@@ -65,26 +59,21 @@ export function useRegisterStellarTokenWithContractDeployment() {
           if (status.type === "pending_approval") {
             onStatusUpdate?.({
               type: "pending_approval",
-              // Note: step and totalSteps are handled in the parent component
             });
           } else if (status.type === "deploying" && status.txHash) {
             onStatusUpdate?.({
               type: "deploying",
               txHash: status.txHash,
-              // Note: step and totalSteps are handled in the parent component
             });
           } else {
-            // For other status types like idle or deployed
             onStatusUpdate?.(status);
           }
         },
       });
 
-      // Extract the token address from the token registration result or use the input tokenAddress
       const extractedTokenAddress =
         tokenRegistrationResult.tokenAddress || tokenAddress;
 
-      // Create the result with the tokenAddress included in the tokenRegistration
       const result: RegisterStellarTokenWithContractResult = {
         tokenRegistration: {
           ...tokenRegistrationResult,

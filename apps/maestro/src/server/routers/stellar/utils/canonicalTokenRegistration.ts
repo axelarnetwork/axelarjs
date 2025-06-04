@@ -66,10 +66,6 @@ export async function buildRegisterCanonicalTokenTransaction({
   // If the asset doesn't have a contract, we'll add the SCA creation to the multicall
   if (!exists && tokenAddress.includes("-")) {
     const [assetCode, issuer] = tokenAddress.split("-");
-    console.log(
-      `Asset ${assetCode}-${issuer} doesn't have a contract, will create it in the multicall`
-    );
-
     const stellarAsset = new Asset(assetCode, issuer);
 
     const assetScVal = assetToScVal(stellarAsset);
@@ -118,7 +114,6 @@ export async function buildRegisterCanonicalTokenTransaction({
     if (simulateResult._arm === "bytes" && simulateResult._value) {
       const buffer = simulateResult._value as Buffer;
       tokenId = buffer.toString("hex");
-      console.log("Token ID (hex):", tokenId);
     }
   } catch (error: any) {
     console.log("Error checking token ID:", error);
@@ -129,7 +124,6 @@ export async function buildRegisterCanonicalTokenTransaction({
   if (tokenId) {
     try {
       const method = "token_manager_address";
-      console.log("Checking if token is registered");
       const { simulateResult } = await simulateCall({
         contractAddress: itsContractAddress,
         method,
@@ -141,42 +135,20 @@ export async function buildRegisterCanonicalTokenTransaction({
         const contractAddress = Address.contract(
           simulateResult._value._value
         ).toString();
-        console.log(
-          "possible tokenId, checking if: ",
-          method,
-          " exists:",
-          contractAddress
-        );
 
         // Check if the token contract exists
         const exists = await checkIfTokenContractExists(contractAddress);
-        console.log(`Token contract exists: ${exists}`);
-        console.log(`Token contract ID: ${contractAddress}`);
-
-        // If token address is in CODE-ISSUER format, log the parsed values
-        if (tokenAddress.includes("-")) {
-          const [assetCode, issuer] = tokenAddress.split("-");
-          console.log(`Asset Code: ${assetCode}, Issuer: ${issuer}`);
-        }
 
         // Check if the token is registered
         isTokenRegistered = exists; // We use the exists check as our token registration check
-        console.log(`Token is registered: ${isTokenRegistered}`);
       }
     } catch (error: any) {
       console.log("Error checking if token is registered:", error);
     }
   }
 
-  if (isTokenRegistered) {
-    console.log(
-      "Token is already registered on ITS, skip to remote deployment"
-    );
-  }
-
   // First call: register_canonical_token (only if not already registered)
   if (!isTokenRegistered) {
-    console.log("added register canonical token to multicall");
     const registerCanonicalArgs: xdr.ScVal[] = [
       _addressToScVal(tokenContractAddress),
     ];
