@@ -100,7 +100,7 @@ export function createRpcUrlConfig(
 }
 
 const xrplEvm = defineChain({
-  id: 1444000,
+  id: 1440000,
   name: "XRPL EVM",
   nativeCurrency: {
     name: "XRP",
