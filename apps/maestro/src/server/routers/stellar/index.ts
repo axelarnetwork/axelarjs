@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
 import { buildRegisterCanonicalTokenTransaction } from "./utils/canonicalTokenRegistration";
+import { buildInterchainTransferTransaction } from "./utils/interchainTransfer";
 import { buildDeployRemoteInterchainTokensTransaction } from "./utils/remoteTokenDeployments";
 import { buildDeployInterchainTokenTransaction } from "./utils/tokenDeployments";
 import { buildMintTokenTransaction } from "./utils/tokenMint";
