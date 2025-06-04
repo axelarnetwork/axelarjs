@@ -1,12 +1,11 @@
 import { Address, Asset, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { hexToScVal } from ".";
 import {
   STELLAR_ITS_CONTRACT_ID,
   STELLAR_MULTICALL_CONTRACT_ID,
   STELLAR_NETWORK_PASSPHRASE,
-  STELLAR_SCA_FACTORY_CONTRACT_IDS,
+  STELLAR_SCA_FACTORY_CONTRACT_ID,
   XLM_ASSET_ADDRESS,
 } from "./config";
 import {
@@ -50,12 +49,6 @@ export async function buildRegisterCanonicalTokenTransaction({
   // Build arguments for the multicall
   const callArgs: xdr.ScVal[] = [];
 
-  // Get the SCA Factory contract ID for the current network
-  const scaFactoryContractId =
-    STELLAR_SCA_FACTORY_CONTRACT_IDS[
-      NEXT_PUBLIC_NETWORK_ENV as keyof typeof STELLAR_SCA_FACTORY_CONTRACT_IDS
-    ];
-
   let tokenContractAddress = tokenAddress;
 
   if (tokenAddress.includes("-")) {
@@ -63,26 +56,24 @@ export async function buildRegisterCanonicalTokenTransaction({
 
     const stellarAsset = new Asset(assetCode, issuer);
     tokenContractAddress = stellarAsset.contractId(STELLAR_NETWORK_PASSPHRASE);
+  } else if (!tokenAddress.startsWith("C")) {
+    throw new Error("Invalid token address");
   }
 
   // Check if asset has a contract
   const exists = await checkIfTokenContractExists(tokenContractAddress);
 
   // If the asset doesn't have a contract, we'll add the SCA creation to the multicall
-  // instead of throwing an error
   if (!exists && tokenAddress.includes("-")) {
     const [assetCode, issuer] = tokenAddress.split("-");
     console.log(
       `Asset ${assetCode}-${issuer} doesn't have a contract, will create it in the multicall`
     );
 
-    // Create a Stellar Asset object
     const stellarAsset = new Asset(assetCode, issuer);
 
-    // Convert the asset to ScVal format for the contract call
     const assetScVal = assetToScVal(stellarAsset);
 
-    // Create the call to create_stellar_asset_contract
     const createSCAArgs: xdr.ScVal[] = [assetScVal];
 
     const createSCACallArgsVec = xdr.ScVal.scvVec(createSCAArgs);
@@ -98,7 +89,7 @@ export async function buildRegisterCanonicalTokenTransaction({
       }),
       new xdr.ScMapEntry({
         key: _symbolToScVal("contract"),
-        val: _addressToScVal(scaFactoryContractId),
+        val: _addressToScVal(STELLAR_SCA_FACTORY_CONTRACT_ID),
       }),
       new xdr.ScMapEntry({
         key: _symbolToScVal("function"),
@@ -261,27 +252,6 @@ export async function buildRegisterCanonicalTokenTransaction({
     );
   }
 
-  // Log the number of operations in the multicall
-  console.log(`Multicall with ${callArgs.length} operations`);
-
-  // Log the operations included in the multicall
-  const operations = [];
-  if (!exists && tokenAddress.includes("-")) {
-    operations.push("SCA creation");
-  }
-  if (!isTokenRegistered) {
-    operations.push("token registration");
-  }
-  if (destinationChainIds.length > 0) {
-    operations.push(`${destinationChainIds.length} remote deployments`);
-  }
-
-  console.log(`Operations in multicall: ${operations.join(", ")}`);
-  console.log(`Using SCA Factory contract: ${scaFactoryContractId}`);
-  console.log(`Using ITS contract: ${itsContractAddress}`);
-  console.log(`Using Multicall contract: ${multicallContractAddress}`);
-
-  // Atualizar a conta com os dados mais recentes
   account = await fetchStellarAccount(caller);
 
   // Create the transaction

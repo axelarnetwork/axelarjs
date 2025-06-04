@@ -127,6 +127,4 @@ export const stellarRouter = router({
         transactionXDR,
       };
     }),
-
-  // Note: Stellar Asset Contract deployment is now handled within the canonical token registration flow
 });
