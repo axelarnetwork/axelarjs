@@ -3,7 +3,6 @@ import { useState } from "react";
 import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 
 import type { DeployAndRegisterTransactionState } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
-import { useDeployStellarTokenSmartContract } from "./useDeployStellarTokenSmartContract";
 import { useRegisterCanonicalTokenOnStellar } from "./useRegisterCanonicalTokenOnStellar";
 
 export interface RegisterStellarTokenWithContractParams {
@@ -15,12 +14,6 @@ export interface RegisterStellarTokenWithContractParams {
 }
 
 export interface RegisterStellarTokenWithContractResult {
-  contractDeployment: {
-    hash: string;
-    status: string;
-    contractId: string;
-    exists: boolean;
-  } | null;
   tokenRegistration: {
     hash: string;
     status: string;
@@ -28,6 +21,7 @@ export interface RegisterStellarTokenWithContractResult {
     tokenManagerAddress: string;
     tokenManagerType: "lock_unlock";
     deploymentMessageId?: string;
+    tokenAddress: string;
   };
 }
 
@@ -37,11 +31,10 @@ export function useRegisterStellarTokenWithContractDeployment() {
   const [data, setData] =
     useState<RegisterStellarTokenWithContractResult | null>(null);
 
-  const { deployStellarTokenSmartContract } =
-    useDeployStellarTokenSmartContract();
   const { registerCanonicalToken } = useRegisterCanonicalTokenOnStellar();
 
-  // Using the parseTokenAddress function defined below
+  // We still keep the parseTokenAddress function for utility purposes
+  // but it's no longer used in the main flow since the backend handles the parsing
 
   const registerTokenWithContractDeployment = async ({
     kit,
@@ -54,36 +47,16 @@ export function useRegisterStellarTokenWithContractDeployment() {
       throw new Error("StellarWalletsKit not provided");
     }
 
-    // Parse the token address to get assetCode and issuer
-    const { assetCode, issuer } = parseTokenAddress(tokenAddress);
-
     setIsLoading(true);
     setError(null);
 
     try {
-      // Step 1: Deploy the Stellar Asset Contract if needed
-      const contractDeploymentResult = await deployStellarTokenSmartContract({
-        kit,
-        assetCode,
-        issuer,
-        onStatusUpdate: (status) => {
-          if (status.type === "pending_approval") {
-            onStatusUpdate?.({
-              type: "pending_approval",
-            });
-          } else if (status.type === "deploying") {
-            onStatusUpdate?.({
-              type: "deploying",
-              txHash: status.txHash,
-            });
-          } else {
-            // For other status types like idle or deployed
-            onStatusUpdate?.(status);
-          }
-        },
-      });
+      // With the new approach, we can directly register the token
+      // The backend will handle SCA creation in the multicall if needed
+      console.log(
+        "Using new single-step flow with SCA creation in multicall if needed"
+      );
 
-      // Step 2: Register the token
       const tokenRegistrationResult = await registerCanonicalToken({
         tokenAddress,
         destinationChains,
@@ -92,11 +65,13 @@ export function useRegisterStellarTokenWithContractDeployment() {
           if (status.type === "pending_approval") {
             onStatusUpdate?.({
               type: "pending_approval",
+              // Note: step and totalSteps are handled in the parent component
             });
           } else if (status.type === "deploying" && status.txHash) {
             onStatusUpdate?.({
               type: "deploying",
               txHash: status.txHash,
+              // Note: step and totalSteps are handled in the parent component
             });
           } else {
             // For other status types like idle or deployed
@@ -105,11 +80,16 @@ export function useRegisterStellarTokenWithContractDeployment() {
         },
       });
 
+      // Extract the token address from the token registration result or use the input tokenAddress
+      const extractedTokenAddress =
+        tokenRegistrationResult.tokenAddress || tokenAddress;
+
+      // Create the result with the tokenAddress included in the tokenRegistration
       const result: RegisterStellarTokenWithContractResult = {
-        contractDeployment: contractDeploymentResult.exists
-          ? null
-          : contractDeploymentResult,
-        tokenRegistration: tokenRegistrationResult,
+        tokenRegistration: {
+          ...tokenRegistrationResult,
+          tokenAddress: extractedTokenAddress,
+        },
       };
 
       setData(result);
