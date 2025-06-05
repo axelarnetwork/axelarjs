@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { zeroAddress, type TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
-import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
+import { useDeployAndRegisterStellarToken } from "~/features/stellarHooks/useDeployAndRegisterStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
 import {
   useReadInterchainTokenFactoryInterchainTokenId,
@@ -63,7 +63,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { deployToken } = useDeployToken();
   const { combinedComputed } = useAllChainConfigsQuery();
   const [isReady, setIsReady] = useState(false);
-  const { deployStellarToken } = useDeployStellarToken();
+  const { deployAndRegisterStellarToken } = useDeployAndRegisterStellarToken();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -317,7 +317,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
           );
         }
 
-        const result = await deployStellarToken({
+        const result = await deployAndRegisterStellarToken({
           kit: kit as any,
           tokenName: input.tokenName,
           tokenSymbol: input.tokenSymbol,
@@ -410,7 +410,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     config,
     prepareMulticall?.request,
     recordDeploymentDraft,
-    deployStellarToken,
+    deployAndRegisterStellarToken,
   ]);
 
   const write = useCallback(() => {

@@ -29,7 +29,6 @@ export interface DeployAndRegisterTokenResultStellar {
   tokenAddress: string;
   tokenManagerAddress: string;
   tokenManagerType: string;
-  gmpMessageIds?: { gmpId: string; axelarDestinationChainId: string }[];
 }
 
 export function useDeployAndRegisterStellarToken() {
@@ -148,7 +147,6 @@ export function useDeployAndRegisterStellarToken() {
       let tokenAddress: string | undefined;
       let tokenManagerAddress: string | undefined;
       let tokenManagerType: string | undefined;
-      const gmpMessageIds: { gmpId: string; axelarDestinationChainId: string }[] = [];
 
       // Check if we have resultMetaXdr in the response (may not be defined in the type)
       const txResponseWithMeta = getTxResponse as any;
@@ -264,33 +262,6 @@ export function useDeployAndRegisterStellarToken() {
                   }
                 }
               }
-              // GMP message event
-              else if (eventName === "gmp_message") {
-                try {
-                  // Extract GMP message ID and destination chain
-                  const gmpMessageId = eventTopics[1]; // messageId
-                  const destinationChain = eventTopics[2]; // destinationChain
-                  
-                  if (
-                    gmpMessageId &&
-                    gmpMessageId.switch() === xdr.ScValType.scvBytes() &&
-                    destinationChain &&
-                    destinationChain.switch() === xdr.ScValType.scvString()
-                  ) {
-                    const gmpId = gmpMessageId.bytes().toString("hex");
-                    const axelarDestinationChainId = scValToNative(destinationChain);
-                    
-                    if (gmpId && axelarDestinationChainId) {
-                      gmpMessageIds.push({
-                        gmpId: `0x${gmpId}`,
-                        axelarDestinationChainId,
-                      });
-                    }
-                  }
-                } catch (error) {
-                  console.error("Error extracting GMP message ID:", error);
-                }
-              }
 
               if (
                 tokenId &&
@@ -340,7 +311,6 @@ export function useDeployAndRegisterStellarToken() {
         tokenAddress,
         tokenManagerAddress,
         tokenManagerType,
-        gmpMessageIds: gmpMessageIds.length > 0 ? gmpMessageIds : undefined,
       };
 
       setData(result);
