@@ -143,7 +143,7 @@ interface AxelarChainConfig extends BaseChainConfig {
 }
 
 export interface VmChainConfig extends BaseChainConfig {
-  chainType: string;
+  chainType: "sui" | "stellar";
   externalChainId: string;
   config: ChainVmSubconfig;
 }

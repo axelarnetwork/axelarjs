@@ -17,7 +17,6 @@ type ITSBaseChainConfig = {
   name: string;
   image: string;
   chain_name: string;
-  chain_type: string;
   native_token: {
     name: string;
     symbol: string;
@@ -26,15 +25,23 @@ type ITSBaseChainConfig = {
   };
 };
 
-// Picked types from original response (what we keep it as-is from the response)
+type ITSEvmChainType = {
+  chain_type: EvmChainConfig["chainType"];
+};
+
+type ITSVmChainType = {
+  chain_type: VmChainConfig["chainType"];
+};
+
 type PICKED_TYPES = "config" | "blockExplorers";
 
-// Map API response to our used fields
-export type ITSEvmChainConfig = Pick<VmChainConfig, PICKED_TYPES> &
-  ITSBaseChainConfig;
+export type ITSEvmChainConfig = Pick<EvmChainConfig, PICKED_TYPES> &
+  ITSBaseChainConfig &
+  ITSEvmChainType;
 
 export type ITSVmChainConfig = Pick<VmChainConfig, PICKED_TYPES> &
-  ITSBaseChainConfig;
+  ITSBaseChainConfig &
+  ITSVmChainType;
 
 export type ITSChainConfig = ITSEvmChainConfig | ITSVmChainConfig;
 
@@ -91,12 +98,11 @@ function mapToITSChainValue(
   };
 
   if (chain.chainType === "evm") {
-    const evmChain = chain as EvmChainConfig;
     return {
       info: {
         ...baseInfo,
         ...commonData,
-        chain_id: parseInt(evmChain.externalChainId),
+        chain_id: parseInt(chain.externalChainId),
       },
       wagmi: wagmiConfig, // wagmiConfig must be provided for EVM
     } as EvmChainsValue;
