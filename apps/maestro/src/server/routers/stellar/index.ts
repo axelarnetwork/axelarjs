@@ -4,6 +4,7 @@ import { publicProcedure, router } from "~/server/trpc";
 import { buildRegisterCanonicalTokenTransaction } from "./utils/canonicalTokenRegistration";
 import { buildInterchainTransferTransaction } from "./utils/interchainTransfer";
 import { buildDeployRemoteInterchainTokensTransaction } from "./utils/remoteTokenDeployments";
+import { buildMintTokenTransaction } from "./utils/tokenMint";
 import { 
   buildDeployInterchainTokenTransaction,
   buildDeployAndRegisterRemoteInterchainTokenTransaction 
@@ -124,6 +125,30 @@ export const stellarRouter = router({
         multicallContractAddress: input.multicallContractAddress,
         gasTokenAddress: input.gasTokenAddress,
         itsContractAddress: input.itsContractAddress,
+      });
+
+      return {
+        transactionXDR,
+      };
+    }),
+
+  // Endpoint to get transaction bytes for minting tokens on Stellar
+  getMintTokenTxBytes: publicProcedure
+    .input(
+      z.object({
+        caller: z.string(), // Caller address
+        toAddress: z.string(), // Recipient address
+        tokenAddress: z.string(), // Token address to mint
+        amount: z.string(), // Amount to mint as string
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Use the utility function to build the mint transaction
+      const { transactionXDR } = await buildMintTokenTransaction({
+        caller: input.caller,
+        toAddress: input.toAddress,
+        tokenAddress: input.tokenAddress,
+        amount: input.amount,
       });
 
       return {
