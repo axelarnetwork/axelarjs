@@ -1,3 +1,4 @@
+import { defineChain } from "viem";
 import {
   arbitrum,
   arbitrumSepolia,
@@ -98,6 +99,27 @@ export function createRpcUrlConfig(
     public: { http: urls },
   };
 }
+
+const xrplEvm = defineChain({
+  id: 1440000,
+  name: "XRPL EVM",
+  nativeCurrency: {
+    name: "XRP",
+    symbol: "XRP",
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: { http: ["https://rpc-mainnet.aws.peersyst.tech"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "blockscout",
+      url: "https://explorer.xrplevm.org",
+      apiUrl: "https://explorer.xrplevm.org/api/v2",
+    },
+  },
+  testnet: false,
+});
 
 export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   {
@@ -678,6 +700,14 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "berachain",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...xrplEvm,
+    rpcUrls: createRpcUrlConfig(xrplEvm, ENVIRONMENTS.mainnet, [], "xrpl-evm"),
+    axelarChainId: "xrpl-evm",
+    axelarChainName: "xrpl-evm",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.mainnet,
   },
 ] as const;
 
