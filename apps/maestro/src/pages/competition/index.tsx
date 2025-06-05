@@ -123,7 +123,7 @@ const CompetitionPage = () => {
         <Card.Body>
           <Card.Title>
             <div className="flex-1">
-              {TOP_TOKEN_COUNT} most transfered tokens
+              {TOP_TOKEN_COUNT} most transferred tokens
             </div>
             <Tooltip
               tip={`The competition started ${startDateDistance}. It ${
