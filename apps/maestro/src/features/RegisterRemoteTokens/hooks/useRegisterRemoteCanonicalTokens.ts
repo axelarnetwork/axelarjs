@@ -10,6 +10,7 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -58,6 +59,7 @@ export default function useRegisterRemoteCanonicalTokens(
 
   const multicallArgs = useMemo(() => {
     if (
+      !isValidEVMAddress(input.tokenAddress) || // This is only used for EVM chains
       !tokenDetails ||
       !gasFeesData ||
       tokenDetails.kind !== "canonical" ||
@@ -76,7 +78,7 @@ export default function useRegisterRemoteCanonicalTokens(
         }
       );
     });
-  }, [destinationChainIds, gasFeesData, tokenDetails, chainId]);
+  }, [tokenDetails, gasFeesData, chainId, input, destinationChainIds]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
