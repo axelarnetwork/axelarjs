@@ -91,13 +91,14 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   }, [combinedComputed.indexedById, input?.destinationChainIds]);
 
   const multicallArgs = useMemo(() => {
-    if (!input || !tokenId || chainId === SUI_CHAIN_ID) {
+    // This is only used for EVM chains
+    if (!input || !tokenId || !isValidEVMAddress(input.tokenAddress)) {
       return [];
     }
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.registerCanonicalInterchainToken.data({
-        tokenAddress: input.tokenAddress as `0x${string}`,
+        tokenAddress: input.tokenAddress,
       });
 
     if (!input.destinationChainIds.length) {
