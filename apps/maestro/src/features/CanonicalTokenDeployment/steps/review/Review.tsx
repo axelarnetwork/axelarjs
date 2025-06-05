@@ -71,7 +71,7 @@ const Review: FC = () => {
     }
   }, [actions, chainConfig, router, state.txState]);
 
-  const isVMChain = chainConfig?.chain_type === "vm";
+  const isVMChain = chainConfig?.chain_type !== "evm";
 
   return (
     <>

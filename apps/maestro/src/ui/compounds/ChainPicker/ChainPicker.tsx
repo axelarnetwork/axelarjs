@@ -76,11 +76,11 @@ const ChainPicker: FC<ChainPickerProps> = ({
               $position="top"
             >
               <Button
-                disabled={disabled || (chain.chain_type === "vm" && !chain.id)} // Add additional VM-specific conditions if needed
+                disabled={disabled || (chain.chain_type !== "evm" && !chain.id)} // Add additional VM-specific conditions if needed
                 className={cn(
                   "flex w-full items-center rounded-2xl hover:ring",
                   {
-                    "opacity-50": chain.chain_type === "vm" && !chain.id, // Visual indicator for unsupported VM chains
+                    "opacity-50": chain.chain_type !== "evm" && !chain.id, // Visual indicator for unsupported VM chains
                   }
                 )}
                 $size="sm"
