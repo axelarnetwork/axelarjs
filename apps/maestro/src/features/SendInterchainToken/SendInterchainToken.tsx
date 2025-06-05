@@ -54,16 +54,6 @@ type Props = {
 
 export const SendInterchainToken: FC<Props> = (props) => {
   const { address } = useAccount();
-  const [state, actions] = useSendInterchainTokenState({
-    tokenAddress: props.tokenAddress,
-    tokenId: props.tokenId,
-    sourceChain: props.sourceChain,
-    isModalOpen: props.isOpen,
-    kind: props.kind,
-    originTokenAddress: props.originTokenAddress,
-    originTokenChainId: props.originTokenChainId,
-  });
-
   const {
     register,
     handleSubmit,
@@ -74,6 +64,19 @@ export const SendInterchainToken: FC<Props> = (props) => {
   } = useForm<FormState>({
     mode: "onChange",
     reValidateMode: "onChange",
+  });
+
+  const destinationAddress = watch("destinationAddress");
+
+  const [state, actions] = useSendInterchainTokenState({
+    tokenAddress: props.tokenAddress,
+    tokenId: props.tokenId,
+    sourceChain: props.sourceChain,
+    isModalOpen: props.isOpen,
+    kind: props.kind,
+    destinationAddress,
+    originTokenAddress: props.originTokenAddress,
+    originTokenChainId: props.originTokenChainId,
   });
 
   const amountToTransfer = watch("amountToTransfer");
@@ -314,6 +317,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               disabled
               compact
               selectedChain={props.sourceChain}
+              hideRPCHealthIndicator={true}
               hideLabel={false}
               chainIconClassName="-translate-x-1.5"
               triggerClassName="w-full md:w-auto rounded-full"
@@ -324,6 +328,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <ChainsDropdown
               compact
               hideLabel={false}
+              hideRPCHealthIndicator={true}
               selectedChain={state.selectedToChain}
               chains={state.eligibleTargetChains}
               disabled={

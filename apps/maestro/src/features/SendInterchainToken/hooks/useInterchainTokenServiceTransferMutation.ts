@@ -25,11 +25,13 @@ export type UseSendInterchainTokenConfig = {
   tokenId: `0x${string}`;
   sourceChainName: string;
   destinationChainName: string;
+  destinationAddress?: string;
   gas?: bigint;
 };
 
 export type UseSendInterchainTokenInput = {
   tokenAddress: `0x${string}`;
+  destinationAddress?: string;
   amount: string;
 };
 
@@ -68,73 +70,77 @@ export function useInterchainTokenServiceTransferMutation(
 
   const approvedAmountRef = useRef(0n);
 
-  const handleInterchainTransfer = useCallback(async () => {
-    try {
-      setTxState({
-        status: "awaiting_approval",
-      });
-
-      invariant(address, "need address");
-
-      const txHash = await interchainTransferAsync({
-        args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
-          tokenId: config.tokenId,
-          destinationChain: config.destinationChainName,
-          destinationAddress: address,
-          amount: approvedAmountRef.current,
-          metadata: "0x",
-          gasValue: config.gas ?? 0n,
-        }),
-        value: config.gas,
-      });
-
-      if (txHash) {
+  const handleInterchainTransfer = useCallback(
+    async (destinationAddress?: string) => {
+      try {
         setTxState({
-          status: "submitted",
-          hash: txHash,
-          chainId,
+          status: "awaiting_approval",
         });
+
+        invariant(address, "need address");
+
+        const txHash = await interchainTransferAsync({
+          args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
+            tokenId: config.tokenId,
+            destinationChain: config.destinationChainName,
+            destinationAddress:
+              (destinationAddress as `0x${string}`) ?? address,
+            amount: approvedAmountRef.current,
+            metadata: "0x",
+            gasValue: config.gas ?? 0n,
+          }),
+          value: config.gas,
+        });
+
+        if (txHash) {
+          setTxState({
+            status: "submitted",
+            hash: txHash,
+            chainId,
+          });
+        }
+      } catch (error) {
+        logger.error("Failed to send token:", {
+          error,
+        });
+        if (error instanceof TransactionExecutionError) {
+          toast.error(`Transaction failed: ${error.cause.shortMessage}`);
+          logger.error("Faied to transfer token:", error.cause);
+
+          setTxState({
+            status: "idle",
+          });
+          return;
+        }
+
+        if (error instanceof Error) {
+          setTxState({
+            status: "reverted",
+            error: error,
+          });
+        } else {
+          setTxState({
+            status: "reverted",
+            error: new Error("failed to transfer token"),
+          });
+        }
       }
-    } catch (error) {
-      logger.error("Failed to send token:", {
-        error,
-      });
-      if (error instanceof TransactionExecutionError) {
-        toast.error(`Transaction failed: ${error.cause.shortMessage}`);
-        logger.error("Faied to transfer token:", error.cause);
-
-        setTxState({
-          status: "idle",
-        });
-        return;
-      }
-
-      if (error instanceof Error) {
-        setTxState({
-          status: "reverted",
-          error: error,
-        });
-      } else {
-        setTxState({
-          status: "reverted",
-          error: new Error("failed to transfer token"),
-        });
-      }
-    }
-  }, [
-    address,
-    chainId,
-    config.destinationChainName,
-    config.gas,
-    config.tokenId,
-    interchainTransferAsync,
-    setTxState,
-  ]);
+    },
+    [
+      address,
+      chainId,
+      config.destinationChainName,
+      config.gas,
+      config.tokenId,
+      interchainTransferAsync,
+      setTxState,
+    ]
+  );
 
   useEffect(
     () => {
       if (approveERC20Recepit && !interchainTransferTxHash) {
-        handleInterchainTransfer().catch((error) => {
+        handleInterchainTransfer(config.destinationAddress).catch((error) => {
           logger.error("Failed to send token:", error);
         });
       }
@@ -150,7 +156,7 @@ export function useInterchainTokenServiceTransferMutation(
   );
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
-    mutationFn: async ({ amount }) => {
+    mutationFn: async ({ amount, destinationAddress }) => {
       // allow token transfers with decimals === 0 but not undefined
       if (!(decimals !== undefined && address && config.gas)) {
         return;
@@ -176,7 +182,7 @@ export function useInterchainTokenServiceTransferMutation(
           return;
         }
 
-        await handleInterchainTransfer();
+        await handleInterchainTransfer(destinationAddress);
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
           toast.error(

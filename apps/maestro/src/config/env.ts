@@ -32,10 +32,6 @@ export const NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS = Maybe.of(
   process.env.NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS
 ).mapOr("0x", String) as `0x${string}`;
 
-export const NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE = Maybe.of(
-  process.env.STELLAR_NETWORK_PASSPHRASE
-).mapOr("Test SDF Network ; September 2015", String);
-
 export const NEXT_PUBLIC_EXPLORER_URL = Maybe.of(
   process.env.NEXT_PUBLIC_EXPLORER_URL
 ).mapOr("", String);
@@ -156,3 +152,11 @@ export const ClaimOwnershipFormFieldIds = {
   sourceChain: "entry.373826717",
   tokenName: "entry.1492946428",
 };
+
+/**
+ * Minimum time between notifications for the same RPC node issue (in seconds)
+ * Default: 30 minutes
+ */
+export const NOTIFICATION_COOLDOWN_SECONDS = Maybe.of(
+  process.env.NOTIFICATION_COOLDOWN_SECONDS
+).mapOr(30 * 60, Number);

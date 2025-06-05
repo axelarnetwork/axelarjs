@@ -34,7 +34,7 @@ const PAGE_TITLE = "My Interchain Tokens";
 const PageTitle = tw(Page.Title)`flex items-center gap-2`;
 
 type TokenListProps = {
-  sessionAddress?: `0x${string}`;
+  sessionAddress?: string;
 };
 
 const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
@@ -43,7 +43,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
 
   const { data, isFetched } = useGetMyInterchainTokensQuery(
     {
-      sessionAddress: sessionAddress as `0x${string}`,
+      sessionAddress: sessionAddress as string,
       limit: PAGE_LIMIT,
       offset,
     },
@@ -126,7 +126,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
                         $size="sm"
                         className="bg-base-300 dark:bg-base-100"
                       >
-                        {maskAddress(token.tokenAddress as `0x${string}`, {
+                        {maskAddress(token.tokenAddress, {
                           segmentA: 10,
                           segmentB: -10,
                         })}

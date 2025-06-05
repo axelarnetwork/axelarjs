@@ -6,7 +6,7 @@ import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { GetBalanceReturnType } from "wagmi/actions";
 
-import { suiChainConfig } from "~/config/chains";
+import { stellarChainConfig, suiChainConfig } from "~/config/chains";
 import { useAccount } from "~/lib/hooks";
 import {
   useTransactionState,
@@ -121,14 +121,50 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     txState,
   ]);
 
+  const onStellarTxComplete = useCallback(async () => {
+    if (txState.status !== "submitted") return;
+    if (!txState.hash) return;
+
+    const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
+      ...remoteToken,
+      deploymentTxHash: txState.hash,
+    }));
+
+    await recordRemoteTokenDeployment({
+      tokenAddress: props.tokenAddress,
+      chainId: props.originChainId ?? -1,
+      axelarChainId: stellarChainConfig.axelarChainId,
+      deploymentMessageId: txState.hash,
+      remoteTokens,
+    });
+    setTxState({
+      status: "confirmed",
+      hash: txState.hash,
+    });
+  }, [
+    baseRemoteTokens,
+    props.originChainId,
+    props.tokenAddress,
+    recordRemoteTokenDeployment,
+    setTxState,
+    txState,
+  ]);
+
+  const txCompleteCallback: Record<string, () => Promise<void>> = {
+    [suiChainConfig.id]: onSuiTxComplete,
+    [stellarChainConfig.id]: onStellarTxComplete,
+  };
+
   useEffect(
     () => {
       if (txState.status !== "submitted") return;
-
-      onSuiTxComplete().catch((error) => {
-        logger.error("Failed to record remote token deployment", error);
-        toast.error("Failed to record remote token deployment");
-      });
+      const callback = txCompleteCallback[props.originChainId ?? ""];
+      if (callback) {
+        callback().catch((error: Error) => {
+          logger.error("Failed to record remote token deployment", error);
+          toast.error("Failed to record remote token deployment");
+        });
+      }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     [txState.status]
   );
@@ -210,7 +246,6 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       }
 
       if (typeof result === "string") {
-        // only evm returns result as string of transaction hash
         setTxState({
           status: "submitted",
           hash: result,

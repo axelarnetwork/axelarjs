@@ -20,7 +20,12 @@ import { TransactionExecutionError } from "viem";
 
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
-import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  useAccount,
+  useChainId,
+  useSwitchChain,
+} from "~/lib/hooks";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -150,7 +155,8 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             </Tooltip>
           )}
           {props.isOriginToken &&
-          (balance?.isTokenMinter || balance?.isTokenOwner) ? (
+          (balance?.isTokenMinter || balance?.isTokenOwner) &&
+          chainId !== STELLAR_CHAIN_ID ? (
             <ManageInterchainToken
               trigger={
                 <Button
@@ -195,22 +201,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
         {!balance?.tokenBalance ? (
           !address ? null : (
             <div>
-              {props.chain?.id?.toLowerCase().includes("stellar") ? (
-                <LinkButton
-                  $size="xs"
-                  $variant="primary"
-                  className="my-1 flex w-full items-center justify-center gap-2"
-                  href={explorerUrl}
-                  target="_blank"
-                >
-                  View on Stellar Explorer{" "}
-                  <ChainIcon
-                    src={props.chain?.image ?? ""}
-                    size="xs"
-                    alt={props.chain?.name ?? ""}
-                  />
-                </LinkButton>
-              ) : isIncompatibleChain ? (
+              {isIncompatibleChain ? (
                 <Button
                   $size="xs"
                   $variant="primary"

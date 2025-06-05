@@ -41,7 +41,6 @@ const InterchainTokenDeployment = () => {
     () => state.step > 0 && state.step < 2,
     [state.step]
   );
-
   const disableChainDropdown = useMemo(
     () =>
       state.txState.type !== "idle" ||
@@ -52,6 +51,7 @@ const InterchainTokenDeployment = () => {
   return (
     <MultiStepDialog
       triggerLabel="Deploy a new Interchain Token"
+      disabled={false}
       title={
         <Dialog.Title className="flex items-center justify-center gap-1 sm:gap-2">
           {showBackButton && <BackButton onClick={actions.prevStep} />}

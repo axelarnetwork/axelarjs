@@ -1,10 +1,16 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
+import { scValToNative } from "stellar-sdk";
+import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
+import type { StellarTokenContractClient } from "~/lib/clients/stellarClient";
 import { suiClient as client } from "~/lib/clients/suiClient";
+import { isValidStellarTokenAddress } from "~/lib/utils/validation";
+import { getStellarChainConfig } from "~/server/routers/stellar/utils";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
+import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
@@ -52,9 +58,6 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         coinType: input.tokenAddress,
       });
 
-      // Get the coin metadata
-      const metadata = await queryCoinMetadata(input.tokenAddress);
-
       const InterchainTokenServiceV0 =
         chainConfig.config.contracts?.InterchainTokenService.objects
           .InterchainTokenServicev0;
@@ -69,7 +72,14 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         InterchainTokenServiceV0
       );
 
-      const decimals = metadata?.decimals ?? coinInfo?.decimals;
+      let decimals = coinInfo?.decimals;
+      // Get the coin metadata
+
+      await queryCoinMetadata(input.tokenAddress)
+        .then((metadata) => (decimals = metadata?.decimals))
+        .catch((e) => {
+          console.log("error in queryCoinMetadata", e);
+        });
 
       const isOperator = input.owner === coinInfo?.operator;
       const isDistributor = input.owner === coinInfo?.distributor;
@@ -85,7 +95,53 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         hasOperatorRole: isOperator,
         hasFlowLimiterRole: isOperator,
       };
+
       return result;
+    }
+
+    // Stellar tokens
+    if (isValidStellarTokenAddress(input.tokenAddress)) {
+      const chainConfig = await getStellarChainConfig(ctx);
+      const rpcUrl = chainConfig.config.rpc[0];
+      const ITSStellarContractClient = (await Client.from({
+        contractId: input.tokenAddress,
+        networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
+        rpcUrl: rpcUrl,
+      })) as unknown as StellarTokenContractClient;
+
+      const [
+        { simulation: simBalance },
+        { simulation: simMinter },
+        { simulation: simOwner },
+        { simulation: simDecimals },
+      ] = await Promise.all([
+        ITSStellarContractClient.balance({
+          id: input.owner,
+        }),
+        ITSStellarContractClient.is_minter({
+          minter: input.owner,
+        }),
+        ITSStellarContractClient.owner(),
+        ITSStellarContractClient.decimals(),
+      ]);
+
+      const balance = scValToNative(simBalance.result.retval).toString();
+      const isMinter = scValToNative(simMinter.result.retval);
+      const isOwner = scValToNative(simOwner.result.retval) === input.owner;
+      const decimals = scValToNative(simDecimals.result.retval);
+
+      // check return values
+      return {
+        decimals,
+        isTokenOwner: isOwner,
+        isTokenMinter: isMinter,
+        tokenBalance: balance,
+        isTokenPendingOwner: false,
+        hasPendingOwner: false,
+        hasMinterRole: isMinter,
+        hasOperatorRole: false,
+        hasFlowLimiterRole: false,
+      };
     }
     // This is for ERC20 tokens
     const balanceOwner = input.owner as `0x${string}`;

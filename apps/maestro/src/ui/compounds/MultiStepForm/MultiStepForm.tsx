@@ -29,7 +29,7 @@ import {
 import type { FieldError } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
-import { STELLAR_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";
@@ -126,7 +126,6 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
   const { width } = useWindowSize();
   return (
     <ChainsDropdownComponent
-      excludeChainIds={[STELLAR_CHAIN_ID]}
       compact
       disabled={props.disabled}
       triggerClassName={cn("-translate-y-1.5", {
@@ -148,6 +147,7 @@ export type ProtectedDialogProps = PropsWithChildren<{
   triggerLabel?: string;
   steps: string[];
   title?: ReactNode;
+  disabled?: boolean;
   onClose: DialogProps["onClose"];
   onBackClick?: () => void;
 }>;
@@ -158,6 +158,7 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   onClose,
   disableClose,
   disableChainsDropdown,
+  disabled,
   ...props
 }) => {
   const { status, data } = useSession();
@@ -187,7 +188,9 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
     <Dialog
       onClose={handleClose}
       renderTrigger={(props) => (
-        <TriggerButton {...props}>{triggerLabel}</TriggerButton>
+        <TriggerButton {...props} disabled={disabled}>
+          {triggerLabel}
+        </TriggerButton>
       )}
     >
       <Dialog.Body $as="section">

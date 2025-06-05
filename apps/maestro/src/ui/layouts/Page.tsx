@@ -26,7 +26,8 @@ type PageState =
   | "disconnected"
   | "network-mismatch"
   | "unsupported-network"
-  | "wrong-sui-network";
+  | "wrong-sui-network"
+  | "wrong-stellar-network";
 
 interface Props extends ComponentProps<typeof Clamp> {
   pageTitle?: string;
@@ -50,7 +51,8 @@ const Page: FC<Props> = ({
   style,
   ...props
 }) => {
-  const { isConnected, isWrongSuiNetwork } = useAccount();
+  const { isConnected, isWrongSuiNetwork, isWrongStellarNetwork } =
+    useAccount();
   const { chain } = useAccount();
   const chainFromRoute = useChainFromRoute();
   const { switchChain } = useSwitchChain();
@@ -79,6 +81,10 @@ const Page: FC<Props> = ({
       return "wrong-sui-network";
     }
 
+    if (isWrongStellarNetwork) {
+      return "wrong-stellar-network";
+    }
+
     // TODO: uncomment this when we have a way to handle multiple chains
 
     // if (chain && allChains?.length && !currentChain) {
@@ -104,6 +110,7 @@ const Page: FC<Props> = ({
     currentChainFromRoute,
     currentChain,
     isWrongSuiNetwork,
+    isWrongStellarNetwork,
   ]);
 
   const router = useRouter();
@@ -179,7 +186,6 @@ const Page: FC<Props> = ({
                 )}
               </div>
               <ChainsDropdown
-                excludeChainIds={[STELLAR_CHAIN_ID]}
                 renderTrigger={() => (
                   <Button $variant="primary">
                     Switch to a valid {process.env.NEXT_PUBLIC_NETWORK_ENV}{" "}
@@ -222,21 +228,9 @@ const Page: FC<Props> = ({
           </div>
         );
       case "wrong-sui-network":
-        return (
-          <div className="grid w-full flex-1 place-items-center">
-            <div className="grid w-full place-items-center gap-4">
-              <div className="flex items-center gap-1 text-center text-xl font-semibold">
-                {`You're currently connected to the wrong Sui network.`}
-                <br />
-                {`Please switch to ${
-                  process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-                    ? "mainnet"
-                    : "testnet"
-                } inside your wallet and refresh the page.`}
-              </div>
-            </div>
-          </div>
-        );
+        return <WrongNetworkSign networkName="sui" />;
+      case "wrong-stellar-network":
+        return <WrongNetworkSign networkName="stellar" />;
       case "connected":
         return children;
     }
@@ -295,6 +289,30 @@ export const FullScreenLoading = ({ loadingMessage = "" }) => (
     </div>
   </div>
 );
+
+const WrongNetworkSign = ({
+  networkName,
+}: {
+  networkName: "stellar" | "sui";
+}) => {
+  const networkNameCapitalized =
+    networkName.charAt(0).toUpperCase() + networkName.slice(1);
+  return (
+    <div className="grid w-full flex-1 place-items-center">
+      <div className="grid w-full place-items-center gap-4">
+        <div className="flex items-center gap-1 text-center text-xl font-semibold">
+          {`You're currently connected to the wrong ${networkNameCapitalized} network.`}
+          <br />
+          {`Please switch to ${
+            process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+              ? "mainnet"
+              : "testnet"
+          } inside your wallet and refresh the page.`}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Object.assign(Page, {
   Title: tw.h1`text-2xl font-semibold`,

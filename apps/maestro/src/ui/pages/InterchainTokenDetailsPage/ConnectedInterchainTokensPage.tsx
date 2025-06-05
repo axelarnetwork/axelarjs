@@ -25,8 +25,8 @@ import {
 import { trpc } from "~/lib/trpc";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { ChainStatus } from "~/server/routers/gmp/getTransactionStatusOnDestinationChains";
-import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
+import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import {
   useGetTransactionsStatusesOnDestinationChainsQuery,
   useInterchainTokensQuery,
@@ -142,7 +142,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     data: tokenDetails,
     error: tokenDetailsError,
     isFetching: isTokenDetailsFetching,
-  } = trpc.erc20.getERC20TokenDetails.useQuery({
+  } = trpc.nativeTokens.getNativeTokenDetails.useQuery({
     chainId: props.chainId,
     tokenAddress: props.tokenAddress,
   });
@@ -205,12 +205,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const refetchPageData = useCallback(() => {
     if (!isInterchainTokenFetching && !isTokenDetailsFetching) {
       void utils.interchainToken.searchInterchainToken.invalidate();
-      void utils.erc20.getERC20TokenDetails.invalidate();
+      void utils.nativeTokens.getNativeTokenDetails.invalidate();
     }
   }, [
     isInterchainTokenFetching,
     isTokenDetailsFetching,
-    utils.erc20.getERC20TokenDetails,
+    utils.nativeTokens.getNativeTokenDetails,
     utils.interchainToken.searchInterchainToken,
   ]);
 
@@ -357,12 +357,12 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         });
     }
   }, [
-    refetchPageData,
-    props.tokenAddress,
     interchainToken?.matchingTokens,
-    props.tokenId,
-    updateStellarAddresses,
     isAlreadyUpdatingRemoteStellar,
+    props.tokenAddress,
+    props.tokenId,
+    refetchPageData,
+    updateStellarAddresses,
   ]);
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});

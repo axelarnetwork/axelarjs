@@ -26,23 +26,21 @@ export const recordInterchainTokenDeployment = protectedProcedure
     let tokenManagerAddress;
     let tokenManagerType;
     const chains = await ctx.configs.chains();
+    const configs = chains[input.axelarChainId];
 
-    if (!input.axelarChainId.includes("sui")) {
-      const configs = chains[input.axelarChainId] as EvmChainsValue;
-
+    // Evm chains
+    if (configs.info.chain_type === "evm") {
+      const evmConfigs = configs as EvmChainsValue;
       invariant(
-        configs,
+        evmConfigs,
         `No configuration found for chain ${input.axelarChainId}`
-      );
-
-      invariant(
-        configs.wagmi,
-        `No wagmi configuration found for chain ${input.axelarChainId}`
       );
 
       // Handle different chain types
       const createServiceClient = () => {
-        return ctx.contracts.createInterchainTokenServiceClient(configs.wagmi);
+        return ctx.contracts.createInterchainTokenServiceClient(
+          evmConfigs.wagmi
+        );
       };
 
       const originChainServiceClient = createServiceClient();
@@ -54,7 +52,10 @@ export const recordInterchainTokenDeployment = protectedProcedure
         .catch(() => null)) as `0x${string}`;
 
       const createTokenManagerClient = (address: string) => {
-        return ctx.contracts.createTokenManagerClient(configs.wagmi, address);
+        return ctx.contracts.createTokenManagerClient(
+          evmConfigs.wagmi,
+          address
+        );
       };
 
       const tokenManagerClient = !tokenManagerAddress

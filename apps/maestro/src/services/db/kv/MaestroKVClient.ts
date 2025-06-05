@@ -14,14 +14,14 @@ export const COLLECTIONS = {
 export type AccountStatus = "enabled" | "disabled" | "privileged";
 
 export const COLLECTION_KEYS = {
-  accountNonce: (accountAddress: `0x${string}`) =>
+  accountNonce: (accountAddress: string) =>
     `${COLLECTIONS.accounts}:${accountAddress}:nonce` as const,
-  accountStatus: (accountAddress: `0x${string}`) =>
+  accountStatus: (accountAddress: string) =>
     `${COLLECTIONS.accounts}:${accountAddress}:status` as const,
   globalMessage: "messages:global" as const,
-  accountMessage: (accountAddress: `0x${string}`) =>
+  accountMessage: (accountAddress: string) =>
     `messages:${accountAddress}` as const,
-  tokenMeta: (tokenId: `0x${string}`) => `tokens:${tokenId}:meta` as const,
+  tokenMeta: (tokenId: string) => `tokens:${tokenId}:meta` as const,
   cached: (key: string) => `cached:${key}` as const,
 };
 
@@ -45,30 +45,27 @@ export class BaseMaestroKVClient {
 }
 
 export default class MaestroKVClient extends BaseMaestroKVClient {
-  async createAccount(accountAddress: `0x${string}`) {
+  async createAccount(accountAddress: string) {
     const key = COLLECTION_KEYS.accountNonce(accountAddress);
     await this.kv.set(key, 0);
   }
 
-  async getAccountNonce(accountAddress: `0x${string}`) {
+  async getAccountNonce(accountAddress: string) {
     const key = COLLECTION_KEYS.accountNonce(accountAddress);
     return await this.kv.get<number>(key);
   }
 
-  async incrementAccountNonce(accountAddress: `0x${string}`) {
+  async incrementAccountNonce(accountAddress: string) {
     const key = COLLECTION_KEYS.accountNonce(accountAddress);
     return await this.kv.incr(key);
   }
 
-  async getAccountStatus(accountAddress: `0x${string}`) {
+  async getAccountStatus(accountAddress: string) {
     const key = COLLECTION_KEYS.accountStatus(accountAddress);
     return await this.kv.get<AccountStatus>(key);
   }
 
-  async setAccountStatus(
-    accountAddress: `0x${string}`,
-    newStatus: AccountStatus
-  ) {
+  async setAccountStatus(accountAddress: string, newStatus: AccountStatus) {
     const oldStatus = await this.getAccountStatus(accountAddress);
 
     if (oldStatus === "privileged") {
@@ -88,13 +85,13 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   }
 
   async getAccounStatuses() {
-    const match = COLLECTION_KEYS.accountStatus("*" as `0x${string}`);
+    const match = COLLECTION_KEYS.accountStatus("*" as string);
     const [, keys] = await this.kv.scan(0, { match });
     const values = await this.kv.mget<AccountStatus[]>(keys);
 
     return keys.map((key, i) => ({
       // extract account address from key (e.g. "accounts:0x1234:status" -> "0x1234")
-      accountAddress: key.split(":")[1] as `0x${string}`,
+      accountAddress: key.split(":")[1],
       status: values[i],
     }));
   }
@@ -109,7 +106,7 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
     return await this.kv.hset(key, message);
   }
 
-  async getAccountMessage(accountAddresss: `0x${string}`) {
+  async getAccountMessage(accountAddresss: string) {
     const key = COLLECTION_KEYS.accountMessage(accountAddresss);
     return await this.kv.hgetall<Message>(key);
   }
@@ -129,12 +126,12 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
     return await this.kv.del(key);
   }
 
-  async setTokenIconUrl(tokenId: `0x${string}`, iconUrl: string) {
+  async setTokenIconUrl(tokenId: string, iconUrl: string) {
     const key = COLLECTION_KEYS.tokenMeta(tokenId);
     return await this.kv.hset(key, { iconUrl });
   }
 
-  async getTokenMeta(tokenId: `0x${string}`) {
+  async getTokenMeta(tokenId: string) {
     const key = COLLECTION_KEYS.tokenMeta(tokenId);
     return await this.kv.hgetall<TokenMeta>(key);
   }

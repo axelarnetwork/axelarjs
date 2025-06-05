@@ -38,7 +38,7 @@ export const TOKEN_MANAGER_TYPES = [
   "mint_burn_from",
   "lock_unlock",
   "lock_unlock_fee",
-  "gateway",
+  "gateway"
 ] as const;
 
 export const getTokenManagerType = (tokenManagerType: TokenManagerType) =>

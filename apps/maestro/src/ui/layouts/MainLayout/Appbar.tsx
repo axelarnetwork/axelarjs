@@ -23,9 +23,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { APP_NAME } from "~/config/app";
+import { stellarChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import Transactions from "~/features/Transactions/Transactions";
-import { STELLAR_CHAIN_ID, useAccount, useDisconnect } from "~/lib/hooks";
+import { useAccount, useDisconnect } from "~/lib/hooks";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import ConnectWalletModal from "~/ui/compounds/ConnectWalletModal/ConnectWalletModal";
 import { useLayoutStateContainer } from "./MainLayout.state";
@@ -45,6 +46,11 @@ const Appbar: FC<AppbarProps> = (props) => {
 
   const [state, actions] = useLayoutStateContainer();
 
+  const explorerUrl =
+    address && chain?.blockExplorers?.default.url
+      ? `${chain.blockExplorers.default.url}/${chain.id === stellarChainConfig.id ? "account" : "address"}/${address}`
+      : null;
+
   const connectedAccountDetails = address ? (
     <>
       <CopyToClipboardButton
@@ -60,7 +66,7 @@ const Appbar: FC<AppbarProps> = (props) => {
           $size="sm"
           target="_blank"
           rel="noopener noreferrer"
-          href={`${chain?.blockExplorers?.default.url}/address/${address}`}
+          href={explorerUrl ?? "#"}
           className="flex flex-nowrap items-center gap-1"
         >
           View on explorer
@@ -100,7 +106,6 @@ const Appbar: FC<AppbarProps> = (props) => {
             {isConnected && address ? (
               <>
                 <ChainsDropdown
-                  excludeChainIds={[STELLAR_CHAIN_ID]}
                   contentClassName="relative left-[-8px] max-h-[70dvh] w-96 md:w-96 z-10 translate-x-2"
                   triggerClassName="btn btn-block justify-between"
                 />
@@ -185,7 +190,7 @@ const Appbar: FC<AppbarProps> = (props) => {
         <div className="hidden items-center gap-2 md:flex">
           {isConnected && address ? (
             <>
-              <ChainsDropdown excludeChainIds={[STELLAR_CHAIN_ID]} />
+              <ChainsDropdown />
               <Dropdown $align="end">
                 <Dropdown.Trigger>
                   <button
@@ -201,7 +206,7 @@ const Appbar: FC<AppbarProps> = (props) => {
                     </div>
                   </button>
                 </Dropdown.Trigger>
-                <Dropdown.Content className="mt-2 grid max-h-[80vh] w-full gap-2 bg-base-100 p-3 dark:bg-base-200 md:w-48">
+                <Dropdown.Content className="mt-2 grid max-h-[80vh] w-full gap-2 bg-base-100 p-3 dark:bg-base-200 md:w-52">
                   {connectedAccountDetails}
                 </Dropdown.Content>
               </Dropdown>

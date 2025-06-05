@@ -1,13 +1,12 @@
 import { Maybe } from "@axelarjs/utils";
-
-import { trpc } from "~/lib/trpc";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { indexBy, partition, prop } from "rambda";
 
 import { CHAIN_CONFIGS, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { logger } from "~/lib/logger";
+import { trpc } from "~/lib/trpc";
 
 const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("id"), CHAIN_CONFIGS);
 const WAGMI_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
@@ -93,11 +92,7 @@ export function useEVMChainConfigsQuery() {
 
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(
-    () =>
-      partition(
-        (x) => (x.chain_id) in WAGMI_CHAIN_CONFIGS_BY_ID,
-        data ?? []
-      ),
+    () => partition((x) => x.chain_id in WAGMI_CHAIN_CONFIGS_BY_ID, data ?? []),
     [data]
   );
 
@@ -173,5 +168,61 @@ export function useVMChainConfigsQuery() {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
     },
+  };
+}
+
+export function useRpcHealthStatusQuery() {
+  return trpc.healthcheck.getRpcStatus.useQuery(
+    {
+      env: NEXT_PUBLIC_NETWORK_ENV,
+    },
+    {
+      staleTime: 1000 * 60 * 2, // 2 minutes
+      refetchOnWindowFocus: true,
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+    }
+  );
+}
+
+export function useSingleRpcHealthStatus(chainName: string | undefined) {
+  const [status, setStatus] = useState<"up" | "down" | "timeout" | "unknown">(
+    "unknown"
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
+  const query = trpc.healthcheck.getSingleRpcStatus.useQuery(
+    {
+      env: NEXT_PUBLIC_NETWORK_ENV,
+      chainName: chainName || "",
+    },
+    {
+      enabled: Boolean(chainName),
+      staleTime: 1000 * 60 * 2, // 2 minutes
+      refetchOnWindowFocus: false,
+      refetchInterval: 1000 * 60 * 5,
+      refetchOnMount: false,
+      refetchOnReconnect: true,
+      trpc: {
+        context: {
+          skipBatch: true,
+        },
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (query.isFetching) {
+      setIsLoading(true);
+    } else if (query.data) {
+      setStatus(query.data.status);
+      setIsLoading(false);
+    }
+  }, [query.isFetching, query.data]);
+
+  return {
+    status,
+    isLoading: isLoading || query.isLoading,
+    refetch: query.refetch,
   };
 }
