@@ -4,7 +4,10 @@ import { publicProcedure, router } from "~/server/trpc";
 import { buildRegisterCanonicalTokenTransaction } from "./utils/canonicalTokenRegistration";
 import { buildInterchainTransferTransaction } from "./utils/interchainTransfer";
 import { buildDeployRemoteInterchainTokensTransaction } from "./utils/remoteTokenDeployments";
-import { buildDeployInterchainTokenTransaction } from "./utils/tokenDeployments";
+import { 
+  buildDeployInterchainTokenTransaction,
+  buildDeployAndRegisterRemoteInterchainTokenTransaction 
+} from "./utils/tokenDeployments";
 
 export const stellarRouter = router({
   // Endpoint to get transaction bytes for deploying a token on Stellar
@@ -116,6 +119,46 @@ export const stellarRouter = router({
       const { transactionXDR } = await buildRegisterCanonicalTokenTransaction({
         caller: input.caller,
         tokenAddress: input.tokenAddress,
+        destinationChainIds: input.destinationChainIds,
+        gasValues: input.gasValues,
+        multicallContractAddress: input.multicallContractAddress,
+        gasTokenAddress: input.gasTokenAddress,
+        itsContractAddress: input.itsContractAddress,
+      });
+
+      return {
+        transactionXDR,
+      };
+    }),
+    
+  // Endpoint to get transaction bytes for deploying and registering an interchain token in a single transaction
+  getDeployAndRegisterRemoteTokenTxBytes: publicProcedure
+    .input(
+      z.object({
+        caller: z.string(), // Caller address
+        tokenName: z.string(),
+        tokenSymbol: z.string(),
+        decimals: z.number(),
+        initialSupply: z.string(), // Bigint as string
+        salt: z.string(), // Hex string
+        minterAddress: z.string().optional(),
+        destinationChainIds: z.array(z.string()),
+        gasValues: z.array(z.string()), // Array of bigint as strings
+        multicallContractAddress: z.string().optional(),
+        gasTokenAddress: z.string().optional(),
+        itsContractAddress: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Use the utility function to build the combined deployment and registration transaction
+      const { transactionXDR } = await buildDeployAndRegisterRemoteInterchainTokenTransaction({
+        caller: input.caller,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        decimals: input.decimals,
+        initialSupply: input.initialSupply,
+        salt: input.salt,
+        minterAddress: input.minterAddress,
         destinationChainIds: input.destinationChainIds,
         gasValues: input.gasValues,
         multicallContractAddress: input.multicallContractAddress,
