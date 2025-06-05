@@ -4,22 +4,20 @@ import { accountsRouter } from "./accounts";
 import { authRouter } from "./auth";
 import { axelarConfigsRouter } from "./axelarConfigs";
 import { axelarjsSDKRouter } from "./axelarjsSDK";
-import { axelarscanRouter } from "./axelarscan";
 import { gmpRouter } from "./gmp";
+import { healthcheckRouter } from "./healthcheck";
 import { interchainTokenRouter } from "./interchainToken";
 import { messagesRouter } from "./messages";
 import { nativeTokensRouter } from "./nativeTokens";
 import { openaiRouter } from "./openai";
-import { suiRouter } from "./sui";
 import { stellarRouter } from "./stellar";
-import { healthcheckRouter } from "./healthcheck";
+import { suiRouter } from "./sui";
 
 export const appRouter = router({
   uptime: publicProcedure.query(() => ({
     uptime: process.uptime(),
   })),
   gmp: gmpRouter,
-  axelarscan: axelarscanRouter,
   nativeTokens: nativeTokensRouter,
   axelarjsSDK: axelarjsSDKRouter,
   axelarConfigs: axelarConfigsRouter,

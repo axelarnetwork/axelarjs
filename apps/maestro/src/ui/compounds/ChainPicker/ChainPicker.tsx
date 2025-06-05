@@ -1,10 +1,11 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Button, cn, Loading, Tooltip } from "@axelarjs/ui";
 import { useCallback, type FC } from "react";
 
+import type { ITSEvmChainConfig, ITSVmChainConfig } from "~/server/chainConfig";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
-type ChainConfig = EVMChainConfig | VMChainConfig;
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+type ChainConfig = ITSEvmChainConfig | ITSVmChainConfig;
 
 export type ChainPickerProps = {
   eligibleChains: ChainConfig[];
@@ -75,10 +76,13 @@ const ChainPicker: FC<ChainPickerProps> = ({
               $position="top"
             >
               <Button
-                disabled={disabled || (chain.chain_type === "vm" && !chain.id)} // Add additional VM-specific conditions if needed
-                className={cn("w-full rounded-2xl hover:ring flex items-center", {
-                  "opacity-50": chain.chain_type === "vm" && !chain.id, // Visual indicator for unsupported VM chains
-                })}
+                disabled={disabled || (chain.chain_type !== "evm" && !chain.id)} // Add additional VM-specific conditions if needed
+                className={cn(
+                  "flex w-full items-center rounded-2xl hover:ring",
+                  {
+                    "opacity-50": chain.chain_type !== "evm" && !chain.id, // Visual indicator for unsupported VM chains
+                  }
+                )}
                 $size="sm"
                 role="button"
                 $variant={buttonVariant}

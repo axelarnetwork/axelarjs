@@ -131,7 +131,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
       "Ethereum"
     ),
     axelarChainId: "Ethereum",
-    axelarChainName: "ethereum",
+    axelarChainName: "Ethereum",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
   },

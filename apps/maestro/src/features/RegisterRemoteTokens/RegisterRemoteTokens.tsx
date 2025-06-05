@@ -1,4 +1,3 @@
-import { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Alert, Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
@@ -15,8 +14,9 @@ import {
 } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { ITSChainConfig } from "~/server/chainConfig";
 import { findGatewayEventIndex } from "~/server/routers/sui/utils/utils";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import useRegisterRemoteCanonicalTokens from "./hooks/useRegisterRemoteCanonicalTokens";
 import useRegisterRemoteInterchainTokens from "./hooks/useRegisterRemoteInterchainTokens";
 
@@ -24,7 +24,7 @@ export type RegisterRemoteTokensProps = {
   tokenAddress: string;
   chainIds: number[];
   originChainId?: number;
-  originChain?: EVMChainConfig | VMChainConfig;
+  originChain?: ITSChainConfig;
   userGasBalance: GetBalanceReturnType | undefined;
   gasFees: bigint[] | undefined;
   onTxStateChange?: (status: TransactionState) => void;

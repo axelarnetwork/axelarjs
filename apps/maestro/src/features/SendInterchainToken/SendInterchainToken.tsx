@@ -1,4 +1,3 @@
-import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Alert,
   Button,
@@ -25,6 +24,7 @@ import {
   isValidEVMAddress,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
+import { ITSChainConfig } from "~/server/chainConfig";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -41,7 +41,7 @@ type Props = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   kind: "canonical" | "interchain";
-  sourceChain: EVMChainConfig;
+  sourceChain: ITSChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
   originTokenAddress?: `0x${string}`;

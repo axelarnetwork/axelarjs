@@ -17,7 +17,7 @@ import {
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
 } from "~/lib/utils/validation";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import ChainsDropdown, {

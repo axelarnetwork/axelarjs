@@ -1,4 +1,3 @@
-import { ITSChainConfig } from "@axelarjs/api";
 import {
   Badge,
   Dropdown,
@@ -16,8 +15,11 @@ import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
 
 import { useAccount, useSwitchChain } from "~/lib/hooks";
-import { useSingleRpcHealthStatus } from "~/services/axelarConfigs/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { ITSChainConfig } from "~/server/chainConfig";
+import {
+  useAllChainConfigsQuery,
+  useSingleRpcHealthStatus,
+} from "~/services/axelarConfigs/hooks";
 import {
   useChainsDropdownContainer,
   withChainsDropdownProvider,
@@ -161,7 +163,7 @@ export const ChainIconComponent: FC<Props> = (props) => {
       <>
         <ChainIcon
           src={selectedChain.image}
-          alt={selectedChain.chain_name}
+          alt={selectedChain.name}
           size={props.size ?? "sm"}
           className={cn(
             { "-translate-x-1.5": !props.hideLabel },
