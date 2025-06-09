@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
-import { scValToNative, xdr } from "@stellar/stellar-sdk";
+import { humanizeEvents, xdr } from "@stellar/stellar-sdk";
 
 import type { DeployAndRegisterTransactionState as BaseDeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment/InterchainTokenDeployment.state";
 import { trpc } from "~/lib/trpc";
@@ -9,7 +9,6 @@ import { useRegisterRemoteInterchainTokenOnStellar } from "../RegisterRemoteToke
 import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
 import { useStellarTransactionSigner } from "./useStellarTransactionSigner";
 
-// Extend the base type to include step and totalSteps for Stellar deployments
 type DeployAndRegisterTransactionState =
   | Extract<BaseDeployAndRegisterTransactionState, { type: "idle" }>
   | (Extract<
@@ -173,111 +172,46 @@ export function useDeployStellarToken() {
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
-            // Found events to process
+            const humanReadableEvents = humanizeEvents(events);
 
-            for (const event of events) {
-              const eventTopics = event.body().v0().topics();
-              if (!eventTopics || eventTopics.length === 0) continue;
+            for (const event of humanReadableEvents) {
+              if (!event.topics || event.topics.length === 0) continue;
 
-              // Check the event name (first topic must be a symbol)
-              const firstTopic = eventTopics[0];
-              if (firstTopic.switch() !== xdr.ScValType.scvSymbol()) continue;
+              const eventName = event.topics[0];
 
-              const eventName = firstTopic.sym().toString();
-              // Process event by name
-
-              // Interchain token deployment event
-              if (
-                eventName === "interchain_token_deployed" &&
-                eventTopics.length >= 3
-              ) {
-                const topic1 = eventTopics[1]; // tokenId (bytes)
-                const topic2 = eventTopics[2]; // tokenAddress (address)
-
-                // Extract tokenId from the event (if not already extracted from return value)
-                if (
-                  !tokenId &&
-                  topic1 &&
-                  topic1.switch() === xdr.ScValType.scvBytes()
-                ) {
-                  tokenId = topic1.bytes().toString("hex");
-                  // Found tokenId in interchain_token_deployed event
-                }
-
-                // Extract tokenAddress
+              if (eventName === "interchain_token_deployed") {
+                // Extract tokenAddress from the third topic (index 2)
                 if (
                   !tokenAddress &&
-                  topic2 &&
-                  topic2.switch() === xdr.ScValType.scvAddress()
+                  event.topics.length > 2 &&
+                  typeof event.topics[2] === "string"
                 ) {
-                  try {
-                    tokenAddress = scValToNative(topic2);
-                    // Found tokenAddress in interchain_token_deployed event
-                  } catch (error) {
-                    // Error extracting tokenAddress
-                    try {
-                      const addressBytes = topic2.address().contractId();
-                      if (addressBytes) {
-                        tokenAddress = addressBytes.toString("hex");
-                        // Using raw hex for tokenAddress
-                      }
-                    } catch (e) {
-                      // Failed to extract raw address bytes
-                    }
-                  }
+                  tokenAddress = event.topics[2];
                 }
-              }
-              // Token manager deployment event
-              else if (
-                eventName === "token_manager_deployed" &&
-                eventTopics.length >= 5
-              ) {
-                const topic3 = eventTopics[3]; // tokenManagerAddress (address)
-                const topic4 = eventTopics[4]; // tokenManagerType (u32)
-
-                // Extract tokenManagerAddress
+              } else if (eventName === "token_manager_deployed") {
+                // Extract tokenManagerAddress from the fourth topic (index 3)
                 if (
                   !tokenManagerAddress &&
-                  topic3 &&
-                  topic3.switch() === xdr.ScValType.scvAddress()
+                  event.topics.length > 3 &&
+                  typeof event.topics[3] === "string"
                 ) {
-                  try {
-                    tokenManagerAddress = scValToNative(topic3);
-                    // Found tokenManagerAddress in token_manager_deployed event
-                  } catch (error) {
-                    // Error extracting tokenManagerAddress
-                    try {
-                      const addressBytes = topic3.address().contractId();
-                      if (addressBytes) {
-                        tokenManagerAddress = addressBytes.toString("hex");
-                        // Using raw hex for tokenManagerAddress
-                      }
-                    } catch (e) {
-                      // Failed to extract raw address bytes
-                    }
-                  }
+                  tokenManagerAddress = event.topics[3];
                 }
 
-                // Extract tokenManagerType
-                if (
-                  tokenManagerType === undefined &&
-                  topic4 &&
-                  topic4.switch() === xdr.ScValType.scvU32()
-                ) {
-                  try {
-                    const typeNumber = scValToNative(topic4);
+                // Extract tokenManagerType from the fifth topic (index 4)
+                if (tokenManagerType === undefined && event.topics.length > 4) {
+                  const typeValue = event.topics[4];
+                  if (
+                    typeof typeValue === "number" ||
+                    typeof typeValue === "string"
+                  ) {
                     tokenManagerType =
-                      typeNumber === 0 ? "mint_burn" : "lock_unlock";
-                    // Found tokenManagerType in token_manager_deployed event
-                  } catch (error) {
-                    // Error extracting tokenManagerType
-                    // In case of error, assume the default type mint_burn
-                    tokenManagerType = "mint_burn";
-                    // Using default tokenManagerType
+                      String(typeValue) === "0" ? "mint_burn" : "lock_unlock";
                   }
                 }
               }
 
+              // If all details are found, no need to process further events
               if (
                 tokenId &&
                 tokenAddress &&
@@ -290,6 +224,7 @@ export function useDeployStellarToken() {
           }
         } catch (error) {
           // Error extracting token information from transaction
+          console.error("Error parsing transaction events:", error);
         }
       }
 

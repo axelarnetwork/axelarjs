@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { scValToNative, xdr } from "@stellar/stellar-sdk";
+import { humanizeEvents } from "@stellar/stellar-sdk";
 
 import {
   useCanonicalTokenDeploymentStateContainer,
@@ -11,7 +11,6 @@ import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { useStellarTransactionSigner } from "./useStellarTransactionSigner";
 
-// Extend the base type to include step and totalSteps for Stellar deployments
 type DeployAndRegisterTransactionState =
   | Extract<BaseDeployAndRegisterTransactionState, { type: "idle" }>
   | (Extract<
@@ -140,98 +139,74 @@ export function useRegisterCanonicalTokenOnStellar() {
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
-            for (const event of events) {
-              const eventTopics = event.body().v0().topics();
-              if (!eventTopics || eventTopics.length === 0) continue;
+            const humanReadableEvents = humanizeEvents(events);
 
-              // Check the event name (first topic must be a symbol)
-              const firstTopic = eventTopics[0];
-              if (firstTopic.switch() !== xdr.ScValType.scvSymbol()) continue;
+            for (const event of humanReadableEvents) {
+              if (!event.topics || event.topics.length === 0) continue;
 
-              const eventName = firstTopic.sym().toString();
+              const eventName = event.topics[0];
 
-              // Process token_manager_deployed event
               if (
                 eventName === "token_manager_deployed" &&
-                eventTopics.length >= 5
+                event.topics.length >= 5
               ) {
-                // In the example: ["token_manager_deployed"sym, kOH4I62W0LAo4Z7poBzdtJwjKE3Ei6iqtPezCRzlOSY=bytes, CDQM…RC6I, CANB…CPEK, 2u32]
+                // In the example: ["token_manager_deployed", "kOH4I62W0LAo4Z7poBzdtJwjKE3Ei6iqtPezCRzlOSY=", "CDQM…RC6I", "CANB…CPEK", 2]
                 // tokenId is at index 1
                 // tokenAddress is at index 2
                 // tokenManagerAddress is at index 3
                 // tokenManagerType is at index 4
 
                 // Extract tokenId from event
-                const topic1 = eventTopics[1]; // tokenId
                 if (
                   !tokenId &&
-                  topic1 &&
-                  topic1.switch() === xdr.ScValType.scvBytes()
+                  event.topics.length > 1 &&
+                  typeof event.topics[1] === "string"
                 ) {
-                  try {
-                    tokenId = topic1.bytes().toString("hex");
-                    console.log("Extracted tokenId from event:", tokenId);
-                  } catch (error) {
-                    console.error(
-                      "Error extracting tokenId from event:",
-                      error
-                    );
-                  }
+                  tokenId = event.topics[1];
+                  console.log("Extracted tokenId from event:", tokenId);
                 }
 
                 // Extract tokenAddress from event
-                const topic2 = eventTopics[2]; // tokenAddress
-                if (!extractedTokenAddress && topic2) {
-                  try {
-                    extractedTokenAddress = scValToNative(topic2);
-                    console.log(
-                      "Extracted tokenAddress from event:",
-                      extractedTokenAddress
-                    );
-                  } catch (error) {
-                    console.error(
-                      "Error extracting tokenAddress from event:",
-                      error
-                    );
-                  }
+                if (
+                  !extractedTokenAddress &&
+                  event.topics.length > 2 &&
+                  typeof event.topics[2] === "string"
+                ) {
+                  extractedTokenAddress = event.topics[2];
+                  console.log(
+                    "Extracted tokenAddress from event:",
+                    extractedTokenAddress
+                  );
                 }
-
-                const topic3 = eventTopics[3]; // tokenManagerAddress
-                const topic4 = eventTopics[4]; // tokenManagerType
 
                 // Extract tokenManagerAddress
                 if (
                   !extractedTokenManagerAddress &&
-                  topic3 &&
-                  topic3.switch() === xdr.ScValType.scvAddress()
+                  event.topics.length > 3 &&
+                  typeof event.topics[3] === "string"
                 ) {
-                  try {
-                    extractedTokenManagerAddress = scValToNative(topic3);
-                  } catch (error) {
-                    // Error extracting tokenManagerAddress
-                    try {
-                      const addressBytes = topic3.address().contractId();
-                      if (addressBytes) {
-                        extractedTokenManagerAddress =
-                          addressBytes.toString("hex");
-                      }
-                    } catch (e) {
-                      // Failed to extract raw address bytes
-                    }
-                  }
+                  extractedTokenManagerAddress = event.topics[3];
+                  console.log(
+                    "Extracted tokenManagerAddress from event:",
+                    extractedTokenManagerAddress
+                  );
                 }
 
                 // Extract tokenManagerType
-                if (topic4 && topic4.switch() === xdr.ScValType.scvU32()) {
-                  try {
-                    const typeNumber = scValToNative(topic4);
+                if (event.topics.length > 4) {
+                  const typeValue = event.topics[4];
+                  if (
+                    typeof typeValue === "number" ||
+                    typeof typeValue === "string"
+                  ) {
                     // Type 2 is lock_unlock for canonical tokens
-                    if (typeNumber === 2) {
+                    if (Number(typeValue) === 2) {
                       tokenManagerType = "lock_unlock";
+                      console.log(
+                        "Extracted tokenManagerType from event:",
+                        tokenManagerType
+                      );
                     }
-                  } catch (error) {
-                    // Error extracting tokenManagerType
-                    // Keep default "lock_unlock" for canonical tokens
                   }
                 }
               }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
-import { rpc, scValToNative, Transaction, xdr } from "@stellar/stellar-sdk";
+import { humanizeEvents, rpc, Transaction, xdr } from "@stellar/stellar-sdk";
 
 import { stellarChainConfig } from "~/config/chains";
 import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
@@ -34,7 +34,9 @@ export interface DeployAndRegisterTokenResultStellar {
 export function useDeployAndRegisterStellarToken() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [data, setData] = useState<DeployAndRegisterTokenResultStellar | null>(null);
+  const [data, setData] = useState<DeployAndRegisterTokenResultStellar | null>(
+    null
+  );
 
   const { pollTransaction } = useStellarTransactionPoller();
 
@@ -76,7 +78,7 @@ export function useDeployAndRegisterStellarToken() {
 
     try {
       setIsLoading(true);
-      
+
       // 1. Get transaction bytes for combined deployment and registration
       const { transactionXDR } = await getDeployAndRegisterRemoteTokenTxBytes({
         caller: publicKey,
@@ -87,7 +89,7 @@ export function useDeployAndRegisterStellarToken() {
         salt,
         minterAddress,
         destinationChainIds,
-        gasValues: gasValues.map(value => value.toString()),
+        gasValues: gasValues.map((value) => value.toString()),
       });
 
       // 2. Sign the transaction
@@ -171,93 +173,55 @@ export function useDeployAndRegisterStellarToken() {
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
-            for (const event of events) {
-              const eventTopics = event.body().v0().topics();
-              if (!eventTopics || eventTopics.length === 0) continue;
+            // Use humanizeEvents to get a more developer-friendly representation
+            const humanReadableEvents = humanizeEvents(events);
+            // console.log("humanReadableEvents", humanReadableEvents); // Uncomment for debugging
 
-              // Check the event name (first topic must be a symbol)
-              const firstTopic = eventTopics[0];
-              if (firstTopic.switch() !== xdr.ScValType.scvSymbol()) continue;
+            // Process each event
+            for (const event of humanReadableEvents) {
+              if (!event.topics || event.topics.length === 0) continue;
 
-              const eventName = firstTopic.sym().toString();
+              const eventName = event.topics[0];
 
-              // Interchain token deployment event
-              if (
-                eventName === "interchain_token_deployed" &&
-                eventTopics.length >= 3
-              ) {
-                const topic1 = eventTopics[1]; // tokenId (bytes)
-                const topic2 = eventTopics[2]; // tokenAddress (address)
-
-                // Extract tokenId from the event (if not already extracted from return value)
+              // Process event by name
+              if (eventName === "interchain_token_deployed") {
+                // Extract tokenId from the second topic (index 1) if not already extracted from return value
                 if (
                   !tokenId &&
-                  topic1 &&
-                  topic1.switch() === xdr.ScValType.scvBytes()
+                  event.topics.length > 1 &&
+                  typeof event.topics[1] === "string"
                 ) {
-                  tokenId = topic1.bytes().toString("hex");
+                  tokenId = event.topics[1];
                 }
 
-                // Extract tokenAddress
+                // Extract tokenAddress from the third topic (index 2)
                 if (
                   !tokenAddress &&
-                  topic2 &&
-                  topic2.switch() === xdr.ScValType.scvAddress()
+                  event.topics.length > 2 &&
+                  typeof event.topics[2] === "string"
                 ) {
-                  try {
-                    tokenAddress = scValToNative(topic2);
-                  } catch (error) {
-                    try {
-                      const addressBytes = topic2.address().contractId();
-                      if (addressBytes) {
-                        tokenAddress = addressBytes.toString("hex");
-                      }
-                    } catch (e) {
-                      // Failed to extract raw address bytes
-                    }
-                  }
+                  tokenAddress = event.topics[2];
                 }
-              }
-              // Token manager deployment event
-              else if (
-                eventName === "token_manager_deployed" &&
-                eventTopics.length >= 5
-              ) {
-                const topic3 = eventTopics[3]; // tokenManagerAddress (address)
-                const topic4 = eventTopics[4]; // tokenManagerType (u32)
-
-                // Extract tokenManagerAddress
+              } else if (eventName === "token_manager_deployed") {
+                // Extract tokenManagerAddress from the fourth topic (index 3)
                 if (
                   !tokenManagerAddress &&
-                  topic3 &&
-                  topic3.switch() === xdr.ScValType.scvAddress()
+                  event.topics.length > 3 &&
+                  typeof event.topics[3] === "string"
                 ) {
-                  try {
-                    tokenManagerAddress = scValToNative(topic3);
-                  } catch (error) {
-                    try {
-                      const addressBytes = topic3.address().contractId();
-                      if (addressBytes) {
-                        tokenManagerAddress = addressBytes.toString("hex");
-                      }
-                    } catch (e) {
-                      // Failed to extract raw address bytes
-                    }
-                  }
+                  tokenManagerAddress = event.topics[3];
                 }
 
-                // Extract tokenManagerType
-                if (
-                  tokenManagerType === undefined &&
-                  topic4 &&
-                  topic4.switch() === xdr.ScValType.scvU32()
-                ) {
-                  try {
-                    const typeNumber = scValToNative(topic4);
+                // Extract tokenManagerType from the fifth topic (index 4)
+                if (tokenManagerType === undefined && event.topics.length > 4) {
+                  const typeValue = event.topics[4];
+                  if (
+                    typeof typeValue === "number" ||
+                    typeof typeValue === "string"
+                  ) {
                     tokenManagerType =
-                      typeNumber === 0 ? "mint_burn" : "lock_unlock";
-                  } catch (error) {
-                    // In case of error, assume the default type mint_burn
+                      String(typeValue) === "0" ? "mint_burn" : "lock_unlock";
+                  } else {
                     tokenManagerType = "mint_burn";
                   }
                 }
@@ -274,7 +238,10 @@ export function useDeployAndRegisterStellarToken() {
             }
           }
         } catch (error) {
-          console.error("Error extracting token information from transaction:", error);
+          console.error(
+            "Error extracting token information from transaction:",
+            error
+          );
         }
       }
 
