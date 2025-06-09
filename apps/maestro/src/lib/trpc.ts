@@ -1,4 +1,4 @@
-import { httpBatchLink } from "@trpc/client";
+import { httpBatchLink, httpLink, splitLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import { ssrPrepass } from "@trpc/next/ssrPrepass";
 import superjson from "superjson";
@@ -30,9 +30,21 @@ export const trpc = createTRPCNext<AppRouter>({
       return {
         queryClient,
         links: [
-          httpBatchLink({
-            transformer: superjson, // optional - adds superjson serialization
-            url: "/api/trpc",
+          splitLink({
+            condition(op: { context?: { skipBatch?: boolean } }) {
+              // Check for context property `skipBatch`
+              return Boolean(op.context?.skipBatch);
+            },
+            // When condition is true, use normal request (no batching)
+            true: httpLink({
+              url: "/api/trpc",
+              transformer: superjson,
+            }),
+            // When condition is false, use batching
+            false: httpBatchLink({
+              transformer: superjson,
+              url: "/api/trpc",
+            }),
           }),
         ],
       };
@@ -40,30 +52,52 @@ export const trpc = createTRPCNext<AppRouter>({
     return {
       queryClient, // use shared queryClient
       links: [
-        httpBatchLink({
-          transformer: superjson, // optional - adds superjson serialization
-          // The server needs to know your app's full url
-          url: `${getBaseUrl()}/api/trpc`,
-          /**
-           * Set custom request headers on every request from tRPC
-           * @link https://trpc.io/docs/v10/header
-           */
-          headers() {
-            if (!ctx?.req?.headers) {
-              return {};
-            }
-
-            // To use SSR properly, you need to forward the client's headers to the server
-            // This is so you can pass through things like cookies when we're server-side rendering
-            // If you're using Node 18, omit the "connection" header
-            const { headers } = ctx.req;
-
-            return {
-              ...headers,
-              // Optional: inform server that it's an SSR request
-              "x-ssr": "1",
-            };
+        splitLink({
+          condition(op: { context?: { skipBatch?: boolean } }) {
+            // Check for context property `skipBatch`
+            return Boolean(op.context?.skipBatch);
           },
+          // When condition is true, use normal request (no batching)
+          true: httpLink({
+            url: `${getBaseUrl()}/api/trpc`,
+            transformer: superjson,
+            headers() {
+              if (!ctx?.req?.headers) {
+                return {};
+              }
+              const { headers } = ctx.req;
+              return {
+                ...headers,
+                // Optional: inform server that it's an SSR request
+                "x-ssr": "1",
+              };
+            },
+          }),
+          // When condition is false, use batching
+          false: httpBatchLink({
+            transformer: superjson,
+            url: `${getBaseUrl()}/api/trpc`,
+            /**
+             * Set custom request headers on every request from tRPC
+             * @link https://trpc.io/docs/v10/header
+             */
+            headers() {
+              if (!ctx?.req?.headers) {
+                return {};
+              }
+
+              // To use SSR properly, you need to forward the client's headers to the server
+              // This is so you can pass through things like cookies when we're server-side rendering
+              // If you're using Node 18, omit the "connection" header
+              const { headers } = ctx.req;
+
+              return {
+                ...headers,
+                // Optional: inform server that it's an SSR request
+                "x-ssr": "1",
+              };
+            },
+          }),
         }),
       ],
     };

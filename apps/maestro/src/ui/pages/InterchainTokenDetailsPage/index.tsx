@@ -3,9 +3,9 @@ import { useRouter } from "next/router";
 
 import { useChainFromRoute } from "~/lib/hooks";
 import { getPrefilledClaimOwnershipFormLink } from "~/lib/utils/gform";
-import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
+import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import Page from "~/ui/layouts/Page";
 import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
@@ -28,11 +28,11 @@ const InterchainTokensPage: FC = () => {
   });
 
   const { data: interchainTokenDetails } = useInterchainTokenDetailsQuery({
-    chainId: interchainToken?.chainId,
-    tokenAddress: interchainToken?.tokenAddress,
+    chainId: routeChain?.id,
+    tokenAddress,
   });
 
-  const { data: tokenDetails } = useERC20TokenDetailsQuery({
+  const { data: tokenDetails } = useNativeTokenDetailsQuery({
     chainId: routeChain?.id,
     tokenAddress,
   });

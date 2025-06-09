@@ -9,10 +9,11 @@ import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
+import { useRegisterRemoteInterchainTokenOnStellar } from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
 
 export type RegisterRemoteInterchainTokensInput = {
@@ -86,8 +87,12 @@ export default function useRegisterRemoteInterchainTokens(
 
   const mutation = useWriteInterchainTokenFactoryMulticall();
 
-  const { registerRemoteInterchainToken } =
+  const { registerRemoteInterchainToken: registerRemoteInterchainTokenOnSui } =
     useRegisterRemoteInterchainTokenOnSui();
+
+  const {
+    registerRemoteInterchainToken: registerRemoteInterchainTokenOnStellar,
+  } = useRegisterRemoteInterchainTokenOnStellar();
 
   if (!tokenDeployment) return;
 
@@ -102,11 +107,21 @@ export default function useRegisterRemoteInterchainTokens(
       | "mint_burn",
   };
 
+  const stellarInput = {
+    salt: tokenDeployment.salt,
+    destinationChainIds,
+    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
+  };
+
   return {
     ...mutation,
     writeContract: () => {
       if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainToken(suiInput);
+        return registerRemoteInterchainTokenOnSui(suiInput);
+      }
+
+      if (chainId === STELLAR_CHAIN_ID) {
+        return registerRemoteInterchainTokenOnStellar(stellarInput);
       }
 
       if (!config) return;
@@ -115,7 +130,11 @@ export default function useRegisterRemoteInterchainTokens(
     },
     writeContractAsync: async () => {
       if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainToken(suiInput);
+        return registerRemoteInterchainTokenOnSui(suiInput);
+      }
+
+      if (chainId === STELLAR_CHAIN_ID) {
+        return registerRemoteInterchainTokenOnStellar(stellarInput);
       }
 
       if (!config) return;

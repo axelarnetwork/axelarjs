@@ -8,9 +8,7 @@ export async function loadChains(config: LoadChainConfig) {
     config.environment as Environment
   );
   const allAssets = Object.values(
-    (await axelarConfigClient.getAxelarAssetConfigs(
-      config.environment as Environment
-    )) as {
+    (await axelarConfigClient.getAxelarAssetConfigs()) as {
       [key: string]: AssetConfig;
     }
   );
@@ -18,9 +16,7 @@ export async function loadChains(config: LoadChainConfig) {
   const _environment = config.environment as Environment;
 
   const rawChains = Object.values(
-    (await axelarConfigClient.getAxelarChainConfigs(
-      config.environment as Environment
-    )) as ChainInfo
+    (await axelarConfigClient.getAxelarChainConfigs()) as ChainInfo
   ) as ChainInfo[];
 
   /*push assets to supported chains*/

@@ -1,139 +1,19 @@
 import {
   AxelarConfigClient,
   AxelarConfigsResponse,
-  AxelarscanClient,
-  EVMChainConfig,
-  VMChainConfig,
+  ChainConfig,
 } from "@axelarjs/api";
-import { invariant } from "@axelarjs/utils";
 
 import { encodeAbiParameters, keccak256 } from "viem";
 
-import { CHAIN_CONFIGS, ExtendedWagmiChainConfig } from "~/config/chains";
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import MaestroKVClient from "~/services/db/kv";
-
-export type EvmChainsValue = {
-  info: EVMChainConfig;
-  wagmi: ExtendedWagmiChainConfig;
-};
-
-export type EVMChainsMap = Record<string | number, EvmChainsValue>;
-
-export type VMChainsValue = {
-  info: VMChainConfig;
-  wagmi?: ExtendedWagmiChainConfig;
-};
-
-export type VMChainsMap = Record<string | number, VMChainsValue>;
-
-export type ChainsMap = Record<string | number, EvmChainsValue | VMChainsValue>;
-
-export async function vmChains<TCacheKey extends string>(
-  kvClient: MaestroKVClient,
-  axelarscanClient: AxelarscanClient,
-  cacheKey: TCacheKey
-): Promise<VMChainsMap> {
-  if (process.env.DISABLE_CACHE !== "true") {
-    const cached = await kvClient.getCached<VMChainsMap>(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-  }
-
-  const chainConfigs = await axelarscanClient.getChainConfigs();
-
-  // Add evm-compatible chains to the list of eligible chains
-  const vmChainsMap = chainConfigs.vm.reduce(
-    (acc, chain) => {
-      const wagmiConfig = CHAIN_CONFIGS.find(
-        (config) => config.id === chain.chain_id
-      );
-
-      const entry = {
-        info: chain,
-        wagmi: wagmiConfig,
-      };
-
-      return {
-        ...acc,
-        [chain.id]: entry,
-        [chain.chain_id]: entry,
-      };
-    },
-    {} as Record<
-      string | number,
-      {
-        info: VMChainConfig;
-        wagmi?: ExtendedWagmiChainConfig;
-      }
-    >
-  );
-
-  // cache for 1 hour
-  await kvClient.setCached<VMChainsMap>(cacheKey, vmChainsMap, 3600);
-
-  return vmChainsMap;
-}
-export async function evmChains<TCacheKey extends string>(
-  kvClient: MaestroKVClient,
-  axelarscanClient: AxelarscanClient,
-  cacheKey: TCacheKey
-): Promise<EVMChainsMap> {
-  if (process.env.DISABLE_CACHE !== "true") {
-    const cached = await kvClient.getCached<EVMChainsMap>(cacheKey);
-
-    if (cached) {
-      return cached;
-    }
-  }
-
-  const chainConfigs = await axelarscanClient.getChainConfigs();
-
-  const configuredIDs = CHAIN_CONFIGS.map((chain) => chain.id);
-
-  const eligibleChains = chainConfigs.evm.filter((chain) =>
-    configuredIDs.includes(chain.chain_id)
-  );
-
-  // Add flow config to the list of eligible chains
-  const evmChainsMap = eligibleChains.reduce(
-    (acc, chain) => {
-      const wagmiConfig = CHAIN_CONFIGS.find(
-        (config) => config.id === chain.chain_id
-      );
-
-      // for type safety
-      invariant(wagmiConfig, "wagmiConfig is required");
-
-      const entry = {
-        info: chain,
-        wagmi: wagmiConfig,
-      };
-
-      entry.info.id = wagmiConfig.axelarChainId;
-
-      return {
-        ...acc,
-        [chain.id]: entry,
-        [chain.chain_id]: entry,
-      };
-    },
-    {} as Record<
-      string | number,
-      {
-        info: EVMChainConfig;
-        wagmi: ExtendedWagmiChainConfig;
-      }
-    >
-  );
-
-  // cache for 1 hour
-  await kvClient.setCached<EVMChainsMap>(cacheKey, evmChainsMap, 3600);
-
-  return evmChainsMap;
-}
+import {
+  ChainsMap,
+  evmChains,
+  EvmChainsValue,
+  vmChains,
+  VMChainsValue,
+} from "./chainConfig";
 
 export async function axelarConfigs<TCacheKey extends string>(
   kvClient: MaestroKVClient,
@@ -141,21 +21,42 @@ export async function axelarConfigs<TCacheKey extends string>(
   cacheKey: TCacheKey
 ): Promise<AxelarConfigsResponse> {
   if (process.env.DISABLE_CACHE !== "true") {
-    const cached = await kvClient.getCached<any>(cacheKey);
+    const cached = await kvClient.getCached<AxelarConfigsResponse>(cacheKey);
 
     if (cached) {
       return cached;
     }
   }
 
-  const chainConfigs = await axelarConfigClient.getAxelarConfigs(
-    NEXT_PUBLIC_NETWORK_ENV
-  );
+  const chainConfigs = await axelarConfigClient.getAxelarConfigs();
 
   // cache for 1 hour
-  await kvClient.setCached<any>(cacheKey, chainConfigs, 3600);
+  await kvClient.setCached<AxelarConfigsResponse>(cacheKey, chainConfigs, 3600);
 
   return chainConfigs;
+}
+
+export async function axelarChainConfigs<TCacheKey extends string>(
+  kvClient: MaestroKVClient,
+  axelarConfigClient: AxelarConfigClient,
+  cacheKey: TCacheKey
+): Promise<Record<string, ChainConfig>> {
+  type RedisType = Promise<Record<string, ChainConfig>>;
+  if (process.env.DISABLE_CACHE !== "true") {
+    const cached = await kvClient.getCached<RedisType>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+  }
+
+  const chainConfigs = await axelarConfigClient.getAxelarConfigs();
+  const chains = chainConfigs.chains;
+
+  // cache for 1 hour
+  await kvClient.setCached<Awaited<RedisType>>(cacheKey, chains, 3600);
+
+  return chains;
 }
 
 // Calculate PREFIX_INTERCHAIN_TOKEN_SALT
@@ -187,7 +88,7 @@ export function generateInterchainTokenSalt(
 
 export async function chains<TCacheKey extends string>(
   kvClient: MaestroKVClient,
-  axelarscanClient: AxelarscanClient,
+  axelarConfigClient: AxelarConfigClient, // Changed from axelarscanClient
   cacheKey: TCacheKey
 ): Promise<ChainsMap> {
   if (process.env.DISABLE_CACHE !== "true") {
@@ -198,9 +99,10 @@ export async function chains<TCacheKey extends string>(
     }
   }
 
+  // Both evmChains and vmChains now use axelarConfigClient
   const [evmChainsMap, vmChainsMap] = await Promise.all([
-    evmChains(kvClient, axelarscanClient, `${cacheKey}-evm`),
-    vmChains(kvClient, axelarscanClient, `${cacheKey}-vm`),
+    evmChains(kvClient, axelarConfigClient, `${cacheKey}-evm`),
+    vmChains(kvClient, axelarConfigClient, `${cacheKey}-vm`),
   ]);
 
   const combinedChainsMap: Record<string, EvmChainsValue | VMChainsValue> = {};

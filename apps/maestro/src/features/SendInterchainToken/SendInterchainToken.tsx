@@ -1,4 +1,3 @@
-import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Alert,
   Button,
@@ -16,6 +15,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 
 import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { isValidSuiAddress } from "@mysten/sui/utils";
+import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
 import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
@@ -24,6 +24,7 @@ import {
   isValidEVMAddress,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
+import { ITSChainConfig } from "~/server/chainConfig";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
@@ -40,7 +41,7 @@ type Props = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   kind: "canonical" | "interchain";
-  sourceChain: EVMChainConfig;
+  sourceChain: ITSChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
   originTokenAddress?: `0x${string}`;
@@ -53,16 +54,6 @@ type Props = {
 
 export const SendInterchainToken: FC<Props> = (props) => {
   const { address } = useAccount();
-  const [state, actions] = useSendInterchainTokenState({
-    tokenAddress: props.tokenAddress,
-    tokenId: props.tokenId,
-    sourceChain: props.sourceChain,
-    isModalOpen: props.isOpen,
-    kind: props.kind,
-    originTokenAddress: props.originTokenAddress,
-    originTokenChainId: props.originTokenChainId,
-  });
-
   const {
     register,
     handleSubmit,
@@ -73,6 +64,19 @@ export const SendInterchainToken: FC<Props> = (props) => {
   } = useForm<FormState>({
     mode: "onChange",
     reValidateMode: "onChange",
+  });
+
+  const destinationAddress = watch("destinationAddress");
+
+  const [state, actions] = useSendInterchainTokenState({
+    tokenAddress: props.tokenAddress,
+    tokenId: props.tokenId,
+    sourceChain: props.sourceChain,
+    isModalOpen: props.isOpen,
+    kind: props.kind,
+    destinationAddress,
+    originTokenAddress: props.originTokenAddress,
+    originTokenChainId: props.originTokenChainId,
   });
 
   const amountToTransfer = watch("amountToTransfer");
@@ -299,7 +303,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
           props.onClose?.();
           resetForm();
           actions.resetTxState();
-        }  
+        }
         actions.setIsModalOpen(isOpen);
       }}
     >
@@ -313,6 +317,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               disabled
               compact
               selectedChain={props.sourceChain}
+              hideRPCHealthIndicator={true}
               hideLabel={false}
               chainIconClassName="-translate-x-1.5"
               triggerClassName="w-full md:w-auto rounded-full"
@@ -323,6 +328,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <ChainsDropdown
               compact
               hideLabel={false}
+              hideRPCHealthIndicator={true}
               selectedChain={state.selectedToChain}
               chains={state.eligibleTargetChains}
               disabled={
@@ -405,9 +411,14 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <Label htmlFor="destinationAddress">
               <Label.Text>Destination Address</Label.Text>
               {isSameChainType && (
-                <Label.AltText className="hover:cursor-pointer hover:opacity-30 transition-opacity" onClick={() => {
-                  setValue("destinationAddress", address ?? "");
-                }}>Use connected wallet address</Label.AltText>
+                <Label.AltText
+                  className="transition-opacity hover:cursor-pointer hover:opacity-30"
+                  onClick={() => {
+                    setValue("destinationAddress", address ?? "");
+                  }}
+                >
+                  Use connected wallet address
+                </Label.AltText>
               )}
             </Label>
             <TextInput
@@ -430,7 +441,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   ) {
                     return "Invalid SUI address";
                   }
-
+                  if (
+                    state.selectedToChain.id.includes("stellar") &&
+                    !StrKey.isValidEd25519PublicKey(value)
+                  ) {
+                    return "Invalid Stellar address";
+                  }
                   if (
                     (state.selectedToChain.chain_type === "evm" ||
                       state.selectedToChain.id.includes("flow")) &&

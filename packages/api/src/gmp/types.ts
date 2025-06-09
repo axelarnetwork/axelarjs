@@ -30,10 +30,10 @@ type BaseGMPParams = {
   contractMethod?: string;
   sourceChain?: string;
   destinationChain?: string;
-  sourceAddress?: `0x${string}`;
-  contractAddress?: `0x${string}`;
-  senderAddress?: `0x${string}`;
-  relayerAddress?: `0x${string}`;
+  sourceAddress?: string;
+  contractAddress?: string;
+  senderAddress?: string;
+  relayerAddress?: string;
   /**
    * Unix timestamp in seconds
    */

@@ -152,3 +152,11 @@ export const ClaimOwnershipFormFieldIds = {
   sourceChain: "entry.373826717",
   tokenName: "entry.1492946428",
 };
+
+/**
+ * Minimum time between notifications for the same RPC node issue (in seconds)
+ * Default: 30 minutes
+ */
+export const NOTIFICATION_COOLDOWN_SECONDS = Maybe.of(
+  process.env.NOTIFICATION_COOLDOWN_SECONDS
+).mapOr(30 * 60, Number);

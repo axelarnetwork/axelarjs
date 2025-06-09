@@ -4,7 +4,7 @@ export type TOKEN_TYPE =
   | "canonical"
   | "gateway";
 export type TOKEN_MANAGER_TYPE = "mintBurn" | "lockUnlock";
-export interface AssetConfig {
+export type AssetConfig = {
   id: string;
   prettySymbol: string;
   name: string | null;
@@ -30,11 +30,11 @@ export interface AssetConfig {
       details?: { fullDenomPath?: string };
     };
   };
-}
+};
 
 export type CHAIN_TYPE = "axelarnet" | "evm" | "sui";
 
-export interface ChainEvmSubconfig {
+export type ChainEvmSubconfig = {
   contracts?: {
     AxelarGateway?: { address: string };
     AxelarGasService?: { address: string };
@@ -50,9 +50,14 @@ export interface ChainEvmSubconfig {
   };
   approxFinalityHeight: number;
   rpc: string[];
-}
+};
 
-export interface ChainSuiSubconfig {
+export type ChainVmSubconfig = {
+  contracts: Record<string, { address: string }>;
+  rpc: string[];
+};
+
+export interface ChainSuiSubconfig extends ChainVmSubconfig {
   contracts: {
     Utils: SuiContract;
     VersionControl: SuiContract;
@@ -63,6 +68,17 @@ export interface ChainSuiSubconfig {
     Abi: SuiContract;
     InterchainTokenService: SuiContract;
     Example: SuiContract;
+  };
+}
+
+export interface ChainStellarSubconfig {
+  contracts: {
+    InterchainTokenService: StellarContract;
+    AxelarGateway: StellarContract;
+    AxelarOperators: StellarContract;
+    AxelarGasService: StellarContract;
+    AxelarExample: StellarContract;
+    Upgrader: StellarContract;
   };
   rpc: string[];
 }
@@ -93,10 +109,14 @@ export interface SuiContract {
   objects: Record<string, string>;
 }
 
+export interface StellarContract {
+  address: string;
+  objects: Record<string, string>;
+}
+
 interface BaseChainConfig {
   id: string;
   displayName: string;
-  externalChainId: string | number;
   iconUrl: string;
   nativeCurrency: {
     name: string;
@@ -112,21 +132,38 @@ interface BaseChainConfig {
 // Chain configs for each chain type with associated contracts
 export interface EvmChainConfig extends BaseChainConfig {
   chainType: "evm";
+  externalChainId: string;
   config: ChainEvmSubconfig;
 }
 
 interface AxelarChainConfig extends BaseChainConfig {
   chainType: "axelarnet";
+  externalChainId: string;
   config: ChainCosmosSubconfig;
 }
 
-export interface SuiChainConfig extends BaseChainConfig {
+export interface VmChainConfig extends BaseChainConfig {
+  chainType: "sui" | "stellar";
+  externalChainId: string;
+  config: ChainVmSubconfig;
+}
+
+export interface SuiChainConfig extends VmChainConfig {
   chainType: "sui";
   config: ChainSuiSubconfig;
 }
 
+export interface StellarChainConfig extends VmChainConfig {
+  chainType: "stellar";
+  config: ChainStellarSubconfig;
+}
+
 // Union type of all possible chain configs
-export type ChainConfig = EvmChainConfig | AxelarChainConfig | SuiChainConfig;
+export type ChainConfig =
+  | EvmChainConfig
+  | AxelarChainConfig
+  | SuiChainConfig
+  | StellarChainConfig;
 
 export interface AxelarConfigsResponse {
   chains: { [chainId: string]: ChainConfig };

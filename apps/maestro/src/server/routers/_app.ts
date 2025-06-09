@@ -4,12 +4,13 @@ import { accountsRouter } from "./accounts";
 import { authRouter } from "./auth";
 import { axelarConfigsRouter } from "./axelarConfigs";
 import { axelarjsSDKRouter } from "./axelarjsSDK";
-import { axelarscanRouter } from "./axelarscan";
-import { erc20Router } from "./erc20";
 import { gmpRouter } from "./gmp";
+import { healthcheckRouter } from "./healthcheck";
 import { interchainTokenRouter } from "./interchainToken";
 import { messagesRouter } from "./messages";
+import { nativeTokensRouter } from "./nativeTokens";
 import { openaiRouter } from "./openai";
+import { stellarRouter } from "./stellar";
 import { suiRouter } from "./sui";
 
 export const appRouter = router({
@@ -17,8 +18,7 @@ export const appRouter = router({
     uptime: process.uptime(),
   })),
   gmp: gmpRouter,
-  axelarscan: axelarscanRouter,
-  erc20: erc20Router,
+  nativeTokens: nativeTokensRouter,
   axelarjsSDK: axelarjsSDKRouter,
   axelarConfigs: axelarConfigsRouter,
   interchainToken: interchainTokenRouter,
@@ -27,6 +27,8 @@ export const appRouter = router({
   messages: messagesRouter,
   accounts: accountsRouter,
   sui: suiRouter,
+  stellar: stellarRouter,
+  healthcheck: healthcheckRouter,
 });
 
 export type AppRouter = typeof appRouter;

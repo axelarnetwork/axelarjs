@@ -1,5 +1,10 @@
-import { ITSChainConfig } from "@axelarjs/api";
-import { Dropdown, HelpCircleIcon } from "@axelarjs/ui";
+import {
+  Badge,
+  Dropdown,
+  HelpCircleIcon,
+  Tooltip,
+  type BadgeProps,
+} from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { cn } from "@axelarjs/ui/utils";
 import { Maybe } from "@axelarjs/utils";
@@ -10,7 +15,11 @@ import { find, propEq } from "rambda";
 import { TransactionExecutionError } from "viem";
 
 import { useAccount, useSwitchChain } from "~/lib/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { ITSChainConfig } from "~/server/chainConfig";
+import {
+  useAllChainConfigsQuery,
+  useSingleRpcHealthStatus,
+} from "~/services/axelarConfigs/hooks";
 import {
   useChainsDropdownContainer,
   withChainsDropdownProvider,
@@ -72,12 +81,58 @@ type Props = {
   onSelectChain?: (chain?: ITSChainConfig) => void;
   size?: keyof typeof ICON_SIZES;
   chainType?: "evm" | "vm";
+  excludeChainIds?: number[];
+  hideRPCHealthIndicator?: boolean;
 };
+
+type HealthStatus = "up" | "down" | "timeout" | "unknown";
+
+const STATUS_LABELS: Partial<Record<HealthStatus, string>> = {
+  down: "Down",
+  up: "Up",
+  timeout: "Timeout",
+  unknown: "Unknown",
+};
+
+const STATUS_COLORS: Partial<
+  Record<HealthStatus, NonNullable<BadgeProps["$variant"]>>
+> = {
+  down: "error",
+  up: "success",
+  timeout: "warning",
+  unknown: "neutral",
+};
+
+const HealthDot: FC<{
+  status: HealthStatus;
+  isLoading?: boolean;
+}> = ({ status, isLoading }) => (
+  <Tooltip
+    tip={
+      isLoading
+        ? "Checking RPC status..."
+        : status
+          ? `RPC is ${status}`
+          : "Unknown status"
+    }
+    $position="right"
+  >
+    <span className="relative ml-1 inline-block align-middle">
+      <Badge
+        $variant={STATUS_COLORS[status]}
+        $size="xs"
+        className={cn("mt-0.5 text-xs", {
+          "animate-pulse": !["error", "executed"].includes(status),
+        })}
+        aria-label={`status: ${STATUS_LABELS[status]}`}
+      />
+    </span>
+  </Tooltip>
+);
 
 export const ChainIconComponent: FC<Props> = (props) => {
   const { allChains: chains } = useAllChainConfigsQuery();
   const { chain } = useAccount();
-
   const [state] = useChainsDropdownContainer();
 
   const selectedChain = useMemo(
@@ -108,7 +163,7 @@ export const ChainIconComponent: FC<Props> = (props) => {
       <>
         <ChainIcon
           src={selectedChain.image}
-          alt={selectedChain.chain_name}
+          alt={selectedChain.name}
           size={props.size ?? "sm"}
           className={cn(
             { "-translate-x-1.5": !props.hideLabel },
@@ -131,6 +186,29 @@ export const ChainIconComponent: FC<Props> = (props) => {
   }
 };
 
+const ChainItem: FC<{
+  chain: ITSChainConfig;
+  onClick: (chainId: number) => void;
+}> = ({ chain, onClick }) => {
+  const { status, isLoading } = useSingleRpcHealthStatus(chain.chain_name);
+
+  return (
+    <Dropdown.Item key={chain.chain_id}>
+      <button
+        onClick={(e: React.MouseEvent) => {
+          e.preventDefault();
+          onClick(chain.chain_id);
+        }}
+        className="group flex w-full items-center gap-2"
+      >
+        <ChainIcon src={chain.image} alt={chain.name} size="md" />
+        <div>{chain.name}</div>
+        <HealthDot status={status} isLoading={isLoading} />
+      </button>
+    </Dropdown.Item>
+  );
+};
+
 const ChainsDropdown: FC<Props> = (props) => {
   const { allChains } = useAllChainConfigsQuery();
   const { chain } = useAccount();
@@ -149,7 +227,11 @@ const ChainsDropdown: FC<Props> = (props) => {
   const eligibleChains = Maybe.of(props.chains ?? allChains).mapOr(
     [],
     (chains) =>
-      chains.filter((chain) => chain.chain_id !== selectedChain?.chain_id)
+      chains.filter(
+        (chain) =>
+          !props.excludeChainIds?.includes(chain.chain_id) &&
+          chain.chain_id !== selectedChain?.chain_id
+      )
   );
 
   const handleChainChange = (chainId: number) => {
@@ -187,6 +269,11 @@ const ChainsDropdown: FC<Props> = (props) => {
     }
   };
 
+  const selectedChainForHealth = props.selectedChain || selectedChain;
+  const { status, isLoading } = useSingleRpcHealthStatus(
+    selectedChainForHealth?.chain_name
+  );
+
   return (
     <Dropdown $align="end">
       {props.renderTrigger?.() ?? (
@@ -204,13 +291,16 @@ const ChainsDropdown: FC<Props> = (props) => {
           tabIndex={props.compact ? -1 : 0}
         >
           <ChainIconComponent {...props} />
+          {selectedChainForHealth && !props.hideRPCHealthIndicator && (
+            <HealthDot status={status} isLoading={isLoading} />
+          )}
         </Dropdown.Trigger>
       )}
 
       {eligibleChains.length > 0 && !props.disabled && (
         <Dropdown.Content
           className={cn(
-            "z-10 mt-2 max-h-[75vh] w-full dark:bg-base-200 md:w-96",
+            "z-10 mt-2 max-h-[75vh] w-full dark:bg-base-200 md:w-[28rem]",
             {
               "broder max-h-[350px] w-80 overflow-x-scroll bg-base-200 dark:bg-base-300 md:w-96":
                 props.compact,
@@ -237,24 +327,11 @@ const ChainsDropdown: FC<Props> = (props) => {
             </Dropdown.Item>
           )}
           {eligibleChains.map((chain) => (
-            <Dropdown.Item
+            <ChainItem
               key={chain.chain_id}
-              className={cn({
-                "pointer-events-none":
-                  chain.chain_id === selectedChain?.chain_id,
-              })}
-            >
-              <button
-                onClick={(e: React.MouseEvent) => {
-                  e.preventDefault();
-                  handleChainChange(chain.chain_id);
-                }}
-                className="group flex w-full items-center gap-2"
-              >
-                <ChainIcon src={chain.image} alt={chain.name} size="md" />
-                <div>{chain.name}</div>
-              </button>
-            </Dropdown.Item>
+              chain={chain}
+              onClick={handleChainChange}
+            />
           ))}
         </Dropdown.Content>
       )}

@@ -13,10 +13,13 @@ import { isAddress } from "viem";
 
 import { useAccount } from "~/lib/hooks";
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
-import { isValidSuiTokenAddress } from "~/lib/utils/validation";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useERC20TokenDetailsQuery } from "~/services/erc20";
+import {
+  isValidStellarTokenAddress,
+  isValidSuiTokenAddress,
+} from "~/lib/utils/validation";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import ChainsDropdown, {
   ChainIconComponent,
 } from "~/ui/components/ChainsDropdown";
@@ -50,6 +53,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
 
   const isValidEVMAddress = isAddress(search as `0x${string}`);
   const isValidSuiAddress = isValidSuiTokenAddress(search);
+  const isValidStellar = isValidStellarTokenAddress(search);
 
   const chainId = connectedChain?.id ?? selectedChainId;
   const chainName = connectedChain?.name ?? defaultChain?.name;
@@ -58,7 +62,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     data: searchERC20Result,
     error: searchERC20Error,
     isLoading: isSearchingERC20,
-  } = useERC20TokenDetailsQuery({
+  } = useNativeTokenDetailsQuery({
     chainId: chainId,
     tokenAddress: search,
   });
@@ -87,22 +91,25 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
       props.onTokenFound({
         tokenId: searchInterchainTokenResult.tokenId as `0x${string}`,
         tokenAddress: search,
-        chainName: searchERC20Result?.axelarChainName,
+        chainName: searchERC20Result?.axelarChainName || undefined,
       });
     }
   }, [
     searchInterchainTokenResult.tokenAddress,
     searchInterchainTokenResult.tokenId,
+    searchERC20Result,
     props,
     search,
-    searchERC20Result,
   ]);
 
   const [isFocused, setIsFocused] = useState(false);
 
   const shouldRenderError =
     (hasError && !searchERC20Result) ||
-    (!isValidEVMAddress && !isValidSuiAddress && search.length >= 10);
+    (!isValidEVMAddress &&
+      !isValidSuiAddress &&
+      !isValidStellar &&
+      search.length >= 10);
 
   return (
     <FormControl className="relative w-full max-w-xs md:max-w-md">
@@ -121,8 +128,8 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           name="tokenAddress"
           placeholder={
             defaultChain?.name
-              ? `Search for ERC-20 token address on ${chainName}`
-              : "Search for ERC-20 token address"
+              ? `Search for any token address on ${chainName}`
+              : "Search for any token address"
           }
           value={search}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -189,7 +196,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           className="-bottom-5 mx-auto w-full flex-1 p-2 text-center text-sm text-error"
         >
           {(searchInterchainTokenError ?? searchERC20Error)?.message ??
-            "Invalid ERC-20 token address"}
+            "Invalid token address"}
         </div>
       )}
     </FormControl>

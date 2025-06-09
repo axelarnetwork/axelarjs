@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useRouter } from "next/router";
 
 import { useAccount, useChainFromRoute } from "~/lib/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
@@ -71,7 +71,7 @@ const Review: FC = () => {
     }
   }, [actions, chainConfig, router, state.txState]);
 
-  const isVMChain = chainConfig?.chain_type === "vm";
+  const isVMChain = chainConfig?.chain_type !== "evm";
 
   return (
     <>

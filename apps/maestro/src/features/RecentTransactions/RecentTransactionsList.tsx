@@ -6,10 +6,7 @@ import Link from "next/link";
 import { formatDuration, intervalToDuration } from "date-fns";
 import type { Address } from "viem";
 
-import {
-  NEXT_PUBLIC_EXPLORER_URL,
-  NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
-} from "~/config/env";
+import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import { TokenIcon } from "~/ui/pages/InterchainTokenDetailsPage/TokenDetailsSection";
@@ -71,7 +68,7 @@ export const RecentTransactionsList: FC<Props> = ({
           <Card.Title className="grid place-items-center">
             <Link
               className="group flex items-center gap-1 hover:text-accent hover:underline"
-              href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/search?contractAddress=${NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS}&contractMethod=${contractMethod}${
+              href={`${NEXT_PUBLIC_EXPLORER_URL}/gmp/search?&contractMethod=${contractMethod}${
                 senderAddress ? `&senderAddress=${senderAddress}` : ``
               }`}
               target="_blank"

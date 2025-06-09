@@ -48,7 +48,7 @@ export async function getDepositAddressFromAxelarNetwork(
 
 function findLinkRequest(
   params: ListenerParams,
-  module: "evm" | "axelarnet" | "sui" | undefined,
+  module: "evm" | "axelarnet" | "sui" | "stellar" | undefined,
   results: LinkRequestResponse[]
 ) {
   return results.find((linkRequest) => {

@@ -1,4 +1,3 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import {
   Alert,
   Badge,
@@ -27,16 +26,17 @@ import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
 import { z } from "zod";
 
-import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
+import { ITSChainConfig } from "~/server/chainConfig";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
-  chain: EVMChainConfig | VMChainConfig;
-  tokenAddress: string;
+  chain: ITSChainConfig;
+  tokenAddress: `0x${string}`;
   wasDeployedByAccount?: boolean;
   decimals: number;
   tokenId?: `0x${string}` | null | undefined;
@@ -60,7 +60,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   );
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
-
+  const isStellarChain = props.chain.chain_id === STELLAR_CHAIN_ID;
   const tokenAddress = props.tokenAddress;
 
   const tokenDetails = [
@@ -78,7 +78,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    ...(!isSuiChain
+    ...(!isSuiChain && !isStellarChain
       ? [
           [
             "Add Token to Wallet",
@@ -221,10 +221,20 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   );
 
   function getTokenExplorerLink() {
+    const explorer = props.chain.blockExplorers?.[0];
+
     if (isSuiChain) {
-      return `${props.chain.explorer.url}/coin/${props.tokenAddress}`;
+      return `${explorer?.url}/coin/${props.tokenAddress}`;
+    } else if (props.chain.chain_type.includes("stellar")) {
+      return `${explorer?.url}/coin/${props.tokenAddress}`;
+    } else if (props.chain.id.includes("stellar")) {
+      if (props.tokenAddress.includes("-")) {
+        return `${explorer?.url}/asset/${props.tokenAddress}`;
+      } else {
+        return `${explorer?.url}/contract/${props.tokenAddress}`;
+      }
     } else {
-      return `${props.chain.explorer.url}/token/${props.tokenAddress}`;
+      return `${explorer?.url}/token/${props.tokenAddress}`;
     }
   }
 
@@ -256,7 +266,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
           <ChainIcon src={props.chain.image} alt={props.chain.name} size="md" />
           <span>View token</span>
           <span className="hidden sm:ml-[-4px] sm:block">
-            on {props.chain.explorer.name}
+            on {props.chain.blockExplorers?.[0].name}
           </span>
           <ExternalLinkIcon className="h-4 w-4 translate-x-1" />
         </LinkButton>
@@ -359,7 +369,9 @@ export const TokenIcon: FC<{ tokenId: `0x${string}` }> = ({ tokenId }) => {
           layout="fill"
         />
       ) : (
-        <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
+        tokenId && (
+          <Identicon seed={jsNumberForAddress(tokenId)} diameter={36} />
+        )
       )}
     </div>
   );

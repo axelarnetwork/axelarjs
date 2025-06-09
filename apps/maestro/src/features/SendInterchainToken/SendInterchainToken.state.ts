@@ -1,4 +1,3 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
@@ -10,25 +9,24 @@ import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { ITSChainConfig } from "~/server/chainConfig";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import {
   useChainInfoQuery,
   useEstimateGasFeeQuery,
 } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { useERC20TokenDetailsQuery } from "~/services/erc20";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
+import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
-
-type ChainConfig = EVMChainConfig | VMChainConfig;
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: string;
   originTokenAddress?: `0x${string}`;
   originTokenChainId?: number;
   tokenId: `0x${string}`;
-  sourceChain: ChainConfig;
+  sourceChain: ITSChainConfig;
   kind: "canonical" | "interchain";
   isModalOpen?: boolean;
   destinationAddress?: string;
@@ -36,7 +34,7 @@ export function useSendInterchainTokenState(props: {
   const { combinedComputed } = useAllChainConfigsQuery();
 
   // Only query ERC20 details for EVM chains
-  const { data: tokenDetails } = useERC20TokenDetailsQuery({
+  const { data: tokenDetails } = useNativeTokenDetailsQuery({
     chainId: props.sourceChain.chain_id,
     tokenAddress: props.tokenAddress,
   });
@@ -54,9 +52,15 @@ export function useSendInterchainTokenState(props: {
   const isApprovalRequired = useMemo(
     () =>
       props.kind === "canonical" &&
+      props.sourceChain.chain_type === "evm" &&
       interchainToken.chainId !== undefined &&
       interchainToken.chainId === props.originTokenChainId,
-    [interchainToken.chainId, props.kind, props.originTokenChainId]
+    [
+      interchainToken.chainId,
+      props.kind,
+      props.originTokenChainId,
+      props.sourceChain.chain_type,
+    ]
   );
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
@@ -134,6 +138,7 @@ export function useSendInterchainTokenState(props: {
     tokenId: props.tokenId,
     destinationChainName: selectedToChain?.id,
     sourceChainName: props.sourceChain.id,
+    destinationAddress: props.destinationAddress,
     gas,
   });
 

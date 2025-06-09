@@ -31,7 +31,7 @@ import { useSession } from "next-auth/react";
 
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import ChainsDropdownComponent from "~/ui/components/ChainsDropdown";
 import ConnectWalletModal from "../ConnectWalletModal/ConnectWalletModal";
 
@@ -42,7 +42,6 @@ export const ModalFormInput = tw(TextInput)`bg-base-200`;
 ModalFormInput.defaultProps = {
   $bordered: true,
 };
-
 
 export const NextButton: FC<ButtonProps> = ({ children, ...props }) => {
   return (
@@ -148,6 +147,7 @@ export type ProtectedDialogProps = PropsWithChildren<{
   triggerLabel?: string;
   steps: string[];
   title?: ReactNode;
+  disabled?: boolean;
   onClose: DialogProps["onClose"];
   onBackClick?: () => void;
 }>;
@@ -158,6 +158,7 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   onClose,
   disableClose,
   disableChainsDropdown,
+  disabled,
   ...props
 }) => {
   const { status, data } = useSession();
@@ -187,7 +188,9 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
     <Dialog
       onClose={handleClose}
       renderTrigger={(props) => (
-        <TriggerButton {...props}>{triggerLabel}</TriggerButton>
+        <TriggerButton {...props} disabled={disabled}>
+          {triggerLabel}
+        </TriggerButton>
       )}
     >
       <Dialog.Body $as="section">

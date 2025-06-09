@@ -5,12 +5,14 @@ import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 
+import { useSendStellarToken } from "~/features/stellarHooks";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -33,10 +35,10 @@ export function useInterchainTransferMutation(
   config: UseSendInterchainTokenConfig
 ) {
   const [txState, setTxState] = useTransactionState();
-
   const chainId = useChainId();
-
   const { address } = useAccount();
+
+  const { sendToken: sendStellarToken } = useSendStellarToken();
 
   const { writeContractAsync: transferAsync } =
     useWriteInterchainTokenInterchainTransfer();
@@ -66,25 +68,30 @@ export function useInterchainTransferMutation(
 
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
     mutationFn: async ({ amount, tokenId, destinationAddress, decimals }) => {
-      if (
-        !(decimals && address && config.gas && tokenId && destinationAddress)
-      ) {
+      if (!(address && config.gas && tokenId && destinationAddress)) {
         return;
       }
 
-      const bnAmount = parseUnits(amount, decimals);
+      const bnAmount = parseUnits(amount, decimals || 0);
       try {
         setTxState({
           status: "awaiting_approval",
         });
         let txHash: any;
+        let encodedRecipient: `0x${string}`;
+        // Encode the recipient address for Stellar since it's a base64 string
+        if (config.destinationChainName.toLowerCase().includes("stellar")) {
+          encodedRecipient = stellarEncodedRecipient(destinationAddress);
+        } else {
+          encodedRecipient = destinationAddress as `0x${string}`;
+        }
         if (config.sourceChainName.toLowerCase().includes("sui")) {
           const sendTokenTxJSON = await getSendTokenTx({
             sender: address,
             tokenId: tokenId,
             amount: bnAmount.toString(),
             destinationChain: config.destinationChainName,
-            destinationAddress: destinationAddress,
+            destinationAddress: encodedRecipient,
             gas: config.gas.toString() ?? "0",
             coinType: config.tokenAddress,
           });
@@ -92,14 +99,24 @@ export function useInterchainTransferMutation(
             transaction: sendTokenTxJSON,
           });
           txHash = receipt.digest;
+        } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
+          const result = await sendStellarToken.mutateAsync({
+            caller: address,
+            tokenId: tokenId,
+            destinationChain: config.destinationChainName,
+            destinationAddress: destinationAddress,
+            amount: Number(bnAmount.toString()),
+            gasValue: Number(config.gas.toString()) || 0,
+          });
+
+          txHash = result.hash;
         } else {
-          const recipient = (destinationAddress ?? address) as `0x${string}`;
           txHash = await transferAsync({
             address: config.tokenAddress as `0x${string}`,
             value: config.gas ?? 0n,
             args: INTERCHAIN_TOKEN_ENCODERS.interchainTransfer.args({
               destinationChain: config.destinationChainName,
-              recipient,
+              recipient: encodedRecipient,
               amount: bnAmount,
               metadata: "0x",
             }),
