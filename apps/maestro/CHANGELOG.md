@@ -1,5 +1,25 @@
 # @axelarjs/maestro
 
+## 0.4.1
+
+### Patch Changes
+
+- [#495](https://github.com/axelarnetwork/axelarjs/pull/495) [`9d1a83f5679274998eb6499ec0de3b0e3169331c`](https://github.com/axelarnetwork/axelarjs/commit/9d1a83f5679274998eb6499ec0de3b0e3169331c) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - change default rpc url for fantom mainnet
+
+- Updated dependencies [[`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e), [`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e)]:
+  - @axelarjs/api@0.4.7
+  - @axelarjs/core@0.2.12
+  - @axelarjs/evm@0.2.9
+
+## 0.3.30
+
+### Patch Changes
+
+- [#484](https://github.com/axelarnetwork/axelarjs/pull/484) [`1d05d568cfed5ab89ca19eadd2961bdfffa91a80`](https://github.com/axelarnetwork/axelarjs/commit/1d05d568cfed5ab89ca19eadd2961bdfffa91a80) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - add flow support to portal
+
+- Updated dependencies [[`1d05d568cfed5ab89ca19eadd2961bdfffa91a80`](https://github.com/axelarnetwork/axelarjs/commit/1d05d568cfed5ab89ca19eadd2961bdfffa91a80)]:
+  - @axelarjs/evm@0.2.8
+
 ## 0.3.29
 
 ### Patch Changes

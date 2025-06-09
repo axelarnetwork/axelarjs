@@ -1,4 +1,3 @@
-import type { EVMChainConfig } from "@axelarjs/api";
 import {
   Alert,
   Button,
@@ -14,18 +13,27 @@ import { invariant } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
+import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
+import { isValidSuiAddress } from "@mysten/sui/utils";
+import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
+import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
-import { preventNonNumericInput } from "~/lib/utils/validation";
+import {
+  isValidEVMAddress,
+  preventNonNumericInput,
+} from "~/lib/utils/validation";
+import { ITSChainConfig } from "~/server/chainConfig";
 import BigNumberText from "~/ui/components/BigNumberText";
-import EVMChainsDropdown from "~/ui/components/EVMChainsDropdown";
+import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
 
 type FormState = {
   amountToTransfer: string;
+  destinationAddress: string;
 };
 
 type Props = {
@@ -33,7 +41,7 @@ type Props = {
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
   kind: "canonical" | "interchain";
-  sourceChain: EVMChainConfig;
+  sourceChain: ITSChainConfig;
   isOpen?: boolean;
   onClose?: () => void;
   originTokenAddress?: `0x${string}`;
@@ -45,16 +53,7 @@ type Props = {
 };
 
 export const SendInterchainToken: FC<Props> = (props) => {
-  const [state, actions] = useSendInterchainTokenState({
-    tokenAddress: props.tokenAddress,
-    tokenId: props.tokenId,
-    sourceChain: props.sourceChain,
-    isModalOpen: props.isOpen,
-    kind: props.kind,
-    originTokenAddress: props.originTokenAddress,
-    originTokenChainId: props.originTokenChainId,
-  });
-
+  const { address } = useAccount();
   const {
     register,
     handleSubmit,
@@ -65,6 +64,19 @@ export const SendInterchainToken: FC<Props> = (props) => {
   } = useForm<FormState>({
     mode: "onChange",
     reValidateMode: "onChange",
+  });
+
+  const destinationAddress = watch("destinationAddress");
+
+  const [state, actions] = useSendInterchainTokenState({
+    tokenAddress: props.tokenAddress,
+    tokenId: props.tokenId,
+    sourceChain: props.sourceChain,
+    isModalOpen: props.isOpen,
+    kind: props.kind,
+    destinationAddress,
+    originTokenAddress: props.originTokenAddress,
+    originTokenChainId: props.originTokenChainId,
   });
 
   const amountToTransfer = watch("amountToTransfer");
@@ -78,14 +90,19 @@ export const SendInterchainToken: FC<Props> = (props) => {
       {
         tokenAddress: props.tokenAddress,
         amount: data.amountToTransfer,
+        tokenId: props.tokenId,
+        destinationAddress: data.destinationAddress,
+        decimals: Number(props.balance.decimals),
       },
       {
-        // handles unhandled errors in the mutation
         onError(error) {
           if (error instanceof Error) {
             toast.error("Failed to transfer token. Please try again.");
             logger.always.error(error);
           }
+        },
+        onSuccess() {
+          void actions.refetchBalances();
         },
       }
     );
@@ -120,7 +137,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
           return {
             children:
               formState.errors.amountToTransfer?.message ??
-              "Amount is required",
+              formState.errors.destinationAddress?.message ??
+              "Please fill in all required fields",
             status: "error",
           };
         }
@@ -145,6 +163,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   }, [
     amountToTransfer,
     formState.errors.amountToTransfer?.message,
+    formState.errors.destinationAddress?.message,
     formState.isValid,
     state.hasInsufficientGasBalance,
     state.nativeTokenSymbol,
@@ -175,6 +194,58 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [actions, props.sourceChain, state.txState, txHash]);
 
+  const suiTxDigest = useMemo(() => {
+    return state.txState.status === "submitted"
+      ? state.txState.suiTx?.digest
+      : undefined;
+  }, [state.txState]);
+
+  const handleSuiTransactionComplete = useCallback(
+    async (result: SuiTransactionBlockResponse) => {
+      // Check if transaction was successful
+      if (result.effects?.status?.status === "success") {
+        await actions.refetchBalances();
+        resetForm();
+        actions.resetTxState();
+        actions.setIsModalOpen(false);
+        toast.success("Tokens sent successfully!", {
+          id: `token-sent:${result.digest}`,
+        });
+      }
+    },
+    [actions, resetForm]
+  );
+
+  useEffect(() => {
+    async function trackTransaction() {
+      if (state.txState.status !== "submitted") return;
+      if (!state.txState.suiTx) return;
+      if (!suiTxDigest) return;
+
+      actions.trackTransaction({
+        status: "submitted",
+        hash: suiTxDigest,
+        suiTx: state.txState.suiTx,
+        chainId: SUI_CHAIN_ID,
+        txType: "INTERCHAIN_TRANSFER",
+      });
+
+      await handleSuiTransactionComplete(state.txState.suiTx);
+    }
+
+    if (state.txState.status === "submitted") {
+      trackTransaction().catch((error) => {
+        logger.error("Failed to track transaction", error);
+      });
+    }
+  }, [
+    actions,
+    suiTxDigest,
+    state.txState,
+    address,
+    handleSuiTransactionComplete,
+  ]);
+
   const handleAllChainsExecuted = useCallback(async () => {
     await actions.refetchBalances();
     resetForm();
@@ -203,6 +274,22 @@ export const SendInterchainToken: FC<Props> = (props) => {
     });
   }, [props.balance.decimals, props.balance.tokenBalance, setValue]);
 
+  const isSameChainType = useMemo(() => {
+    if (props.sourceChain.chain_type === "evm") {
+      // Handle edge case where the source chain is EVM and the destination chain is flow which is compatible with EVM but it's a VM chain
+      return (
+        state.selectedToChain?.chain_type === "evm" ||
+        state.selectedToChain?.id.includes("flow")
+      );
+    }
+
+    return state.selectedToChain?.chain_type === props.sourceChain.chain_type;
+  }, [
+    state.selectedToChain?.chain_type,
+    state.selectedToChain?.id,
+    props.sourceChain.chain_type,
+  ]);
+
   return (
     <Modal
       trigger={props.trigger}
@@ -226,10 +313,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
         <div className="grid grid-cols-2 gap-4 p-1">
           <div className="flex items-center gap-2">
             <label className="text-md align-top">From:</label>
-            <EVMChainsDropdown
+            <ChainsDropdown
               disabled
               compact
               selectedChain={props.sourceChain}
+              hideRPCHealthIndicator={true}
               hideLabel={false}
               chainIconClassName="-translate-x-1.5"
               triggerClassName="w-full md:w-auto rounded-full"
@@ -237,9 +325,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
           </div>
           <div className="flex items-center gap-2">
             <label className="text-md align-top">To:</label>
-            <EVMChainsDropdown
+            <ChainsDropdown
               compact
               hideLabel={false}
+              hideRPCHealthIndicator={true}
               selectedChain={state.selectedToChain}
               chains={state.eligibleTargetChains}
               disabled={
@@ -318,6 +407,60 @@ export const SendInterchainToken: FC<Props> = (props) => {
             />
           </FormControl>
 
+          <FormControl>
+            <Label htmlFor="destinationAddress">
+              <Label.Text>Destination Address</Label.Text>
+              {isSameChainType && (
+                <Label.AltText
+                  className="transition-opacity hover:cursor-pointer hover:opacity-30"
+                  onClick={() => {
+                    setValue("destinationAddress", address ?? "");
+                  }}
+                >
+                  Use connected wallet address
+                </Label.AltText>
+              )}
+            </Label>
+            <TextInput
+              id="destinationAddress"
+              $bordered
+              placeholder="Enter destination address"
+              className="bg-base-200"
+              autoComplete="off"
+              data-1p-ignore
+              data-lpignore="true"
+              data-form-type="other"
+              aria-autocomplete="none"
+              {...register("destinationAddress", {
+                required: "Destination address is required",
+                validate: (value) => {
+                  // TODO handle sui address length
+                  if (
+                    state.selectedToChain.id.includes("sui") &&
+                    !isValidSuiAddress(value)
+                  ) {
+                    return "Invalid SUI address";
+                  }
+                  if (
+                    state.selectedToChain.id.includes("stellar") &&
+                    !StrKey.isValidEd25519PublicKey(value)
+                  ) {
+                    return "Invalid Stellar address";
+                  }
+                  if (
+                    (state.selectedToChain.chain_type === "evm" ||
+                      state.selectedToChain.id.includes("flow")) &&
+                    !isValidEVMAddress(value)
+                  ) {
+                    return "Invalid EVM address";
+                  }
+
+                  return true;
+                },
+              })}
+            />
+          </FormControl>
+
           {state.txState.status === "idle" &&
             state.estimatedWaitTimeInMinutes > 2 && (
               <Alert icon={<EyeIcon />}>
@@ -331,7 +474,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               additionalChainNames={[state.selectedToChain.id]}
               originChainName={props.sourceChain.chain_name}
               tokenName={state.tokenSymbol ?? ""}
-              originAxelarChainId={props.sourceChain.chain_name}
+              originAxelarChainId={props.sourceChain.id}
               tokenAddress={props.tokenAddress}
               haikuType="send"
             />

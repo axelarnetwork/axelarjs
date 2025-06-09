@@ -4,10 +4,9 @@ import { capitalize } from "@axelarjs/utils/string";
 import { useEffect, useMemo, useState, type FC } from "react";
 import Link from "next/link";
 
-import { useAccount } from "wagmi";
-
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
 import { type InterchainToken } from "~/lib/drizzle/schema";
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import type { RecentTransactionsOutput } from "~/server/routers/gmp/getRecentTransactions";
 import Pagination from "~/ui/components/Pagination";
@@ -54,7 +53,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   const { data: txns, isLoading } = trpc.gmp.getRecentTransactions.useQuery(
     {
       contractMethod,
-      senderAddress,
+      senderAddress: senderAddress ?? "",
       pageSize: maxTransactions,
       page,
     },
@@ -66,7 +65,7 @@ export const RecentTransactionsTable: FC<Props> = ({
   const { data: prevPageTxns } = trpc.gmp.getRecentTransactions.useQuery(
     {
       contractMethod,
-      senderAddress,
+      senderAddress: senderAddress ?? "",
       pageSize: maxTransactions,
       page: page > 0 ? page - 1 : 0,
     },
@@ -77,7 +76,7 @@ export const RecentTransactionsTable: FC<Props> = ({
 
   const { data: nextPageTxns } = trpc.gmp.getRecentTransactions.useQuery({
     contractMethod,
-    senderAddress,
+    senderAddress: senderAddress ?? "",
     pageSize: maxTransactions,
     page: page + 1,
   });

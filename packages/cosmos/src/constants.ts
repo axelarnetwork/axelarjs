@@ -19,8 +19,13 @@ const mainnetConfigs: EnvironmentConfigs = {
   axelarLcdUrl: "https://lcd-axelar.imperator.co",
 };
 
+const devnetAmplifierConfigs: EnvironmentConfigs = {
+  axelarRpcUrl: "http://devnet-amplifier.axelar.dev:26657",
+  axelarLcdUrl: "http://devnet-amplifier.axelar.dev:1317",
+};
+
 const configsMap: Record<Environment, EnvironmentConfigs> = {
-  devnet: testnetConfigs,
+  ["devnet-amplifier"]: devnetAmplifierConfigs,
   testnet: testnetConfigs,
   mainnet: mainnetConfigs,
 };

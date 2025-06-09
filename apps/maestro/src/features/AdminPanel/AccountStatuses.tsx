@@ -32,7 +32,7 @@ type AccountStatusesViewState =
     }
   | {
       status: "editing";
-      accountAddress: `0x${string}`;
+      accountAddress: string;
     };
 
 export const AccountStatusesManager = () => {
@@ -159,13 +159,13 @@ const AccountStatusDropdown: FC<{
 };
 
 type AccountStatusRowProps = {
-  accountAddress: `0x${string}`;
+  accountAddress: string;
   status: AccountStatus;
   isEditting?: boolean;
   isMutating?: boolean;
   disabled: boolean;
-  onSave: (accountAddress: `0x${string}`, status: AccountStatus) => void;
-  onSelect: (accountAddress: `0x${string}`) => void;
+  onSave: (accountAddress: string, status: AccountStatus) => void;
+  onSelect: (accountAddress: string) => void;
 };
 
 const AccountStatusRow: FC<AccountStatusRowProps> = (props) => {
@@ -218,13 +218,13 @@ const STATUS_OPTIONS = ["enabled", "privileged", "disabled"] as const;
 
 type AddAccountStatusProps = {
   onClose?: () => void;
-  onAdd?: (accountAddress: `0x${string}`, status: AccountStatus) => void;
+  onAdd?: (accountAddress: string, status: AccountStatus) => void;
 };
 
 const AddAccountStatus: FC<AddAccountStatusProps> = ({ onClose, onAdd }) => {
   const [selectedStatus, setSelectedStatus] =
     useState<AccountStatus>("enabled");
-  const [accountAddress, setAccountAddress] = useState<`0x${string}`>();
+  const [accountAddress, setAccountAddress] = useState<string>();
 
   const isDisabled =
     !accountAddress || !selectedStatus || !isAddress(accountAddress);
@@ -247,11 +247,11 @@ const AddAccountStatus: FC<AddAccountStatusProps> = ({ onClose, onAdd }) => {
           <FormControl className="flex-1">
             <Label>Account Adrress</Label>
             <TextInput
-              placeholder="0x"
+              placeholder="0x..."
               $size="sm"
               value={accountAddress}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setAccountAddress(e.target.value as `0x${string}`)
+                setAccountAddress(e.target.value)
               }
             />
           </FormControl>

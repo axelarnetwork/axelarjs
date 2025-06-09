@@ -6,8 +6,10 @@ import { invariant, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { zeroAddress, type TransactionReceipt } from "viem";
-import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
+import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
+import useDeployToken from "~/features/suiHooks/useDeployToken";
 import {
   useReadInterchainTokenFactoryInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
@@ -18,11 +20,19 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+  useChainId,
+} from "~/lib/hooks";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
+import { TOKEN_MANAGER_TYPES } from "../../../lib/drizzle/schema/common";
 import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 export interface UseDeployAndRegisterInterchainTokenInput {
@@ -34,7 +44,7 @@ export interface UseDeployAndRegisterInterchainTokenInput {
   remoteDeploymentGasFees?: EstimateGasFeeMultipleChainsOutput;
   initialSupply?: bigint;
   salt: `0x${string}`;
-  minterAddress?: `0x${string}`;
+  minterAddress?: string;
 }
 
 export interface UseDeployAndRegisterRemoteInterchainTokenConfig {
@@ -47,9 +57,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   input?: UseDeployAndRegisterInterchainTokenInput
 ) {
   const { address: deployerAddress } = useAccount();
+  const { address } = useAccount();
+  const { kit } = useStellarKit();
   const chainId = useChainId();
-
-  const { computed } = useEVMChainConfigsQuery();
+  const { deployToken } = useDeployToken();
+  const { combinedComputed } = useAllChainConfigsQuery();
+  const [isReady, setIsReady] = useState(false);
+  const { deployStellarToken } = useDeployStellarToken();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -62,7 +76,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { data: tokenId } = useReadInterchainTokenFactoryInterchainTokenId({
     args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenId.args({
       salt: input?.salt as `0x${string}`,
-      deployer: deployerAddress as `0x${string}`,
+      deployer: deployerAddress,
     }),
     query: {
       enabled:
@@ -80,31 +94,39 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       },
     });
 
-  const { destinationChainNames } = useMemo(() => {
-    const index = computed.indexedById;
+  const { destinationChainIds } = useMemo(() => {
+    const index = combinedComputed.indexedById;
+    const originalChain = index[input?.sourceChainId ?? chainId];
+    const originalChainName = originalChain?.chain_name ?? "Unknown";
 
     return {
-      destinationChainNames:
+      originalChainName,
+      destinationChainIds:
         input?.destinationChainIds.map(
-          (destinationChainId) =>
-            index[destinationChainId]?.chain_name ?? "Unknown"
+          (destinationChainId) => index[destinationChainId]?.id ?? "Unknown"
         ) ?? [],
     };
-  }, [computed.indexedById, input?.destinationChainIds]);
+  }, [
+    chainId,
+    input?.destinationChainIds,
+    input?.sourceChainId,
+    combinedComputed.indexedById,
+  ]);
 
   const multicallArgs = useMemo(() => {
-    if (!input || !tokenId) {
+    if (!input || !tokenId || chainId === SUI_CHAIN_ID) {
       return [];
     }
 
+    const minter = input?.minterAddress ?? zeroAddress;
     const commonArgs = {
-      minter: input?.minterAddress ?? zeroAddress,
       salt: input.salt,
     };
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployInterchainToken.data({
         ...commonArgs,
+        minter: minter as `0x${string}`,
         initialSupply: input.initialSupply || 0n,
         name: input.tokenName,
         symbol: input.tokenSymbol,
@@ -116,25 +138,24 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       return [deployTxData];
     }
 
-    const registerTxData = destinationChainNames.map((destinationChain, i) =>
-      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+    const registerTxData = destinationChainIds.map((destinationChain, i) =>
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken2.data({
         ...commonArgs,
         originalChainName: "",
+        minter: minter as `0x${string}`,
         destinationChain,
         gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
       })
     );
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames]);
+  }, [input, tokenId, destinationChainIds, chainId]);
 
   const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
-
   const isMutationReady =
     multicallArgs.length > 0 &&
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
-    (!destinationChainNames.length || totalGasFee > 0n);
-
+    (!destinationChainIds.length || totalGasFee > 0n);
   const { data: prepareMulticall } = useSimulateInterchainTokenFactoryMulticall(
     {
       chainId,
@@ -145,8 +166,36 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       },
     }
   );
-
   const multicall = useWriteInterchainTokenFactoryMulticall();
+
+  useEffect(() => {
+    if (isValidEVMAddress(deployerAddress) && !prepareMulticall?.request) {
+      setIsReady(false);
+      console.warn("Failed to simulate multicall for deploying remote tokens");
+      return;
+    }
+    if (!tokenId || !tokenAddress) {
+      if (input) {
+        if (
+          !input.sourceChainId.includes("sui") &&
+          !input.sourceChainId.includes("stellar")
+        ) {
+          setIsReady(false);
+          return;
+        }
+      }
+    }
+
+    setIsReady(true);
+  }, [
+    input,
+    tokenId,
+    deployerAddress,
+    tokenAddress,
+    input?.sourceChainId,
+    combinedComputed,
+    prepareMulticall?.request,
+  ]);
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: multicall?.data,
@@ -174,7 +223,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       setRecordDeploymentArgs({
         kind: "interchain",
         deploymentMessageId: `${txHash}-${txIndex}`,
-        tokenId,
+        tokenId: tokenId as string,
         tokenAddress,
         deployerAddress,
         salt: input.salt,
@@ -184,6 +233,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         axelarChainId: input.sourceChainId,
         originalMinterAddress: input.minterAddress,
         destinationAxelarChainIds: input.destinationChainIds,
+        tokenManagerAddress: "",
       });
     },
     [deployerAddress, input, tokenAddress, tokenId]
@@ -213,7 +263,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
               txHash: tx.hash,
             });
           })
-          .catch((e) => {
+          .catch((e: Error) => {
             console.error(
               "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
               e
@@ -229,36 +279,139 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   );
 
   const recordDeploymentDraft = useCallback(async () => {
-    if (!input || !tokenId || !deployerAddress || !tokenAddress) {
-      return;
+    if (
+      input &&
+      tokenAddress &&
+      !input.sourceChainId.includes("sui") &&
+      !input.sourceChainId.includes("stellar")
+    ) {
+      return await recordDeploymentAsync({
+        kind: "interchain",
+        tokenId: tokenId as string,
+        deployerAddress,
+        tokenAddress,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        axelarChainId: input.sourceChainId,
+        salt: input.salt,
+        originalMinterAddress: input.minterAddress,
+        destinationAxelarChainIds: input.destinationChainIds,
+        deploymentMessageId: "",
+        tokenManagerAddress: "",
+      });
     }
-
-    return await recordDeploymentAsync({
-      kind: "interchain",
-      tokenId,
-      deployerAddress,
-      tokenAddress,
-      tokenName: input.tokenName,
-      tokenSymbol: input.tokenSymbol,
-      tokenDecimals: input.decimals,
-      axelarChainId: input.sourceChainId,
-      salt: input.salt,
-      originalMinterAddress: input.minterAddress,
-      destinationAxelarChainIds: input.destinationChainIds,
-      deploymentMessageId: "",
-    });
   }, [deployerAddress, input, recordDeploymentAsync, tokenAddress, tokenId]);
 
   const writeAsync = useCallback(async () => {
-    invariant(
-      prepareMulticall?.request !== undefined,
-      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
-    );
-
     await recordDeploymentDraft();
+    if (chainId === STELLAR_CHAIN_ID && input) {
+      try {
+        const gasValues =
+          input?.remoteDeploymentGasFees?.gasFees?.map((x) => BigInt(x.fee)) ??
+          [];
 
-    return await multicall.writeContractAsync(prepareMulticall.request);
-  }, [multicall, prepareMulticall?.request, recordDeploymentDraft]);
+        if (!address || !kit) {
+          throw new Error(
+            "Stellar wallet not connected or public key not available."
+          );
+        }
+
+        const result = await deployStellarToken({
+          kit: kit as any,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          decimals: input.decimals,
+          initialSupply: input.initialSupply || 0n,
+          salt: input.salt,
+          minterAddress: input.minterAddress,
+          destinationChainIds: input.destinationChainIds,
+          gasValues: gasValues,
+          onStatusUpdate: config.onStatusUpdate,
+        });
+        if (result) {
+          setRecordDeploymentArgs({
+            kind: "interchain",
+            tokenId: result.tokenId,
+            deployerAddress: deployerAddress,
+            tokenAddress: result.tokenAddress,
+            tokenName: input.tokenName,
+            tokenSymbol: input.tokenSymbol,
+            tokenDecimals: input.decimals,
+            axelarChainId: input.sourceChainId,
+            salt: input.salt,
+            originalMinterAddress: input.minterAddress,
+            destinationAxelarChainIds: input.destinationChainIds,
+            deploymentMessageId: result.hash,
+            tokenManagerAddress: result.tokenManagerAddress,
+            tokenManagerType: result.tokenManagerType as
+              | (typeof TOKEN_MANAGER_TYPES)[number]
+              | null
+              | undefined,
+          });
+        }
+        return result;
+      } catch (error) {
+        console.error("Stellar deployment failed:", error);
+        config.onStatusUpdate?.({
+          type: "idle",
+        });
+        throw error;
+      }
+    } else if (chainId === SUI_CHAIN_ID && input) {
+      const gasValues =
+        input?.remoteDeploymentGasFees?.gasFees?.map((x) => x.fee) ?? [];
+      const result = await deployToken({
+        initialSupply: input.initialSupply as bigint,
+        symbol: input.tokenSymbol,
+        name: input.tokenName,
+        decimals: input.decimals,
+        destinationChainIds: input.destinationChainIds,
+        minterAddress: input.minterAddress,
+        gasValues,
+      });
+      if (result?.digest && result.deploymentMessageId) {
+        const token: any = result?.events?.[0]?.parsedJson;
+        setRecordDeploymentArgs({
+          kind: "interchain",
+          deploymentMessageId: result.deploymentMessageId,
+          tokenId: token.token_id?.id,
+          deployerAddress,
+          salt: input.salt,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          tokenDecimals: input.decimals,
+          tokenManagerType: result.tokenManagerType,
+          axelarChainId: input.sourceChainId,
+          originalMinterAddress: result.minterAddress,
+          destinationAxelarChainIds: input.destinationChainIds,
+          tokenManagerAddress: result.tokenManagerAddress,
+          tokenAddress: result.tokenAddress,
+        });
+        return result;
+      }
+    } else {
+      // Handle EVM deployment
+      invariant(
+        prepareMulticall?.request !== undefined,
+        "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
+      );
+
+      return await multicall.writeContractAsync(prepareMulticall.request);
+    }
+  }, [
+    chainId,
+    deployToken,
+    deployerAddress,
+    input,
+    address,
+    kit,
+    multicall,
+    config,
+    prepareMulticall?.request,
+    recordDeploymentDraft,
+    deployStellarToken,
+  ]);
 
   const write = useCallback(() => {
     invariant(
@@ -268,7 +421,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
 
     recordDeploymentDraft()
       .then(() => multicall.writeContract(prepareMulticall.request))
-      .catch((e) => {
+      .catch((e: Error) => {
         console.error(
           "useDeployAndRegisterRemoteInterchainTokenMutation: unable to record tx",
           e
@@ -284,5 +437,5 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     recordDeploymentDraft,
   ]);
 
-  return { ...multicall, writeAsync, write };
+  return { ...multicall, writeAsync, write, isReady };
 }

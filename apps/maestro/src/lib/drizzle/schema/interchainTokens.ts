@@ -3,7 +3,6 @@ import { pgEnum, pgTable, smallint, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import {
-  ADDRESS_LENGTH,
   axelarChainId,
   createdAt,
   deploymentMessageId,
@@ -33,14 +32,10 @@ export const interchainTokens = pgTable("interchain_tokens", {
   tokenSymbol: varchar("token_symbol", { length: 100 }).notNull(),
   tokenDecimals: smallint("token_decimals").notNull(),
   deploymentMessageId: deploymentMessageId.notNull(),
-  deployerAddress: varchar("deployer_address", {
-    length: ADDRESS_LENGTH,
-  }).notNull(),
+  deployerAddress: varchar("deployer_address").notNull(),
   tokenManagerAddress: tokenManagerAddress.notNull(),
   tokenManagerType: tokenManagerTypeEnum("token_manager_type"),
-  originalMinterAddress: varchar("original_minter_address", {
-    length: ADDRESS_LENGTH,
-  }),
+  originalMinterAddress: varchar("original_minter_address"),
   kind: tokenKindEnum("kind").notNull(),
   createdAt,
   updatedAt,

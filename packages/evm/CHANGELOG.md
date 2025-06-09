@@ -1,5 +1,17 @@
 # @axelarjs/evm
 
+## 0.2.9
+
+### Patch Changes
+
+- [#553](https://github.com/axelarnetwork/axelarjs/pull/553) [`39b4ce770e3072a0e83bb99c649bbd521eb7604e`](https://github.com/axelarnetwork/axelarjs/commit/39b4ce770e3072a0e83bb99c649bbd521eb7604e) Thanks [@npty](https://github.com/npty)! - Supported devnet-amplifier
+
+## 0.2.8
+
+### Patch Changes
+
+- [#484](https://github.com/axelarnetwork/axelarjs/pull/484) [`1d05d568cfed5ab89ca19eadd2961bdfffa91a80`](https://github.com/axelarnetwork/axelarjs/commit/1d05d568cfed5ab89ca19eadd2961bdfffa91a80) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - add flow support to portal
+
 ## 0.2.7
 
 ### Patch Changes

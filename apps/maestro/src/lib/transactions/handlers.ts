@@ -1,12 +1,11 @@
 import { toast } from "@axelarjs/ui/toaster";
 
 import { TransactionExecutionError } from "viem";
-import type { WriteContractData } from "wagmi/query";
 
 import { logger } from "~/lib/logger";
 
 type TransactionResultHooks = {
-  onSuccess?: (tx: WriteContractData) => void;
+  onSuccess?: (tx: string) => void;
   onTransactionError?: (error: TransactionExecutionError) => void;
   onUnknownError?: (error: Error) => void;
 };
@@ -36,7 +35,7 @@ const DEFAULT_HOOKS: TransactionResultHooks = {
  * ```
  */
 export async function handleTransactionResult(
-  txPromise: Promise<WriteContractData | undefined>,
+  txPromise: Promise<string | undefined>,
   hooks: TransactionResultHooks
 ): Promise<void> {
   const handleSuccess = hooks.onSuccess ?? DEFAULT_HOOKS.onSuccess;

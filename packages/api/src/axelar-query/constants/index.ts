@@ -27,14 +27,14 @@ const localConfigs: EnvironmentConfigs = {
 };
 const devnetConfigs: EnvironmentConfigs = {
   resourceUrl: "https://nest-server-devnet.axelar.dev",
-  axelarRpcUrl: "",
-  axelarLcdUrl: "",
-  axelarGMPApiUrl: "https://devnet.api.gmp.axelarscan.io",
-  axelarscanBaseApiUrl: "",
+  axelarRpcUrl: "http://devnet-amplifier.axelar.dev:26657",
+  axelarLcdUrl: "http://devnet-amplifier.axelar.dev:1317",
+  axelarGMPApiUrl: "https://devnet-amplifier.api.axelarscan.io/gmp",
+  axelarscanBaseApiUrl: "https://devnet-amplifier.api.axelarscan.io",
   depositServiceUrl: "https://deposit-service-devnet-release.devnet.axelar.dev",
   recoveryApiUrl: "",
   axelarCrosschainApiUrl: "",
-  axelarscanUrl: "",
+  axelarscanUrl: "https://devnet-amplifier.axelarscan.io",
   wssStatus: "",
 };
 const testnetConfigs: EnvironmentConfigs = {
@@ -63,7 +63,7 @@ const mainnetConfigs: EnvironmentConfigs = {
 };
 
 configsMap["local"] = localConfigs;
-configsMap["devnet"] = devnetConfigs;
+configsMap["devnet-amplifier"] = devnetConfigs;
 configsMap["testnet"] = testnetConfigs;
 configsMap["mainnet"] = mainnetConfigs;
 

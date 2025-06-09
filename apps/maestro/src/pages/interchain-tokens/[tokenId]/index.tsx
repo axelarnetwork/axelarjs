@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import { trpc } from "~/lib/trpc";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import Page from "~/ui/layouts/Page";
 
 const TokenDetailsRedirectPage = () => {
@@ -12,7 +12,8 @@ const TokenDetailsRedirectPage = () => {
   );
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { computed, isLoading: isLoadingChains } = useEVMChainConfigsQuery();
+  const { combinedComputed, isLoading: isLoadingChains } =
+    useAllChainConfigsQuery();
 
   const { tokenId } = router.query;
 
@@ -31,29 +32,27 @@ const TokenDetailsRedirectPage = () => {
       return;
     }
 
-    const wagmiChain = computed.wagmiChains.find(
+    const wagmiChain = combinedComputed.wagmiChains.find(
       (c) => c.axelarChainId === interchainToken.axelarChainId
     );
+    const vmChain = combinedComputed.indexedById[interchainToken.axelarChainId];
+    const chainName = wagmiChain?.axelarChainName || vmChain?.chain_name;
 
     setLoadingMessage("Redirecting...");
 
-    if (!wagmiChain) {
+    if (!chainName) {
       setErrorMessage("Axelar chain not found");
       return;
     }
 
     router
-      .push(
-        `/${wagmiChain.axelarChainName.toLowerCase()}/${
-          interchainToken.tokenAddress
-        }`
-      )
+      .push(`/${chainName.toLowerCase()}/${interchainToken.tokenAddress}`)
       .catch(() => {
         setErrorMessage("Error redirecting to token details page");
       });
   }, [
-    computed.indexedById,
-    computed.wagmiChains,
+    combinedComputed.indexedById,
+    combinedComputed.wagmiChains,
     interchainToken,
     isLoading,
     router,

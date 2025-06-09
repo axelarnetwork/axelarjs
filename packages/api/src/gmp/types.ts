@@ -1,3 +1,5 @@
+import type { Log } from "viem";
+
 type BaseGMPResponse<T> = T & {
   time_spent: number;
 };
@@ -28,10 +30,10 @@ type BaseGMPParams = {
   contractMethod?: string;
   sourceChain?: string;
   destinationChain?: string;
-  sourceAddress?: `0x${string}`;
-  contractAddress?: `0x${string}`;
-  senderAddress?: `0x${string}`;
-  relayerAddress?: `0x${string}`;
+  sourceAddress?: string;
+  contractAddress?: string;
+  senderAddress?: string;
+  relayerAddress?: string;
   /**
    * Unix timestamp in seconds
    */
@@ -69,6 +71,23 @@ export type SearchGMPParams = Omit<BaseGMPParams, "contractMethod"> & {
   };
 };
 
+export type TransactionReceipt = {
+  blockHash: `0x${string}`;
+  blockNumber: number;
+  contractAddress: string | null;
+  cumulativeGasUsed: string;
+  effectiveGasPrice: string;
+  from: `0x${string}`;
+  gasUsed: string;
+  logs: Array<Log>;
+  status: number;
+  to: `0x${string}`;
+  transactionHash: `0x${string}`;
+  transactionIndex: number;
+  type: number;
+  gasLimit: string;
+};
+
 export type SearchGMPCall = {
   blockNumber: number;
   blockHash: `0x${string}`;
@@ -84,11 +103,13 @@ export type SearchGMPCall = {
   event: string;
   eventIndex: number;
   eventSignature: string;
-  id: string;
+  _id: string;
   chain: string;
   contract_address: `0x${string}`;
   chain_type: ChainType;
   destination_chain_type: ChainType;
+  receipt?: TransactionReceipt;
+  messageIdIndex: number;
   returnValues: {
     sender: string;
     destinationChain: string;
@@ -99,6 +120,36 @@ export type SearchGMPCall = {
     amount: string;
     messageId?: string;
   };
+};
+
+export type SearchGMPCallback = {
+  chain: string;
+  chain_type: ChainType;
+  destination_chain_type: ChainType;
+  created_at: GMPTxCreatedAt;
+  eventIndex: number;
+  returnValues: {
+    sourceChain: string;
+    destinationChain: string;
+    sourceAddress: string;
+    destinationAddress: string;
+    destinationContractAddress: string;
+    sender: string;
+    payload: string;
+    messageID: string;
+    messageId: string;
+    payloadHash: string;
+  };
+  messageIdIndex: number;
+  blockNumber: number;
+  block_timestamp: number;
+  parentMessageID: string;
+  receipt: SearchGMPReceipt;
+  _id: string;
+  id: string;
+  messageIdHash: string;
+  event: string;
+  transaction: SearchGMPTransaction;
 };
 
 type SearchGMPReceipt = {
@@ -266,6 +317,7 @@ export type SearchGMPResponseData = {
   status: GMPTxStatus;
   executed?: SearchGMPExecuted;
   error?: SearchGMPDataError;
+  message_id: string;
   time_spent: SearchGMPTimespent;
   gas_paid: SearchGMPGasPaid;
   gas_status: SearchGMPGasStatus;
@@ -280,6 +332,7 @@ export type SearchGMPResponseData = {
   interchain_transfer?: InterchainTransferEvent;
   interchain_token_deployment_started?: InterchainTokenDeploymentStartedEvent;
   token_manager_deployment_started?: TokenManagerDeploymentStartedEvent;
+  callback?: SearchGMPCallback;
 };
 
 export type SearchGMPTimespent = {

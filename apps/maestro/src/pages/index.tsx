@@ -3,12 +3,11 @@ import { useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 
-import { useAccount } from "wagmi";
-
 import RecentTransactions from "~/features/RecentTransactions";
 import SearchInterchainToken, {
   TokenFoundResult,
 } from "~/features/SearchInterchainToken";
+import { useAccount } from "~/lib/hooks";
 import { ConditionalRenderInterchainBanner } from "~/ui/components/InterchainBanner";
 import { useLayoutStateContainer } from "~/ui/layouts/MainLayout";
 import Page from "~/ui/layouts/Page";
@@ -48,7 +47,7 @@ export default function HomePage() {
         contentClassName="place-items-center"
         mustBeConnected
       >
-        <div className="w-full">
+        <div className="mb-20 w-full">
           <ConditionalRenderInterchainBanner />
         </div>
         <div

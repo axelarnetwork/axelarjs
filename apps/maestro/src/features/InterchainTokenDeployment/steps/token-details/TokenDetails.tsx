@@ -11,14 +11,18 @@ import { Maybe } from "@axelarjs/utils";
 import { ComponentRef, useMemo, useRef, type FC } from "react";
 import { type FieldError, type SubmitHandler } from "react-hook-form";
 
+import { isValidSuiAddress } from "@mysten/sui/utils";
+
 import "~/features/InterchainTokenDeployment";
 
 import {
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import {
   isValidEVMAddress,
+  isValidStellarWalletAddress,
   preventNonHexInput,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
@@ -29,8 +33,45 @@ import {
   ValidationError,
 } from "~/ui/compounds/MultiStepForm";
 
+const MAX_UINT64 = BigInt(2) ** BigInt(64) - BigInt(1);
+
+const validateMinterAddress = (minter: string, chainId: number) => {
+  if (!minter) {
+    return {
+      type: "validate",
+      message: "Minter address is required",
+    };
+  }
+
+  if (chainId === SUI_CHAIN_ID) {
+    if (!isValidSuiAddress(minter)) {
+      return {
+        type: "validate",
+        message: "Invalid Sui minter address",
+      };
+    }
+  } else if (chainId === STELLAR_CHAIN_ID) {
+    if (!isValidStellarWalletAddress(minter)) {
+      return {
+        type: "validate",
+        message: "Invalid Stellar minter address",
+      };
+    }
+  } else {
+    if (!isValidEVMAddress(minter)) {
+      return {
+        type: "validate",
+        message: "Invalid EVM minter address",
+      };
+    }
+  }
+
+  return true;
+};
+
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
+  const chainId = useChainId();
 
   const { register, handleSubmit, formState, watch } = state.tokenDetailsForm;
 
@@ -40,26 +81,20 @@ const TokenDetails: FC = () => {
   const isMintable = watch("isMintable");
   const minter = watch("minter");
   const supply = watch("initialSupply");
+  const tokenDecimals = watch("tokenDecimals");
 
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
       return;
     }
 
-    if (!minter) {
-      return {
-        type: "required",
-        message: "Minter address is required",
-      };
+    if (minter) {
+      const minterValidation = validateMinterAddress(minter, chainId);
+      if (minterValidation !== true) {
+        return minterValidation;
+      }
     }
-
-    if (!isValidEVMAddress(minter)) {
-      return {
-        type: "validate",
-        message: "Invalid minter address",
-      };
-    }
-  }, [isMintable, minter]);
+  }, [isMintable, minter, chainId]);
 
   const initialSupplyErrorMessage = useMemo<FieldError | undefined>(() => {
     if (isMintable) {
@@ -72,7 +107,18 @@ const TokenDetails: FC = () => {
         message: "Fixed supply token requires an initial balance",
       };
     }
-  }, [isMintable, minter, supply]);
+
+    if (
+      chainId === SUI_CHAIN_ID &&
+      supply &&
+      BigInt(supply) * BigInt(10) ** BigInt(tokenDecimals) > MAX_UINT64
+    ) {
+      return {
+        type: "validate",
+        message: "Supply must be less than 2^64 - 1 for Sui",
+      };
+    }
+  }, [isMintable, minter, supply, chainId, tokenDecimals]);
 
   const isFormValid = useMemo(() => {
     if (minterErrorMessage || initialSupplyErrorMessage) {

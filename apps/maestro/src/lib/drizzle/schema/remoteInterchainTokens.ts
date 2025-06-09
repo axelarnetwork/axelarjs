@@ -3,7 +3,6 @@ import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import {
-  ADDRESS_LENGTH,
   axelarChainId,
   createdAt,
   deploymentMessageId,
@@ -37,9 +36,7 @@ export const remoteInterchainTokens = pgTable("remote_interchain_tokens", {
     .references(() => interchainTokens.tokenId),
   axelarChainId: axelarChainId.notNull(),
   tokenAddress: tokenAddress.notNull(),
-  tokenManagerAddress: varchar("token_manager_address", {
-    length: ADDRESS_LENGTH,
-  }),
+  tokenManagerAddress: varchar("token_manager_address"),
   tokenManagerType: tokenManagerTypeEnum("token_manager_type"),
   deploymentMessageId: deploymentMessageId.notNull(),
   deploymentStatus: deplymentStatusEnum("deployment_status").default("pending"),

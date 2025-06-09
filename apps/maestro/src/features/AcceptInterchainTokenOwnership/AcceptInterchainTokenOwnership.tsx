@@ -1,4 +1,3 @@
-import type { EVMChainConfig } from "@axelarjs/api";
 import { Button } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
@@ -9,12 +8,13 @@ import { useWaitForTransactionReceipt } from "wagmi";
 import { useWriteInterchainTokenServiceAcceptOwnership } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
+import { ITSChainConfig } from "~/server/chainConfig";
 
 type Props = {
   trigger?: JSX.Element;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
-  sourceChain: EVMChainConfig;
+  sourceChain: ITSChainConfig;
   isOpen?: boolean;
   accountAddress: `0x${string}`;
   onClose?: () => void;
@@ -43,13 +43,13 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     await Promise.all([
       trpcContext.interchainToken.searchInterchainToken.invalidate(),
       trpcContext.interchainToken.getInterchainTokenDetails.invalidate(),
-      trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
+      trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate(),
     ]);
 
     await Promise.all([
       trpcContext.interchainToken.searchInterchainToken.refetch(),
       trpcContext.interchainToken.getInterchainTokenDetails.refetch(),
-      trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
+      trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(),
     ]);
 
     setTxState({
@@ -62,7 +62,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
     acceptTxHash,
     receipt,
     setTxState,
-    trpcContext.erc20.getERC20TokenBalanceForOwner,
+    trpcContext.interchainToken.getInterchainTokenBalanceForOwner,
     trpcContext.interchainToken.getInterchainTokenDetails,
     trpcContext.interchainToken.searchInterchainToken,
   ]);

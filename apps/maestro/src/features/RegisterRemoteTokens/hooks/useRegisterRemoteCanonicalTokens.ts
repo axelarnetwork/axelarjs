@@ -1,8 +1,6 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import { useChainId } from "wagmi";
-
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -11,13 +9,15 @@ import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
+import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
+import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
 
 export type RegisterRemoteCanonicalTokensInput = {
   chainIds: number[];
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   originChainId: number;
   deployerAddress: `0x${string}`;
 };
@@ -25,24 +25,23 @@ export type RegisterRemoteCanonicalTokensInput = {
 export default function useRegisterRemoteCanonicalTokens(
   input: RegisterRemoteCanonicalTokensInput
 ) {
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
+
   const chainId = useChainId();
 
   const destinationChains = useMemo(
     () =>
       input.chainIds
-        .map((chainId) => computed.indexedByChainId[chainId])
+        .map((chainId) => combinedComputed.indexedByChainId[chainId])
         .filter(Boolean),
-    [input.chainIds, computed.indexedByChainId]
+    [input.chainIds, combinedComputed.indexedByChainId]
   );
 
-  const destinationChainIds = destinationChains.map(
-    (chain) => chain.chain_name
-  );
+  const destinationChainIds = destinationChains.map((chain) => chain.id);
 
   const sourceChain = useMemo(
-    () => computed.indexedByChainId[chainId],
-    [chainId, computed.indexedByChainId]
+    () => combinedComputed.indexedByChainId[chainId],
+    [chainId, combinedComputed.indexedByChainId]
   );
 
   const { data: tokenDetails } = useInterchainTokenDetailsQuery({
@@ -58,7 +57,12 @@ export default function useRegisterRemoteCanonicalTokens(
   });
 
   const multicallArgs = useMemo(() => {
-    if (!tokenDetails || !gasFeesData || tokenDetails.kind !== "canonical")
+    if (
+      !tokenDetails ||
+      !gasFeesData ||
+      tokenDetails.kind !== "canonical" ||
+      chainId === SUI_CHAIN_ID
+    )
       return [];
 
     return destinationChainIds.map((axelarChainId, i) => {
@@ -66,14 +70,13 @@ export default function useRegisterRemoteCanonicalTokens(
 
       return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
         {
-          originalChain: sourceChain?.chain_name ?? "0x",
-          originalTokenAddress: tokenDetails.tokenAddress,
+          originalTokenAddress: tokenDetails.tokenAddress as `0x${string}`,
           destinationChain: axelarChainId,
           gasValue,
         }
       );
     });
-  }, [destinationChainIds, gasFeesData, sourceChain?.chain_name, tokenDetails]);
+  }, [destinationChainIds, gasFeesData, tokenDetails, chainId]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
@@ -87,13 +90,32 @@ export default function useRegisterRemoteCanonicalTokens(
 
   const mutation = useWriteInterchainTokenFactoryMulticall();
 
+  const { registerRemoteInterchainToken } =
+    useRegisterRemoteInterchainTokenOnSui();
+
+  const suiInput = {
+    axelarChainIds: destinationChainIds,
+    originChainId: input.originChainId,
+    coinType: input.tokenAddress,
+    symbol: tokenDetails?.tokenSymbol ?? "",
+    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
+    tokenManagerType: tokenDetails?.tokenManagerType as
+      | "lock_unlock"
+      | "mint_burn",
+  };
   return {
     ...mutation,
     writeContract: () => {
+      if (chainId === SUI_CHAIN_ID) {
+        return registerRemoteInterchainToken(suiInput);
+      }
       if (!config) return;
       return mutation.writeContract(config.request);
     },
     writeContractAsync: async () => {
+      if (chainId === SUI_CHAIN_ID) {
+        return registerRemoteInterchainToken(suiInput);
+      }
       if (!config) return;
       return await mutation.writeContractAsync(config.request);
     },

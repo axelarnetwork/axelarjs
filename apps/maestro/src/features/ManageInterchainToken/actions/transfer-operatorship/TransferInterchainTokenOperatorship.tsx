@@ -10,17 +10,19 @@ import { toast } from "@axelarjs/ui/toaster";
 import { useCallback, useEffect, useMemo, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
+import { isValidSuiAddress } from "@mysten/sui/utils";
 import {
   isAddress,
   TransactionExecutionError,
   type TransactionReceipt,
 } from "viem";
-import { useChainId, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 import { useWriteTokenManagerTransferOperatorship } from "~/lib/contracts/TokenManager.hooks";
-import { useTransactionState } from "~/lib/hooks/useTransactionState";
+import { SUI_CHAIN_ID, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { useTransferOperatorshipMutation } from "../../hooks/useTransferOperatorshipMutation";
 import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
 
 type FormState = {
@@ -60,52 +62,59 @@ export const TransferInterchainTokenOperatorship: FC = () => {
 
   const trpcContext = trpc.useUtils();
 
-  const onReceipt = useCallback(
-    async (receipt: TransactionReceipt) => {
-      if (!transferTxHash) {
-        return;
-      }
-
-      await Promise.all([
+  const onSuccess = useCallback(
+    (receipt?: TransactionReceipt) => {
+      Promise.all([
         trpcContext.interchainToken.searchInterchainToken.invalidate(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.invalidate(),
-      ]);
+        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.invalidate(),
+      ]).catch((error) => {
+        logger.error("Failed to invalidate queries", error);
+      });
 
-      await Promise.all([
+      Promise.all([
         trpcContext.interchainToken.searchInterchainToken.refetch(),
-        trpcContext.erc20.getERC20TokenBalanceForOwner.refetch(),
-      ]);
+        trpcContext.interchainToken.getInterchainTokenBalanceForOwner.refetch(),
+      ]).catch((error) => {
+        logger.error("Failed to refetch queries", error);
+      });
 
       setTxState({
         status: "confirmed",
-        receipt,
+        receipt: receipt ?? undefined,
       });
 
       toast.success("Successfully transferred token operatorship");
     },
     [
       setTxState,
-      transferTxHash,
-      trpcContext.erc20.getERC20TokenBalanceForOwner,
+      trpcContext.interchainToken.getInterchainTokenBalanceForOwner,
       trpcContext.interchainToken.searchInterchainToken,
     ]
   );
+
+  const onReceipt = useCallback(
+    (receipt?: TransactionReceipt) => {
+      if (!transferTxHash) {
+        return;
+      }
+
+      onSuccess(receipt);
+    },
+    [onSuccess, transferTxHash]
+  );
+
+  const { transferOperatorship } = useTransferOperatorshipMutation();
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: transferTxHash,
   });
 
-  useEffect(
-    () => {
-      if (receipt) {
-        onReceipt(receipt).catch((error) => {
-          logger.error("Failed to process receipt", error);
-        });
-      }
-    },
+  useEffect(() => {
+    if (receipt) {
+      onReceipt(receipt);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt]
-  );
+  }, [receipt]);
 
   const submitHandler = useCallback<SubmitHandler<FormState>>(
     async (data, e) => {
@@ -116,17 +125,36 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       });
 
       try {
-        const txHash = await transferOperatorshipAsync({
-          address: tokenDetails?.tokenManagerAddress as `0x${string}`,
-          args: [data.recipientAddress],
-        });
+        if (chainId === SUI_CHAIN_ID) {
+          const result = await transferOperatorship(
+            tokenDetails?.tokenAddress as string,
+            data.recipientAddress,
+            state.tokenId,
+            tokenDetails?.tokenSymbol as string
+          );
 
-        if (txHash) {
-          setTxState({
-            status: "submitted",
-            chainId,
-            hash: txHash,
+          if (result?.digest) {
+            setTxState({
+              status: "submitted",
+              hash: result.digest,
+              chainId,
+              suiTx: result,
+            });
+            onSuccess();
+          }
+        } else {
+          const txHash = await transferOperatorshipAsync({
+            address: tokenDetails?.tokenManagerAddress as `0x${string}`,
+            args: [data.recipientAddress],
           });
+
+          if (txHash) {
+            setTxState({
+              status: "submitted",
+              chainId,
+              hash: txHash,
+            });
+          }
         }
       } catch (error) {
         if (error instanceof TransactionExecutionError) {
@@ -150,9 +178,14 @@ export const TransferInterchainTokenOperatorship: FC = () => {
       }
     },
     [
-      chainId,
       setTxState,
+      chainId,
+      transferOperatorship,
+      tokenDetails?.tokenAddress,
+      tokenDetails?.tokenSymbol,
       tokenDetails?.tokenManagerAddress,
+      state.tokenId,
+      onSuccess,
       transferOperatorshipAsync,
     ]
   );
@@ -198,8 +231,16 @@ export const TransferInterchainTokenOperatorship: FC = () => {
               {...register("recipientAddress", {
                 disabled: isTransfering,
                 validate(value) {
-                  if (!value || !isAddress(value)) {
-                    return "Invalid address";
+                  if (!value) return "Address is required";
+
+                  if (chainId === SUI_CHAIN_ID) {
+                    if (!isValidSuiAddress(value)) {
+                      return "Invalid Sui address";
+                    }
+                  } else {
+                    if (!isAddress(value)) {
+                      return "Invalid EVM address";
+                    }
                   }
 
                   return true;

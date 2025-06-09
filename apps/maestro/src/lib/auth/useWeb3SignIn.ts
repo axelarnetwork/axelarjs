@@ -1,5 +1,5 @@
 import { debounce, invariant } from "@axelarjs/utils";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   signIn,
   signOut,
@@ -7,17 +7,21 @@ import {
   type SignInResponse,
 } from "next-auth/react";
 
+import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
-import { useDisconnect, useSignMessage } from "wagmi";
+import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 
 import { wagmiConfig } from "~/config/wagmi";
+import { useDisconnect } from "~/lib/hooks";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "../trpc";
+import { setStellarConnectionState } from "../utils/stellar";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
   onSignInSuccess?: (response?: SignInResponse) => void;
-  onSignInStart?: (address: `0x${string}`) => void;
+  onSignInStart?: (address: string) => void;
 };
 
 const DEFAULT_OPTIONS: UseWeb3SignInOptions = {
@@ -41,15 +45,18 @@ export function useWeb3SignIn({
 }: UseWeb3SignInOptions = DEFAULT_OPTIONS) {
   const { data: session, status: sessionStatus } = useSession();
   const { signMessageAsync } = useSignMessage();
-  const { disconnectAsync } = useDisconnect();
+  const { disconnect } = useDisconnect();
+  const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
+  const currentSuiAccount = useCurrentAccount();
 
-  const signInAddressRef = useRef<`0x${string}` | null>(null);
+  const signInAddressRef = useRef<string | null>(null);
 
   const { mutateAsync: createSignInMessage } =
     trpc.auth.createSignInMessage.useMutation();
 
   // avoid signing in multiple times
   const isSigningInRef = useRef(false);
+  const { kit } = useStellarKit();
 
   const {
     mutateAsync: signInWithWeb3Async,
@@ -57,21 +64,51 @@ export function useWeb3SignIn({
     error,
     ...mutation
   } = useMutation({
-    mutationFn: async (address?: `0x${string}` | null) => {
+    mutationFn: async (address?: string | null) => {
       try {
         invariant(address, "Address is required");
 
         signInAddressRef.current = address;
         isSigningInRef.current = true;
 
-        const { message } = await createSignInMessage({ address });
+        const { message } = await createSignInMessage({ address }).catch(
+          (error) => {
+            console.error("Error creating sign in message", error);
+            throw error;
+          }
+        );
 
         onSignInStart?.(address);
-        const signature = await signMessageAsync({ message });
-        const response = await signIn("credentials", { address, signature });
+        let signature;
+        // 42 is the length of an EVM address
+        if (address.length === 42) {
+          signature = await signMessageAsync({ message });
+        }
+        // 66 is the length of a sui address
+        else if (address.length === 66) {
+          const resp = await signSuiMessageAsync({
+            message: new TextEncoder().encode(message),
+          });
+          signature = resp.signature;
+        } else if (address.startsWith("G")) {
+          // Stellar
+          invariant(kit, "Stellar wallet kit not initialized");
+          const result = await kit.signMessage(message);
+          signature = result.signedMessage;
+        }
 
+        const response = await signIn("credentials", {
+          address,
+          signature,
+          redirect: false,
+        });
         if (response?.error) {
           throw new Error(response.error);
+        }
+
+        // If we successfully signed in with a Stellar wallet, set the connection state
+        if (address.startsWith("G")) {
+          setStellarConnectionState(true);
         }
 
         onSignInSuccess?.(response);
@@ -79,7 +116,7 @@ export function useWeb3SignIn({
         isSigningInRef.current = false;
       } catch (error) {
         if (error instanceof Error) {
-          await disconnectAsync();
+          disconnect();
           await signOut();
 
           signInAddressRef.current = null;
@@ -91,7 +128,7 @@ export function useWeb3SignIn({
     },
   });
 
-  const unwatch = watchAccount(wagmiConfig, {
+  const unwatchEVM = watchAccount(wagmiConfig, {
     onChange: debounce(async ({ address }) => {
       if (
         enabled === false ||
@@ -110,10 +147,36 @@ export function useWeb3SignIn({
         return;
       }
 
-      unwatch();
+      unwatchEVM();
       await signInWithWeb3Async(address);
     }, 150),
   });
+
+  // Same check as above, but for sui
+  useEffect(() => {
+    if (
+      enabled === false ||
+      isSigningInRef.current ||
+      sessionStatus === "loading" ||
+      !currentSuiAccount
+    ) {
+      return;
+    }
+
+    const address = currentSuiAccount.address as `0x${string}`;
+
+    if (session?.address === address || signInAddressRef.current === address) {
+      return;
+    }
+
+    void signInWithWeb3Async(address);
+  }, [
+    currentSuiAccount,
+    sessionStatus,
+    session?.address,
+    enabled,
+    signInWithWeb3Async,
+  ]);
 
   return {
     retryAsync: signInWithWeb3Async.bind(null, signInAddressRef.current),

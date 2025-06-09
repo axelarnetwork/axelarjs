@@ -1,10 +1,19 @@
-import { Alert, InfoIcon } from "@axelarjs/ui";
-import { useMemo, type FC } from "react";
+import { Alert, Button, InfoIcon } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
+import { useCallback, useMemo, type FC } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-import { useChainFromRoute } from "~/lib/hooks";
+import { TransactionExecutionError } from "viem";
+
+import {
+  STELLAR_CHAIN_ID,
+  useAccount,
+  useChainFromRoute,
+  useSwitchChain,
+} from "~/lib/hooks";
 import { useGetChainsConfig } from "~/services/axelarConfigs/hooks";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { MultiStepDialog, StepLoading } from "~/ui/compounds/MultiStepForm";
 import {
   CanonicalTokenDeploymentStateProvider,
@@ -29,9 +38,22 @@ const STEPS = [Step1, Step2, Step3];
 const CanonicalTokenDeployment: FC = () => {
   const { state, actions } = useCanonicalTokenDeploymentStateContainer();
   const routeChain = useChainFromRoute();
+  const { chain: currentConnectedChain } = useAccount();
   const { data: chainInfo } = useGetChainsConfig({
     axelarChainId: routeChain?.axelarChainId,
   });
+  const { switchChain } = useSwitchChain();
+  const isStellarChain = routeChain?.id === STELLAR_CHAIN_ID;
+
+  const handleSwitchChain = useCallback(() => {
+    try {
+      switchChain?.({ chainId: routeChain?.id as number });
+    } catch (error) {
+      if (error instanceof TransactionExecutionError) {
+        toast.error(`Failed to switch chain: ${error.cause.shortMessage}`);
+      }
+    }
+  }, [routeChain?.id, switchChain]);
 
   const isGatewayToken = useMemo(() => {
     if (!chainInfo?.assets || !state.tokenDetails?.tokenAddress) return false;
@@ -52,6 +74,10 @@ const CanonicalTokenDeployment: FC = () => {
     [state.step]
   );
 
+  const isOnTokenNativeChain = useMemo(() => {
+    return routeChain?.id === currentConnectedChain?.id;
+  }, [routeChain?.id, currentConnectedChain?.id]);
+
   if (isGatewayToken)
     return (
       <Alert $status="warning" icon={<InfoIcon className="h-6 w-6" />}>
@@ -71,9 +97,29 @@ const CanonicalTokenDeployment: FC = () => {
       </Alert>
     );
 
+  if (!isOnTokenNativeChain) {
+    const imageSrc = chainInfo?.iconUrl?.replace("images/", "logos/");
+
+    return (
+      <Button
+        $variant="primary"
+        className="my-1 flex w-full"
+        onClick={handleSwitchChain}
+      >
+        Connect to {routeChain?.name ?? "chain"} to register token{" "}
+        <ChainIcon
+          size="sm"
+          src={imageSrc ?? ""}
+          alt={routeChain?.name ?? ""}
+        />
+      </Button>
+    );
+  }
+
   return (
     <MultiStepDialog
       triggerLabel="Register interchain token"
+      disabled={isStellarChain}
       steps={["Token details", "Register & Deploy", "Review"]}
       step={state.step}
       showBackButton={showBackButton}

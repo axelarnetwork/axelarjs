@@ -94,6 +94,25 @@ export const hex64Literal = () => hex64().transform(asHexLiteral);
 
 export const numericString = () => z.string().regex(/^[0-9.]+$/);
 
+/**
+ * Zod schema to validate a Sui Token Address (Coin Type)
+ * Format: 0x<PACKAGE_ID>::<MODULE_NAME>::<STRUCT_NAME>
+ * e.g., 0x2::sui::SUI or 0x123...abc::mycoin::MYCOIN
+ */
+export const suiTokenAddress = () =>
+  z
+    .string()
+    .regex(
+      /^0x[a-fA-F0-9]{64}::\w+::\w+$/,
+      "Invalid Sui token address format (expected: 0x<packageId>::<module>::<struct>)"
+    );
+
+// Checks if a string matches the Sui Coin Type format: 0x<PACKAGE_ID>::<MODULE_NAME>::<STRUCT_NAME>
+// e.g., 0x2::sui::SUI or 0x123...abc::mycoin::MYCOIN
+export function isValidSuiTokenAddress(address: string): boolean {
+  return suiTokenAddress().safeParse(address).success;
+}
+
 const abiInputSchema = z.object({
   name: z.string().optional(),
   type: z.string().optional(),
@@ -110,3 +129,36 @@ export const contractABI = z.array(
     type: z.string().optional(),
   })
 );
+
+const STELLAR_CONTRACT_REGEX = /^C[A-Z2-7]{55}$/;
+const STELLAR_SYMBOL_ISSUER_REGEX = /^[A-Za-z0-9-]{1,12}-G[A-Z2-7]{55}$/;
+const STELLAR_WALLET_ADDRESS_REGEX = /^G[A-Z2-7]{55}$/;
+
+export const stellarTokenAddress = () =>
+  z
+    .string()
+    .regex(STELLAR_CONTRACT_REGEX, "Invalid Stellar token address")
+    .or(
+      z
+        .string()
+        .regex(STELLAR_SYMBOL_ISSUER_REGEX, "Invalid Stellar token address")
+    );
+
+export const stellarWalletAddress = () =>
+  z
+    .string()
+    .regex(STELLAR_WALLET_ADDRESS_REGEX, "Invalid Stellar wallet address");
+
+export function isValidStellarTokenAddress(address: string): boolean {
+  return stellarTokenAddress().safeParse(address).success;
+}
+
+/**
+ * Checks if a string is a valid Stellar wallet address (account public key)
+ * Stellar wallet addresses start with 'G' and are 56 characters long in base32 encoding
+ * @param address The address to check
+ * @returns boolean indicating if the address is a valid Stellar wallet address
+ */
+export function isValidStellarWalletAddress(address: string): boolean {
+  return stellarWalletAddress().safeParse(address).success;
+}

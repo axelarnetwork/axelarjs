@@ -1,14 +1,11 @@
-import { Alert } from "@axelarjs/ui";
 import type { FC } from "react";
 import { useRouter } from "next/router";
 
-import { isAddress } from "viem";
-
 import { useChainFromRoute } from "~/lib/hooks";
 import { getPrefilledClaimOwnershipFormLink } from "~/lib/utils/gform";
-import { useERC20TokenDetailsQuery } from "~/services/erc20/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
+import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import Page from "~/ui/layouts/Page";
 import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
@@ -31,19 +28,18 @@ const InterchainTokensPage: FC = () => {
   });
 
   const { data: interchainTokenDetails } = useInterchainTokenDetailsQuery({
-    chainId: interchainToken?.chainId,
-    tokenAddress: interchainToken?.tokenAddress,
-  });
-
-  const { data: tokenDetails } = useERC20TokenDetailsQuery({
     chainId: routeChain?.id,
     tokenAddress,
   });
 
-  if (!isAddress(tokenAddress)) {
-    return <Alert $status="error">Invalid token address</Alert>;
-  }
+  const { data: tokenDetails } = useNativeTokenDetailsQuery({
+    chainId: routeChain?.id,
+    tokenAddress,
+  });
 
+  // if (!isAddress(tokenAddress)) {
+  //   return <Alert $status="error">Invalid token address</Alert>;
+  // }
   const chainNames =
     interchainToken?.matchingTokens
       ?.filter((token) => token.isRegistered)
@@ -78,7 +74,7 @@ const InterchainTokensPage: FC = () => {
                   interchainToken.chain.name,
                   chainNames,
                   "Interchain Token Service (ITS)",
-                  destToken.tokenAddress as string,
+                  destToken.tokenAddress,
                   tokenDetails.name,
                   tokenDetails.symbol
                 )

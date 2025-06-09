@@ -7,4 +7,4 @@ export const CHAIN_TABS = [
     label: "Cosmos Chains",
     value: "cosmos",
   },
-];
+] as const;

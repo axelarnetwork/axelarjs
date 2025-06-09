@@ -3,8 +3,7 @@ import { useCallback, useEffect } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
-import { useAccount, useDisconnect } from "wagmi";
-
+import { useAccount, useDisconnect } from "~/lib/hooks";
 import type { AccountStatus } from "~/services/db/kv";
 import { logger } from "../logger";
 
@@ -27,8 +26,8 @@ export function useRouteProtection({
   redirectTo = "/",
   accountStatuses = ["enabled", "privileged"],
 }: UseRouteProtectionProps) {
-  const { address } = useAccount();
-  const { disconnectAsync } = useDisconnect();
+  const { address, isLoadingStellar: isLoadingStellarAccount } = useAccount();
+  const { disconnect } = useDisconnect();
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
 
@@ -36,8 +35,8 @@ export function useRouteProtection({
 
   const handleSignout = useCallback(async () => {
     await signOut({ callbackUrl: "/" });
-    await disconnectAsync();
-  }, [disconnectAsync]);
+    disconnect();
+  }, [disconnect]);
 
   /**
    * redirect rules rules:
@@ -47,8 +46,11 @@ export function useRouteProtection({
    * If the user is logged in and has an address, but the address is not in the session, redirect to the homepage.
    */
   useEffect(() => {
-    if (sessionStatus === "loading" || !session) return;
-
+    if (sessionStatus === "loading" || !session || isLoadingStellarAccount) {
+      console.log("IT IS RETUTNING");
+      return;
+    }
+    console.log("IT IS NOT RETUTNING");
     if (
       // sign out if the user is not logged in
       (!address && prevAddress) ||
@@ -72,6 +74,7 @@ export function useRouteProtection({
     router,
     session,
     sessionStatus,
+    isLoadingStellarAccount,
   ]);
 
   return handleSignout;

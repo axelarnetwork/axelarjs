@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { APP_NAME } from "~/config/app";
-import { hex40Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 
 export const SIGNIN_MESSAGE = `Sign this message to access ${APP_NAME}.`;
@@ -12,7 +11,7 @@ export const getSignInMessage = (nonce: number) =>
 export const createSignInMessage = publicProcedure
   .input(
     z.object({
-      address: hex40Literal(),
+      address: z.string(),
     })
   )
   .mutation(async ({ input, ctx }) => {

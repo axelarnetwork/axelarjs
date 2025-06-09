@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/evm",
-  "version": "0.2.7",
+  "version": "0.2.9",
   "publishConfig": {
     "access": "public"
   },
@@ -50,11 +50,11 @@
     "@axelarjs/utils": "workspace:*",
     "package-json": "^8.1.1",
     "tsx": "^4.7.1",
-    "viem": "^2.21.1",
+    "viem": "^2.30.1",
     "zx": "^7.2.3"
   },
   "devDependencies": {
-    "@axelar-network/interchain-token-service": "^2.0.1",
+    "@axelar-network/interchain-token-service": "^2.1.0",
     "@axelarjs/api": "workspace:^",
     "@axelarjs/config": "workspace:*",
     "@types/node": "^20.11.30",

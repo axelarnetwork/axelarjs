@@ -7,10 +7,10 @@ import Link from "next/link";
 
 import { filter, map } from "rambda";
 
-import { WAGMI_CHAIN_CONFIGS } from "~/config/wagmi";
+import { CHAIN_CONFIGS } from "~/config/chains";
 import { trpc } from "~/lib/trpc";
-import { useEVMChainConfigsQuery } from "~/services/axelarscan/hooks";
-import { ChainIcon } from "~/ui/components/EVMChainsDropdown";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
+import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import Pagination from "~/ui/components/Pagination";
 import Page from "~/ui/layouts/Page";
 
@@ -18,7 +18,7 @@ const useGetMyInterchainTokensQuery =
   trpc.interchainToken.getMyInterchainTokens.useQuery;
 
 function getChainNameSlug(chainId: number) {
-  const chain = WAGMI_CHAIN_CONFIGS.find((chain) => chain.id === chainId);
+  const chain = CHAIN_CONFIGS.find((chain) => chain.id === chainId);
 
   return chain?.axelarChainName.toLowerCase() ?? "";
 }
@@ -34,7 +34,7 @@ const PAGE_TITLE = "My Interchain Tokens";
 const PageTitle = tw(Page.Title)`flex items-center gap-2`;
 
 type TokenListProps = {
-  sessionAddress?: `0x${string}`;
+  sessionAddress?: string;
 };
 
 const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
@@ -43,7 +43,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
 
   const { data, isFetched } = useGetMyInterchainTokensQuery(
     {
-      sessionAddress: sessionAddress as `0x${string}`,
+      sessionAddress: sessionAddress as string,
       limit: PAGE_LIMIT,
       offset,
     },
@@ -53,7 +53,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
     }
   );
 
-  const { computed } = useEVMChainConfigsQuery();
+  const { combinedComputed } = useAllChainConfigsQuery();
 
   const maybeTokens = Maybe.of(data).map((data) => data.items);
   const totalPages = Maybe.of(data).mapOr(0, (data) => data.totalPages);
@@ -64,14 +64,17 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
         .map(
           map(
             (token) =>
-              [token, computed.indexedById[token.axelarChainId]] as const
+              [
+                token,
+                combinedComputed.indexedById[token.axelarChainId],
+              ] as const
           )
         )
         .mapOr(
           [],
           filter(([token, chain]) => Boolean(token) && Boolean(chain))
         ),
-    [computed.indexedById, maybeTokens]
+    [combinedComputed.indexedById, maybeTokens]
   );
 
   const totalTokens = Maybe.of(data).mapOr(0, (data) => data.totalItems);
@@ -123,7 +126,7 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
                         $size="sm"
                         className="bg-base-300 dark:bg-base-100"
                       >
-                        {maskAddress(token.tokenAddress as `0x${string}`, {
+                        {maskAddress(token.tokenAddress, {
                           segmentA: 10,
                           segmentB: -10,
                         })}

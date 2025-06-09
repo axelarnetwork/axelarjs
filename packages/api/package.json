@@ -1,6 +1,6 @@
 {
   "name": "@axelarjs/api",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "publishConfig": {
     "access": "public"
   },
@@ -105,11 +105,11 @@
   "dependencies": {
     "@axelarjs/core": "workspace:*",
     "@axelarjs/cosmos": "workspace:*",
-    "@axelarjs/utils": "workspace:*",
     "@axelarjs/proto": "workspace:*",
+    "@axelarjs/utils": "workspace:*",
     "isomorphic-unfetch": "^4.0.2",
     "rambda": "^9.1.1",
     "string-similarity-js": "^2.1.4",
-    "viem": "^2.8.18"
+    "viem": "^2.26.3"
   }
 }
