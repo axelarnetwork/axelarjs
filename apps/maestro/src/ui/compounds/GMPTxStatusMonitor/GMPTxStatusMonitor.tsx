@@ -1,4 +1,3 @@
-import type { EVMChainConfig, VMChainConfig } from "@axelarjs/api";
 import type { GMPTxStatus } from "@axelarjs/api/gmp";
 import { Badge, cn, Progress, Tooltip, type BadgeProps } from "@axelarjs/ui";
 import { useEffect, useMemo, type FC } from "react";
@@ -8,15 +7,15 @@ import { clamp, splitAt } from "rambda";
 import { useBlockNumber, useTransaction } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
+import { ITSChainConfig } from "~/server/chainConfig";
 import { useChainId } from "~/lib/hooks";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
-type ChainConfig = EVMChainConfig | VMChainConfig;
 
 const STATUS_LABELS: Partial<Record<ExtendedGMPTxStatus, string>> = {
   called: "Initialized",
@@ -234,7 +233,7 @@ export type ChainStatusItemProps = {
   status: ExtendedGMPTxStatus;
   txHash: string;
   logIndex: number;
-  chain: ChainConfig;
+  chain: ITSChainConfig;
   className?: string;
   compact?: boolean;
   offset?: number;
@@ -245,11 +244,11 @@ export type ChainStatusItemsProps = Omit<
   "chain" | "logIndex"
 > & {
   logIndexes: number[];
-  chains: ChainConfig[];
+  chains: ITSChainConfig[];
 };
 
 const CollapsedChains: FC<{
-  chains: ChainConfig[];
+  chains: ITSChainConfig[];
   offset: number;
 }> = ({ chains, offset }) => {
   if (chains.length > offset) {

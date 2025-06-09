@@ -11,7 +11,7 @@ import {
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 import { useRegisterRemoteInterchainTokenOnStellar } from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
