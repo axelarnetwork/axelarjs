@@ -1,14 +1,9 @@
 import { toast } from "@axelarjs/ui/toaster";
 import { useCallback } from "react";
 
-import { rpc, Transaction } from "@stellar/stellar-sdk";
-
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
-import {
-  STELLAR_NETWORK_PASSPHRASE,
-  STELLAR_RPC_URL,
-} from "~/server/routers/stellar/utils/config";
+import { useStellarTransactionSigner } from "./useStellarTransactionSigner";
 
 interface MintStellarTokensParams {
   amount: string;
@@ -19,6 +14,7 @@ interface MintStellarTokensParams {
 
 export default function useMintStellarTokens() {
   const { kit } = useStellarKit();
+  const { signAndSubmitTransaction } = useStellarTransactionSigner();
   const utils = trpc.useUtils();
   const { mutateAsync: getMintTx } =
     trpc.stellar.getMintTokenTxBytes.useMutation({
@@ -59,22 +55,10 @@ export default function useMintStellarTokens() {
           amount,
         });
 
-        // Sign the transaction
-        const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
-          networkPassphrase: STELLAR_NETWORK_PASSPHRASE || "",
+        const result = await signAndSubmitTransaction({
+          kit,
+          transactionXDR,
         });
-
-        // Submit the transaction
-        const server = new rpc.Server(STELLAR_RPC_URL, {
-          allowHttp: STELLAR_RPC_URL.startsWith("http://"),
-        });
-
-        const tx = new Transaction(
-          signedTxXdr,
-          STELLAR_NETWORK_PASSPHRASE || ""
-        );
-
-        const result = await server.sendTransaction(tx);
 
         // Invalidate all balance queries to refresh the UI
         await utils.interchainToken.getInterchainTokenBalanceForOwner.invalidate();
@@ -102,7 +86,12 @@ export default function useMintStellarTokens() {
         throw error;
       }
     },
-    [kit, getMintTx, utils.interchainToken.getInterchainTokenBalanceForOwner]
+    [
+      kit,
+      getMintTx,
+      utils.interchainToken.getInterchainTokenBalanceForOwner,
+      signAndSubmitTransaction,
+    ]
   );
 
   return mintTokens;

@@ -1,14 +1,26 @@
 import { useState } from "react";
 
 import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
-import { rpc, scValToNative, Transaction, xdr } from "@stellar/stellar-sdk";
+import { scValToNative, xdr } from "@stellar/stellar-sdk";
 
-import { stellarChainConfig } from "~/config/chains";
-import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
+import type { DeployAndRegisterTransactionState as BaseDeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment/InterchainTokenDeployment.state";
 import { trpc } from "~/lib/trpc";
-import { STELLAR_NETWORK_PASSPHRASE } from "~/server/routers/stellar/utils/config";
 import { useRegisterRemoteInterchainTokenOnStellar } from "../RegisterRemoteTokens/hooks/useRegisterRemoteInterchainTokenOnStellar";
 import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
+import { useStellarTransactionSigner } from "./useStellarTransactionSigner";
+
+// Extend the base type to include step and totalSteps for Stellar deployments
+type DeployAndRegisterTransactionState =
+  | Extract<BaseDeployAndRegisterTransactionState, { type: "idle" }>
+  | (Extract<
+      BaseDeployAndRegisterTransactionState,
+      { type: "pending_approval" }
+    > & { step?: number; totalSteps?: number })
+  | (Extract<BaseDeployAndRegisterTransactionState, { type: "deploying" }> & {
+      step?: number;
+      totalSteps?: number;
+    })
+  | Extract<BaseDeployAndRegisterTransactionState, { type: "deployed" }>;
 
 export interface DeployTokenParams {
   kit: StellarWalletsKit;
@@ -38,6 +50,7 @@ export function useDeployStellarToken() {
   const [data, setData] = useState<DeployTokenResultStellar | null>(null);
 
   const { pollTransaction } = useStellarTransactionPoller();
+  const { signAndSubmitTransaction } = useStellarTransactionSigner();
 
   const { mutateAsync: getDeployTokenTxBytes } =
     trpc.stellar.getDeployTokenTxBytes.useMutation();
@@ -91,34 +104,21 @@ export function useDeployStellarToken() {
         minterAddress,
       });
 
-      // 2. Sign the transaction
-      const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
-        networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
-      });
-
-      // 3. Submit the transaction
-      const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
-      const server = new rpc.Server(rpcUrl);
-
-      const tx = new Transaction(signedTxXdr, STELLAR_NETWORK_PASSPHRASE);
-
-      const initialResponse = await server.sendTransaction(tx);
-
-      if (initialResponse.status === "PENDING") {
-        onStatusUpdate?.({
-          type: "deploying",
-          txHash: initialResponse.hash,
+      // 2. Sign and submit the transaction
+      const initialResponse =
+        await signAndSubmitTransaction<DeployAndRegisterTransactionState>({
+          kit,
+          transactionXDR,
+          onStatusUpdate,
+          createDeployingStatus: (txHash: string) => ({
+            type: "deploying",
+            txHash,
+            step: 1,
+            totalSteps: destinationChainIds.length > 0 ? 2 : 1,
+          }),
         });
-      }
 
-      if (
-        initialResponse.status === "ERROR" ||
-        initialResponse.status === "DUPLICATE" ||
-        initialResponse.status === "TRY_AGAIN_LATER"
-      ) {
-        const errorMessage = `Stellar transaction submission failed with status: ${initialResponse.status}. Error: ${JSON.stringify(initialResponse.errorResult)}`;
-        throw new Error(errorMessage);
-      }
+      const { server } = initialResponse;
 
       const pollingResult = await pollTransaction(
         server,

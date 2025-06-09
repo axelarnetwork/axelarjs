@@ -1,16 +1,28 @@
 import { useState } from "react";
 
-import { rpc, scValToNative, Transaction, xdr } from "@stellar/stellar-sdk";
+import { scValToNative, xdr } from "@stellar/stellar-sdk";
 
-import { stellarChainConfig } from "~/config/chains";
 import {
   useCanonicalTokenDeploymentStateContainer,
-  type DeployAndRegisterTransactionState,
+  type DeployAndRegisterTransactionState as BaseDeployAndRegisterTransactionState,
 } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useStellarTransactionPoller } from "~/features/stellarHooks/useStellarTransactionPoller";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
-import { STELLAR_NETWORK_PASSPHRASE } from "~/server/routers/stellar/utils/config";
+import { useStellarTransactionSigner } from "./useStellarTransactionSigner";
+
+// Extend the base type to include step and totalSteps for Stellar deployments
+type DeployAndRegisterTransactionState =
+  | Extract<BaseDeployAndRegisterTransactionState, { type: "idle" }>
+  | (Extract<
+      BaseDeployAndRegisterTransactionState,
+      { type: "pending_approval" }
+    > & { step?: number; totalSteps?: number })
+  | (Extract<BaseDeployAndRegisterTransactionState, { type: "deploying" }> & {
+      step?: number;
+      totalSteps?: number;
+    })
+  | Extract<BaseDeployAndRegisterTransactionState, { type: "deployed" }>;
 
 export type RegisterCanonicalTokenOnStellarParams = {
   tokenAddress: string;
@@ -38,6 +50,7 @@ export function useRegisterCanonicalTokenOnStellar() {
   const { kit } = useStellarKit();
   const { actions } = useCanonicalTokenDeploymentStateContainer();
   const { pollTransaction } = useStellarTransactionPoller();
+  const { signAndSubmitTransaction } = useStellarTransactionSigner();
 
   const { mutateAsync: getRegisterCanonicalTokenTxBytes } =
     trpc.stellar.getRegisterCanonicalTokenTxBytes.useMutation();
@@ -78,37 +91,18 @@ export function useRegisterCanonicalTokenOnStellar() {
         gasValues: gasValues.map((v) => v.toString()),
       });
 
-      const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
-        networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
-      });
-      const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
-      const server = new rpc.Server(rpcUrl);
-      const tx = new Transaction(signedTxXdr, STELLAR_NETWORK_PASSPHRASE);
-
-      const txHash = tx.hash().toString("hex");
-
-      onStatusUpdate?.({
-        type: "deploying",
-        txHash: txHash,
-      });
-
-      const initialResponse = await server.sendTransaction(tx);
-
-      if (
-        initialResponse.status === "ERROR" ||
-        initialResponse.status === "DUPLICATE" ||
-        initialResponse.status === "TRY_AGAIN_LATER"
-      ) {
-        const errorMessage = `Stellar canonical token registration failed with status: ${initialResponse.status}. Error: ${JSON.stringify(initialResponse.errorResult)}`;
-        throw new Error(errorMessage);
-      }
-
-      if (initialResponse.status === "PENDING") {
-        onStatusUpdate?.({
-          type: "deploying",
-          txHash: initialResponse.hash,
+      const initialResponse =
+        await signAndSubmitTransaction<DeployAndRegisterTransactionState>({
+          kit,
+          transactionXDR,
+          onStatusUpdate,
+          createDeployingStatus: (txHash) => ({
+            type: "deploying",
+            txHash,
+          }),
         });
-      }
+
+      const { server } = initialResponse;
 
       const pollingResult = await pollTransaction(
         server,
