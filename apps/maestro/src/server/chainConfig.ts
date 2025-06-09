@@ -7,6 +7,7 @@ import { invariant } from "@axelarjs/utils";
 
 import { CHAIN_CONFIGS, ExtendedWagmiChainConfig } from "~/config/chains";
 import MaestroKVClient from "~/services/db/kv";
+import { axelarChainConfigs } from "./utils";
 
 /**
  * This chain config type is used for mapping the s3 chain config type into the type we've used across ITS Portal app to limit changes across the codebase.
@@ -118,14 +119,20 @@ function mapToITSChainValue(
   }
 }
 
-async function getAllChains(axelarConfigClient: AxelarConfigClient) {
-  const axelarConfig = await axelarConfigClient.getAxelarConfigs();
-  const chainKeys = Object.keys(axelarConfig.chains);
+async function getAllChains(
+  kvClient: MaestroKVClient,
+  axelarConfigClient: AxelarConfigClient
+) {
+  const axelarConfigChains = await axelarChainConfigs(
+    kvClient,
+    axelarConfigClient,
+    "axelar-chain-configs"
+  );
+  const chainKeys = Object.keys(axelarConfigChains);
   return chainKeys
-    .map((key) => axelarConfig.chains[key])
+    .map((key) => axelarConfigChains[key])
     .filter(
-      (chain) =>
-        chain.chainType !== "axelarnet" && (chain.config as any).contracts
+      (chain) => chain.chainType !== "axelarnet" && chain.config.contracts
     );
 }
 
@@ -142,7 +149,7 @@ async function getEvmChainsMapInternal<TCacheKey extends string>(
     }
   }
 
-  const allChains = await getAllChains(axelarConfigClient);
+  const allChains = await getAllChains(kvClient, axelarConfigClient);
 
   const configuredIDs = CHAIN_CONFIGS.map((chain) => chain.id);
 
@@ -187,7 +194,7 @@ async function getVmChainsMapInternal<TCacheKey extends string>(
     }
   }
 
-  const allChains = await getAllChains(axelarConfigClient);
+  const allChains = await getAllChains(kvClient, axelarConfigClient);
 
   const eligibleVmChains = allChains.filter(
     (chain) => chain.chainType !== "evm" // Assuming anything not EVM is VM for ITS purposes
