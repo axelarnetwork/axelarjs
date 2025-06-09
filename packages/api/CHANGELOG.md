@@ -1,5 +1,13 @@
 # @axelarjs/api
 
+## 0.4.8
+
+### Patch Changes
+
+- Updated dependencies [[`dd036a5c4dbd67c7e78b9493849cccc4b2010001`](https://github.com/axelarnetwork/axelarjs/commit/dd036a5c4dbd67c7e78b9493849cccc4b2010001)]:
+  - @axelarjs/core@0.2.13
+  - @axelarjs/cosmos@0.2.14
+
 ## 0.4.7
 
 ### Patch Changes
