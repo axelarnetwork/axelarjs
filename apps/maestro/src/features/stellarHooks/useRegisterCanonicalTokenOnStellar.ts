@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { humanizeEvents } from "@stellar/stellar-sdk";
+import { humanizeEvents, xdr } from "@stellar/stellar-sdk";
 
 import {
   useCanonicalTokenDeploymentStateContainer,
@@ -139,77 +139,38 @@ export function useRegisterCanonicalTokenOnStellar() {
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
-            const humanReadableEvents = humanizeEvents(events);
+            // Use the helper function to parse events
+            const parsedEventData = parseCanonicalTokenEvents(events);
 
-            for (const event of humanReadableEvents) {
-              if (!event.topics || event.topics.length === 0) continue;
+            // Update local variables with parsed data
+            if (parsedEventData.tokenId) {
+              tokenId = parsedEventData.tokenId;
+              console.log("Extracted tokenId from event:", tokenId);
+            }
 
-              const eventName = event.topics[0];
+            if (parsedEventData.tokenAddress) {
+              extractedTokenAddress = parsedEventData.tokenAddress;
+              console.log(
+                "Extracted tokenAddress from event:",
+                extractedTokenAddress
+              );
+            }
 
-              if (
-                eventName === "token_manager_deployed" &&
-                event.topics.length >= 5
-              ) {
-                // In the example: ["token_manager_deployed", "kOH4I62W0LAo4Z7poBzdtJwjKE3Ei6iqtPezCRzlOSY=", "CDQM…RC6I", "CANB…CPEK", 2]
-                // tokenId is at index 1
-                // tokenAddress is at index 2
-                // tokenManagerAddress is at index 3
-                // tokenManagerType is at index 4
+            if (parsedEventData.tokenManagerAddress) {
+              extractedTokenManagerAddress =
+                parsedEventData.tokenManagerAddress;
+              console.log(
+                "Extracted tokenManagerAddress from event:",
+                extractedTokenManagerAddress
+              );
+            }
 
-                // Extract tokenId from event
-                if (
-                  !tokenId &&
-                  event.topics.length > 1 &&
-                  typeof event.topics[1] === "string"
-                ) {
-                  tokenId = event.topics[1];
-                  console.log("Extracted tokenId from event:", tokenId);
-                }
-
-                // Extract tokenAddress from event
-                if (
-                  !extractedTokenAddress &&
-                  event.topics.length > 2 &&
-                  typeof event.topics[2] === "string"
-                ) {
-                  extractedTokenAddress = event.topics[2];
-                  console.log(
-                    "Extracted tokenAddress from event:",
-                    extractedTokenAddress
-                  );
-                }
-
-                // Extract tokenManagerAddress
-                if (
-                  !extractedTokenManagerAddress &&
-                  event.topics.length > 3 &&
-                  typeof event.topics[3] === "string"
-                ) {
-                  extractedTokenManagerAddress = event.topics[3];
-                  console.log(
-                    "Extracted tokenManagerAddress from event:",
-                    extractedTokenManagerAddress
-                  );
-                }
-
-                // Extract tokenManagerType
-                if (event.topics.length > 4) {
-                  const typeValue = event.topics[4];
-                  if (
-                    typeof typeValue === "number" ||
-                    typeof typeValue === "string"
-                  ) {
-                    // Type 2 is lock_unlock for canonical tokens
-                    if (Number(typeValue) === 2) {
-                      tokenManagerType = "lock_unlock";
-                      console.log(
-                        "Extracted tokenManagerType from event:",
-                        tokenManagerType
-                      );
-                    }
-                  }
-                }
-              }
+            if (parsedEventData.tokenManagerType) {
+              tokenManagerType = parsedEventData.tokenManagerType;
+              console.log(
+                "Extracted tokenManagerType from event:",
+                tokenManagerType
+              );
             }
           }
         } catch (error) {
@@ -261,6 +222,79 @@ export function useRegisterCanonicalTokenOnStellar() {
     error,
     data,
   };
+}
+
+/**
+ * Parsed data from Stellar canonical token registration events
+ */
+interface ParsedCanonicalTokenData {
+  tokenId?: string;
+  tokenAddress?: string;
+  tokenManagerAddress?: string;
+  tokenManagerType?: "lock_unlock";
+}
+
+/**
+ * Parses Stellar canonical token registration events to extract token data
+ * @param events - Raw Stellar events from transaction metadata
+ * @param initialData - Optional initial data to supplement event data
+ * @returns Parsed canonical token data
+ */
+function parseCanonicalTokenEvents(
+  events: xdr.DiagnosticEvent[],
+  initialData: Partial<ParsedCanonicalTokenData> = {}
+): ParsedCanonicalTokenData {
+  const result: ParsedCanonicalTokenData = { ...initialData };
+
+  const humanReadableEvents = humanizeEvents(events);
+
+  for (const event of humanReadableEvents) {
+    if (!event.topics || event.topics.length === 0) continue;
+
+    const eventName = event.topics[0];
+
+    if (eventName === "token_manager_deployed" && event.topics.length >= 5) {
+      // Extract tokenId from event
+      if (
+        !result.tokenId &&
+        event.topics.length > 1 &&
+        typeof event.topics[1] === "string"
+      ) {
+        result.tokenId = event.topics[1];
+      }
+
+      // Extract tokenAddress from event
+      if (
+        !result.tokenAddress &&
+        event.topics.length > 2 &&
+        typeof event.topics[2] === "string"
+      ) {
+        result.tokenAddress = event.topics[2];
+      }
+
+      // Extract tokenManagerAddress
+      if (
+        !result.tokenManagerAddress &&
+        event.topics.length > 3 &&
+        typeof event.topics[3] === "string"
+      ) {
+        result.tokenManagerAddress = event.topics[3];
+      }
+
+      // Extract tokenManagerType - for canonical tokens it should be type 2 (lock_unlock)
+      if (result.tokenManagerType === undefined && event.topics.length > 4) {
+        const typeValue = event.topics[4];
+        if (typeof typeValue === "number" || typeof typeValue === "string") {
+          // Type 2 is lock_unlock for canonical tokens
+          if (Number(typeValue) === 2) {
+            result.tokenManagerType = "lock_unlock";
+          }
+        }
+      }
+    }
+  }
+
+  return result;
 }
 
 export default useRegisterCanonicalTokenOnStellar;

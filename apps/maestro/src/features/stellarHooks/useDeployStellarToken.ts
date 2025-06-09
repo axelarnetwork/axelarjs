@@ -172,55 +172,18 @@ export function useDeployStellarToken() {
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
-            const humanReadableEvents = humanizeEvents(events);
+            const parsedEventData = parseTokenDeploymentEvents(events, {
+              tokenId,
+            });
 
-            for (const event of humanReadableEvents) {
-              if (!event.topics || event.topics.length === 0) continue;
-
-              const eventName = event.topics[0];
-
-              if (eventName === "interchain_token_deployed") {
-                // Extract tokenAddress from the third topic (index 2)
-                if (
-                  !tokenAddress &&
-                  event.topics.length > 2 &&
-                  typeof event.topics[2] === "string"
-                ) {
-                  tokenAddress = event.topics[2];
-                }
-              } else if (eventName === "token_manager_deployed") {
-                // Extract tokenManagerAddress from the fourth topic (index 3)
-                if (
-                  !tokenManagerAddress &&
-                  event.topics.length > 3 &&
-                  typeof event.topics[3] === "string"
-                ) {
-                  tokenManagerAddress = event.topics[3];
-                }
-
-                // Extract tokenManagerType from the fifth topic (index 4)
-                if (tokenManagerType === undefined && event.topics.length > 4) {
-                  const typeValue = event.topics[4];
-                  if (
-                    typeof typeValue === "number" ||
-                    typeof typeValue === "string"
-                  ) {
-                    tokenManagerType =
-                      String(typeValue) === "0" ? "mint_burn" : "lock_unlock";
-                  }
-                }
-              }
-
-              // If all details are found, no need to process further events
-              if (
-                tokenId &&
-                tokenAddress &&
-                tokenManagerAddress &&
-                tokenManagerType
-              ) {
-                break;
-              }
-            }
+            // Update local variables with parsed data
+            if (parsedEventData.tokenId) tokenId = parsedEventData.tokenId;
+            if (parsedEventData.tokenAddress)
+              tokenAddress = parsedEventData.tokenAddress;
+            if (parsedEventData.tokenManagerAddress)
+              tokenManagerAddress = parsedEventData.tokenManagerAddress;
+            if (parsedEventData.tokenManagerType)
+              tokenManagerType = parsedEventData.tokenManagerType;
           }
         } catch (error) {
           // Error extracting token information from transaction
@@ -297,4 +260,85 @@ export function useDeployStellarToken() {
     error,
     data,
   };
+}
+
+/**
+ * Parsed data from Stellar token deployment events
+ */
+interface ParsedTokenDeploymentData {
+  tokenId?: string;
+  tokenAddress?: string;
+  tokenManagerAddress?: string;
+  tokenManagerType?: "mint_burn" | "lock_unlock";
+}
+
+/**
+ * Parses Stellar token deployment events to extract token data
+ * @param events - Raw Stellar events from transaction metadata
+ * @param initialData - Optional initial data to supplement event data
+ * @returns Parsed token deployment data
+ */
+function parseTokenDeploymentEvents(
+  events: xdr.DiagnosticEvent[],
+  initialData: Partial<ParsedTokenDeploymentData> = {}
+): ParsedTokenDeploymentData {
+  const result: ParsedTokenDeploymentData = { ...initialData };
+
+  const humanReadableEvents = humanizeEvents(events);
+
+  for (const event of humanReadableEvents) {
+    if (!event.topics || event.topics.length === 0) continue;
+
+    const eventName = event.topics[0];
+
+    if (eventName === "interchain_token_deployed") {
+      // Extract tokenId from the second topic (index 1)
+      if (
+        !result.tokenId &&
+        event.topics.length > 1 &&
+        typeof event.topics[1] === "string"
+      ) {
+        result.tokenId = event.topics[1];
+      }
+
+      // Extract tokenAddress from the third topic (index 2)
+      if (
+        !result.tokenAddress &&
+        event.topics.length > 2 &&
+        typeof event.topics[2] === "string"
+      ) {
+        result.tokenAddress = event.topics[2];
+      }
+    } else if (eventName === "token_manager_deployed") {
+      // Extract tokenManagerAddress from the fourth topic (index 3)
+      if (
+        !result.tokenManagerAddress &&
+        event.topics.length > 3 &&
+        typeof event.topics[3] === "string"
+      ) {
+        result.tokenManagerAddress = event.topics[3];
+      }
+
+      // Extract tokenManagerType from the fifth topic (index 4)
+      if (result.tokenManagerType === undefined && event.topics.length > 4) {
+        const typeValue = event.topics[4];
+        if (typeof typeValue === "number" || typeof typeValue === "string") {
+          result.tokenManagerType =
+            String(typeValue) === "0" ? "mint_burn" : "lock_unlock";
+        }
+      }
+    }
+
+    // If all details are found, no need to process further events
+    if (
+      result.tokenId &&
+      result.tokenAddress &&
+      result.tokenManagerAddress &&
+      result.tokenManagerType
+    ) {
+      break;
+    }
+  }
+
+  return result;
 }
