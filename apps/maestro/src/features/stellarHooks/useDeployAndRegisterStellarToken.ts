@@ -168,14 +168,11 @@ export function useDeployAndRegisterStellarToken() {
             tokenId = returnValue.bytes().toString("hex");
           }
 
-          // Extract tokenAddress, tokenManagerAddress, tokenManagerType, and GMP message IDs from events
           const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
-            // Use humanizeEvents to get a more developer-friendly representation
             const humanReadableEvents = humanizeEvents(events);
-            // console.log("humanReadableEvents", humanReadableEvents); // Uncomment for debugging
 
             // Process each event
             for (const event of humanReadableEvents) {

@@ -13,7 +13,7 @@ import React, {
 import { parseUnits } from "viem";
 import { WriteContractData } from "wagmi/query";
 
-import type { DeployAndRegisterTokenResultStellar } from "~/features/stellarHooks";
+import type { DeployTokenResultStellar } from "~/features/stellarHooks";
 import { DeployTokenResult } from "~/features/suiHooks/useDeployToken";
 import { useTransactionsContainer } from "~/features/Transactions";
 import {
@@ -131,8 +131,7 @@ export const Step2: FC = () => {
 
       if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
         try {
-          const result =
-            (await txPromise) as DeployAndRegisterTokenResultStellar;
+          const result = (await txPromise) as DeployTokenResultStellar;
           if (result && result.hash && result.tokenAddress) {
             if (rootState.selectedChains.length >= 0) {
               addTransaction({
