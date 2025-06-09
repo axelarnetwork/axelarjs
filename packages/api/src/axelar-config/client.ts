@@ -10,10 +10,13 @@ export const createAxelarConfigClient = (
   env: Environment,
   options?: HttpClientOptions
 ) =>
-  AxelarConfigClient.init({
-    instance: HttpClient.extend({
-      ...(options ?? {
-        prefixUrl: AXELAR_CONFIG_API_URLS[env],
+  AxelarConfigClient.init(
+    {
+      instance: HttpClient.extend({
+        ...(options ?? {
+          prefixUrl: AXELAR_CONFIG_API_URLS[env],
+        }),
       }),
-    }),
-  });
+    },
+    env
+  );

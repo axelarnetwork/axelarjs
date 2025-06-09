@@ -1,16 +1,9 @@
-import {
-  ITSChainConfig,
-  type EVMChainConfig,
-  type VMChainConfig,
-} from "@axelarjs/api";
-
 import { NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM } from "~/config/env";
-
-type ChainConfig = EVMChainConfig | VMChainConfig;
+import { ITSChainConfig } from "~/server/chainConfig";
 
 type ChainConfigIndex = {
-  indexedById: Record<string, ChainConfig>;
-  indexedByChainId: Record<number, ChainConfig>;
+  indexedById: Record<string, ITSChainConfig>;
+  indexedByChainId: Record<number, ITSChainConfig>;
 };
 
 /**
@@ -29,7 +22,7 @@ export const filterEligibleChains = (
 
   const currentChain = destinationChains.find(
     (chain) => chain.chain_id === currentChainId
-  ) as ChainConfig;
+  );
 
   if (!currentChain) return [];
 
@@ -66,7 +59,7 @@ export function getNormalizedTwoHopChainConfig(
   axelarChainId: string,
   combinedComputed: ChainConfigIndex,
   chainId: number
-): ChainConfig {
+): ITSChainConfig {
   const { indexedById, indexedByChainId } = combinedComputed;
 
   if (axelarChainId !== "axelar") {

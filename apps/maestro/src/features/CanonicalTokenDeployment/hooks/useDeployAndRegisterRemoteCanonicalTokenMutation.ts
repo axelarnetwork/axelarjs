@@ -27,7 +27,7 @@ import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
-import { useAllChainConfigsQuery } from "~/services/axelarscan/hooks";
+import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import type { DeployAndRegisterTransactionState } from "../CanonicalTokenDeployment.state";
 
 export interface UseDeployAndRegisterCanonicalTokenInput {
