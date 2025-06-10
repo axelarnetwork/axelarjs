@@ -35,7 +35,7 @@ export async function buildRegisterCanonicalTokenTransaction({
   itsContractAddress?: string;
   multicallContractAddress?: string;
   gasTokenAddress?: string;
-}): Promise<{ transactionXDR: string }> {
+}): Promise<{ transactionXDR: string; isTokenRegistered: boolean }> {
   if (
     destinationChainIds.length !== gasValues.length &&
     destinationChainIds.length > 0
@@ -89,7 +89,7 @@ export async function buildRegisterCanonicalTokenTransaction({
       }),
       new xdr.ScMapEntry({
         key: _symbolToScVal("function"),
-        val: _symbolToScVal("create_stellar_asset_contract"),
+        val: _symbolToScVal("deploy_stellar_asset_contract"),
       }),
     ];
 
@@ -232,7 +232,7 @@ export async function buildRegisterCanonicalTokenTransaction({
     args: [xdr.ScVal.scvVec(callArgs)],
   });
 
-  return { transactionXDR };
+  return { transactionXDR, isTokenRegistered };
 }
 
 // Helper functions for ScVal creation

@@ -83,12 +83,19 @@ export function useRegisterCanonicalTokenOnStellar() {
         type: "pending_approval",
       });
 
-      const { transactionXDR } = await getRegisterCanonicalTokenTxBytes({
-        caller: publicKey,
-        tokenAddress,
-        destinationChainIds: destinationChains,
-        gasValues: gasValues.map((v) => v.toString()),
-      });
+      const { transactionXDR, isTokenRegistered } =
+        await getRegisterCanonicalTokenTxBytes({
+          caller: publicKey,
+          tokenAddress,
+          destinationChainIds: destinationChains,
+          gasValues: gasValues.map((v) => v.toString()),
+        });
+
+      if (isTokenRegistered) {
+        throw new Error(
+          "Token is already registered on ITS. Please contact our support team."
+        );
+      }
 
       const initialResponse =
         await signAndSubmitTransaction<DeployAndRegisterTransactionState>({
@@ -145,32 +152,19 @@ export function useRegisterCanonicalTokenOnStellar() {
             // Update local variables with parsed data
             if (parsedEventData.tokenId) {
               tokenId = parsedEventData.tokenId;
-              console.log("Extracted tokenId from event:", tokenId);
             }
 
             if (parsedEventData.tokenAddress) {
               extractedTokenAddress = parsedEventData.tokenAddress;
-              console.log(
-                "Extracted tokenAddress from event:",
-                extractedTokenAddress
-              );
             }
 
             if (parsedEventData.tokenManagerAddress) {
               extractedTokenManagerAddress =
                 parsedEventData.tokenManagerAddress;
-              console.log(
-                "Extracted tokenManagerAddress from event:",
-                extractedTokenManagerAddress
-              );
             }
 
             if (parsedEventData.tokenManagerType) {
               tokenManagerType = parsedEventData.tokenManagerType;
-              console.log(
-                "Extracted tokenManagerType from event:",
-                tokenManagerType
-              );
             }
           }
         } catch (error) {
@@ -247,6 +241,7 @@ function parseCanonicalTokenEvents(
   const result: ParsedCanonicalTokenData = { ...initialData };
 
   const humanReadableEvents = humanizeEvents(events);
+  console.log("Human readable events:", humanReadableEvents);
 
   for (const event of humanReadableEvents) {
     if (!event.topics || event.topics.length === 0) continue;
@@ -254,39 +249,39 @@ function parseCanonicalTokenEvents(
     const eventName = event.topics[0];
 
     if (eventName === "token_manager_deployed" && event.topics.length >= 5) {
-      // Extract tokenId from event
-      if (
-        !result.tokenId &&
-        event.topics.length > 1 &&
-        typeof event.topics[1] === "string"
-      ) {
-        result.tokenId = event.topics[1];
+      // Extract tokenId from event - handle both Buffer and string types
+      if (!result.tokenId && event.topics[1]) {
+        if (typeof event.topics[1] === "string") {
+          result.tokenId = event.topics[1];
+        } else {
+          result.tokenId = "0x" + Buffer.from(event.topics[1]).toString("hex");
+        }
       }
 
       // Extract tokenAddress from event
-      if (
-        !result.tokenAddress &&
-        event.topics.length > 2 &&
-        typeof event.topics[2] === "string"
-      ) {
-        result.tokenAddress = event.topics[2];
+      if (!result.tokenAddress && event.topics[2]) {
+        if (typeof event.topics[2] === "string") {
+          result.tokenAddress = event.topics[2];
+        }
       }
 
       // Extract tokenManagerAddress
-      if (
-        !result.tokenManagerAddress &&
-        event.topics.length > 3 &&
-        typeof event.topics[3] === "string"
-      ) {
-        result.tokenManagerAddress = event.topics[3];
+      if (!result.tokenManagerAddress && event.topics[3]) {
+        if (typeof event.topics[3] === "string") {
+          result.tokenManagerAddress = event.topics[3];
+        }
       }
 
       // Extract tokenManagerType - for canonical tokens it should be type 2 (lock_unlock)
-      if (result.tokenManagerType === undefined && event.topics.length > 4) {
+      if (
+        result.tokenManagerType === undefined &&
+        event.topics[4] !== undefined
+      ) {
         const typeValue = event.topics[4];
         if (typeof typeValue === "number" || typeof typeValue === "string") {
+          const typeNum = Number(typeValue);
           // Type 2 is lock_unlock for canonical tokens
-          if (Number(typeValue) === 2) {
+          if (typeNum === 2) {
             result.tokenManagerType = "lock_unlock";
           }
         }

@@ -198,7 +198,6 @@ export async function checkIfTokenContractExists(contractAddress: string) {
     );
     return true;
   } catch (e) {
-    console.log("Contract does not exist: ", contractAddress);
     return false;
   }
 }

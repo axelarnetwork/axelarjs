@@ -4,11 +4,11 @@ import { publicProcedure, router } from "~/server/trpc";
 import { buildRegisterCanonicalTokenTransaction } from "./utils/canonicalTokenRegistration";
 import { buildInterchainTransferTransaction } from "./utils/interchainTransfer";
 import { buildDeployRemoteInterchainTokensTransaction } from "./utils/remoteTokenDeployments";
-import { buildMintTokenTransaction } from "./utils/tokenMint";
-import { 
+import {
+  buildDeployAndRegisterRemoteInterchainTokenTransaction,
   buildDeployInterchainTokenTransaction,
-  buildDeployAndRegisterRemoteInterchainTokenTransaction 
 } from "./utils/tokenDeployments";
+import { buildMintTokenTransaction } from "./utils/tokenMint";
 
 export const stellarRouter = router({
   // Endpoint to get transaction bytes for deploying a token on Stellar
@@ -117,18 +117,20 @@ export const stellarRouter = router({
     )
     .mutation(async ({ input }) => {
       // Use the utility function to build the canonical token registration transaction
-      const { transactionXDR } = await buildRegisterCanonicalTokenTransaction({
-        caller: input.caller,
-        tokenAddress: input.tokenAddress,
-        destinationChainIds: input.destinationChainIds,
-        gasValues: input.gasValues,
-        multicallContractAddress: input.multicallContractAddress,
-        gasTokenAddress: input.gasTokenAddress,
-        itsContractAddress: input.itsContractAddress,
-      });
+      const { transactionXDR, isTokenRegistered } =
+        await buildRegisterCanonicalTokenTransaction({
+          caller: input.caller,
+          tokenAddress: input.tokenAddress,
+          destinationChainIds: input.destinationChainIds,
+          gasValues: input.gasValues,
+          multicallContractAddress: input.multicallContractAddress,
+          gasTokenAddress: input.gasTokenAddress,
+          itsContractAddress: input.itsContractAddress,
+        });
 
       return {
         transactionXDR,
+        isTokenRegistered,
       };
     }),
 
@@ -155,7 +157,7 @@ export const stellarRouter = router({
         transactionXDR,
       };
     }),
-    
+
   // Endpoint to get transaction bytes for deploying and registering an interchain token in a single transaction
   getDeployAndRegisterRemoteTokenTxBytes: publicProcedure
     .input(
@@ -176,20 +178,21 @@ export const stellarRouter = router({
     )
     .mutation(async ({ input }) => {
       // Use the utility function to build the combined deployment and registration transaction
-      const { transactionXDR } = await buildDeployAndRegisterRemoteInterchainTokenTransaction({
-        caller: input.caller,
-        tokenName: input.tokenName,
-        tokenSymbol: input.tokenSymbol,
-        decimals: input.decimals,
-        initialSupply: input.initialSupply,
-        salt: input.salt,
-        minterAddress: input.minterAddress,
-        destinationChainIds: input.destinationChainIds,
-        gasValues: input.gasValues,
-        multicallContractAddress: input.multicallContractAddress,
-        gasTokenAddress: input.gasTokenAddress,
-        itsContractAddress: input.itsContractAddress,
-      });
+      const { transactionXDR } =
+        await buildDeployAndRegisterRemoteInterchainTokenTransaction({
+          caller: input.caller,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          decimals: input.decimals,
+          initialSupply: input.initialSupply,
+          salt: input.salt,
+          minterAddress: input.minterAddress,
+          destinationChainIds: input.destinationChainIds,
+          gasValues: input.gasValues,
+          multicallContractAddress: input.multicallContractAddress,
+          gasTokenAddress: input.gasTokenAddress,
+          itsContractAddress: input.itsContractAddress,
+        });
 
       return {
         transactionXDR,
