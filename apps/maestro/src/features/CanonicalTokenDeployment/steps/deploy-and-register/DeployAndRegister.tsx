@@ -164,21 +164,31 @@ export const Step3: FC = () => {
       // Handle Stellar token deployment
       if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
         try {
-          const result = (await txPromise) as RegisterCanonicalTokenResult;
-          if (result) {
+          const result = await txPromise;
+
+          console.log("Stellar result:", result);
+
+          if (
+            result &&
+            typeof result === "object" &&
+            "hash" in result &&
+            "tokenAddress" in result
+          ) {
+            rootActions.setTxState({
+              type: "deployed",
+              tokenAddress: result.tokenAddress,
+              txHash: result.hash,
+            });
             if (rootState.selectedChains.length > 0) {
               addTransaction({
                 status: "submitted",
-                hash: result.digest,
+                hash: result.hash,
                 chainId: sourceChain.chain_id,
                 txType: "INTERCHAIN_DEPLOYMENT",
               });
               return;
             }
           } else {
-            rootActions.setTxState({
-              type: "idle",
-            });
             throw new Error("Stellar deployment result incomplete.");
           }
         } catch (e: any) {

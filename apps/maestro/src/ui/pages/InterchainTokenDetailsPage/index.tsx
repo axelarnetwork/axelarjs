@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 
 import { useChainFromRoute } from "~/lib/hooks";
 import { getPrefilledClaimOwnershipFormLink } from "~/lib/utils/gform";
-import { normalizeStellarTokenAddress } from "~/lib/utils/stellar";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
@@ -12,17 +11,12 @@ import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
 
 const InterchainTokensPage: FC = () => {
-  const { tokenAddress: TokenAddress } = useRouter().query as {
+  const { tokenAddress } = useRouter().query as {
     chainName: string;
     tokenAddress: `0x${string}`;
   };
 
   const routeChain = useChainFromRoute();
-  const tokenAddress = normalizeStellarTokenAddress(
-    TokenAddress,
-    routeChain?.name
-  );
-
   const {
     data: interchainToken,
     isLoading,
