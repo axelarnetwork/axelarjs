@@ -166,19 +166,12 @@ export const Step3: FC = () => {
         try {
           const result = await txPromise;
 
-          console.log("Stellar result:", result);
-
           if (
             result &&
             typeof result === "object" &&
             "hash" in result &&
             "tokenAddress" in result
           ) {
-            rootActions.setTxState({
-              type: "deployed",
-              tokenAddress: result.tokenAddress,
-              txHash: result.hash,
-            });
             if (rootState.selectedChains.length > 0) {
               addTransaction({
                 status: "submitted",

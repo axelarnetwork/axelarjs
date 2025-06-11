@@ -271,13 +271,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       if (!kit) {
         throw new Error("Stellar wallet not connected");
       }
-
-      // tokenAddress can be in format tokenSymbol-Issuer or contract address
-      console.log({
-        tokenAddress: input.tokenAddress,
-        destinationChains: input.destinationChainIds,
-        gasValues: input.remoteDeploymentGasFees,
-      });
       const result = await registerTokenWithContractDeployment({
         kit,
         tokenAddress: input.tokenAddress,
@@ -290,8 +283,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
           }
         },
       });
-
-      console.log("result", result);
 
       if (result?.tokenRegistration?.hash) {
         setRecordDeploymentArgs({
