@@ -1,6 +1,5 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
-// Stellar SDK imports
 import { Account, Address, scValToNative } from "stellar-sdk";
 import { z } from "zod";
 
