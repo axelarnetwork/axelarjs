@@ -27,10 +27,6 @@ async function callStellarContractMethod<T>({
   rpcUrl: string;
 }): Promise<T | undefined> {
   try {
-    console.log(
-      `[Stellar] Calling '${method}' method${args.length > 0 ? " with args" : ""}`
-    );
-
     const result = await simulateCall({
       contractAddress,
       method,
@@ -41,17 +37,12 @@ async function callStellarContractMethod<T>({
     });
 
     if (result.simulateResult) {
-      // Parse the XDR object to native JavaScript value
       const nativeValue = scValToNative(result.simulateResult);
-      console.log(`[Stellar] '${method}' method found:`, nativeValue);
       return nativeValue as T;
     } else {
-      console.log(`[Stellar] '${method}' method returned no value`);
       return undefined;
     }
   } catch (error) {
-    console.error(`[Stellar] Error calling '${method}' method:`, error);
-    // Method might not be available on all tokens, so we just log the error
     return undefined;
   }
 }
