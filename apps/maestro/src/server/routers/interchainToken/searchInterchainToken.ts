@@ -1,8 +1,8 @@
 import { invariant } from "@axelarjs/utils";
 
+import { Asset } from "@stellar/stellar-sdk";
 import { TRPCError } from "@trpc/server";
 import { partition, pluck, propEq } from "rambda";
-import { Asset } from "@stellar/stellar-sdk";
 import { Client } from "stellar-sdk/contract";
 import { z } from "zod";
 
@@ -15,7 +15,11 @@ import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 import { formatTokenId, getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
-
+/**
+ * Check if a token is registered on Stellar by directly querying the Stellar contract
+ */
+// Importar a função checkIfTokenContractExists
+import { checkIfTokenContractExists } from "../stellar/utils/transactions";
 import {
   getCoinAddressFromType,
   getSuiEventsByTxHash,
@@ -23,6 +27,9 @@ import {
 
 interface StellarITSContractClient {
   interchain_token_address: (params: {
+    token_id: Buffer;
+  }) => Promise<{ result: string }>;
+  registered_token_address: (params: {
     token_id: Buffer;
   }) => Promise<{ result: string }>;
   token_manager_address: (params: {
@@ -352,9 +359,9 @@ async function scanChains(
           // Use type assertion to handle the remoteTokens property
           const tokenWithRemoteTokens: TokenDetails = {
             ...tokenDetails,
-            remoteTokens: (tokenDetails as any).remoteTokens || []
+            remoteTokens: (tokenDetails as any).remoteTokens || [],
           };
-            
+
           const result = getInterchainToken(
             tokenWithRemoteTokens,
             chainConfig,
@@ -448,21 +455,25 @@ async function getTokenDetails(
   ctx: Context
 ) {
   // First, try with the original token address
-  let tokenDetails = await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-    chainConfig.axelarChainId,
-    tokenAddress
-  );
+  let tokenDetails =
+    await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+      chainConfig.axelarChainId,
+      tokenAddress
+    );
 
   if (tokenDetails) {
     // Ensure the token has remoteTokens property
     if (!tokenDetails.remoteTokens && tokenDetails.tokenId) {
-      const fullToken = await ctx.persistence.postgres.getInterchainTokenByTokenId(tokenDetails.tokenId);
+      const fullToken =
+        await ctx.persistence.postgres.getInterchainTokenByTokenId(
+          tokenDetails.tokenId
+        );
       if (fullToken) {
         return fullToken;
       } else {
         return {
           ...tokenDetails,
-          remoteTokens: []
+          remoteTokens: [],
         } as TokenDetails;
       }
     }
@@ -470,10 +481,11 @@ async function getTokenDetails(
   }
 
   // Check for remote token with original address
-  let remoteTokenDetails = await ctx.persistence.postgres.getRemoteInterchainTokenByChainIdAndTokenAddress(
-    chainConfig.axelarChainId,
-    tokenAddress
-  );
+  let remoteTokenDetails =
+    await ctx.persistence.postgres.getRemoteInterchainTokenByChainIdAndTokenAddress(
+      chainConfig.axelarChainId,
+      tokenAddress
+    );
 
   if (remoteTokenDetails) {
     const token = await ctx.persistence.postgres.getInterchainTokenByTokenId(
@@ -483,50 +495,56 @@ async function getTokenDetails(
     if (token && !token.remoteTokens) {
       return {
         ...token,
-        remoteTokens: []
+        remoteTokens: [],
       } as TokenDetails;
     }
     return token;
   }
 
   // If not found and this is a Stellar chain, try the alternative format
-  if (chainConfig.axelarChainName.includes('stellar')) {
+  if (chainConfig.axelarChainName.includes("stellar")) {
     try {
       let alternativeAddress = null;
-      
+
       // If original is symbol-issuer format (not starting with 'C'), convert to contract format
       if (!tokenAddress.startsWith("C")) {
         // Check for both ':' and '-' separators
-        const separator = tokenAddress.includes(":") 
-          ? ":" 
-          : tokenAddress.includes("-") 
-            ? "-" 
+        const separator = tokenAddress.includes(":")
+          ? ":"
+          : tokenAddress.includes("-")
+            ? "-"
             : null;
-            
+
         if (separator) {
           const [assetCode, issuer] = tokenAddress.split(separator);
           const stellarAsset = new Asset(assetCode, issuer);
-          alternativeAddress = stellarAsset.contractId(STELLAR_NETWORK_PASSPHRASE);
+          alternativeAddress = stellarAsset.contractId(
+            STELLAR_NETWORK_PASSPHRASE
+          );
         }
       }
 
       if (alternativeAddress) {
         // Check for interchain token with alternative address
-        tokenDetails = await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-          chainConfig.axelarChainId,
-          alternativeAddress
-        );
+        tokenDetails =
+          await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+            chainConfig.axelarChainId,
+            alternativeAddress
+          );
 
         if (tokenDetails) {
           // Ensure the token has remoteTokens property
           if (!tokenDetails.remoteTokens && tokenDetails.tokenId) {
-            const fullToken = await ctx.persistence.postgres.getInterchainTokenByTokenId(tokenDetails.tokenId);
+            const fullToken =
+              await ctx.persistence.postgres.getInterchainTokenByTokenId(
+                tokenDetails.tokenId
+              );
             if (fullToken) {
               return fullToken;
             } else {
               return {
                 ...tokenDetails,
-                remoteTokens: []
+                remoteTokens: [],
               } as TokenDetails;
             }
           }
@@ -534,36 +552,38 @@ async function getTokenDetails(
         }
 
         // Check for remote token with alternative address
-        remoteTokenDetails = await ctx.persistence.postgres.getRemoteInterchainTokenByChainIdAndTokenAddress(
-          chainConfig.axelarChainId,
-          alternativeAddress
-        );
+        remoteTokenDetails =
+          await ctx.persistence.postgres.getRemoteInterchainTokenByChainIdAndTokenAddress(
+            chainConfig.axelarChainId,
+            alternativeAddress
+          );
 
         if (remoteTokenDetails) {
-          const token = await ctx.persistence.postgres.getInterchainTokenByTokenId(
-            remoteTokenDetails.tokenId
-          );
+          const token =
+            await ctx.persistence.postgres.getInterchainTokenByTokenId(
+              remoteTokenDetails.tokenId
+            );
           // Make sure it has remoteTokens property
           if (token && !token.remoteTokens) {
             return {
               ...token,
-              remoteTokens: []
+              remoteTokens: [],
             } as TokenDetails;
           }
           return token;
         }
       }
     } catch (error) {
-      console.error(`[getTokenDetails] Error converting address format:`, error);
+      console.error(
+        `[getTokenDetails] Error converting address format:`,
+        error
+      );
     }
   }
 
   return null;
 }
 
-/**
- * Check if a token is registered on Stellar by directly querying the Stellar contract
- */
 export async function getStellarTokenRegistrationDetails(
   tokenId: string,
   ctx: Context
@@ -575,33 +595,40 @@ export async function getStellarTokenRegistrationDetails(
   try {
     const chainConfig = await getStellarChainConfig(ctx);
     const rpcUrl = chainConfig.config.rpc[0];
+
     // Create a network-configured Stellar contract client
     const ITSStellarContractClient = (await Client.from({
       contractId: chainConfig.config.contracts.InterchainTokenService.address,
       networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
-      rpcUrl: rpcUrl,
+      rpcUrl,
     })) as unknown as StellarITSContractClient;
 
     // Format the token ID properly (32 bytes)
     const tokenIdBuffer = formatTokenId(tokenId);
-    const { result: tokenAddress } =
-      await ITSStellarContractClient.interchain_token_address({
+
+    // Get registered token address - this is the correct method to use
+    const tokenAddressResult =
+      await ITSStellarContractClient.registered_token_address({
         token_id: tokenIdBuffer,
       });
-    const { result: tokenManagerAddress } =
+    const tokenAddress = tokenAddressResult.result;
+
+    // Get token manager address
+    const tokenManagerResult =
       await ITSStellarContractClient.token_manager_address({
         token_id: tokenIdBuffer,
       });
+    const tokenManagerAddress = tokenManagerResult.result;
 
-    // Check if the token contract exists
-    const tokenStellarContractClient = (await Client.from({
-      contractId: tokenAddress,
-      networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
-      rpcUrl: rpcUrl,
-    }).catch(() => null)) as unknown as StellarITSContractClient;
+    // Verify if the token contract exists
+    const tokenContractExists = await checkIfTokenContractExists(tokenAddress);
+
+    const isRegistered = Boolean(
+      tokenAddress && tokenManagerAddress && tokenContractExists
+    );
 
     return {
-      isRegistered: Boolean(tokenStellarContractClient),
+      isRegistered,
       tokenAddress: tokenAddress,
       tokenManagerAddress: tokenManagerAddress || null,
     };
