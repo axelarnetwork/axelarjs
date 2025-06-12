@@ -1,17 +1,61 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
-import { scValToNative } from "stellar-sdk";
-import { Client } from "stellar-sdk/contract";
+// Stellar SDK imports
+import { Account, Address, scValToNative } from "stellar-sdk";
 import { z } from "zod";
 
-import type { StellarTokenContractClient } from "~/lib/clients/stellarClient";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { isValidStellarTokenAddress } from "~/lib/utils/validation";
-import { getStellarChainConfig } from "~/server/routers/stellar/utils";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
+import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
+import { simulateCall } from "../stellar/utils/transactions";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
+
+// Helper function to call Stellar contract methods and handle errors
+async function callStellarContractMethod<T>({
+  contractAddress,
+  method,
+  account,
+  args = [],
+  rpcUrl,
+}: {
+  contractAddress: string;
+  method: string;
+  account: Account;
+  args?: any[];
+  rpcUrl: string;
+}): Promise<T | undefined> {
+  try {
+    console.log(
+      `[Stellar] Calling '${method}' method${args.length > 0 ? " with args" : ""}`
+    );
+
+    const result = await simulateCall({
+      contractAddress,
+      method,
+      account,
+      args,
+      rpcUrl,
+      networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
+    });
+
+    if (result.simulateResult) {
+      // Parse the XDR object to native JavaScript value
+      const nativeValue = scValToNative(result.simulateResult);
+      console.log(`[Stellar] '${method}' method found:`, nativeValue);
+      return nativeValue as T;
+    } else {
+      console.log(`[Stellar] '${method}' method returned no value`);
+      return undefined;
+    }
+  } catch (error) {
+    console.error(`[Stellar] Error calling '${method}' method:`, error);
+    // Method might not be available on all tokens, so we just log the error
+    return undefined;
+  }
+}
 
 export const ROLES_ENUM = ["MINTER", "OPERATOR", "FLOW_LIMITER"] as const;
 
@@ -101,47 +145,83 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
     // Stellar tokens
     if (isValidStellarTokenAddress(input.tokenAddress)) {
-      const chainConfig = await getStellarChainConfig(ctx);
-      const rpcUrl = chainConfig.config.rpc[0];
-      const ITSStellarContractClient = (await Client.from({
-        contractId: input.tokenAddress,
-        networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
-        rpcUrl: rpcUrl,
-      })) as unknown as StellarTokenContractClient;
+      try {
+        const chainConfig = await getStellarChainConfig(ctx);
+        const rpcUrl = chainConfig.config.rpc[0];
 
-      const [
-        { simulation: simBalance },
-        { simulation: simMinter },
-        { simulation: simOwner },
-        { simulation: simDecimals },
-      ] = await Promise.all([
-        ITSStellarContractClient.balance({
-          id: input.owner,
-        }),
-        ITSStellarContractClient.is_minter({
-          minter: input.owner,
-        }),
-        ITSStellarContractClient.owner(),
-        ITSStellarContractClient.decimals(),
-      ]);
+        const dummyAccount = new Account(input.owner, "0");
 
-      const balance = scValToNative(simBalance.result.retval).toString();
-      const isMinter = scValToNative(simMinter.result.retval);
-      const isOwner = scValToNative(simOwner.result.retval) === input.owner;
-      const decimals = scValToNative(simDecimals.result.retval);
+        const decimalsRaw = await callStellarContractMethod<number>({
+          contractAddress: input.tokenAddress,
+          method: "decimals",
+          account: dummyAccount,
+          rpcUrl,
+        });
 
-      // check return values
-      return {
-        decimals,
-        isTokenOwner: isOwner,
-        isTokenMinter: isMinter,
-        tokenBalance: balance,
-        isTokenPendingOwner: false,
-        hasPendingOwner: false,
-        hasMinterRole: isMinter,
-        hasOperatorRole: false,
-        hasFlowLimiterRole: false,
-      };
+        const decimals = decimalsRaw !== undefined ? decimalsRaw : 0;
+
+        const balanceRaw = await callStellarContractMethod<any>({
+          contractAddress: input.tokenAddress,
+          method: "balance",
+          account: dummyAccount,
+          args: [new Address(input.owner).toScVal()],
+          rpcUrl,
+        });
+
+        let balance = "0";
+        if (balanceRaw) {
+          balance = String(balanceRaw).replace("n", "");
+        }
+
+        const ownerAddressObj = await callStellarContractMethod<any>({
+          contractAddress: input.tokenAddress,
+          method: "owner",
+          account: dummyAccount,
+          rpcUrl,
+        });
+
+        // Owner check
+        const isTokenOwner = ownerAddressObj === input.owner;
+
+        const isTokenMinter =
+          (await callStellarContractMethod<boolean>({
+            contractAddress: input.tokenAddress,
+            method: "is_minter",
+            account: dummyAccount,
+            args: [new Address(input.owner).toScVal()],
+            rpcUrl,
+          })) || false;
+
+        const result = {
+          decimals,
+          isTokenOwner,
+          isTokenMinter,
+          tokenBalance: balance ? balance.toString() : "0",
+          isTokenPendingOwner: false,
+          hasPendingOwner: false,
+          hasMinterRole: !!isTokenMinter,
+          hasOperatorRole: !!isTokenOwner,
+          hasFlowLimiterRole: !!isTokenOwner,
+        };
+
+        return result;
+      } catch (error) {
+        console.error(
+          `[Stellar] Error in token balance retrieval for ${input.tokenAddress}:`,
+          error
+        );
+        return {
+          decimals: 0,
+          isTokenOwner: false,
+          isTokenMinter: false,
+          tokenBalance: "0",
+          isTokenPendingOwner: false,
+          hasPendingOwner: false,
+          hasMinterRole: false,
+          hasOperatorRole: false,
+          hasFlowLimiterRole: false,
+        };
+      }
     }
     // This is for ERC20 tokens
     const balanceOwner = input.owner as `0x${string}`;
