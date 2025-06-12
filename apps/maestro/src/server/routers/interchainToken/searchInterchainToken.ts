@@ -15,10 +15,6 @@ import type { Context } from "~/server/context";
 import { publicProcedure } from "~/server/trpc";
 import { formatTokenId, getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
-/**
- * Check if a token is registered on Stellar by directly querying the Stellar contract
- */
-// Importar a função checkIfTokenContractExists
 import { checkIfTokenContractExists } from "../stellar/utils/transactions";
 import {
   getCoinAddressFromType,
@@ -606,21 +602,18 @@ export async function getStellarTokenRegistrationDetails(
     // Format the token ID properly (32 bytes)
     const tokenIdBuffer = formatTokenId(tokenId);
 
-    // Get registered token address - this is the correct method to use
     const tokenAddressResult =
       await ITSStellarContractClient.registered_token_address({
         token_id: tokenIdBuffer,
       });
     const tokenAddress = tokenAddressResult.result;
 
-    // Get token manager address
     const tokenManagerResult =
       await ITSStellarContractClient.token_manager_address({
         token_id: tokenIdBuffer,
       });
     const tokenManagerAddress = tokenManagerResult.result;
 
-    // Verify if the token contract exists
     const tokenContractExists = await checkIfTokenContractExists(tokenAddress);
 
     const isRegistered = Boolean(
