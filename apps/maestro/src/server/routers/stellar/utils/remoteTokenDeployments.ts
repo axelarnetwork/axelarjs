@@ -105,7 +105,6 @@ export async function buildDeployRemoteInterchainTokensTransaction({
     // Arguments differ between canonical and interchain tokens
     let deployRemoteArgs: xdr.ScVal[];
 
-    console.log("isCanonical", isCanonical);
     if (isCanonical) {
       const tokenAddressScVal = salt.startsWith("C")
         ? _addressToScVal(salt) // Endereço de contrato
