@@ -2,6 +2,7 @@ import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
 import {
+  NEXT_PUBLIC_CANONICAL_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
@@ -60,6 +61,7 @@ export default function useRegisterRemoteCanonicalTokens(
     sourceChainId: sourceChain?.id ?? "0",
     gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
+    gasMultiplier: 1.2,
   });
 
   const multicallArgs = useMemo(() => {
