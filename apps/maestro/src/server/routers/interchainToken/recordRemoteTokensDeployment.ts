@@ -3,6 +3,8 @@ import { always } from "rambda";
 import { z } from "zod";
 
 import { suiChainConfig } from "~/config/chains";
+import { STELLAR_CHAIN_ID } from "~/lib/hooks";
+import { normalizeStellarTokenAddress } from "~/lib/utils/stellar";
 import { protectedProcedure } from "~/server/trpc";
 import type { NewRemoteInterchainTokenInput } from "~/services/db/postgres";
 
@@ -37,16 +39,26 @@ export const recordRemoteTokensDeployment = protectedProcedure
       });
     }
 
+    console.log("testando configs", configs.info.chain_id);
+    let tokenAddress = input.tokenAddress;
+    if (configs.info.chain_id === STELLAR_CHAIN_ID) {
+      console.log("testando tokenAddress", tokenAddress);
+      tokenAddress = normalizeStellarTokenAddress(tokenAddress);
+      console.log("tokenAddress normalizado", tokenAddress);
+    }
+
     const originToken =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         configs.info.id,
-        input.tokenAddress
+        tokenAddress
       );
+
+    console.log("Origin token:", originToken);
 
     if (!originToken) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Could not find interchain token details for ${input.tokenAddress} on chain ${input.chainId}`,
+        message: `Could not find interchain token details for ${tokenAddress} on chain ${input.chainId}`,
       });
     }
 
@@ -115,9 +127,15 @@ export const recordRemoteTokensDeployment = protectedProcedure
           tokenManagerAddress = originToken.tokenManagerAddress ?? "0x";
         }
 
+        // Set token manager type based on whether the token is canonical or not
+        const tokenManagerType =
+          originToken.kind === "canonical"
+            ? ("lock_unlock" as const)
+            : ("mint_burn" as const);
+
         return {
           tokenManagerAddress,
-          tokenManagerType: "mint_burn" as const,
+          tokenManagerType,
           tokenAddress,
           tokenId: originToken.tokenId,
           axelarChainId: remoteToken.axelarChainId,
@@ -134,7 +152,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
     } catch (error: any) {
       if (error.message.includes("duplicate key")) {
         console.warn(
-          `Remote tokens for ${input.tokenAddress} on chain ${input.chainId} already recorded`
+          `Remote tokens for ${tokenAddress} on chain ${input.chainId} already recorded`
         );
         return;
       }

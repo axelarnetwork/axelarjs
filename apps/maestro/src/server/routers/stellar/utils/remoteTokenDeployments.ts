@@ -26,6 +26,7 @@ export async function buildDeployRemoteInterchainTokensTransaction({
   multicallContractAddress = STELLAR_MULTICALL_CONTRACT_ID,
   gasTokenAddress = XLM_ASSET_ADDRESS,
   minterAddress,
+  isCanonical = false,
 }: {
   caller: string;
   salt: string;
@@ -35,6 +36,7 @@ export async function buildDeployRemoteInterchainTokensTransaction({
   multicallContractAddress?: string;
   gasTokenAddress?: string;
   minterAddress?: string;
+  isCanonical?: boolean;
 }): Promise<{ transactionXDR: string }> {
   if (destinationChainIds.length !== gasValues.length) {
     throw new Error(
@@ -99,14 +101,34 @@ export async function buildDeployRemoteInterchainTokensTransaction({
 
     // Build the gas payment for this destination
     const gasPaymentScVal = _buildGasPaymentMapScVal(gasTokenAddress, gasValue);
-
-    // Add arguments for deploy_remote_interchain_token in the correct order
-    const deployRemoteArgs: xdr.ScVal[] = [
-      _addressToScVal(effectiveMinter),
-      _bytesToScVal(salt),
-      _stringToScVal(destinationChainId),
-      gasPaymentScVal,
-    ];
+    
+    // Arguments differ between canonical and interchain tokens
+    let deployRemoteArgs: xdr.ScVal[];
+    
+    if (isCanonical) {
+      // For canonical tokens: token_address, destination_chain, spender, gas_token
+      // Note: token_address is passed in the salt parameter for canonical tokens
+      // O endereço do token pode estar no formato de contrato (começando com C) ou no formato symbol-issuer
+      // Verificamos o formato e usamos a função apropriada
+      const tokenAddressScVal = salt.startsWith("C") 
+        ? _addressToScVal(salt) // Endereço de contrato
+        : _stringToScVal(salt); // Formato symbol-issuer
+        
+      deployRemoteArgs = [
+        tokenAddressScVal, // token_address (passed in salt parameter)
+        _stringToScVal(destinationChainId),
+        _addressToScVal(caller), // spender is the caller
+        gasPaymentScVal, // gas_token as option<Token>
+      ];
+    } else {
+      // For interchain tokens: salt, destination_chain, gas_payment
+      deployRemoteArgs = [
+        _addressToScVal(effectiveMinter),
+        _bytesToScVal(salt),
+        _stringToScVal(destinationChainId),
+        gasPaymentScVal,
+      ];
+    }
 
     // Create the struct for the contract call following the original structure
     const callArgsVec = xdr.ScVal.scvVec(deployRemoteArgs);
@@ -126,7 +148,11 @@ export async function buildDeployRemoteInterchainTokensTransaction({
       }),
       new xdr.ScMapEntry({
         key: _symbolToScVal("function"),
-        val: _symbolToScVal("deploy_remote_interchain_token"),
+        val: _symbolToScVal(
+          isCanonical
+            ? "deploy_remote_canonical_token"
+            : "deploy_remote_interchain_token"
+        ),
       }),
     ];
 
