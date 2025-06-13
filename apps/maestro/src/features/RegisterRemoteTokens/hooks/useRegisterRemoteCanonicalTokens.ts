@@ -5,15 +5,20 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
+import type { DeployAndRegisterTransactionState as InterchainDeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { isValidEVMAddress } from "~/lib/utils/validation";
-import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
+import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
+import {
+  useRegisterRemoteInterchainTokenOnStellar,
+  type RegisterRemoteInterchainTokenOnStellarInput,
+} from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
 
 export type RegisterRemoteCanonicalTokensInput = {
@@ -92,8 +97,12 @@ export default function useRegisterRemoteCanonicalTokens(
 
   const mutation = useWriteInterchainTokenFactoryMulticall();
 
-  const { registerRemoteInterchainToken } =
+  const { registerRemoteInterchainToken: registerRemoteInterchainTokenOnSui } =
     useRegisterRemoteInterchainTokenOnSui();
+
+  const {
+    registerRemoteInterchainToken: registerRemoteInterchainTokenOnStellar,
+  } = useRegisterRemoteInterchainTokenOnStellar();
 
   const suiInput = {
     axelarChainIds: destinationChainIds,
@@ -105,18 +114,43 @@ export default function useRegisterRemoteCanonicalTokens(
       | "lock_unlock"
       | "mint_burn",
   };
+
+  const statusUpdateAdapter = (
+    status: InterchainDeployAndRegisterTransactionState
+  ): void => {
+    console.debug(
+      "[useRegisterRemoteCanonicalTokens] Stellar transaction status update:",
+      status
+    );
+  };
+
+  const stellarInput: RegisterRemoteInterchainTokenOnStellarInput = {
+    // for stellar remote canonical tokens we pass the token address as salt
+    salt: tokenDetails?.tokenAddress || input.tokenAddress,
+    destinationChainIds: destinationChainIds,
+    gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
+    isCanonical: true,
+    onStatusUpdate: statusUpdateAdapter,
+  };
+
   return {
     ...mutation,
     writeContract: () => {
       if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainToken(suiInput);
+        return registerRemoteInterchainTokenOnSui(suiInput);
+      }
+      if (chainId === STELLAR_CHAIN_ID) {
+        return registerRemoteInterchainTokenOnStellar(stellarInput);
       }
       if (!config) return;
       return mutation.writeContract(config.request);
     },
     writeContractAsync: async () => {
       if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainToken(suiInput);
+        return registerRemoteInterchainTokenOnSui(suiInput);
+      }
+      if (chainId === STELLAR_CHAIN_ID) {
+        return registerRemoteInterchainTokenOnStellar(stellarInput);
       }
       if (!config) return;
       return await mutation.writeContractAsync(config.request);
