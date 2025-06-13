@@ -53,6 +53,7 @@ export const stellarRouter = router({
         multicallContractAddress: z.string().optional(),
         gasTokenAddress: z.string().optional(),
         itsContractAddress: z.string().optional(),
+        isCanonical: z.boolean().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -67,6 +68,7 @@ export const stellarRouter = router({
           multicallContractAddress: input.multicallContractAddress,
           gasTokenAddress: input.gasTokenAddress,
           itsContractAddress: input.itsContractAddress,
+          isCanonical: input.isCanonical,
         });
 
       return {
