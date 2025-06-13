@@ -111,7 +111,6 @@ export default function useRegisterRemoteInterchainTokens(
     salt: tokenDeployment?.salt,
     destinationChainIds,
     gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
-    isCanonical: true,
   };
 
   return {
