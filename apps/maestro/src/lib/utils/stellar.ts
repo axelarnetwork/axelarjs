@@ -17,7 +17,6 @@ export const {
 
 export function normalizeStellarTokenAddress(tokenAddress: string): string {
   // If not Stellar or already a contract address, return as is
-  console.log("formatting tokenAddress", tokenAddress);
   if (tokenAddress.startsWith("C")) {
     return tokenAddress;
   }
@@ -37,7 +36,6 @@ export function normalizeStellarTokenAddress(tokenAddress: string): string {
     const [assetCode, issuer] = tokenAddress.split(separator);
     const stellarAsset = new Asset(assetCode, issuer);
     const contractId = stellarAsset.contractId(STELLAR_NETWORK_PASSPHRASE);
-    console.log("formatted contractId", contractId);
     return contractId;
   } catch (error) {
     console.error("Error normalizing Stellar token address:", error);
