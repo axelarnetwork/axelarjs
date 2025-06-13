@@ -14,7 +14,6 @@ import {
 } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
-import { normalizeStellarTokenAddress } from "~/lib/utils/stellar";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { findGatewayEventIndex } from "~/server/routers/sui/utils/utils";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -131,12 +130,8 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       deploymentTxHash: txState.hash,
     }));
 
-    const normalizedTokenAddress = normalizeStellarTokenAddress(
-      props.tokenAddress
-    );
-
     await recordRemoteTokenDeployment({
-      tokenAddress: normalizedTokenAddress,
+      tokenAddress: props.tokenAddress,
       chainId: props.originChainId ?? -1,
       axelarChainId: stellarChainConfig.axelarChainId,
       deploymentMessageId: txState.hash,
