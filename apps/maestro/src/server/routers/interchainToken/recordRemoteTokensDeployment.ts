@@ -39,12 +39,9 @@ export const recordRemoteTokensDeployment = protectedProcedure
       });
     }
 
-    console.log("testando configs", configs.info.chain_id);
     let tokenAddress = input.tokenAddress;
     if (configs.info.chain_id === STELLAR_CHAIN_ID) {
-      console.log("testando tokenAddress", tokenAddress);
       tokenAddress = normalizeStellarTokenAddress(tokenAddress);
-      console.log("tokenAddress normalizado", tokenAddress);
     }
 
     const originToken =
@@ -52,8 +49,6 @@ export const recordRemoteTokensDeployment = protectedProcedure
         configs.info.id,
         tokenAddress
       );
-
-    console.log("Origin token:", originToken);
 
     if (!originToken) {
       throw new TRPCError({
