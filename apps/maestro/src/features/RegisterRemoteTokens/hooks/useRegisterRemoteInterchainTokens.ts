@@ -108,7 +108,7 @@ export default function useRegisterRemoteInterchainTokens(
   };
 
   const stellarInput = {
-    salt: input.tokenAddress,
+    salt: tokenDeployment?.salt,
     destinationChainIds,
     gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
     isCanonical: true,

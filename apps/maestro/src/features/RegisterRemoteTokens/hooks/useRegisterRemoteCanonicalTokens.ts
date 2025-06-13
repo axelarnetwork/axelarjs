@@ -5,7 +5,6 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
-// Import just the InterchainDeployAndRegisterTransactionState type which we need for the adapter
 import type { DeployAndRegisterTransactionState as InterchainDeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import {
   useSimulateInterchainTokenFactoryMulticall,
@@ -116,8 +115,6 @@ export default function useRegisterRemoteCanonicalTokens(
       | "mint_burn",
   };
 
-  const salt = tokenDetails?.tokenAddress || input.tokenAddress;
-
   const statusUpdateAdapter = (
     status: InterchainDeployAndRegisterTransactionState
   ): void => {
@@ -128,7 +125,8 @@ export default function useRegisterRemoteCanonicalTokens(
   };
 
   const stellarInput: RegisterRemoteInterchainTokenOnStellarInput = {
-    salt: salt,
+    // for stellar remote canonical tokens we pass the token address as salt
+    salt: tokenDetails?.tokenAddress || input.tokenAddress,
     destinationChainIds: destinationChainIds,
     gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
     isCanonical: true,
