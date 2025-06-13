@@ -101,19 +101,15 @@ export async function buildDeployRemoteInterchainTokensTransaction({
 
     // Build the gas payment for this destination
     const gasPaymentScVal = _buildGasPaymentMapScVal(gasTokenAddress, gasValue);
-    
+
     // Arguments differ between canonical and interchain tokens
     let deployRemoteArgs: xdr.ScVal[];
-    
+
     if (isCanonical) {
-      // For canonical tokens: token_address, destination_chain, spender, gas_token
-      // Note: token_address is passed in the salt parameter for canonical tokens
-      // O endereço do token pode estar no formato de contrato (começando com C) ou no formato symbol-issuer
-      // Verificamos o formato e usamos a função apropriada
-      const tokenAddressScVal = salt.startsWith("C") 
+      const tokenAddressScVal = salt.startsWith("C")
         ? _addressToScVal(salt) // Endereço de contrato
         : _stringToScVal(salt); // Formato symbol-issuer
-        
+
       deployRemoteArgs = [
         tokenAddressScVal, // token_address (passed in salt parameter)
         _stringToScVal(destinationChainId),
