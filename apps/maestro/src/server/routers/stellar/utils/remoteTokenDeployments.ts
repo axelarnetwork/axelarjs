@@ -107,8 +107,8 @@ export async function buildDeployRemoteInterchainTokensTransaction({
 
     if (isCanonical) {
       const tokenAddressScVal = salt.startsWith("C")
-        ? _addressToScVal(salt) // Endereço de contrato
-        : _stringToScVal(salt); // Formato symbol-issuer
+        ? _addressToScVal(salt) // contract address
+        : _stringToScVal(salt); // symbol-issuer
 
       deployRemoteArgs = [
         tokenAddressScVal, // token_address (passed in salt parameter)
