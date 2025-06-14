@@ -17,7 +17,6 @@ const InterchainTokensPage: FC = () => {
   };
 
   const routeChain = useChainFromRoute();
-
   const {
     data: interchainToken,
     isLoading,

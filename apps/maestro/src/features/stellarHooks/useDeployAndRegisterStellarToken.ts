@@ -1,27 +1,15 @@
 import { useState } from "react";
 
 import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
-import { humanizeEvents, xdr } from "@stellar/stellar-sdk";
+import { humanizeEvents, rpc, Transaction, xdr } from "@stellar/stellar-sdk";
 
-import type { DeployAndRegisterTransactionState as BaseDeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment/InterchainTokenDeployment.state";
+import { stellarChainConfig } from "~/config/chains";
+import type { DeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import { trpc } from "~/lib/trpc";
-import { useRegisterRemoteInterchainTokenOnStellar } from "../RegisterRemoteTokens/hooks/useRegisterRemoteInterchainTokenOnStellar";
+import { STELLAR_NETWORK_PASSPHRASE } from "~/server/routers/stellar/utils/config";
 import { useStellarTransactionPoller } from "./useStellarTransactionPoller";
-import { useStellarTransactionSigner } from "./useStellarTransactionSigner";
 
-type DeployAndRegisterTransactionState =
-  | Extract<BaseDeployAndRegisterTransactionState, { type: "idle" }>
-  | (Extract<
-      BaseDeployAndRegisterTransactionState,
-      { type: "pending_approval" }
-    > & { step?: number; totalSteps?: number })
-  | (Extract<BaseDeployAndRegisterTransactionState, { type: "deploying" }> & {
-      step?: number;
-      totalSteps?: number;
-    })
-  | Extract<BaseDeployAndRegisterTransactionState, { type: "deployed" }>;
-
-export interface DeployTokenParams {
+export interface DeployAndRegisterTokenParams {
   kit: StellarWalletsKit;
   tokenName: string;
   tokenSymbol: string;
@@ -34,7 +22,7 @@ export interface DeployTokenParams {
   onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void;
 }
 
-export interface DeployTokenResultStellar {
+export interface DeployAndRegisterTokenResultStellar {
   hash: string;
   status: string;
   tokenId: string;
@@ -43,22 +31,19 @@ export interface DeployTokenResultStellar {
   tokenManagerType: string;
 }
 
-export function useDeployStellarToken() {
+export function useDeployAndRegisterStellarToken() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [data, setData] = useState<DeployTokenResultStellar | null>(null);
+  const [data, setData] = useState<DeployAndRegisterTokenResultStellar | null>(
+    null
+  );
 
   const { pollTransaction } = useStellarTransactionPoller();
-  const { signAndSubmitTransaction } = useStellarTransactionSigner();
 
-  const { mutateAsync: getDeployTokenTxBytes } =
-    trpc.stellar.getDeployTokenTxBytes.useMutation();
+  const { mutateAsync: getDeployAndRegisterRemoteTokenTxBytes } =
+    trpc.stellar.getDeployAndRegisterRemoteTokenTxBytes.useMutation();
 
-  const {
-    registerRemoteInterchainToken: registerRemoteInterchainTokenOnStellar,
-  } = useRegisterRemoteInterchainTokenOnStellar();
-
-  const deployStellarToken = async ({
+  const deployAndRegisterStellarToken = async ({
     kit,
     tokenName,
     tokenSymbol,
@@ -69,7 +54,7 @@ export function useDeployStellarToken() {
     destinationChainIds,
     gasValues,
     onStatusUpdate,
-  }: DeployTokenParams): Promise<DeployTokenResultStellar> => {
+  }: DeployAndRegisterTokenParams): Promise<DeployAndRegisterTokenResultStellar> => {
     if (!kit) {
       throw new Error("StellarWalletsKit not provided");
     }
@@ -84,16 +69,18 @@ export function useDeployStellarToken() {
       throw new Error("Failed to get Stellar wallet public key");
     }
 
-    // First step: deploy the token on Stellar
+    // Single step: deploy and register the token on Stellar in one transaction
     onStatusUpdate?.({
       type: "pending_approval",
       step: 1,
-      totalSteps: destinationChainIds.length > 0 ? 2 : 1,
+      totalSteps: 1,
     });
 
     try {
-      // 1. Get transaction bytes for token deployment
-      const { transactionXDR } = await getDeployTokenTxBytes({
+      setIsLoading(true);
+
+      // 1. Get transaction bytes for combined deployment and registration
+      const { transactionXDR } = await getDeployAndRegisterRemoteTokenTxBytes({
         caller: publicKey,
         tokenName,
         tokenSymbol,
@@ -101,23 +88,38 @@ export function useDeployStellarToken() {
         initialSupply: initialSupply.toString(),
         salt,
         minterAddress,
+        destinationChainIds,
+        gasValues: gasValues.map((value) => value.toString()),
       });
 
-      // 2. Sign and submit the transaction
-      const initialResponse =
-        await signAndSubmitTransaction<DeployAndRegisterTransactionState>({
-          kit,
-          transactionXDR,
-          onStatusUpdate,
-          createDeployingStatus: (txHash: string) => ({
-            type: "deploying",
-            txHash,
-            step: 1,
-            totalSteps: destinationChainIds.length > 0 ? 2 : 1,
-          }),
-        });
+      // 2. Sign the transaction
+      const { signedTxXdr } = await kit.signTransaction(transactionXDR, {
+        networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
+      });
 
-      const { server } = initialResponse;
+      // 3. Submit the transaction
+      const rpcUrl = stellarChainConfig.rpcUrls.default.http[0];
+      const server = new rpc.Server(rpcUrl);
+
+      const tx = new Transaction(signedTxXdr, STELLAR_NETWORK_PASSPHRASE);
+
+      const initialResponse = await server.sendTransaction(tx);
+
+      if (initialResponse.status === "PENDING") {
+        onStatusUpdate?.({
+          type: "deploying",
+          txHash: initialResponse.hash,
+        });
+      }
+
+      if (
+        initialResponse.status === "ERROR" ||
+        initialResponse.status === "DUPLICATE" ||
+        initialResponse.status === "TRY_AGAIN_LATER"
+      ) {
+        const errorMessage = `Stellar transaction submission failed with status: ${initialResponse.status}. Error: ${JSON.stringify(initialResponse.errorResult)}`;
+        throw new Error(errorMessage);
+      }
 
       const pollingResult = await pollTransaction(
         server,
@@ -164,14 +166,13 @@ export function useDeployStellarToken() {
             returnValue.switch() === xdr.ScValType.scvBytes()
           ) {
             tokenId = returnValue.bytes().toString("hex");
-            // Extracted tokenId from transaction return value
           }
 
-          // Extract tokenAddress, tokenManagerAddress and tokenManagerType from events
           const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
+            // Use the helper function to parse events
             const parsedEventData = parseTokenDeploymentEvents(events, {
               tokenId,
             });
@@ -186,8 +187,10 @@ export function useDeployStellarToken() {
               tokenManagerType = parsedEventData.tokenManagerType;
           }
         } catch (error) {
-          // Error extracting token information from transaction
-          console.error("Error parsing transaction events:", error);
+          console.error(
+            "Error extracting token information from transaction:",
+            error
+          );
         }
       }
 
@@ -216,26 +219,9 @@ export function useDeployStellarToken() {
         tokenId = `0x${tokenId}`;
       }
 
-      // 6. If there are destinationChainIds, do remote deployment
-      let remoteDeployResult;
-      if (destinationChainIds.length > 0) {
-        onStatusUpdate?.({
-          type: "pending_approval",
-          step: 2,
-          totalSteps: 2,
-        });
-        remoteDeployResult = await registerRemoteInterchainTokenOnStellar({
-          salt,
-          destinationChainIds,
-          gasValues,
-          onStatusUpdate,
-        });
-      }
-
-      // 7. Return the complete result
-      // If there's a remote deployment, use the remote transaction hash as the main hash
-      const result: DeployTokenResultStellar = {
-        hash: remoteDeployResult ? remoteDeployResult : initialResponse.hash,
+      // Return the complete result
+      const result: DeployAndRegisterTokenResultStellar = {
+        hash: initialResponse.hash,
         status: "SUCCESS",
         tokenId,
         tokenAddress,
@@ -255,7 +241,7 @@ export function useDeployStellarToken() {
   };
 
   return {
-    deployStellarToken,
+    deployAndRegisterStellarToken,
     isLoading,
     error,
     data,

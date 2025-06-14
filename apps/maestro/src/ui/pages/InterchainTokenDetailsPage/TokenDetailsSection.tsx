@@ -36,7 +36,7 @@ export type TokenDetailsSectionProps = {
   name: string;
   symbol: string;
   chain: ITSChainConfig;
-  tokenAddress: `0x${string}`;
+  tokenAddress: string;
   wasDeployedByAccount?: boolean;
   decimals: number;
   tokenId?: `0x${string}` | null | undefined;

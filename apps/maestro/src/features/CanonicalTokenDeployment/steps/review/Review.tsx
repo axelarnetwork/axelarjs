@@ -138,7 +138,24 @@ const Review: FC = () => {
             $variant="primary"
             onClick={async () => {
               setShouldFetch(true);
-              await router.replace(router.asPath);
+              // For Stellar tokens, we need to use the deployed contract address
+              // instead of refreshing the current path which might have the old symbol-issuer format
+              if (
+                routeChain.axelarChainName.includes("stellar") &&
+                state.txState.type === "deployed"
+              ) {
+                // Extract the base path (everything before the last slash)
+                const currentPath = router.asPath;
+                const lastSlashIndex = currentPath.lastIndexOf("/");
+                const basePath = currentPath.substring(0, lastSlashIndex + 1);
+
+                // Replace only the token address part
+                await router.replace(
+                  `${basePath}${state.txState.tokenAddress}`
+                );
+              } else {
+                await router.replace(router.asPath);
+              }
             }}
           >
             View token page!

@@ -13,6 +13,7 @@ export type RegisterRemoteInterchainTokenOnStellarInput = {
   destinationChainIds: string[];
   gasValues: bigint[];
   onStatusUpdate?: (status: DeployAndRegisterTransactionState) => void;
+  isCanonical?: boolean;
 };
 
 export const useRegisterRemoteInterchainTokenOnStellar = () => {
@@ -29,6 +30,7 @@ export const useRegisterRemoteInterchainTokenOnStellar = () => {
     destinationChainIds,
     gasValues,
     onStatusUpdate,
+    isCanonical,
   }: RegisterRemoteInterchainTokenOnStellarInput) => {
     if (!kit) {
       throw new Error("Wallet not connected");
@@ -42,6 +44,7 @@ export const useRegisterRemoteInterchainTokenOnStellar = () => {
           salt,
           destinationChainIds,
           gasValues: gasValues.map((v) => v.toString()),
+          isCanonical,
         });
 
       // Sign the transaction
