@@ -16,20 +16,20 @@ import { kv } from "@vercel/kv";
 import OpenAI from "openai";
 import type { Chain } from "viem";
 
+import { CHAIN_CONFIGS } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS,
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
   NEXT_PUBLIC_NETWORK_ENV,
 } from "~/config/env";
 import { NEXT_AUTH_OPTIONS, type Web3Session } from "~/config/next-auth";
-import { CHAIN_CONFIGS } from "~/config/chains";
 import db from "~/lib/drizzle/client";
 import axelarjsSDKClient from "~/services/axelarjsSDK";
-import axelarscanClient from "~/services/axelarscan";
 import MaestroKVClient from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres";
 import gmpClient from "~/services/gmp";
-import { axelarConfigs, evmChains, vmChains, chains } from "./utils";
+import { evmChains, vmChains } from "./chainConfig";
+import { axelarConfigs, chains } from "./utils";
 
 export interface ContextConfig {
   req: NextApiRequest;
@@ -49,7 +49,7 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  const networkEnv = NEXT_PUBLIC_NETWORK_ENV
+  const networkEnv = NEXT_PUBLIC_NETWORK_ENV;
 
   const axelarQueryClient = createAxelarQueryClient(networkEnv);
   const axelarConfigClient = createAxelarConfigClient(networkEnv);
@@ -60,7 +60,6 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
     session,
     services: {
       gmp: gmpClient,
-      axelarscan: axelarscanClient,
       axelarjsSDK: axelarjsSDKClient,
       axelarQuery: axelarQueryClient,
       openai: openaiClient,
@@ -72,16 +71,21 @@ const createContextInner = async ({ req, res }: ContextConfig) => {
       evmChains: evmChains.bind(
         null,
         maestroKVClient,
-        axelarscanClient,
+        axelarConfigClient,
         "chains-evm" as const
       ),
       vmChains: vmChains.bind(
         null,
         maestroKVClient,
-        axelarscanClient,
+        axelarConfigClient,
         "chains-vm" as const
       ),
-      chains: chains.bind(null, maestroKVClient, axelarscanClient, "chains" as const),
+      chains: chains.bind(
+        null,
+        maestroKVClient,
+        axelarConfigClient,
+        "chains" as const
+      ),
       axelarConfigs: axelarConfigs.bind(
         null,
         maestroKVClient,

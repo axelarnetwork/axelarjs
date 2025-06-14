@@ -11,7 +11,7 @@ import {
   getStellarConnectionState,
   STELLAR_CONNECTION_CHANGE,
 } from "~/lib/utils/stellar";
-import { useEVMChainConfigsQuery } from "../../services/axelarscan/hooks";
+import { useEVMChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 
 // Custom event for stellar wallet connection changes
 export { STELLAR_CONNECTION_CHANGE };
