@@ -185,7 +185,6 @@ export const Step3: FC = () => {
             throw new Error("Stellar deployment result incomplete.");
           }
         } catch (e: any) {
-          console.log("errorror", e);
           toast.error(e.message || "Stellar deployment failed");
           rootActions.setTxState({
             type: "idle",
