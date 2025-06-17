@@ -456,7 +456,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       destinationChainIds,
       executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
       gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
-      gasMultiplier: 1.1,
+      gasMultiplier: 1.2,
     });
 
   const originToken = useMemo(
