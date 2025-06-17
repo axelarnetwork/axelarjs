@@ -91,14 +91,11 @@ export const Step3: FC = () => {
           !state.isEstimatingGasFees &&
           !state.hasGasFeesEstimationError);
 
-      if (
-        (!deployCanonicalTokenAsync &&
-          sourceChain?.chain_id !== STELLAR_CHAIN_ID) ||
-        !hasGasfees
-      ) {
+      if (!deployCanonicalTokenAsync && !hasGasfees) {
         console.warn("gas prices not loaded");
         return;
       }
+      
       actions.setIsDeploying(true);
 
       invariant(sourceChain, "source chain not found");

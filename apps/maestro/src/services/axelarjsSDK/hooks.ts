@@ -12,7 +12,7 @@ export function useEstimateGasFeeQuery(input: EstimateGasFeeInput) {
     enabled:
       Boolean(input.destinationChainId) &&
       input.destinationChainId !== "undefined",
-    staleTime: 0,
+    staleTime: 1000,
   });
 }
 
@@ -21,7 +21,7 @@ export function useEstimateGasFeeMultipleChainsQuery(
 ) {
   return trpc.axelarjsSDK.estimateGasFeesMultipleChains.useQuery(input, {
     enabled: Boolean(input.destinationChainIds?.length),
-    staleTime: 0,
+    staleTime: 1000,
   });
 }
 
