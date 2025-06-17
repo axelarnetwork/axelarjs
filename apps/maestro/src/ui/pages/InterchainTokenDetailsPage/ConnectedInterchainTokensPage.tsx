@@ -459,8 +459,6 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       gasMultiplier: 1.2,
     });
 
-  const totalGasFee = gasFees?.totalGasFee ?? 0n;
-
   const originToken = useMemo(
     () => interchainToken.matchingTokens?.find((x) => x.isOriginToken),
     [interchainToken]

@@ -55,7 +55,7 @@ async function estimateGasFeeMultipleChains(
           // temporary fix to multiply the gas fee for ethereum-sepolia by 2.5 - prevent insufficient gas error
           let adjustedFee = fee;
           if (destinationChainId === "ethereum-sepolia") {
-            adjustedFee = (fee * 5n) / 2n; // Multiplicando por 2.5 (5/2)
+            adjustedFee = (fee * 5n) / 2n;
           }
 
           return {
