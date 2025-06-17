@@ -112,9 +112,6 @@ export const stellarRouter = router({
         tokenAddress: z.string(),
         destinationChainIds: z.array(z.string()),
         gasValues: z.array(z.string()),
-        multicallContractAddress: z.string().optional(),
-        gasTokenAddress: z.string().optional(),
-        itsContractAddress: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {

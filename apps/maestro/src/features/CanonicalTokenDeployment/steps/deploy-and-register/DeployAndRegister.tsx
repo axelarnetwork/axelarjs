@@ -91,7 +91,7 @@ export const Step3: FC = () => {
           !state.isEstimatingGasFees &&
           !state.hasGasFeesEstimationError);
 
-      if (!deployCanonicalTokenAsync && !hasGasfees) {
+      if (!deployCanonicalTokenAsync || !hasGasfees) {
         console.warn("gas prices not loaded");
         return;
       }
