@@ -9,8 +9,8 @@ import {
 } from "~/config/env";
 import { useBalance, useChainId } from "~/lib/hooks";
 import { toNumericString } from "~/lib/utils/bigint";
-import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
+import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useInterchainTokenDeploymentStateContainer } from "../../InterchainTokenDeployment.state";
 
 export type UseStep2ChainSelectionStateProps = {
@@ -40,7 +40,7 @@ export function useStep2ChainSelectionState() {
     destinationChainIds: rootState.selectedChains,
     gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT),
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
-    gasMultiplier: "auto",
+    // gasMultiplier: 1.1,
   });
 
   useEffect(() => {

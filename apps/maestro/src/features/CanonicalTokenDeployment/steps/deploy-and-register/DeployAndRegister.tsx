@@ -17,7 +17,12 @@ import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalT
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { RegisterCanonicalTokenResult } from "~/features/suiHooks/useRegisterCanonicalToken";
 import { useTransactionsContainer } from "~/features/Transactions";
-import { SUI_CHAIN_ID, useBalance, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useBalance,
+  useChainId,
+} from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -90,6 +95,7 @@ export const Step3: FC = () => {
         console.warn("gas prices not loaded");
         return;
       }
+      
       actions.setIsDeploying(true);
 
       invariant(sourceChain, "source chain not found");
@@ -152,31 +158,74 @@ export const Step3: FC = () => {
         }
       }
 
-      await handleTransactionResult(txPromise as Promise<WriteContractData>, {
-        onSuccess(txHash) {
-          rootActions.setTxState({
-            type: "deploying",
-            txHash: txHash,
-          });
-          rootActions.toggleAdditionalChain;
+      // Handle Stellar token deployment
+      if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
+        try {
+          const result = await txPromise;
 
-          if (validDestinationChainIds.length > 0) {
-            addTransaction({
-              status: "submitted",
-              hash: txHash,
-              chainId: sourceChain.chain_id,
-              txType: "INTERCHAIN_DEPLOYMENT",
-            });
+          if (
+            result &&
+            typeof result === "object" &&
+            "hash" in result &&
+            "tokenAddress" in result
+          ) {
+            if (rootState.selectedChains.length > 0) {
+              addTransaction({
+                status: "submitted",
+                hash: result.hash,
+                chainId: sourceChain.chain_id,
+                txType: "INTERCHAIN_DEPLOYMENT",
+              });
+              return;
+            }
+          } else {
+            throw new Error("Stellar deployment result incomplete.");
           }
-        },
-        onTransactionError(txError) {
+        } catch (e: any) {
+          toast.error(e.message || "Stellar deployment failed");
           rootActions.setTxState({
             type: "idle",
           });
+        }
+        return;
+      }
 
-          toast.error(txError.shortMessage);
-        },
-      });
+      // For EVM chains, handle the transaction result
+      if (txPromise) {
+        try {
+          await handleTransactionResult(
+            txPromise as Promise<WriteContractData>,
+            {
+              onSuccess(txHash) {
+                rootActions.setTxState({
+                  type: "deploying",
+                  txHash: txHash,
+                });
+
+                if (validDestinationChainIds.length > 0) {
+                  addTransaction({
+                    status: "submitted",
+                    hash: txHash,
+                    chainId: sourceChain.chain_id,
+                    txType: "INTERCHAIN_DEPLOYMENT",
+                  });
+                }
+              },
+              onTransactionError(txError) {
+                rootActions.setTxState({
+                  type: "idle",
+                });
+                toast.error(txError.shortMessage);
+              },
+            }
+          );
+        } catch (e: any) {
+          toast.error(e.message);
+          rootActions.setTxState({
+            type: "idle",
+          });
+        }
+      }
     },
     [
       rootState.selectedChains.length,
@@ -187,7 +236,7 @@ export const Step3: FC = () => {
       actions,
       sourceChain,
       rootActions,
-      validDestinationChainIds.length,
+      validDestinationChainIds,
       rootState.tokenDetails.tokenAddress,
       addTransaction,
     ]

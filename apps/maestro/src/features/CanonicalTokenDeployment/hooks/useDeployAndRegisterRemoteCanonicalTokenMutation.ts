@@ -6,6 +6,7 @@ import { reduce } from "rambda";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import { useRegisterStellarTokenWithContractDeployment } from "~/features/stellarHooks";
 import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
 import {
   useReadInterchainTokenFactoryCanonicalInterchainTokenId,
@@ -16,7 +17,13 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import { SUI_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+  useChainId,
+} from "~/lib/hooks";
+import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
@@ -47,6 +54,9 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const { combinedComputed } = useAllChainConfigsQuery();
   const { registerCanonicalToken } = useRegisterCanonicalToken();
+  const { registerTokenWithContractDeployment } =
+    useRegisterStellarTokenWithContractDeployment();
+  const { kit } = useStellarKit();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -81,13 +91,14 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   }, [combinedComputed.indexedById, input?.destinationChainIds]);
 
   const multicallArgs = useMemo(() => {
-    if (!input || !tokenId || chainId === SUI_CHAIN_ID) {
+    // This is only used for EVM chains
+    if (!input || !tokenId || !isValidEVMAddress(input.tokenAddress)) {
       return [];
     }
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.registerCanonicalInterchainToken.data({
-        tokenAddress: input.tokenAddress as `0x${string}`,
+        tokenAddress: input.tokenAddress,
       });
 
     if (!input.destinationChainIds.length) {
@@ -254,6 +265,44 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         });
         return result;
       }
+    }
+
+    if (chainId === STELLAR_CHAIN_ID && input) {
+      if (!kit) {
+        throw new Error("Stellar wallet not connected");
+      }
+      const result = await registerTokenWithContractDeployment({
+        kit,
+        tokenAddress: input.tokenAddress,
+        destinationChains: input.destinationChainIds,
+        gasValues: input.remoteDeploymentGasFees,
+        onStatusUpdate: (status) => {
+          // Forward status updates to the UI
+          if (config.onStatusUpdate) {
+            config.onStatusUpdate(status);
+          }
+        },
+      });
+
+      if (result?.tokenRegistration?.hash) {
+        setRecordDeploymentArgs({
+          kind: "canonical",
+          deploymentMessageId:
+            result?.tokenRegistration?.deploymentMessageId ||
+            result?.tokenRegistration?.hash,
+          tokenId: result.tokenRegistration.tokenId,
+          deployerAddress,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          tokenDecimals: input.decimals,
+          tokenManagerType: result.tokenRegistration.tokenManagerType,
+          axelarChainId: input.sourceChainId,
+          destinationAxelarChainIds: input.destinationChainIds,
+          tokenAddress: result.tokenRegistration.tokenAddress,
+          tokenManagerAddress: result.tokenRegistration.tokenManagerAddress,
+        });
+        return result.tokenRegistration;
+      }
     } else {
       invariant(
         data?.request !== undefined,
@@ -269,6 +318,9 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     deployerAddress,
     input,
     registerCanonicalToken,
+    registerTokenWithContractDeployment,
+    kit,
+    config,
   ]);
 
   const write = useCallback(() => {

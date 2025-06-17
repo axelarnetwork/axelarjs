@@ -10,8 +10,8 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
-import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
+import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 import { useRegisterRemoteInterchainTokenOnStellar } from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
@@ -54,7 +54,7 @@ export default function useRegisterRemoteInterchainTokens(
     sourceChainId: sourceChain?.id ?? "0",
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
     gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
-    gasMultiplier: "auto",
+    gasMultiplier: 1.2,
   });
 
   const multicallArgs = useMemo(() => {
@@ -108,7 +108,7 @@ export default function useRegisterRemoteInterchainTokens(
   };
 
   const stellarInput = {
-    salt: tokenDeployment.salt,
+    salt: tokenDeployment?.salt,
     destinationChainIds,
     gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
   };

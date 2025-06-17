@@ -1,3 +1,4 @@
+import { Asset } from "@stellar/stellar-sdk";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -6,6 +7,7 @@ import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
+import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 
 const remoteTokenSchema = z.object({
   id: z.string(),
@@ -81,11 +83,82 @@ export const getInterchainTokenDetails = publicProcedure
     //   });
     // }
 
-    const tokenRecord =
+    // For Stellar tokens, we need to handle both symbol-issuer and contract address formats
+    let tokenRecord = null;
+
+    tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         axelarChainId,
         input.tokenAddress
       );
+
+    // If not found and this is a Stellar chain, try the alternative Contract format
+    if (!tokenRecord && input.chainId === STELLAR_CHAIN_ID) {
+      console.log(
+        `[getInterchainTokenDetails] Token not found with original address, trying alternative format`
+      );
+
+      try {
+        let alternativeAddress = null;
+
+        // If original is symbol-issuer format (not starting with 'C'), convert to contract format
+        if (!input.tokenAddress.startsWith("C")) {
+          // Check for both ':' and '-' separators
+          const separator = input.tokenAddress.includes(":")
+            ? ":"
+            : input.tokenAddress.includes("-")
+              ? "-"
+              : null;
+
+          if (separator) {
+            const [assetCode, issuer] = input.tokenAddress.split(separator);
+            const stellarAsset = new Asset(assetCode, issuer);
+            alternativeAddress = stellarAsset.contractId(
+              STELLAR_NETWORK_PASSPHRASE
+            );
+            console.log(
+              `[getInterchainTokenDetails] Converted to contract format: ${input.tokenAddress} → ${alternativeAddress}`
+            );
+          }
+        }
+
+        if (alternativeAddress) {
+          tokenRecord =
+            await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+              axelarChainId,
+              alternativeAddress
+            );
+
+          if (tokenRecord) {
+            console.log(
+              `[getInterchainTokenDetails] Found token with alternative address`
+            );
+          }
+        }
+      } catch (error) {
+        console.error(
+          `[getInterchainTokenDetails] Error converting address format:`,
+          error
+        );
+      }
+    }
+
+    // If we found a token but it doesn't have remoteTokens, get the full record
+    if (tokenRecord && !tokenRecord.remoteTokens && tokenRecord.tokenId) {
+      const fullTokenRecord =
+        await ctx.persistence.postgres.getInterchainTokenByTokenId(
+          tokenRecord.tokenId
+        );
+
+      if (fullTokenRecord) {
+        tokenRecord = fullTokenRecord;
+      } else {
+        tokenRecord = {
+          ...tokenRecord,
+          remoteTokens: [],
+        };
+      }
+    }
 
     if (!tokenRecord) {
       throw new TRPCError({
