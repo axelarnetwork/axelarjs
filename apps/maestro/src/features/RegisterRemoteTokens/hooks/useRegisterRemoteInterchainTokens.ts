@@ -54,7 +54,7 @@ export default function useRegisterRemoteInterchainTokens(
     sourceChainId: sourceChain?.id ?? "0",
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
     gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
-    gasMultiplier: 1.1,
+    gasMultiplier: 1.2,
   });
 
   const multicallArgs = useMemo(() => {

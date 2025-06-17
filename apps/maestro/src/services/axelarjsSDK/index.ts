@@ -51,12 +51,20 @@ async function estimateGasFeeMultipleChains(
         ...params,
         destinationChainId,
       })
-        .then((fee) => ({
-          status: "success" as const,
-          fee,
-          sourceChainId: params.sourceChainId,
-          destinationChainId,
-        }))
+        .then((fee) => {
+          // temporary fix to multiply the gas fee for ethereum-sepolia by 2.5 - prevent insufficient gas error
+          let adjustedFee = fee;
+          if (destinationChainId === "ethereum-sepolia") {
+            adjustedFee = (fee * 5n) / 2n; // Multiplicando por 2.5 (5/2)
+          }
+
+          return {
+            status: "success" as const,
+            fee: adjustedFee,
+            sourceChainId: params.sourceChainId,
+            destinationChainId,
+          };
+        })
         .catch((error) => ({
           status: "error" as const,
           error: error instanceof Error ? error.message : "Unknown error",
