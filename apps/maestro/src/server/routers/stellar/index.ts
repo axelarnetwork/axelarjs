@@ -50,9 +50,6 @@ export const stellarRouter = router({
         destinationChainIds: z.array(z.string()),
         gasValues: z.array(z.string()), // Array of bigint as strings
         minterAddress: z.string().optional(),
-        multicallContractAddress: z.string().optional(),
-        gasTokenAddress: z.string().optional(),
-        itsContractAddress: z.string().optional(),
         isCanonical: z.boolean().optional(),
       })
     )
@@ -65,9 +62,6 @@ export const stellarRouter = router({
           destinationChainIds: input.destinationChainIds,
           gasValues: input.gasValues,
           minterAddress: input.minterAddress,
-          multicallContractAddress: input.multicallContractAddress,
-          gasTokenAddress: input.gasTokenAddress,
-          itsContractAddress: input.itsContractAddress,
           isCanonical: input.isCanonical,
         });
 
@@ -121,9 +115,6 @@ export const stellarRouter = router({
           tokenAddress: input.tokenAddress,
           destinationChainIds: input.destinationChainIds,
           gasValues: input.gasValues,
-          multicallContractAddress: input.multicallContractAddress,
-          gasTokenAddress: input.gasTokenAddress,
-          itsContractAddress: input.itsContractAddress,
         });
 
       return {
@@ -169,9 +160,6 @@ export const stellarRouter = router({
         minterAddress: z.string().optional(),
         destinationChainIds: z.array(z.string()),
         gasValues: z.array(z.string()),
-        multicallContractAddress: z.string().optional(),
-        gasTokenAddress: z.string().optional(),
-        itsContractAddress: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -187,9 +175,6 @@ export const stellarRouter = router({
           minterAddress: input.minterAddress,
           destinationChainIds: input.destinationChainIds,
           gasValues: input.gasValues,
-          multicallContractAddress: input.multicallContractAddress,
-          gasTokenAddress: input.gasTokenAddress,
-          itsContractAddress: input.itsContractAddress,
         });
 
       return {
