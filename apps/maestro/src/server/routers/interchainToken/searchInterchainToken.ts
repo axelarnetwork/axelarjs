@@ -450,7 +450,6 @@ async function getTokenDetails(
   tokenAddress: string,
   ctx: Context
 ) {
-  // First, try with the original token address
   let tokenDetails =
     await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
       chainConfig.axelarChainId,
@@ -458,7 +457,6 @@ async function getTokenDetails(
     );
 
   if (tokenDetails) {
-    // Ensure the token has remoteTokens property
     if (!tokenDetails.remoteTokens && tokenDetails.tokenId) {
       const fullToken =
         await ctx.persistence.postgres.getInterchainTokenByTokenId(

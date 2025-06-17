@@ -108,17 +108,16 @@ export const stellarRouter = router({
   getRegisterCanonicalTokenTxBytes: publicProcedure
     .input(
       z.object({
-        caller: z.string(), // Caller address
-        tokenAddress: z.string(), // Token address to register
+        caller: z.string(),
+        tokenAddress: z.string(),
         destinationChainIds: z.array(z.string()),
-        gasValues: z.array(z.string()), // Array of bigint as strings
+        gasValues: z.array(z.string()),
         multicallContractAddress: z.string().optional(),
         gasTokenAddress: z.string().optional(),
         itsContractAddress: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      // Use the utility function to build the canonical token registration transaction
       const { transactionXDR, isTokenRegistered } =
         await buildRegisterCanonicalTokenTransaction({
           caller: input.caller,
@@ -140,10 +139,10 @@ export const stellarRouter = router({
   getMintTokenTxBytes: publicProcedure
     .input(
       z.object({
-        caller: z.string(), // Caller address
-        toAddress: z.string(), // Recipient address
-        tokenAddress: z.string(), // Token address to mint
-        amount: z.string(), // Amount to mint as string
+        caller: z.string(),
+        toAddress: z.string(),
+        tokenAddress: z.string(),
+        amount: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -164,15 +163,15 @@ export const stellarRouter = router({
   getDeployAndRegisterRemoteTokenTxBytes: publicProcedure
     .input(
       z.object({
-        caller: z.string(), // Caller address
+        caller: z.string(),
         tokenName: z.string(),
         tokenSymbol: z.string(),
         decimals: z.number(),
-        initialSupply: z.string(), // Bigint as string
-        salt: z.string(), // Hex string
+        initialSupply: z.string(),
+        salt: z.string(),
         minterAddress: z.string().optional(),
         destinationChainIds: z.array(z.string()),
-        gasValues: z.array(z.string()), // Array of bigint as strings
+        gasValues: z.array(z.string()),
         multicallContractAddress: z.string().optional(),
         gasTokenAddress: z.string().optional(),
         itsContractAddress: z.string().optional(),
