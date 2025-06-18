@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import { TimeoutInfinite } from "@stellar/stellar-sdk";
 import {
   Account,
   BASE_FEE,
@@ -97,28 +98,19 @@ export async function createContractTransaction({
   transactionXDR: string;
   preparedTransaction: any;
 }> {
-  // Create a Contract instance
   const contract = new Contract(contractAddress);
-
-  // Create RPC server instance for preparing the transaction
   const server = new rpc.Server(rpcUrl);
-
-  // Create the operation using the contract.call method
   const operation = contract.call(method, ...args);
 
-  // Build the transaction
+  // Step 1: Build initial transaction
   const txBuilder = new TransactionBuilder(account, {
     fee: BASE_FEE,
     networkPassphrase,
   }).addOperation(operation);
 
-  const builtTransaction = txBuilder.setTimeout(0).build();
+  const builtTransaction = txBuilder.setTimeout(TimeoutInfinite).build();
 
-  // Get the XDR before preparing
-  // const xdrBeforePrepare = builtTransaction.toEnvelope().toXDR("base64");
-  // console.log({ xdrBeforePrepare });
-
-  // Prepare the transaction (simulate and discover storage footprint)
+  // Step 2: Prepare the transaction to get resource requirements
   let preparedTransaction;
   try {
     preparedTransaction = await server.prepareTransaction(builtTransaction);
@@ -127,12 +119,38 @@ export async function createContractTransaction({
     throw error;
   }
 
-  // Get the final XDR
-  const transactionXDR = preparedTransaction.toEnvelope().toXDR("base64");
+  // Step 3: Calculate boosted fee
+  const boostedFee = Math.ceil(Number(preparedTransaction.fee) * 1.2);
+
+  const refreshedAccount = await server.getAccount(account.accountId());
+
+  // Step 4: Build new transaction with boosted fee
+  const feeBoostedTxBuilder = new TransactionBuilder(refreshedAccount, {
+    fee: boostedFee.toString(),
+    networkPassphrase,
+  }).addOperation(operation);
+
+  const feeBoostedTransaction = feeBoostedTxBuilder
+    .setTimeout(TimeoutInfinite)
+    .build();
+
+  // Step 5: Prepare the boosted transaction (CRITICAL - gets resource footprint)
+  let finalPreparedTransaction;
+  try {
+    finalPreparedTransaction = await server.prepareTransaction(
+      feeBoostedTransaction
+    );
+  } catch (error) {
+    console.error("Error preparing boosted transaction:", error);
+    throw error;
+  }
+
+  // Step 6: Get the final XDR
+  const transactionXDR = finalPreparedTransaction.toEnvelope().toXDR("base64");
 
   return {
     transactionXDR,
-    preparedTransaction,
+    preparedTransaction: finalPreparedTransaction,
   };
 }
 
@@ -168,7 +186,7 @@ export async function simulateCall({
     networkPassphrase,
   })
     .addOperation(operation)
-    .setTimeout(0)
+    .setTimeout(TimeoutInfinite)
     .build();
 
   // Get the XDR before preparing
