@@ -24,6 +24,7 @@ import {
   mantle,
   moonbeam,
   optimism,
+  plume,
   polygon,
   scroll,
 } from "viem/chains";
@@ -56,6 +57,7 @@ export const MAINNET_CHAINS = {
   binance: bsc,
   immutable: immutableZkEvm,
   flow: flowMainnet,
+  plume,
 } as const;
 
 export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;
