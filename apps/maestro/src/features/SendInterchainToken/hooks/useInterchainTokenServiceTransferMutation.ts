@@ -19,6 +19,7 @@ import {
 import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
+import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -83,8 +84,10 @@ export function useInterchainTokenServiceTransferMutation(
           args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
             tokenId: config.tokenId,
             destinationChain: config.destinationChainName,
-            destinationAddress:
-              (destinationAddress as `0x${string}`) ?? address,
+            destinationAddress: 
+              config.destinationChainName.toLowerCase() === "stellar" && typeof destinationAddress === "string"
+                ? encodeStellarAddressAsBytes(destinationAddress)
+                : (destinationAddress as `0x${string}`) ?? address,
             amount: approvedAmountRef.current,
             metadata: "0x",
             gasValue: config.gas ?? 0n,

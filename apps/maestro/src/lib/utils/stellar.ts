@@ -15,6 +15,21 @@ export const {
   STELLAR_CONNECTION_CHANGE
 );
 
+/**
+ * Encodes a Stellar address as hex bytes with 0x prefix for use in Ethereum contracts
+ * 
+ * @param address - The Stellar address to encode
+ * @returns The hex-encoded address with 0x prefix as an Ethereum-compatible hex string
+ */
+export function encodeStellarAddressAsBytes(address: string): `0x${string}` {
+  const encoder = new TextEncoder();
+  const addressBytes = encoder.encode(address);
+  const hexString = Array.from(addressBytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `0x${hexString}`;
+}
+
 export function normalizeStellarTokenAddress(tokenAddress: string): string {
   // If not Stellar or already a contract address, return as is
   if (tokenAddress.startsWith("C")) {
