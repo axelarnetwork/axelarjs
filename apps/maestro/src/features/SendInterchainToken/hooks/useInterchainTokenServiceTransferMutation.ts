@@ -79,7 +79,6 @@ export function useInterchainTokenServiceTransferMutation(
         });
 
         invariant(address, "need address");
-        invariant(destinationAddress, "need destination address");
 
         const txHash = await interchainTransferAsync({
           args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({

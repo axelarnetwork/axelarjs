@@ -20,8 +20,13 @@ export const {
  * 
  * @param address - The Stellar address to encode
  * @returns The hex-encoded address with 0x prefix as an Ethereum-compatible hex string
+ * @throws Error if address is null, undefined, or empty
  */
-export function encodeStellarAddressAsBytes(address: string): `0x${string}` {
+export function encodeStellarAddressAsBytes(address?: string | null): `0x${string}` {
+  if (!address) {
+    throw new Error("Stellar address cannot be empty or undefined");
+  }
+  
   const encoder = new TextEncoder();
   const addressBytes = encoder.encode(address);
   const hexString = Array.from(addressBytes)
