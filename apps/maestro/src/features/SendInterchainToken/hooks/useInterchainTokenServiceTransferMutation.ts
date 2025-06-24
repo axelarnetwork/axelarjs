@@ -86,7 +86,7 @@ export function useInterchainTokenServiceTransferMutation(
             destinationChain: config.destinationChainName,
             destinationAddress:
               config.destinationChainName.toLowerCase() === "stellar"
-                ? encodeStellarAddressAsBytes(destinationAddress)
+                ? encodeStellarAddressAsBytes(destinationAddress ?? address)
                 : ((destinationAddress as `0x${string}`) ?? address),
             amount: approvedAmountRef.current,
             metadata: "0x",
