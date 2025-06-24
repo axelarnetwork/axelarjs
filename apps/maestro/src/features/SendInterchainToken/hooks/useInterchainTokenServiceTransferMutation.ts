@@ -84,10 +84,10 @@ export function useInterchainTokenServiceTransferMutation(
           args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
             tokenId: config.tokenId,
             destinationChain: config.destinationChainName,
-            destinationAddress: 
-              config.destinationChainName.toLowerCase() === "stellar" && typeof destinationAddress === "string"
-                ? encodeStellarAddressAsBytes(destinationAddress)
-                : (destinationAddress as `0x${string}`) ?? address,
+            destinationAddress:
+              config.destinationChainName.toLowerCase() === "stellar"
+                ? encodeStellarAddressAsBytes(destinationAddress || address)
+                : ((destinationAddress as `0x${string}`) ?? address),
             amount: approvedAmountRef.current,
             metadata: "0x",
             gasValue: config.gas ?? 0n,
