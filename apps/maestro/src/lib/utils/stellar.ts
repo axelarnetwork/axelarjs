@@ -15,6 +15,21 @@ export const {
   STELLAR_CONNECTION_CHANGE
 );
 
+export function encodeStellarAddressAsBytes(
+  address?: string | null
+): `0x${string}` {
+  if (!address) {
+    throw new Error("Stellar address cannot be empty or undefined");
+  }
+
+  const encoder = new TextEncoder();
+  const addressBytes = encoder.encode(address);
+  const hexString = Array.from(addressBytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `0x${hexString}`;
+}
+
 export function normalizeStellarTokenAddress(tokenAddress: string): string {
   // If not Stellar or already a contract address, return as is
   if (tokenAddress.startsWith("C")) {
