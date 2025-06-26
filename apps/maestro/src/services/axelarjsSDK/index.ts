@@ -37,9 +37,13 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
   // TODO: find a better way to handle conditional gas fee based on the destination chain
   const gasMultiplier = Number(params.gasMultiplier) || FEE_MULTIPLIER;
   const multiplier = params.destinationChainId.includes("stellar")
-    ? 2
+    ? 1.5
     : gasMultiplier;
-  return (BigInt(fee as string) * BigInt(multiplier * 1000)) / 1000n;
+
+  const finalValue =
+    (BigInt(fee as string) * BigInt(multiplier * 1000)) / 1000n;
+
+  return finalValue;
 }
 
 async function estimateGasFeeMultipleChains(
