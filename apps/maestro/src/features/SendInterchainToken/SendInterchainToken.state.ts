@@ -185,9 +185,7 @@ export function useSendInterchainTokenState(props: {
       eligibleTargetChains,
       tokenSymbol,
       gasFee: Maybe.of(gas).mapOrUndefined((gasValue) => {
-        const decimals = props.sourceChain.id.toLowerCase().includes("stellar")
-          ? 7
-          : 18;
+        const decimals = props.sourceChain.native_token.decimals;
         return toNumericString(gasValue, decimals);
       }),
       nativeTokenSymbol,
