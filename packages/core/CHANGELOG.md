@@ -1,5 +1,11 @@
 # @axelarjs/core
 
+## 0.2.13
+
+### Patch Changes
+
+- [#577](https://github.com/axelarnetwork/axelarjs/pull/577) [`dd036a5c4dbd67c7e78b9493849cccc4b2010001`](https://github.com/axelarnetwork/axelarjs/commit/dd036a5c4dbd67c7e78b9493849cccc4b2010001) Thanks [@npty](https://github.com/npty)! - update rpc url for stellar mainnet
+
 ## 0.2.12
 
 ### Patch Changes
