@@ -24,6 +24,7 @@ import {
   mantleTestnet,
   moonbaseAlpha,
   optimismSepolia,
+  plumeSepolia,
   polygonAmoy,
   polygonMumbai,
   scrollSepolia,
@@ -61,6 +62,7 @@ export const TESTNET_CHAINS = {
   fraxtal: fraxtalTestnet,
   flow: flowTestnet,
   hedera: hederaTestnet,
+  plume: plumeSepolia,
 } as const;
 
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;
