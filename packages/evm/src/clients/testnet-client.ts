@@ -9,6 +9,7 @@ import {
   arbitrumSepolia,
   avalancheFuji,
   baseSepolia,
+  berachainBepolia,
   blastSepolia,
   bscTestnet,
   celoAlfajores,
@@ -61,6 +62,7 @@ export const TESTNET_CHAINS = {
   fraxtal: fraxtalTestnet,
   flow: flowTestnet,
   hedera: hederaTestnet,
+  berachain: berachainBepolia,
 } as const;
 
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;

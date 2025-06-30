@@ -10,6 +10,7 @@ import {
   aurora,
   avalanche,
   base,
+  berachain,
   blast,
   bsc,
   celo,
@@ -56,6 +57,7 @@ export const MAINNET_CHAINS = {
   binance: bsc,
   immutable: immutableZkEvm,
   flow: flowMainnet,
+  berachain,
 } as const;
 
 export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;
