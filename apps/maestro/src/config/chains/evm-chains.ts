@@ -109,7 +109,7 @@ const xrplEvm = defineChain({
     decimals: 18,
   },
   rpcUrls: {
-    default: { http: ["https://rpc-mainnet.aws.peersyst.tech"] },
+    default: { http: ["https://rpc.xrplevm.org"] },
   },
   blockExplorers: {
     default: {
