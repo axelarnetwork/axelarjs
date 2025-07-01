@@ -9,6 +9,7 @@ import {
   arbitrumSepolia,
   avalancheFuji,
   baseSepolia,
+  berachainBepolia,
   blastSepolia,
   bscTestnet,
   celoAlfajores,
@@ -63,6 +64,7 @@ export const TESTNET_CHAINS = {
   flow: flowTestnet,
   hedera: hederaTestnet,
   plume: plumeSepolia,
+  berachain: berachainBepolia,
 } as const;
 
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;
