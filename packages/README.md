@@ -1,6 +1,6 @@
 # Packages
 
-Publishable npm packages
+Publishable npm packages.
 
 | package                                                   | description                                                                      |
 | --------------------------------------------------------- | -------------------------------------------------------------------------------- |
