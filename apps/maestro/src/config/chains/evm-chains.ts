@@ -8,6 +8,7 @@ import {
   avalancheFuji,
   base,
   baseSepolia,
+  berachain,
   berachainBepolia,
   blast,
   blastSepolia,
@@ -689,6 +690,19 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "xrpl-evm",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...berachain,
+    rpcUrls: createRpcUrlConfig(
+      berachain,
+      ENVIRONMENTS.mainnet,
+      [],
+      "berachain"
+    ),
+    axelarChainId: "berachain",
+    axelarChainName: "berachain",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.mainnet,
   },
   {
     ...berachainBepolia,
