@@ -120,7 +120,7 @@ describe("axelar-query (node client)", () => {
     test.skip("should return the correct denom for a given symbol", async () => {
       const api = createAxelarQueryClient(ENVIRONMENTS.mainnet);
       const denom = await api.getDenomFromSymbol("USDC", "ethereum");
-      expect(denom).toBe("uusdc");
+      expect(denom).toBe("0xaab70a74fae5d4d70134970cc0a7a03ff70bfffd5891f79d2f4daf1b5fade846");
     });
 
     test("cache should work properly", async () => {

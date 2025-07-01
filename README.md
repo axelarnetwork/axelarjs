@@ -26,3 +26,4 @@ Apps:
 | ----------------------------- | ------------------------------- |
 | 🎼 [maestro](/apps/maestro)   | Interchain Token Service Portal |
 | 🕵️‍♂️ [registry](/apps/registry) | Axelarjs Chain Registry UI      |
+
