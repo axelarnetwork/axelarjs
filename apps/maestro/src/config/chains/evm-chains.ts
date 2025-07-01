@@ -38,6 +38,8 @@ import {
   moonbeam,
   optimism,
   optimismSepolia,
+  plume,
+  plumeSepolia,
   polygon,
   polygonAmoy,
   polygonZkEvm,
@@ -708,6 +710,27 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "xrpl-evm",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...plume,
+    rpcUrls: createRpcUrlConfig(plume, ENVIRONMENTS.mainnet, [], "plume"),
+    axelarChainId: "plume",
+    axelarChainName: "plume",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...plumeSepolia,
+    rpcUrls: createRpcUrlConfig(
+      plumeSepolia,
+      ENVIRONMENTS.testnet,
+      [],
+      "plume"
+    ),
+    axelarChainId: "plume",
+    axelarChainName: "plume",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.testnet,
   },
 ] as const;
 

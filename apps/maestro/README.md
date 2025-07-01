@@ -1,6 +1,6 @@
 # Interchain Maestro
 
-Orchestration for cross-chain tokens & contracts
+Orchestration for cross-chain tokens & contracts.
 
 ### Getting started
 
