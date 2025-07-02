@@ -8,7 +8,7 @@ describe("depositService - helper", () => {
     test("should return true if destination chain is EVM and asset is wrapped native gas token", async () => {
       const env = ENVIRONMENTS.testnet;
       const configClients = createAxelarConfigClient(env);
-      const chainConfigs = await configClients.getAxelarConfigs(env);
+      const chainConfigs = await configClients.getAxelarConfigs();
 
       Object.entries(chainConfigs.assets).forEach(([assetId, assetConfig]) => {
         Object.entries(assetConfig.chains).forEach(
