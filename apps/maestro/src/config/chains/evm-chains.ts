@@ -8,6 +8,7 @@ import {
   avalancheFuji,
   base,
   baseSepolia,
+  berachain,
   berachainBepolia,
   blast,
   blastSepolia,
@@ -40,6 +41,8 @@ import {
   moonbeam,
   optimism,
   optimismSepolia,
+  plume,
+  plumeSepolia,
   polygon,
   polygonAmoy,
   polygonZkEvm,
@@ -691,6 +694,19 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.testnet,
   },
   {
+    ...berachain,
+    rpcUrls: createRpcUrlConfig(
+      berachain,
+      ENVIRONMENTS.mainnet,
+      [],
+      "berachain"
+    ),
+    axelarChainId: "berachain",
+    axelarChainName: "berachain",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
     ...berachainBepolia,
     rpcUrls: createRpcUrlConfig(
       berachainBepolia,
@@ -731,6 +747,27 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     axelarChainName: "hedera",
     supportWagmi: true,
     environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...plume,
+    rpcUrls: createRpcUrlConfig(plume, ENVIRONMENTS.mainnet, [], "plume"),
+    axelarChainId: "plume",
+    axelarChainName: "plume",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...plumeSepolia,
+    rpcUrls: createRpcUrlConfig(
+      plumeSepolia,
+      ENVIRONMENTS.testnet,
+      [],
+      "plume"
+    ),
+    axelarChainId: "plume",
+    axelarChainName: "plume",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.testnet,
   },
 ] as const;
 
