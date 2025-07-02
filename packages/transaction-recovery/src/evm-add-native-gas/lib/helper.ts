@@ -6,11 +6,7 @@ import {
 } from "@axelarjs/api";
 import { Environment } from "@axelarjs/core";
 
-
-import {
-  Hash,
-  TransactionReceipt,
-} from "viem";
+import { Hash, TransactionReceipt } from "viem";
 
 import { extractReceiptInfoForNativeGasPaid } from "../lib/getReceiptInfo";
 
@@ -26,7 +22,7 @@ export async function getGasServiceAddressFromChainConfig(
   env: Environment,
   chain: string
 ) {
-  const _chainConfigs = await configClient.getAxelarConfigs(env);
+  const _chainConfigs = await configClient.getAxelarConfigs();
   return (
     _chainConfigs.chains[chain.toLowerCase()]?.config as ChainEvmSubconfig
   ).contracts?.AxelarGasService?.address;
@@ -71,4 +67,3 @@ export async function isInsufficientFeeTx(
 
   return gmpTx?.gas_status === "gas_paid_not_enough_gas";
 }
-
