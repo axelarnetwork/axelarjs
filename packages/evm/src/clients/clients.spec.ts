@@ -22,7 +22,7 @@ describe("EVM Clients", () => {
   it.skip("should support all mainnet chains", async () => {
     const env = "mainnet";
     const configClient = createAxelarConfigClient(env);
-    const configs = await configClient.getAxelarConfigs(env);
+    const configs = await configClient.getAxelarConfigs();
     const chains = Object.keys(configs.chains).filter(
       (chainId) =>
         configs.chains[chainId]?.chainType === "evm" &&
@@ -47,7 +47,7 @@ describe("EVM Clients", () => {
   it.skip("should support all testnet chains", async () => {
     const env = "testnet";
     const configClient = createAxelarConfigClient(env);
-    const configs = await configClient.getAxelarConfigs(env);
+    const configs = await configClient.getAxelarConfigs();
     const chains = Object.keys(configs.chains).filter(
       (chainId) =>
         configs.chains[chainId]?.chainType === "evm" &&

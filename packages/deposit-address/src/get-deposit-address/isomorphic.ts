@@ -38,9 +38,7 @@ export async function getDepositAddress(
     requestConfig,
   } = params;
 
-  const chainConfigs = await dependencies.configClient.getAxelarConfigs(
-    params.environment
-  );
+  const chainConfigs = await dependencies.configClient.getAxelarConfigs();
 
   // we consider undefined asset as a native token asset
   if (asset === "native") {
@@ -107,9 +105,7 @@ export async function getLinkedDepositAddress(
   params: SendOptions,
   dependencies: GetLinkedDepositAddressDependencies
 ) {
-  const chainConfigs = await dependencies.configClient.getAxelarConfigs(
-    params.environment
-  );
+  const chainConfigs = await dependencies.configClient.getAxelarConfigs();
 
   /**
    * input validation
@@ -136,9 +132,7 @@ export async function getNativeWrapDepositAddress(
   params: DepositNativeWrapOptions,
   dependencies: GetDepositServiceDependencies
 ) {
-  const chainConfigs = await dependencies.configClient.getAxelarConfigs(
-    params.environment
-  );
+  const chainConfigs = await dependencies.configClient.getAxelarConfigs();
 
   await validateAddressAndChains(
     params.sourceChain,
@@ -164,9 +158,7 @@ export async function getNativeUnwrapDepositAddress(
   params: DepositNativeUnwrapOptions,
   dependencies: GetDepositServiceDependencies
 ) {
-  const chainConfigs = await dependencies.configClient.getAxelarConfigs(
-    params.environment
-  );
+  const chainConfigs = await dependencies.configClient.getAxelarConfigs();
 
   await validateAddressAndChains(
     params.sourceChain,
