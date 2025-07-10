@@ -1165,14 +1165,6 @@ export const interchainTokenServiceAbi = [
   },
 ] as const;
 
-export const interchainTokenServiceAddress =
-  "0xB5FB4BE02232B1bBA4dC8f81dc24C26980dE9e3C" as const;
-
-export const interchainTokenServiceConfig = {
-  address: interchainTokenServiceAddress,
-  abi: interchainTokenServiceAbi,
-} as const;
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1181,10 +1173,7 @@ export const interchainTokenServiceConfig = {
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__
  */
 export const useReadInterchainTokenService =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-  });
+  /*#__PURE__*/ createUseReadContract({ abi: interchainTokenServiceAbi });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"chainName"`
@@ -1192,7 +1181,6 @@ export const useReadInterchainTokenService =
 export const useReadInterchainTokenServiceChainName =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "chainName",
   });
 
@@ -1202,7 +1190,6 @@ export const useReadInterchainTokenServiceChainName =
 export const useReadInterchainTokenServiceChainNameHash =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "chainNameHash",
   });
 
@@ -1212,7 +1199,6 @@ export const useReadInterchainTokenServiceChainNameHash =
 export const useReadInterchainTokenServiceContractCallValue =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "contractCallValue",
   });
 
@@ -1222,7 +1208,6 @@ export const useReadInterchainTokenServiceContractCallValue =
 export const useReadInterchainTokenServiceContractId =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "contractId",
   });
 
@@ -1232,7 +1217,6 @@ export const useReadInterchainTokenServiceContractId =
 export const useReadInterchainTokenServiceDeployedTokenManager =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "deployedTokenManager",
   });
 
@@ -1242,7 +1226,6 @@ export const useReadInterchainTokenServiceDeployedTokenManager =
 export const useReadInterchainTokenServiceGasService =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "gasService",
   });
 
@@ -1252,7 +1235,6 @@ export const useReadInterchainTokenServiceGasService =
 export const useReadInterchainTokenServiceGateway =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "gateway",
   });
 
@@ -1262,7 +1244,6 @@ export const useReadInterchainTokenServiceGateway =
 export const useReadInterchainTokenServiceGatewayCaller =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "gatewayCaller",
   });
 
@@ -1272,7 +1253,6 @@ export const useReadInterchainTokenServiceGatewayCaller =
 export const useReadInterchainTokenServiceGetExpressExecutor =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "getExpressExecutor",
   });
 
@@ -1282,7 +1262,6 @@ export const useReadInterchainTokenServiceGetExpressExecutor =
 export const useReadInterchainTokenServiceHasRole =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "hasRole",
   });
 
@@ -1292,7 +1271,6 @@ export const useReadInterchainTokenServiceHasRole =
 export const useReadInterchainTokenServiceImplementation =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "implementation",
   });
 
@@ -1302,7 +1280,6 @@ export const useReadInterchainTokenServiceImplementation =
 export const useReadInterchainTokenServiceInterchainTokenAddress =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "interchainTokenAddress",
   });
 
@@ -1312,7 +1289,6 @@ export const useReadInterchainTokenServiceInterchainTokenAddress =
 export const useReadInterchainTokenServiceInterchainTokenDeployer =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "interchainTokenDeployer",
   });
 
@@ -1322,7 +1298,6 @@ export const useReadInterchainTokenServiceInterchainTokenDeployer =
 export const useReadInterchainTokenServiceInterchainTokenFactory =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "interchainTokenFactory",
   });
 
@@ -1332,7 +1307,6 @@ export const useReadInterchainTokenServiceInterchainTokenFactory =
 export const useReadInterchainTokenServiceInterchainTokenId =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "interchainTokenId",
   });
 
@@ -1342,7 +1316,6 @@ export const useReadInterchainTokenServiceInterchainTokenId =
 export const useReadInterchainTokenServiceIsOperator =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "isOperator",
   });
 
@@ -1352,7 +1325,6 @@ export const useReadInterchainTokenServiceIsOperator =
 export const useReadInterchainTokenServiceIsTrustedAddress =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "isTrustedAddress",
   });
 
@@ -1362,7 +1334,6 @@ export const useReadInterchainTokenServiceIsTrustedAddress =
 export const useReadInterchainTokenServiceOwner =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "owner",
   });
 
@@ -1372,7 +1343,6 @@ export const useReadInterchainTokenServiceOwner =
 export const useReadInterchainTokenServicePaused =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "paused",
   });
 
@@ -1382,7 +1352,6 @@ export const useReadInterchainTokenServicePaused =
 export const useReadInterchainTokenServicePendingOwner =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "pendingOwner",
   });
 
@@ -1392,7 +1361,6 @@ export const useReadInterchainTokenServicePendingOwner =
 export const useReadInterchainTokenServiceRegisteredTokenAddress =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "registeredTokenAddress",
   });
 
@@ -1402,7 +1370,6 @@ export const useReadInterchainTokenServiceRegisteredTokenAddress =
 export const useReadInterchainTokenServiceTokenHandler =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "tokenHandler",
   });
 
@@ -1412,7 +1379,6 @@ export const useReadInterchainTokenServiceTokenHandler =
 export const useReadInterchainTokenServiceTokenManager =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "tokenManager",
   });
 
@@ -1422,7 +1388,6 @@ export const useReadInterchainTokenServiceTokenManager =
 export const useReadInterchainTokenServiceTokenManagerAddress =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "tokenManagerAddress",
   });
 
@@ -1432,7 +1397,6 @@ export const useReadInterchainTokenServiceTokenManagerAddress =
 export const useReadInterchainTokenServiceTokenManagerDeployer =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "tokenManagerDeployer",
   });
 
@@ -1442,7 +1406,6 @@ export const useReadInterchainTokenServiceTokenManagerDeployer =
 export const useReadInterchainTokenServiceTokenManagerImplementation =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "tokenManagerImplementation",
   });
 
@@ -1452,7 +1415,6 @@ export const useReadInterchainTokenServiceTokenManagerImplementation =
 export const useReadInterchainTokenServiceTrustedAddress =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "trustedAddress",
   });
 
@@ -1462,7 +1424,6 @@ export const useReadInterchainTokenServiceTrustedAddress =
 export const useReadInterchainTokenServiceTrustedAddressHash =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "trustedAddressHash",
   });
 
@@ -1470,10 +1431,7 @@ export const useReadInterchainTokenServiceTrustedAddressHash =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__
  */
 export const useWriteInterchainTokenService =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-  });
+  /*#__PURE__*/ createUseWriteContract({ abi: interchainTokenServiceAbi });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"acceptOperatorship"`
@@ -1481,7 +1439,6 @@ export const useWriteInterchainTokenService =
 export const useWriteInterchainTokenServiceAcceptOperatorship =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "acceptOperatorship",
   });
 
@@ -1491,7 +1448,6 @@ export const useWriteInterchainTokenServiceAcceptOperatorship =
 export const useWriteInterchainTokenServiceAcceptOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "acceptOwnership",
   });
 
@@ -1501,7 +1457,6 @@ export const useWriteInterchainTokenServiceAcceptOwnership =
 export const useWriteInterchainTokenServiceDeployInterchainToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "deployInterchainToken",
   });
 
@@ -1511,7 +1466,6 @@ export const useWriteInterchainTokenServiceDeployInterchainToken =
 export const useWriteInterchainTokenServiceExecute =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "execute",
   });
 
@@ -1521,7 +1475,6 @@ export const useWriteInterchainTokenServiceExecute =
 export const useWriteInterchainTokenServiceExpressExecute =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "expressExecute",
   });
 
@@ -1531,7 +1484,6 @@ export const useWriteInterchainTokenServiceExpressExecute =
 export const useWriteInterchainTokenServiceInterchainTransfer =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "interchainTransfer",
   });
 
@@ -1541,7 +1493,6 @@ export const useWriteInterchainTokenServiceInterchainTransfer =
 export const useWriteInterchainTokenServiceLinkToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "linkToken",
   });
 
@@ -1551,7 +1502,6 @@ export const useWriteInterchainTokenServiceLinkToken =
 export const useWriteInterchainTokenServiceMigrateInterchainToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "migrateInterchainToken",
   });
 
@@ -1561,7 +1511,6 @@ export const useWriteInterchainTokenServiceMigrateInterchainToken =
 export const useWriteInterchainTokenServiceMulticall =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "multicall",
   });
 
@@ -1571,7 +1520,6 @@ export const useWriteInterchainTokenServiceMulticall =
 export const useWriteInterchainTokenServiceProposeOperatorship =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "proposeOperatorship",
   });
 
@@ -1581,7 +1529,6 @@ export const useWriteInterchainTokenServiceProposeOperatorship =
 export const useWriteInterchainTokenServiceProposeOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "proposeOwnership",
   });
 
@@ -1591,7 +1538,6 @@ export const useWriteInterchainTokenServiceProposeOwnership =
 export const useWriteInterchainTokenServiceRegisterCustomToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "registerCustomToken",
   });
 
@@ -1601,7 +1547,6 @@ export const useWriteInterchainTokenServiceRegisterCustomToken =
 export const useWriteInterchainTokenServiceRegisterTokenMetadata =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "registerTokenMetadata",
   });
 
@@ -1611,7 +1556,6 @@ export const useWriteInterchainTokenServiceRegisterTokenMetadata =
 export const useWriteInterchainTokenServiceRemoveTrustedAddress =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "removeTrustedAddress",
   });
 
@@ -1621,7 +1565,6 @@ export const useWriteInterchainTokenServiceRemoveTrustedAddress =
 export const useWriteInterchainTokenServiceSetFlowLimits =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "setFlowLimits",
   });
 
@@ -1631,7 +1574,6 @@ export const useWriteInterchainTokenServiceSetFlowLimits =
 export const useWriteInterchainTokenServiceSetPauseStatus =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "setPauseStatus",
   });
 
@@ -1641,7 +1583,6 @@ export const useWriteInterchainTokenServiceSetPauseStatus =
 export const useWriteInterchainTokenServiceSetTrustedAddress =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "setTrustedAddress",
   });
 
@@ -1651,7 +1592,6 @@ export const useWriteInterchainTokenServiceSetTrustedAddress =
 export const useWriteInterchainTokenServiceSetup =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "setup",
   });
 
@@ -1661,7 +1601,6 @@ export const useWriteInterchainTokenServiceSetup =
 export const useWriteInterchainTokenServiceTransferOperatorship =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "transferOperatorship",
   });
 
@@ -1671,7 +1610,6 @@ export const useWriteInterchainTokenServiceTransferOperatorship =
 export const useWriteInterchainTokenServiceTransferOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "transferOwnership",
   });
 
@@ -1681,7 +1619,6 @@ export const useWriteInterchainTokenServiceTransferOwnership =
 export const useWriteInterchainTokenServiceTransmitInterchainTransfer =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "transmitInterchainTransfer",
   });
 
@@ -1691,7 +1628,6 @@ export const useWriteInterchainTokenServiceTransmitInterchainTransfer =
 export const useWriteInterchainTokenServiceUpgrade =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "upgrade",
   });
 
@@ -1699,10 +1635,7 @@ export const useWriteInterchainTokenServiceUpgrade =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__
  */
 export const useSimulateInterchainTokenService =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-  });
+  /*#__PURE__*/ createUseSimulateContract({ abi: interchainTokenServiceAbi });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `functionName` set to `"acceptOperatorship"`
@@ -1710,7 +1643,6 @@ export const useSimulateInterchainTokenService =
 export const useSimulateInterchainTokenServiceAcceptOperatorship =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "acceptOperatorship",
   });
 
@@ -1720,7 +1652,6 @@ export const useSimulateInterchainTokenServiceAcceptOperatorship =
 export const useSimulateInterchainTokenServiceAcceptOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "acceptOwnership",
   });
 
@@ -1730,7 +1661,6 @@ export const useSimulateInterchainTokenServiceAcceptOwnership =
 export const useSimulateInterchainTokenServiceDeployInterchainToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "deployInterchainToken",
   });
 
@@ -1740,7 +1670,6 @@ export const useSimulateInterchainTokenServiceDeployInterchainToken =
 export const useSimulateInterchainTokenServiceExecute =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "execute",
   });
 
@@ -1750,7 +1679,6 @@ export const useSimulateInterchainTokenServiceExecute =
 export const useSimulateInterchainTokenServiceExpressExecute =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "expressExecute",
   });
 
@@ -1760,7 +1688,6 @@ export const useSimulateInterchainTokenServiceExpressExecute =
 export const useSimulateInterchainTokenServiceInterchainTransfer =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "interchainTransfer",
   });
 
@@ -1770,7 +1697,6 @@ export const useSimulateInterchainTokenServiceInterchainTransfer =
 export const useSimulateInterchainTokenServiceLinkToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "linkToken",
   });
 
@@ -1780,7 +1706,6 @@ export const useSimulateInterchainTokenServiceLinkToken =
 export const useSimulateInterchainTokenServiceMigrateInterchainToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "migrateInterchainToken",
   });
 
@@ -1790,7 +1715,6 @@ export const useSimulateInterchainTokenServiceMigrateInterchainToken =
 export const useSimulateInterchainTokenServiceMulticall =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "multicall",
   });
 
@@ -1800,7 +1724,6 @@ export const useSimulateInterchainTokenServiceMulticall =
 export const useSimulateInterchainTokenServiceProposeOperatorship =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "proposeOperatorship",
   });
 
@@ -1810,7 +1733,6 @@ export const useSimulateInterchainTokenServiceProposeOperatorship =
 export const useSimulateInterchainTokenServiceProposeOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "proposeOwnership",
   });
 
@@ -1820,7 +1742,6 @@ export const useSimulateInterchainTokenServiceProposeOwnership =
 export const useSimulateInterchainTokenServiceRegisterCustomToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "registerCustomToken",
   });
 
@@ -1830,7 +1751,6 @@ export const useSimulateInterchainTokenServiceRegisterCustomToken =
 export const useSimulateInterchainTokenServiceRegisterTokenMetadata =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "registerTokenMetadata",
   });
 
@@ -1840,7 +1760,6 @@ export const useSimulateInterchainTokenServiceRegisterTokenMetadata =
 export const useSimulateInterchainTokenServiceRemoveTrustedAddress =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "removeTrustedAddress",
   });
 
@@ -1850,7 +1769,6 @@ export const useSimulateInterchainTokenServiceRemoveTrustedAddress =
 export const useSimulateInterchainTokenServiceSetFlowLimits =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "setFlowLimits",
   });
 
@@ -1860,7 +1778,6 @@ export const useSimulateInterchainTokenServiceSetFlowLimits =
 export const useSimulateInterchainTokenServiceSetPauseStatus =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "setPauseStatus",
   });
 
@@ -1870,7 +1787,6 @@ export const useSimulateInterchainTokenServiceSetPauseStatus =
 export const useSimulateInterchainTokenServiceSetTrustedAddress =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "setTrustedAddress",
   });
 
@@ -1880,7 +1796,6 @@ export const useSimulateInterchainTokenServiceSetTrustedAddress =
 export const useSimulateInterchainTokenServiceSetup =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "setup",
   });
 
@@ -1890,7 +1805,6 @@ export const useSimulateInterchainTokenServiceSetup =
 export const useSimulateInterchainTokenServiceTransferOperatorship =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "transferOperatorship",
   });
 
@@ -1900,7 +1814,6 @@ export const useSimulateInterchainTokenServiceTransferOperatorship =
 export const useSimulateInterchainTokenServiceTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "transferOwnership",
   });
 
@@ -1910,7 +1823,6 @@ export const useSimulateInterchainTokenServiceTransferOwnership =
 export const useSimulateInterchainTokenServiceTransmitInterchainTransfer =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "transmitInterchainTransfer",
   });
 
@@ -1920,7 +1832,6 @@ export const useSimulateInterchainTokenServiceTransmitInterchainTransfer =
 export const useSimulateInterchainTokenServiceUpgrade =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     functionName: "upgrade",
   });
 
@@ -1928,10 +1839,7 @@ export const useSimulateInterchainTokenServiceUpgrade =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenServiceAbi}__
  */
 export const useWatchInterchainTokenServiceEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
-  });
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: interchainTokenServiceAbi });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenServiceAbi}__ and `eventName` set to `"ExpressExecuted"`
@@ -1939,7 +1847,6 @@ export const useWatchInterchainTokenServiceEvent =
 export const useWatchInterchainTokenServiceExpressExecutedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "ExpressExecuted",
   });
 
@@ -1949,7 +1856,6 @@ export const useWatchInterchainTokenServiceExpressExecutedEvent =
 export const useWatchInterchainTokenServiceExpressExecutionFulfilledEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "ExpressExecutionFulfilled",
   });
 
@@ -1959,7 +1865,6 @@ export const useWatchInterchainTokenServiceExpressExecutionFulfilledEvent =
 export const useWatchInterchainTokenServiceInterchainTokenDeployedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "InterchainTokenDeployed",
   });
 
@@ -1969,7 +1874,6 @@ export const useWatchInterchainTokenServiceInterchainTokenDeployedEvent =
 export const useWatchInterchainTokenServiceInterchainTokenDeploymentStartedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "InterchainTokenDeploymentStarted",
   });
 
@@ -1979,7 +1883,6 @@ export const useWatchInterchainTokenServiceInterchainTokenDeploymentStartedEvent
 export const useWatchInterchainTokenServiceInterchainTokenIdClaimedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "InterchainTokenIdClaimed",
   });
 
@@ -1989,7 +1892,6 @@ export const useWatchInterchainTokenServiceInterchainTokenIdClaimedEvent =
 export const useWatchInterchainTokenServiceInterchainTransferEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "InterchainTransfer",
   });
 
@@ -1999,7 +1901,6 @@ export const useWatchInterchainTokenServiceInterchainTransferEvent =
 export const useWatchInterchainTokenServiceInterchainTransferReceivedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "InterchainTransferReceived",
   });
 
@@ -2009,7 +1910,6 @@ export const useWatchInterchainTokenServiceInterchainTransferReceivedEvent =
 export const useWatchInterchainTokenServiceLinkTokenStartedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "LinkTokenStarted",
   });
 
@@ -2019,7 +1919,6 @@ export const useWatchInterchainTokenServiceLinkTokenStartedEvent =
 export const useWatchInterchainTokenServiceOwnershipTransferStartedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "OwnershipTransferStarted",
   });
 
@@ -2029,7 +1928,6 @@ export const useWatchInterchainTokenServiceOwnershipTransferStartedEvent =
 export const useWatchInterchainTokenServiceOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "OwnershipTransferred",
   });
 
@@ -2039,7 +1937,6 @@ export const useWatchInterchainTokenServiceOwnershipTransferredEvent =
 export const useWatchInterchainTokenServicePausedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "Paused",
   });
 
@@ -2049,7 +1946,6 @@ export const useWatchInterchainTokenServicePausedEvent =
 export const useWatchInterchainTokenServiceRolesAddedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "RolesAdded",
   });
 
@@ -2059,7 +1955,6 @@ export const useWatchInterchainTokenServiceRolesAddedEvent =
 export const useWatchInterchainTokenServiceRolesProposedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "RolesProposed",
   });
 
@@ -2069,7 +1964,6 @@ export const useWatchInterchainTokenServiceRolesProposedEvent =
 export const useWatchInterchainTokenServiceRolesRemovedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "RolesRemoved",
   });
 
@@ -2079,7 +1973,6 @@ export const useWatchInterchainTokenServiceRolesRemovedEvent =
 export const useWatchInterchainTokenServiceTokenManagerDeployedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "TokenManagerDeployed",
   });
 
@@ -2089,7 +1982,6 @@ export const useWatchInterchainTokenServiceTokenManagerDeployedEvent =
 export const useWatchInterchainTokenServiceTokenMetadataRegisteredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "TokenMetadataRegistered",
   });
 
@@ -2099,7 +1991,6 @@ export const useWatchInterchainTokenServiceTokenMetadataRegisteredEvent =
 export const useWatchInterchainTokenServiceTrustedAddressRemovedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "TrustedAddressRemoved",
   });
 
@@ -2109,7 +2000,6 @@ export const useWatchInterchainTokenServiceTrustedAddressRemovedEvent =
 export const useWatchInterchainTokenServiceTrustedAddressSetEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "TrustedAddressSet",
   });
 
@@ -2119,7 +2009,6 @@ export const useWatchInterchainTokenServiceTrustedAddressSetEvent =
 export const useWatchInterchainTokenServiceUnpausedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "Unpaused",
   });
 
@@ -2129,6 +2018,5 @@ export const useWatchInterchainTokenServiceUnpausedEvent =
 export const useWatchInterchainTokenServiceUpgradedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenServiceAbi,
-    address: interchainTokenServiceAddress,
     eventName: "Upgraded",
   });
