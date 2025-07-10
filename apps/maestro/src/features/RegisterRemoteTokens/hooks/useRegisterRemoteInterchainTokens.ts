@@ -67,9 +67,11 @@ export default function useRegisterRemoteInterchainTokens(
       return [];
 
     return destinationChainIds.map((chainId, i) =>
-      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainTokenWithMinter.data({
         salt: tokenDeployment.salt,
+        minter: "0x0000000000000000000000000000000000000000", // No minter set for security benefits
         destinationChain: chainId,
+        destinationMinter: "0x0000000000000000000000000000000000000000", // No destination minter set
         gasValue: gasFeesData.gasFees[i].fee,
       })
     );
