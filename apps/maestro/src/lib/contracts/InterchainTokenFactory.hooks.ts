@@ -477,14 +477,6 @@ export const interchainTokenFactoryAbi = [
   },
 ] as const;
 
-export const interchainTokenFactoryAddress =
-  "0x83a93500d23Fbc3e82B410aD07A6a9F7A0670D66" as const;
-
-export const interchainTokenFactoryConfig = {
-  address: interchainTokenFactoryAddress,
-  abi: interchainTokenFactoryAbi,
-} as const;
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -493,10 +485,7 @@ export const interchainTokenFactoryConfig = {
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__
  */
 export const useReadInterchainTokenFactory =
-  /*#__PURE__*/ createUseReadContract({
-    abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
-  });
+  /*#__PURE__*/ createUseReadContract({ abi: interchainTokenFactoryAbi });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"canonicalInterchainTokenDeploySalt"`
@@ -504,7 +493,6 @@ export const useReadInterchainTokenFactory =
 export const useReadInterchainTokenFactoryCanonicalInterchainTokenDeploySalt =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "canonicalInterchainTokenDeploySalt",
   });
 
@@ -514,7 +502,6 @@ export const useReadInterchainTokenFactoryCanonicalInterchainTokenDeploySalt =
 export const useReadInterchainTokenFactoryCanonicalInterchainTokenId =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "canonicalInterchainTokenId",
   });
 
@@ -524,7 +511,6 @@ export const useReadInterchainTokenFactoryCanonicalInterchainTokenId =
 export const useReadInterchainTokenFactoryChainNameHash =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "chainNameHash",
   });
 
@@ -534,7 +520,6 @@ export const useReadInterchainTokenFactoryChainNameHash =
 export const useReadInterchainTokenFactoryContractId =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "contractId",
   });
 
@@ -544,7 +529,6 @@ export const useReadInterchainTokenFactoryContractId =
 export const useReadInterchainTokenFactoryImplementation =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "implementation",
   });
 
@@ -554,7 +538,6 @@ export const useReadInterchainTokenFactoryImplementation =
 export const useReadInterchainTokenFactoryInterchainTokenDeploySalt =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "interchainTokenDeploySalt",
   });
 
@@ -564,7 +547,6 @@ export const useReadInterchainTokenFactoryInterchainTokenDeploySalt =
 export const useReadInterchainTokenFactoryInterchainTokenId =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "interchainTokenId",
   });
 
@@ -574,7 +556,6 @@ export const useReadInterchainTokenFactoryInterchainTokenId =
 export const useReadInterchainTokenFactoryInterchainTokenService =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "interchainTokenService",
   });
 
@@ -584,7 +565,6 @@ export const useReadInterchainTokenFactoryInterchainTokenService =
 export const useReadInterchainTokenFactoryLinkedTokenDeploySalt =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "linkedTokenDeploySalt",
   });
 
@@ -594,7 +574,6 @@ export const useReadInterchainTokenFactoryLinkedTokenDeploySalt =
 export const useReadInterchainTokenFactoryLinkedTokenId =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "linkedTokenId",
   });
 
@@ -604,7 +583,6 @@ export const useReadInterchainTokenFactoryLinkedTokenId =
 export const useReadInterchainTokenFactoryOwner =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "owner",
   });
 
@@ -614,7 +592,6 @@ export const useReadInterchainTokenFactoryOwner =
 export const useReadInterchainTokenFactoryPendingOwner =
   /*#__PURE__*/ createUseReadContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "pendingOwner",
   });
 
@@ -622,10 +599,7 @@ export const useReadInterchainTokenFactoryPendingOwner =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__
  */
 export const useWriteInterchainTokenFactory =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
-  });
+  /*#__PURE__*/ createUseWriteContract({ abi: interchainTokenFactoryAbi });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"acceptOwnership"`
@@ -633,7 +607,6 @@ export const useWriteInterchainTokenFactory =
 export const useWriteInterchainTokenFactoryAcceptOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "acceptOwnership",
   });
 
@@ -643,7 +616,6 @@ export const useWriteInterchainTokenFactoryAcceptOwnership =
 export const useWriteInterchainTokenFactoryApproveDeployRemoteInterchainToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "approveDeployRemoteInterchainToken",
   });
 
@@ -653,7 +625,6 @@ export const useWriteInterchainTokenFactoryApproveDeployRemoteInterchainToken =
 export const useWriteInterchainTokenFactoryDeployInterchainToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "deployInterchainToken",
   });
 
@@ -663,7 +634,6 @@ export const useWriteInterchainTokenFactoryDeployInterchainToken =
 export const useWriteInterchainTokenFactoryDeployRemoteCanonicalInterchainToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteCanonicalInterchainToken",
   });
 
@@ -673,7 +643,6 @@ export const useWriteInterchainTokenFactoryDeployRemoteCanonicalInterchainToken 
 export const useWriteInterchainTokenFactoryDeployRemoteInterchainToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteInterchainToken",
   });
 
@@ -683,7 +652,6 @@ export const useWriteInterchainTokenFactoryDeployRemoteInterchainToken =
 export const useWriteInterchainTokenFactoryDeployRemoteInterchainTokenWithMinter =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteInterchainTokenWithMinter",
   });
 
@@ -693,7 +661,6 @@ export const useWriteInterchainTokenFactoryDeployRemoteInterchainTokenWithMinter
 export const useWriteInterchainTokenFactoryLinkToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "linkToken",
   });
 
@@ -703,7 +670,6 @@ export const useWriteInterchainTokenFactoryLinkToken =
 export const useWriteInterchainTokenFactoryMulticall =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "multicall",
   });
 
@@ -713,7 +679,6 @@ export const useWriteInterchainTokenFactoryMulticall =
 export const useWriteInterchainTokenFactoryProposeOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "proposeOwnership",
   });
 
@@ -723,7 +688,6 @@ export const useWriteInterchainTokenFactoryProposeOwnership =
 export const useWriteInterchainTokenFactoryRegisterCanonicalInterchainToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "registerCanonicalInterchainToken",
   });
 
@@ -733,7 +697,6 @@ export const useWriteInterchainTokenFactoryRegisterCanonicalInterchainToken =
 export const useWriteInterchainTokenFactoryRegisterCustomToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "registerCustomToken",
   });
 
@@ -743,7 +706,6 @@ export const useWriteInterchainTokenFactoryRegisterCustomToken =
 export const useWriteInterchainTokenFactoryRevokeDeployRemoteInterchainToken =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "revokeDeployRemoteInterchainToken",
   });
 
@@ -753,7 +715,6 @@ export const useWriteInterchainTokenFactoryRevokeDeployRemoteInterchainToken =
 export const useWriteInterchainTokenFactorySetup =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "setup",
   });
 
@@ -763,7 +724,6 @@ export const useWriteInterchainTokenFactorySetup =
 export const useWriteInterchainTokenFactoryTransferOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "transferOwnership",
   });
 
@@ -773,7 +733,6 @@ export const useWriteInterchainTokenFactoryTransferOwnership =
 export const useWriteInterchainTokenFactoryUpgrade =
   /*#__PURE__*/ createUseWriteContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "upgrade",
   });
 
@@ -781,10 +740,7 @@ export const useWriteInterchainTokenFactoryUpgrade =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__
  */
 export const useSimulateInterchainTokenFactory =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
-  });
+  /*#__PURE__*/ createUseSimulateContract({ abi: interchainTokenFactoryAbi });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `functionName` set to `"acceptOwnership"`
@@ -792,7 +748,6 @@ export const useSimulateInterchainTokenFactory =
 export const useSimulateInterchainTokenFactoryAcceptOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "acceptOwnership",
   });
 
@@ -802,7 +757,6 @@ export const useSimulateInterchainTokenFactoryAcceptOwnership =
 export const useSimulateInterchainTokenFactoryApproveDeployRemoteInterchainToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "approveDeployRemoteInterchainToken",
   });
 
@@ -812,7 +766,6 @@ export const useSimulateInterchainTokenFactoryApproveDeployRemoteInterchainToken
 export const useSimulateInterchainTokenFactoryDeployInterchainToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "deployInterchainToken",
   });
 
@@ -822,7 +775,6 @@ export const useSimulateInterchainTokenFactoryDeployInterchainToken =
 export const useSimulateInterchainTokenFactoryDeployRemoteCanonicalInterchainToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteCanonicalInterchainToken",
   });
 
@@ -832,7 +784,6 @@ export const useSimulateInterchainTokenFactoryDeployRemoteCanonicalInterchainTok
 export const useSimulateInterchainTokenFactoryDeployRemoteInterchainToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteInterchainToken",
   });
 
@@ -842,7 +793,6 @@ export const useSimulateInterchainTokenFactoryDeployRemoteInterchainToken =
 export const useSimulateInterchainTokenFactoryDeployRemoteInterchainTokenWithMinter =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "deployRemoteInterchainTokenWithMinter",
   });
 
@@ -852,7 +802,6 @@ export const useSimulateInterchainTokenFactoryDeployRemoteInterchainTokenWithMin
 export const useSimulateInterchainTokenFactoryLinkToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "linkToken",
   });
 
@@ -862,7 +811,6 @@ export const useSimulateInterchainTokenFactoryLinkToken =
 export const useSimulateInterchainTokenFactoryMulticall =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "multicall",
   });
 
@@ -872,7 +820,6 @@ export const useSimulateInterchainTokenFactoryMulticall =
 export const useSimulateInterchainTokenFactoryProposeOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "proposeOwnership",
   });
 
@@ -882,7 +829,6 @@ export const useSimulateInterchainTokenFactoryProposeOwnership =
 export const useSimulateInterchainTokenFactoryRegisterCanonicalInterchainToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "registerCanonicalInterchainToken",
   });
 
@@ -892,7 +838,6 @@ export const useSimulateInterchainTokenFactoryRegisterCanonicalInterchainToken =
 export const useSimulateInterchainTokenFactoryRegisterCustomToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "registerCustomToken",
   });
 
@@ -902,7 +847,6 @@ export const useSimulateInterchainTokenFactoryRegisterCustomToken =
 export const useSimulateInterchainTokenFactoryRevokeDeployRemoteInterchainToken =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "revokeDeployRemoteInterchainToken",
   });
 
@@ -912,7 +856,6 @@ export const useSimulateInterchainTokenFactoryRevokeDeployRemoteInterchainToken 
 export const useSimulateInterchainTokenFactorySetup =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "setup",
   });
 
@@ -922,7 +865,6 @@ export const useSimulateInterchainTokenFactorySetup =
 export const useSimulateInterchainTokenFactoryTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "transferOwnership",
   });
 
@@ -932,7 +874,6 @@ export const useSimulateInterchainTokenFactoryTransferOwnership =
 export const useSimulateInterchainTokenFactoryUpgrade =
   /*#__PURE__*/ createUseSimulateContract({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     functionName: "upgrade",
   });
 
@@ -940,10 +881,7 @@ export const useSimulateInterchainTokenFactoryUpgrade =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenFactoryAbi}__
  */
 export const useWatchInterchainTokenFactoryEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
-  });
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: interchainTokenFactoryAbi });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link interchainTokenFactoryAbi}__ and `eventName` set to `"DeployRemoteInterchainTokenApproval"`
@@ -951,7 +889,6 @@ export const useWatchInterchainTokenFactoryEvent =
 export const useWatchInterchainTokenFactoryDeployRemoteInterchainTokenApprovalEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     eventName: "DeployRemoteInterchainTokenApproval",
   });
 
@@ -961,7 +898,6 @@ export const useWatchInterchainTokenFactoryDeployRemoteInterchainTokenApprovalEv
 export const useWatchInterchainTokenFactoryOwnershipTransferStartedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     eventName: "OwnershipTransferStarted",
   });
 
@@ -971,7 +907,6 @@ export const useWatchInterchainTokenFactoryOwnershipTransferStartedEvent =
 export const useWatchInterchainTokenFactoryOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     eventName: "OwnershipTransferred",
   });
 
@@ -981,7 +916,6 @@ export const useWatchInterchainTokenFactoryOwnershipTransferredEvent =
 export const useWatchInterchainTokenFactoryRevokedDeployRemoteInterchainTokenApprovalEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     eventName: "RevokedDeployRemoteInterchainTokenApproval",
   });
 
@@ -991,6 +925,5 @@ export const useWatchInterchainTokenFactoryRevokedDeployRemoteInterchainTokenApp
 export const useWatchInterchainTokenFactoryUpgradedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: interchainTokenFactoryAbi,
-    address: interchainTokenFactoryAddress,
     eventName: "Upgraded",
   });
