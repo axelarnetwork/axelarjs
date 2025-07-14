@@ -85,6 +85,7 @@ export const AcceptInterchainTokenOwnership: FC<Props> = (props) => {
 
     try {
       const txHash = await acceptOwnershipAsync({});
+      
       setTxState({
         status: "submitted",
         hash: txHash,
