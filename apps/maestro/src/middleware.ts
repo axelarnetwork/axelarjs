@@ -32,33 +32,50 @@ export async function middleware(req: NextRequest) {
   // Extract country
   const country = req.geo?.country ?? "US";
 
+  // Check geographic restrictions first
+  const isGeographicallyRestricted = RESTRICTED_COUNTRIES.includes(country);
+  if (isGeographicallyRestricted) {
+    logger.warn("unauthorized_access_attempt:", {
+      ...(req.geo ?? {}),
+      ip: req.ip,
+      walletAddress: "unauthenticated",
+      userAgent: req.headers.get("user-agent"),
+      restrictionType: "geographic",
+    });
+    req.nextUrl.pathname = "/restricted";
+    return NextResponse.rewrite(req.nextUrl);
+  }
+
+  // Check wallet sanctions second
+  let isWalletRestricted = false;
+  let walletAddress: string | null = null;
+
   try {
-    const walletAddress = await getAuthenticatedWalletAddress(req);
-    if (!walletAddress) {
-      return NextResponse.rewrite(req.nextUrl);
-    }
+    walletAddress = await getAuthenticatedWalletAddress(req);
 
-    const isRestricted =
-      RESTRICTED_COUNTRIES.includes(country) ||
-      (await checkWalletAddresses(walletAddress));
-
-    if (!isRestricted && req.nextUrl.pathname === "/restricted") {
-      req.nextUrl.pathname = "/";
-      return NextResponse.redirect(req.nextUrl);
-    }
-
-    if (isRestricted) {
-      console.info("unauthorized_access_attempt:", {
-        ...(req.geo ?? {}),
-        ip: req.ip,
-        walletAddress,
-        userAgent: req.headers.get("user-agent"),
-      });
-
-      req.nextUrl.pathname = "/restricted";
+    if (walletAddress) {
+      isWalletRestricted = await checkWalletAddresses(walletAddress);
     }
   } catch (error) {
-    console.error("Error getting wallet address:", error);
+    logger.error("Error checking wallet sanctions:", error);
+  }
+
+  // If the user is not/no longer restricted by wallet sanctions, redirect to the home page
+  if (!isWalletRestricted && req.nextUrl.pathname === "/restricted") {
+    req.nextUrl.pathname = "/";
+    return NextResponse.redirect(req.nextUrl);
+  }
+
+  if (isWalletRestricted) {
+    logger.warn("unauthorized_access_attempt:", {
+      ...(req.geo ?? {}),
+      ip: req.ip,
+      walletAddress: walletAddress || "unauthenticated",
+      userAgent: req.headers.get("user-agent"),
+      restrictionType: "wallet",
+    });
+
+    req.nextUrl.pathname = "/restricted";
   }
 
   // Rewrite to URL
