@@ -29,11 +29,6 @@ export class OFACSanctionsService {
     const lastUpdate = await this.kvClient.getSanctionsLastUpdate();
     const hasData = (await this.kvClient.getSanctionedWalletsCount()) > 0;
 
-    if (!hasData && lastUpdate) {
-      await this.kvClient.setSanctionsLastUpdate("");
-      throw new Error("Got no data but last update was set");
-    }
-
     return {
       hasData,
       lastUpdate,
