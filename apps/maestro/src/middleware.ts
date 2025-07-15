@@ -1,4 +1,18 @@
+import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
+
+import { logger } from "~/lib/logger";
+import { ofacSanctionsService } from "~/services/ofacSanctions/ofacSanctions";
+
+logger.configure({
+  env:
+    process.env.NODE_ENV === "development" ||
+    ["preview", "development"].includes(String(process.env.VERCEL_ENV))
+      ? "development"
+      : "production",
+});
+
+type WalletAddress = string;
 
 // Limit middleware pathname config
 export const config = {
@@ -14,29 +28,66 @@ export const config = {
   ],
 };
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   // Extract country
   const country = req.geo?.country ?? "US";
 
-  const isRestricted = RESTRICTED_COUNTRIES.includes(country);
+  try {
+    const walletAddress = await getAuthenticatedWalletAddress(req);
+    if (!walletAddress) {
+      return NextResponse.rewrite(req.nextUrl);
+    }
 
-  if (!isRestricted && req.nextUrl.pathname === "/restricted") {
-    req.nextUrl.pathname = "/";
-    return NextResponse.redirect(req.nextUrl);
-  }
+    const isRestricted =
+      RESTRICTED_COUNTRIES.includes(country) ||
+      (await checkWalletAddresses(walletAddress));
 
-  if (isRestricted) {
-    console.info("unauthorized_access_attempt:", {
-      ...(req.geo ?? {}),
-      ip: req.ip,
-      userAgent: req.headers.get("user-agent"),
-    });
+    if (!isRestricted && req.nextUrl.pathname === "/restricted") {
+      req.nextUrl.pathname = "/";
+      return NextResponse.redirect(req.nextUrl);
+    }
 
-    req.nextUrl.pathname = "/restricted";
+    if (isRestricted) {
+      console.info("unauthorized_access_attempt:", {
+        ...(req.geo ?? {}),
+        ip: req.ip,
+        walletAddress,
+        userAgent: req.headers.get("user-agent"),
+      });
+
+      req.nextUrl.pathname = "/restricted";
+    }
+  } catch (error) {
+    console.error("Error getting wallet address:", error);
   }
 
   // Rewrite to URL
   return NextResponse.rewrite(req.nextUrl);
+}
+
+/**
+ * Check if the authenticated user's wallet address is sanctioned
+ */
+async function checkWalletAddresses(address: WalletAddress): Promise<boolean> {
+  return await ofacSanctionsService.isWalletSanctioned(address);
+}
+
+/**
+ * Get the authenticated user's wallet address from the session cookie
+ */
+async function getAuthenticatedWalletAddress(
+  req: NextRequest
+): Promise<WalletAddress | null> {
+  const token = await getToken({ req });
+  if (!token) {
+    return null;
+  }
+
+  if (!token.sub) {
+    throw new Error("No wallet address found in token");
+  }
+
+  return token.sub;
 }
 
 /**
