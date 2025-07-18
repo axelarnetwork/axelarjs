@@ -1,7 +1,7 @@
 import { Maybe } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 
-import { indexBy, partition, prop } from "rambda";
+import { indexBy, partition, prop, compose, toLower } from "rambda";
 
 import { CHAIN_CONFIGS, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
@@ -46,6 +46,10 @@ export function useAllChainConfigsQuery() {
       indexedByChainId: {
         ...vmComputed.indexedByChainId,
         ...evmComputed.indexedByChainId,
+      },
+      indexedByAlternativeId: {
+        ...vmComputed.indexedByAlternativeId,
+        ...evmComputed.indexedByAlternativeId,
       },
       wagmiChains: evmComputed.wagmiChains,
     }),
@@ -124,6 +128,7 @@ export function useEVMChainConfigsQuery() {
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
+      indexedByAlternativeId: indexBy(compose(toLower,prop("id")), configured),
       wagmiChains,
     },
   };
@@ -167,6 +172,7 @@ export function useVMChainConfigsQuery() {
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
+      indexedByAlternativeId: indexBy(compose(toLower,prop("id")), configured),
     },
   };
 }

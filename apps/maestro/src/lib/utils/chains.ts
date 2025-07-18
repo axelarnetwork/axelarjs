@@ -4,6 +4,7 @@ import { ITSChainConfig } from "~/server/chainConfig";
 type ChainConfigIndex = {
   indexedById: Record<string, ITSChainConfig>;
   indexedByChainId: Record<number, ITSChainConfig>;
+  indexedByAlternativeId: Record<string, ITSChainConfig>;
 };
 
 /**
@@ -60,9 +61,12 @@ export function getNormalizedTwoHopChainConfig(
   combinedComputed: ChainConfigIndex,
   chainId: number
 ): ITSChainConfig {
-  const { indexedById, indexedByChainId } = combinedComputed;
+  const { indexedById, indexedByChainId, indexedByAlternativeId } = combinedComputed;
 
   if (axelarChainId !== "axelar") {
+    if (!indexedById[axelarChainId]) {
+      return indexedByAlternativeId[axelarChainId]
+    }
     return indexedById[axelarChainId];
   }
 
