@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/core",
   "version": "0.2.12",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "description": "Axelarjs Core",
   "publishConfig": {
     "access": "public"

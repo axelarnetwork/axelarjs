@@ -9,6 +9,9 @@
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "type": "module",
   "scripts": {
     "dev": "next dev --turbo",

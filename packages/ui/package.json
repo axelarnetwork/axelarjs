@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/ui",
   "version": "0.1.6",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "publishConfig": {
     "access": "public"
   },

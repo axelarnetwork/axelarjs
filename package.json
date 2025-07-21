@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git+https://github.com/axelarnetwork/axelarjs"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "prepare": "husky install",
     "build": "turbo run build",

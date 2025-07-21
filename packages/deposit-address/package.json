@@ -1,6 +1,9 @@
 {
   "name": "@axelarjs/deposit-address",
   "version": "0.1.25",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "description": "Axelarjs Deposit Address",
   "repository": {
     "type": "git",

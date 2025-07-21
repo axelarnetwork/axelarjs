@@ -5,6 +5,9 @@
   "publishConfig": {
     "access": "restricted"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
