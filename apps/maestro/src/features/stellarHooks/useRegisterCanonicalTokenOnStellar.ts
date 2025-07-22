@@ -142,7 +142,7 @@ export function useRegisterCanonicalTokenOnStellar() {
         try {
           // Extract data from events
           const transactionMeta = txResponseWithMeta.resultMetaXdr;
-          const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
+          const sorobanMeta = transactionMeta.v4()?.sorobanMeta();
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
