@@ -9,7 +9,8 @@ const RestrictedPage: FC = () => (
           <AlertTriangleIcon />
           Your access is restricted
         </Card.Title>
-        Access from this IP address or location is currently restricted.
+        Access from this wallet address, IP address or location is currently
+        restricted.
       </Card.Body>
     </Card>
   </div>
