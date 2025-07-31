@@ -75,7 +75,7 @@ export const CUSTOM_RPC_NODES: Record<
     "sui-2": [
       // No known public DRPC endpoint
     ], // Sui Devnet
-    "stellar-2025-q1": [
+    "stellar-2025-q2-2": [
       // No known public DRPC endpoint
     ], // Stellar Devnet
   },
