@@ -47,9 +47,13 @@ export type TokenDetailsSectionProps = {
 };
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
-  const wallet = createWalletClient({
-    transport: custom((window as any).ethereum),
-  });
+  let wallet = null;
+  if ((window as any).ethereum) {
+    wallet = createWalletClient({
+      transport: custom((window as any).ethereum),
+    });
+  }
+
   const { data: meta } = trpc.interchainToken.getInterchainTokenMeta.useQuery(
     {
       tokenId: props.tokenId!,
@@ -78,7 +82,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    ...(!isSuiChain && !isStellarChain
+    ...(wallet && !isSuiChain && !isStellarChain
       ? [
           [
             "Add Token to Wallet",
