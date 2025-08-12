@@ -3,6 +3,7 @@ import { Alert, Button, cn, Tooltip } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
+import { useSession } from "next-auth/react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 
@@ -119,6 +120,15 @@ function getDeploymentStatus(
     : { ...deploymentStatus, status: "pending" };
 }
 
+const useIsAuthenticated = () => {
+  const { data: session, status: sessionStatus } = useSession();
+  return {
+    isAuthenticated: sessionStatus === "authenticated" && !!session?.address,
+    session,
+    sessionStatus,
+  };
+};
+
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
@@ -128,6 +138,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     useState(false);
   const { address } = useAccount();
   const chainId = useChainId();
+  const { isAuthenticated } = useIsAuthenticated();
   const {
     data: interchainToken,
     refetch: refetchInterchainToken,
@@ -269,8 +280,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   // Try to recover deployment message id if it's missing
   useEffect(() => {
-    recoverMessageId();
-  }, [recoverMessageId]);
+    if (isAuthenticated) {
+      recoverMessageId();
+    }
+  }, [recoverMessageId, isAuthenticated]);
 
   const { mutateAsync: updateSuiAddresses } =
     trpc.interchainToken.updateSuiRemoteTokenAddresses.useMutation();
@@ -285,6 +298,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   // the address is wrong on the Sui chain on deployment because it's the EVM address,
   // we wait for the tx to be executed then we update the address on the Sui chain
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const suiChain = interchainToken?.matchingTokens?.find((x) =>
       x.chain?.id.includes("sui")
     );
@@ -315,6 +330,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         });
     }
   }, [
+    isAuthenticated,
     interchainToken?.matchingTokens,
     isAlreadyUpdatingRemoteSui,
     props.tokenAddress,
@@ -327,6 +343,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   // the address is wrong on the Stellar chain on deployment because it's the EVM address,
   // we wait for the tx to be executed then we update the address on the Stellar chain
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const stellarChain = interchainToken?.matchingTokens?.find((x) =>
       x.chain?.id.includes("stellar")
     );
@@ -357,6 +375,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
         });
     }
   }, [
+    isAuthenticated,
     interchainToken?.matchingTokens,
     isAlreadyUpdatingRemoteStellar,
     props.tokenAddress,
@@ -375,6 +394,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   );
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     interchainToken?.matchingTokens?.forEach((x) => {
       // check if the EVM token address is the same as sui, which is wrong
       if (
@@ -400,6 +421,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       }
     });
   }, [
+    isAuthenticated,
     interchainToken?.matchingTokens,
     props.chainId,
     props.tokenAddress,
