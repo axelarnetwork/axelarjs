@@ -31,6 +31,7 @@ import {
 } from "viem/chains";
 
 import { centrifuge } from "./custom/centrifuge";
+import { hyperliquid } from "./custom/hyperliquid";
 
 /**
  * Mainnet chains
@@ -60,6 +61,7 @@ export const MAINNET_CHAINS = {
   flow: flowMainnet,
   plume,
   berachain,
+  hyperliquid,
 } as const;
 
 export type SupportedMainnetChain = keyof typeof MAINNET_CHAINS;
