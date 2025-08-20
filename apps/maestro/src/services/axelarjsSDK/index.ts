@@ -108,7 +108,7 @@ async function getChainInfo(params: GetChainInfoInput) {
       }
     | undefined;
 
-  if (!targetChain) {
+  if (!targetChain || !targetChain.config) {
     throw new Error(`Could not find chain config for ${params.axelarChainId}`);
   }
 

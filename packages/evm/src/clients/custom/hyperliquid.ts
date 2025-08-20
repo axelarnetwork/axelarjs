@@ -12,8 +12,8 @@ export const hyperliquid = defineChain({
   },
   blockExplorers: {
     default: {
-      name: "Purrsec",
-      url: "https://purrsec.com",
+      name: "HyperEVMScan",
+      url: "https://hyperevmscan.io/",
     },
   },
 });
@@ -30,8 +30,8 @@ export const hyperliquidTestnet = defineChain({
   },
   blockExplorers: {
     default: {
-      name: "Purrsec Testnet",
-      url: "https://testnet.purrsec.com",
+      name: "HyperEVMScan",
+      url: "https://hyperevmscan.io/",
     },
   },
 });

@@ -144,7 +144,6 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
 
   if (simulationError) {
-    // Debug logging for simulation result
     console.log(
       "useDeployAndRegisterRemoteCanonicalTokenMutation simulation:",
       {

@@ -139,8 +139,8 @@ const hyperEVM = defineChain({
   },
   blockExplorers: {
     default: {
-      name: "Hyperliquid Explorer",
-      url: "https://app.hyperliquid.xyz/explorer",
+      name: "HyperEVMScan",
+      url: "https://hyperevmscan.io/",
     },
   },
   testnet: false,
@@ -159,8 +159,8 @@ const hyperEVMTestnet = defineChain({
   },
   blockExplorers: {
     default: {
-      name: "Hyperliquid Explorer",
-      url: "https://app.hyperliquid-testnet.xyz/explorer",
+      name: "HyperEVMScan",
+      url: "https://hyperevmscan.io/",
     },
   },
   testnet: true,
