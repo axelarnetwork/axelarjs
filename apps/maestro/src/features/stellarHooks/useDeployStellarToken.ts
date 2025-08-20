@@ -150,45 +150,37 @@ export function useDeployStellarToken() {
 
       // Check if we have resultMetaXdr in the response (may not be defined in the type)
       const txResponseWithMeta = getTxResponse as any;
-      if (txResponseWithMeta.resultMetaXdr) {
-        try {
-          // Extract tokenId from the transaction return value
-          const transactionMeta = txResponseWithMeta.resultMetaXdr;
-          const returnValue = transactionMeta
-            .v3()
-            ?.sorobanMeta()
-            ?.returnValue();
+      try {
+        // Extract tokenId from the transaction return value
+        const returnValue = txResponseWithMeta.returnValue
 
-          if (
-            returnValue &&
-            returnValue.switch() === xdr.ScValType.scvBytes()
-          ) {
-            tokenId = returnValue.bytes().toString("hex");
-            // Extracted tokenId from transaction return value
-          }
-
-          // Extract tokenAddress, tokenManagerAddress and tokenManagerType from events
-          const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
-          const events = sorobanMeta?.events();
-
-          if (events && events.length > 0) {
-            const parsedEventData = parseTokenDeploymentEvents(events, {
-              tokenId,
-            });
-
-            // Update local variables with parsed data
-            if (parsedEventData.tokenId) tokenId = parsedEventData.tokenId;
-            if (parsedEventData.tokenAddress)
-              tokenAddress = parsedEventData.tokenAddress;
-            if (parsedEventData.tokenManagerAddress)
-              tokenManagerAddress = parsedEventData.tokenManagerAddress;
-            if (parsedEventData.tokenManagerType)
-              tokenManagerType = parsedEventData.tokenManagerType;
-          }
-        } catch (error) {
-          // Error extracting token information from transaction
-          console.error("Error parsing transaction events:", error);
+        if (
+          returnValue &&
+          returnValue.switch() === xdr.ScValType.scvBytes()
+        ) {
+          tokenId = returnValue.bytes().toString("hex");
         }
+
+        // Extract tokenAddress, tokenManagerAddress and tokenManagerType from events
+        const events = txResponseWithMeta.diagnosticEventsXdr
+
+        if (events && events.length > 0) {
+          const parsedEventData = parseTokenDeploymentEvents(events, {
+            tokenId,
+          });
+
+          // Update local variables with parsed data
+          if (parsedEventData.tokenId) tokenId = parsedEventData.tokenId;
+          if (parsedEventData.tokenAddress)
+            tokenAddress = parsedEventData.tokenAddress;
+          if (parsedEventData.tokenManagerAddress)
+            tokenManagerAddress = parsedEventData.tokenManagerAddress;
+          if (parsedEventData.tokenManagerType)
+            tokenManagerType = parsedEventData.tokenManagerType;
+        }
+      } catch (error) {
+        // Error extracting token information from transaction
+        console.error("Error parsing transaction events:", error);
       }
 
       // If we couldn't extract all the necessary information, throw an error

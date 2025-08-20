@@ -157,7 +157,7 @@ export function useDeployAndRegisterStellarToken() {
           // Extract tokenId from the transaction return value
           const transactionMeta = txResponseWithMeta.resultMetaXdr;
           const returnValue = transactionMeta
-            .v3()
+            .v4()
             ?.sorobanMeta()
             ?.returnValue();
 
@@ -168,7 +168,7 @@ export function useDeployAndRegisterStellarToken() {
             tokenId = returnValue.bytes().toString("hex");
           }
 
-          const sorobanMeta = transactionMeta.v3()?.sorobanMeta();
+          const sorobanMeta = transactionMeta.v4()?.sorobanMeta();
           const events = sorobanMeta?.events();
 
           if (events && events.length > 0) {
