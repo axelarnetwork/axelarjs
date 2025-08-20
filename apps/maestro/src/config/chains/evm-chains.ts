@@ -126,6 +126,46 @@ const xrplEvm = defineChain({
   testnet: false,
 });
 
+const hyperEVM = defineChain({
+  id: 999,
+  name: "HyperEVM",
+  nativeCurrency: {
+    name: "HYPE",
+    symbol: "HYPE",
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: { http: ["https://rpc.hyperliquid.xyz/evm"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "HyperEVMScan",
+      url: "https://hyperevmscan.io/",
+    },
+  },
+  testnet: false,
+});
+
+const hyperEVMTestnet = defineChain({
+  id: 998,
+  name: "HyperEVM Testnet",
+  nativeCurrency: {
+    name: "HYPE",
+    symbol: "HYPE",
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: { http: ["https://rpc.hyperliquid-testnet.xyz/evm"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "HyperEVMScan",
+      url: "https://hyperevmscan.io/",
+    },
+  },
+  testnet: true,
+});
+
 export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   {
     ...mainnet,
@@ -750,7 +790,12 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...plumeMainnet,
-    rpcUrls: createRpcUrlConfig(plumeMainnet, ENVIRONMENTS.mainnet, [], "plume"),
+    rpcUrls: createRpcUrlConfig(
+      plumeMainnet,
+      ENVIRONMENTS.mainnet,
+      [],
+      "plume"
+    ),
     axelarChainId: "plume",
     axelarChainName: "plume",
     supportWagmi: true,
@@ -766,6 +811,32 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     ),
     axelarChainId: "plume",
     axelarChainName: "plume",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.testnet,
+  },
+  {
+    ...hyperEVM,
+    rpcUrls: createRpcUrlConfig(
+      hyperEVM,
+      ENVIRONMENTS.mainnet,
+      [],
+      "hyperliquid"
+    ),
+    axelarChainId: "hyperliquid",
+    axelarChainName: "hyperliquid",
+    supportWagmi: true,
+    environment: ENVIRONMENTS.mainnet,
+  },
+  {
+    ...hyperEVMTestnet,
+    rpcUrls: createRpcUrlConfig(
+      hyperEVMTestnet,
+      ENVIRONMENTS.testnet,
+      [],
+      "hyperliquid"
+    ),
+    axelarChainId: "hyperliquid",
+    axelarChainName: "hyperliquid",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
   },

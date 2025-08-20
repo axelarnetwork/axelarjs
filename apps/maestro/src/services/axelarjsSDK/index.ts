@@ -1,6 +1,6 @@
 import {
   AxelarQueryAPI,
-  loadChains as getChainConfigs,
+  importS3Config as getChainConfigs,
   type Environment,
 } from "@axelar-network/axelarjs-sdk";
 
@@ -89,17 +89,35 @@ async function estimateGasFeeMultipleChains(
 
 // TODO: Find out why do we need chain configs from axelarjs-sdk while we already have them in axelarscan API
 async function getChainInfo(params: GetChainInfoInput) {
-  const chains = await getChainConfigs({
-    environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
-  });
+  const configs = await getChainConfigs(
+    process.env.NEXT_PUBLIC_NETWORK_ENV as Environment
+  );
 
-  const chainConfig = chains.find((chain) => chain.id === params.axelarChainId);
+  if (!configs || !configs.chains) {
+    throw new Error("No chain configs found");
+  }
 
-  if (!chainConfig) {
+  const targetChain = Object.values(configs.chains).find(
+    (chain: any) => chain.id === params.axelarChainId
+  ) as
+    | {
+        id: string;
+        displayName: string;
+        approxFinalityHeight: number;
+        config: { approxFinalityWaitTime: number };
+      }
+    | undefined;
+
+  if (!targetChain || !targetChain.config) {
     throw new Error(`Could not find chain config for ${params.axelarChainId}`);
   }
 
-  return chainConfig;
+  return {
+    id: targetChain.id,
+    chainName: targetChain.displayName,
+    confirmLevel: targetChain.approxFinalityHeight,
+    estimatedWaitTime: targetChain.config.approxFinalityWaitTime,
+  };
 }
 
 const extendedClient = {

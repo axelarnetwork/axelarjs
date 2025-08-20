@@ -121,7 +121,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames, chainId]);
+  }, [input, tokenId, destinationChainNames]);
 
   const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
     0n,
@@ -133,14 +133,30 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
     (!destinationChainNames.length || totalGasFee > 0n);
 
-  const { data } = useSimulateInterchainTokenFactoryMulticall({
-    chainId,
-    value: totalGasFee,
-    args: [multicallArgs],
-    query: {
-      enabled: isMutationReady,
-    },
-  });
+  const { data, error: simulationError } =
+    useSimulateInterchainTokenFactoryMulticall({
+      chainId,
+      value: totalGasFee,
+      args: [multicallArgs],
+      query: {
+        enabled: isMutationReady,
+      },
+    });
+
+  if (simulationError) {
+    console.log(
+      "useDeployAndRegisterRemoteCanonicalTokenMutation simulation:",
+      {
+        data: !!data,
+        request: !!data?.request,
+        simulationError,
+        isMutationReady,
+        totalGasFee: totalGasFee.toString(),
+        multicallArgs: multicallArgs.length,
+        multicallArgsDetails: multicallArgs,
+      }
+    );
+  }
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
@@ -306,7 +322,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     } else {
       invariant(
         data?.request !== undefined,
-        "useDeployAndRegisterRemoteCanonicalTokenMutation: prepareMulticall?.request is not defined"
+        `useDeployAndRegisterRemoteCanonicalTokenMutation: prepareMulticall?.request is not defined, chainId: ${chainId}, input: ${JSON.stringify(input)}`
       );
       return await multicall.writeContractAsync(data.request);
     }

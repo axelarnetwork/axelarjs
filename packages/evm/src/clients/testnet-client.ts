@@ -33,6 +33,7 @@ import {
 } from "viem/chains";
 
 import { centrifugeTestnet } from "./custom/centrifuge";
+import { hyperliquidTestnet } from "./custom/hyperliquid";
 
 /**
  * Testnet chains
@@ -65,6 +66,7 @@ export const TESTNET_CHAINS = {
   hedera: hederaTestnet,
   plume: plumeSepolia,
   berachain: berachainBepolia,
+  hyperliquid: hyperliquidTestnet,
 } as const;
 
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;
