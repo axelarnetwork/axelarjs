@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const COLLECTIONS = {
   accounts: "accounts",
+  ofac: "ofac",
 } as const;
 
 /**
@@ -23,6 +24,9 @@ export const COLLECTION_KEYS = {
     `messages:${accountAddress}` as const,
   tokenMeta: (tokenId: string) => `tokens:${tokenId}:meta` as const,
   cached: (key: string) => `cached:${key}` as const,
+  // OFAC Sanctions keys
+  ofacSanctionsWallets: "sanctions:wallets" as const,
+  ofacSanctionsLastUpdate: "sanctions:lastUpdate" as const,
 };
 
 export const messageSchema = z.object({
@@ -134,5 +138,57 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   async getTokenMeta(tokenId: string) {
     const key = COLLECTION_KEYS.tokenMeta(tokenId);
     return await this.kv.hgetall<TokenMeta>(key);
+  }
+
+  // OFAC Sanctions Methods
+  async isWalletSanctioned(walletAddress: string): Promise<boolean> {
+    return (
+      (await this.kv.sismember(
+        COLLECTION_KEYS.ofacSanctionsWallets,
+        walletAddress.toLowerCase()
+      )) === 1
+    );
+  }
+
+  async setSanctionedWallets(walletAddresses: string[]): Promise<void> {
+    const key = COLLECTION_KEYS.ofacSanctionsWallets;
+    // Clear existing set and add new addresses
+    await this.kv.del(key);
+    await this.addSanctionedWallets(walletAddresses);
+  }
+
+  async getSanctionsLastUpdate(): Promise<string | null> {
+    const key = COLLECTION_KEYS.ofacSanctionsLastUpdate;
+    return await this.kv.get<string>(key);
+  }
+
+  async setSanctionsLastUpdate(timestamp: string): Promise<void> {
+    const key = COLLECTION_KEYS.ofacSanctionsLastUpdate;
+    await this.kv.set(key, timestamp);
+  }
+
+  async addSanctionedWallets(walletAddresses: string[]): Promise<void> {
+    const key = COLLECTION_KEYS.ofacSanctionsWallets;
+    if (walletAddresses.length > 0) {
+      const normalizedAddresses = walletAddresses.map((addr) =>
+        addr.toLowerCase()
+      );
+      await this.kv.sadd(key, ...normalizedAddresses);
+    }
+  }
+
+  async getSanctionedWalletsCount(): Promise<number> {
+    const key = COLLECTION_KEYS.ofacSanctionsWallets;
+    return await this.kv.scard(key);
+  }
+
+  async removeSanctionedWallets(walletAddresses: string[]): Promise<void> {
+    const key = COLLECTION_KEYS.ofacSanctionsWallets;
+    if (walletAddresses.length > 0) {
+      const normalizedAddresses = walletAddresses.map((addr) =>
+        addr.toLowerCase()
+      );
+      await this.kv.srem(key, ...normalizedAddresses);
+    }
   }
 }
