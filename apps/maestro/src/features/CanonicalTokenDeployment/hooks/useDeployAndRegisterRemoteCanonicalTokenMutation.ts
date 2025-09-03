@@ -6,6 +6,7 @@ import { reduce } from "rambda";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import { useRegisterCanonicalToken as useRegisterSolanaCanonicalToken } from "~/features/solanaHooks/useRegisterCanonicalToken";
 import { useRegisterStellarTokenWithContractDeployment } from "~/features/stellarHooks";
 import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
 import {
@@ -18,6 +19,7 @@ import {
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
 import {
+  SOLANA_CHAIN_ID,
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
   useAccount,
@@ -54,6 +56,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const { combinedComputed } = useAllChainConfigsQuery();
   const { registerCanonicalToken } = useRegisterCanonicalToken();
+  const { registerCanonicalToken: solanaRegisterCanonicalToken } =
+    useRegisterSolanaCanonicalToken();
   const { registerTokenWithContractDeployment } =
     useRegisterStellarTokenWithContractDeployment();
   const { kit } = useStellarKit();
@@ -319,6 +323,45 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         });
         return result.tokenRegistration;
       }
+    } else if (chainId === SOLANA_CHAIN_ID && input) {
+      // Solana canonical token registration doesn't support destination chains
+      // It only registers the token on the current chain
+      const result = await solanaRegisterCanonicalToken({
+        caller: deployerAddress,
+        tokenAddress: input.tokenAddress,
+        onStatusUpdate: (status) => {
+          // Forward status updates to the UI
+          if (config.onStatusUpdate) {
+            if (status.type === "registering" && status.txHash) {
+              config.onStatusUpdate({
+                type: "deploying",
+                txHash: status.txHash,
+              });
+            } else {
+              config.onStatusUpdate({
+                type: "pending_approval",
+              });
+            }
+          }
+        },
+      });
+
+      if (result?.signature) {
+        setRecordDeploymentArgs({
+          kind: "canonical",
+          deploymentMessageId: result.signature,
+          tokenId: result.tokenId || "",
+          deployerAddress,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          tokenDecimals: input.decimals,
+          axelarChainId: input.sourceChainId,
+          destinationAxelarChainIds: [], // Solana doesn't support destination chains for canonical tokens
+          tokenAddress: result.tokenAddress || input.tokenAddress,
+          tokenManagerAddress: result.tokenManagerAddress || "",
+        });
+        return { signature: result.signature };
+      }
     } else {
       invariant(
         data?.request !== undefined,
@@ -327,16 +370,17 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       return await multicall.writeContractAsync(data.request);
     }
   }, [
-    data,
-    multicall,
     recordDeploymentDraft,
     chainId,
-    deployerAddress,
     input,
     registerCanonicalToken,
-    registerTokenWithContractDeployment,
+    deployerAddress,
     kit,
+    registerTokenWithContractDeployment,
     config,
+    solanaRegisterCanonicalToken,
+    data?.request,
+    multicall,
   ]);
 
   const write = useCallback(() => {

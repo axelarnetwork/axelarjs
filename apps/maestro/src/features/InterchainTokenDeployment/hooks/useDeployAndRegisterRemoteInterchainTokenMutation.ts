@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { zeroAddress, type TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import { useDeploySolanaToken } from "~/features/solanaHooks/useDeploySolanaToken";
 import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
 import {
@@ -21,6 +22,7 @@ import {
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
 import {
+  SOLANA_CHAIN_ID,
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
   useAccount,
@@ -64,6 +66,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const { combinedComputed } = useAllChainConfigsQuery();
   const [isReady, setIsReady] = useState(false);
   const { deployStellarToken } = useDeployStellarToken();
+  const { deploySolanaToken } = useDeploySolanaToken();
 
   const { mutateAsync: recordDeploymentAsync } =
     trpc.interchainToken.recordInterchainTokenDeployment.useMutation();
@@ -114,7 +117,12 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   ]);
 
   const multicallArgs = useMemo(() => {
-    if (!input || !tokenId || chainId === SUI_CHAIN_ID) {
+    if (
+      !input ||
+      !tokenId ||
+      chainId === SUI_CHAIN_ID ||
+      chainId === SOLANA_CHAIN_ID
+    ) {
       return [];
     }
 
@@ -176,7 +184,8 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
       if (input) {
         if (
           !input.sourceChainId.includes("sui") &&
-          !input.sourceChainId.includes("stellar")
+          !input.sourceChainId.includes("stellar") &&
+          !input.sourceChainId.includes("solana")
         ) {
           setIsReady(false);
           return;
@@ -388,6 +397,59 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
         });
         return result;
       }
+    } else if (chainId === SOLANA_CHAIN_ID && input) {
+      const result = await deploySolanaToken({
+        caller: address as string,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        decimals: input.decimals,
+        initialSupply: String(input.initialSupply ?? 0n),
+        salt: input.salt,
+        minterAddress: input.minterAddress,
+        destinationChainIds: input.destinationChainIds,
+        gasValues: input.remoteDeploymentGasFees?.gasFees?.map((x) =>
+          String(x.fee)
+        ),
+        onStatusUpdate: (status) => {
+          // Adapt Solana hook status into the shared transaction state
+          if (status.type === "pending_approval") {
+            onStatusUpdate({
+              type: "pending_approval",
+              step: status.step ?? 1,
+              totalSteps:
+                status.totalSteps ?? (input.destinationChainIds.length ? 2 : 1),
+            });
+            return;
+          }
+          if (status.type === "deploying") {
+            onStatusUpdate({ type: "deploying", txHash: status.txHash ?? "" });
+            return;
+          }
+          // Do not emit "deployed" here; the outer flow will set deployed after persistence
+          onStatusUpdate({ type: "idle" });
+        },
+      });
+
+      if (result?.signature) {
+        setRecordDeploymentArgs({
+          kind: "interchain",
+          deploymentMessageId: result.signature,
+          tokenId: (result.tokenId as string) ?? "",
+          deployerAddress,
+          salt: input.salt,
+          tokenName: input.tokenName,
+          tokenSymbol: input.tokenSymbol,
+          tokenDecimals: input.decimals,
+          tokenManagerType: undefined,
+          axelarChainId: input.sourceChainId,
+          originalMinterAddress: input.minterAddress,
+          destinationAxelarChainIds: input.destinationChainIds,
+          tokenManagerAddress: result.tokenManagerAddress ?? "",
+          tokenAddress: result.tokenAddress ?? "",
+        });
+      }
+
+      return result;
     } else {
       // Handle EVM deployment
       invariant(
@@ -406,9 +468,11 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     kit,
     multicall,
     config,
+    onStatusUpdate,
     prepareMulticall?.request,
     recordDeploymentDraft,
     deployStellarToken,
+    deploySolanaToken,
   ]);
 
   const write = useCallback(() => {

@@ -153,3 +153,31 @@ export async function getMetadata(tokenAddress: string, ctx: Context) {
     return null as any;
   }
 }
+
+// Borsh encoding helpers
+export function encodeVariantU8(index: number): Buffer {
+  if (index < 0 || index > 255) throw new Error("variant index out of range");
+  return Buffer.from([index]);
+}
+
+export function encodeU32LE(value: number): Buffer {
+  if (!Number.isInteger(value) || value < 0) {
+    throw new Error("encodeU32LE expects a non-negative integer");
+  }
+  const b = Buffer.alloc(4);
+  b.writeUInt32LE(value, 0);
+  return b;
+}
+
+export function encodeU64LE(value: bigint | number | string): Buffer {
+  const big = typeof value === "bigint" ? value : BigInt(value);
+  if (big < 0n) throw new Error("encodeU64LE expects non-negative");
+  const b = Buffer.alloc(8);
+  b.writeBigUInt64LE(big, 0);
+  return b;
+}
+
+export function encodeStringBorsh(value: string): Buffer {
+  const bytes = Buffer.from(value, "utf8");
+  return Buffer.concat([encodeU32LE(bytes.length), bytes]);
+}
