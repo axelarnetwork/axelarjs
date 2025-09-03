@@ -201,9 +201,13 @@ async function getVmChainsMapInternal<TCacheKey extends string>(
   );
 
   const chainsMap = eligibleVmChains.reduce<VMChainsMap>((acc, chain) => {
-    const internalChainIdNumber = CHAIN_CONFIGS.find(
-      (config) => config.axelarChainId === chain.id
-    )?.id;
+    const normalize = (v: string) => v.toLowerCase().split("-")[0];
+    const chainBaseId = normalize(chain.id);
+    const matchingConfig = CHAIN_CONFIGS.find((config) => {
+      const localBaseId = normalize(String(config.axelarChainId ?? ""));
+      return localBaseId === chainBaseId;
+    });
+    const internalChainIdNumber = matchingConfig?.id;
 
     // Only add entry if internalChainIdNumber was found
     if (internalChainIdNumber !== undefined) {

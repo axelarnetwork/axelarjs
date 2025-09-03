@@ -3,6 +3,7 @@ import React, { forwardRef } from "react";
 
 import type { ISupportedWallet } from "@creit.tech/stellar-wallets-kit";
 import { ConnectModal } from "@mysten/dapp-kit";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 import { useAuth } from "~/contexts/AuthContext";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
@@ -21,6 +22,7 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const { kit, isLoading } = useStellarKit();
     const { signInAsync } = useAuth();
+    const { setVisible: setSolanaModalVisible } = useWalletModal();
 
     const handleStellarConnect = async () => {
       if (!kit || isLoading) return;
@@ -74,6 +76,15 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
               </Button>
             }
           />
+          <Button
+            $size={$size}
+            $variant={$variant}
+            className="w-full"
+            onClick={() => setSolanaModalVisible(true)}
+            aria-label="Open wallet connection modal for Solana"
+          >
+            Solana
+          </Button>
           <Button
             $size={$size}
             $variant={$variant}

@@ -373,4 +373,25 @@ export default class MaestroPostgresClient {
       .set({ tokenAddress, updatedAt: new Date() })
       .where(eq(remoteInterchainTokens.tokenId, tokenId));
   }
+
+  async updateSolanaRemoteTokenAddresses(inputs: {
+    tokenId: string;
+    tokenAddress: string;
+    tokenManagerAddress: string;
+  }) {
+    await this.db
+      .update(remoteInterchainTokens)
+      .set({
+        deploymentStatus: "confirmed",
+        tokenAddress: inputs.tokenAddress,
+        tokenManagerAddress: inputs.tokenManagerAddress,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(remoteInterchainTokens.tokenId, inputs.tokenId),
+          ilike(remoteInterchainTokens.axelarChainId, "%solana%")
+        )
+      );
+  }
 }

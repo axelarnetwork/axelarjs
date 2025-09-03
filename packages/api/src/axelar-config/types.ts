@@ -32,7 +32,7 @@ export type AssetConfig = {
   };
 };
 
-export type CHAIN_TYPE = "axelarnet" | "evm" | "sui";
+export type CHAIN_TYPE = "axelarnet" | "evm" | "sui" | "svm";
 
 export type ChainEvmSubconfig = {
   contracts?: {
@@ -100,6 +100,16 @@ export interface ChainCosmosSubconfig {
   grpc: string[];
 }
 
+export interface ChainSolanaSubconfig {
+  contracts: {
+    AxelarGateway: SolanaProgram;
+    AxelarGasService: SolanaProgram;
+    InterchainGovernance: SolanaProgram;
+    InterchainTokenService: SolanaProgram;
+  };
+  rpc: string[];
+}
+
 export interface BaseContracts {
   [contractName: string]: { address: string };
 }
@@ -112,6 +122,10 @@ export interface SuiContract {
 export interface StellarContract {
   address: string;
   objects: Record<string, string>;
+}
+
+export interface SolanaProgram {
+  address: string;
 }
 
 interface BaseChainConfig {
@@ -143,7 +157,7 @@ interface AxelarChainConfig extends BaseChainConfig {
 }
 
 export interface VmChainConfig extends BaseChainConfig {
-  chainType: "sui" | "stellar";
+  chainType: "sui" | "stellar" | "svm";
   externalChainId: string;
   config: ChainVmSubconfig;
 }
@@ -158,12 +172,18 @@ export interface StellarChainConfig extends VmChainConfig {
   config: ChainStellarSubconfig;
 }
 
+export interface SolanaChainConfig extends VmChainConfig {
+  chainType: "svm";
+  config: ChainSolanaSubconfig;
+}
+
 // Union type of all possible chain configs
 export type ChainConfig =
   | EvmChainConfig
   | AxelarChainConfig
   | SuiChainConfig
-  | StellarChainConfig;
+  | StellarChainConfig
+  | SolanaChainConfig;
 
 export interface AxelarConfigsResponse {
   chains: { [chainId: string]: ChainConfig };

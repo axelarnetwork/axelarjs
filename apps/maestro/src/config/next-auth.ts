@@ -4,7 +4,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
 import { kv } from "@vercel/kv";
+import bs58 from "bs58";
 import { Keypair } from "stellar-sdk";
+import nacl from "tweetnacl";
 import { verifyMessage } from "viem";
 
 import db from "~/lib/drizzle/client";
@@ -115,6 +117,21 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
             );
           } catch (error) {
             console.error("Failed to verify Stellar signature:", error);
+          }
+        }
+        // is Solana address (base58 ~32 bytes) — verify via ed25519 (tweetnacl)
+        else {
+          try {
+            const publicKey = bs58.decode(address);
+            const signatureBytes = Buffer.from(signature, "base64");
+            const messageBytes = new TextEncoder().encode(message);
+            isMessageSigned = nacl.sign.detached.verify(
+              messageBytes,
+              new Uint8Array(signatureBytes),
+              new Uint8Array(publicKey)
+            );
+          } catch (error) {
+            isMessageSigned = false;
           }
         }
 
