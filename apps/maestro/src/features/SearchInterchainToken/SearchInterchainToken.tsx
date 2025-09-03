@@ -139,7 +139,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        <div className="btn join-item bg-base-300">
+        <div className="btn join-item relative z-10 bg-base-300">
           {isLoading && isAddress(search) ? (
             <SpinnerIcon className="h-6 w-6 animate-spin text-primary" />
           ) : (
