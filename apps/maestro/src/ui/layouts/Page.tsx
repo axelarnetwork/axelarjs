@@ -22,7 +22,8 @@ type PageState =
   | "network-mismatch"
   | "unsupported-network"
   | "wrong-sui-network"
-  | "wrong-stellar-network";
+  | "wrong-stellar-network"
+  | "wrong-solana-network";
 
 interface Props extends ComponentProps<typeof Clamp> {
   pageTitle?: string;
@@ -46,8 +47,12 @@ const Page: FC<Props> = ({
   style,
   ...props
 }) => {
-  const { isConnected, isWrongSuiNetwork, isWrongStellarNetwork } =
-    useAccount();
+  const {
+    isConnected,
+    isWrongSuiNetwork,
+    isWrongStellarNetwork,
+    isWrongSolanaNetwork,
+  } = useAccount();
   const { chain } = useAccount();
   const chainFromRoute = useChainFromRoute();
   const { switchChain } = useSwitchChain();
@@ -80,6 +85,10 @@ const Page: FC<Props> = ({
       return "wrong-stellar-network";
     }
 
+    if (isWrongSolanaNetwork) {
+      return "wrong-solana-network";
+    }
+
     // TODO: uncomment this when we have a way to handle multiple chains
 
     // if (chain && allChains?.length && !currentChain) {
@@ -106,6 +115,7 @@ const Page: FC<Props> = ({
     currentChain,
     isWrongSuiNetwork,
     isWrongStellarNetwork,
+    isWrongSolanaNetwork,
   ]);
 
   const router = useRouter();
@@ -226,6 +236,8 @@ const Page: FC<Props> = ({
         return <WrongNetworkSign networkName="sui" />;
       case "wrong-stellar-network":
         return <WrongNetworkSign networkName="stellar" />;
+      case "wrong-solana-network":
+        return <WrongNetworkSign networkName="solana" />;
       case "connected":
         return children;
     }
@@ -288,7 +300,7 @@ export const FullScreenLoading = ({ loadingMessage = "" }) => (
 const WrongNetworkSign = ({
   networkName,
 }: {
-  networkName: "stellar" | "sui";
+  networkName: "stellar" | "sui" | "solana";
 }) => {
   const networkNameCapitalized =
     networkName.charAt(0).toUpperCase() + networkName.slice(1);

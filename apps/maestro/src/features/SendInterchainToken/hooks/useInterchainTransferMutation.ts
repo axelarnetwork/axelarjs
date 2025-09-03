@@ -2,6 +2,8 @@ import { INTERCHAIN_TOKEN_ENCODERS } from "@axelarjs/evm";
 import { toast } from "@axelarjs/ui/toaster";
 
 import { useSignAndExecuteTransaction } from "@mysten/dapp-kit";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { Transaction } from "@solana/web3.js";
 import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 
@@ -39,6 +41,8 @@ export function useInterchainTransferMutation(
   const { address } = useAccount();
 
   const { sendToken: sendStellarToken } = useSendStellarToken();
+  const { connection } = useConnection();
+  const { sendTransaction } = useWallet();
 
   const { writeContractAsync: transferAsync } =
     useWriteInterchainTokenInterchainTransfer();
@@ -48,6 +52,9 @@ export function useInterchainTransferMutation(
       console.log("error in getSendTokenTx", error.message);
     },
   });
+
+  const { mutateAsync: getSolanaSendTokenTx } =
+    trpc.solana.getInterchainTransferTxBytes.useMutation();
 
   const { mutateAsync: signAndExecuteTransaction } =
     useSignAndExecuteTransaction({
@@ -110,6 +117,32 @@ export function useInterchainTransferMutation(
           });
 
           txHash = result.hash;
+        } else if (config.sourceChainName.toLowerCase().includes("solana")) {
+          const { txBase64 } = await getSolanaSendTokenTx({
+            caller: address,
+            tokenId: tokenId,
+            tokenAddress: config.tokenAddress,
+            destinationChain: config.destinationChainName,
+            destinationAddress: encodedRecipient,
+            amount: bnAmount.toString(),
+            gasValue: "0",
+          });
+
+          const tx = Transaction.from(Buffer.from(txBase64, "base64"));
+          const sim = await connection.simulateTransaction(tx);
+          if (sim.value.err) {
+            // eslint-disable-next-line no-console
+            console.error("[Solana] simulateTransaction error", sim.value);
+            const logs = (sim.value.logs || []).join("\n");
+            throw new Error(
+              `Simulation failed: ${JSON.stringify(sim.value.err)}\n${logs}`
+            );
+          }
+
+          txHash = await sendTransaction(tx, connection, {
+            preflightCommitment: "confirmed",
+            skipPreflight: false,
+          });
         } else {
           txHash = await transferAsync({
             address: config.tokenAddress as `0x${string}`,

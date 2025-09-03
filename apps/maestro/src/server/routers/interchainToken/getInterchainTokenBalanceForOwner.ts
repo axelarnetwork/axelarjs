@@ -1,12 +1,21 @@
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+  getMint,
+  TOKEN_2022_PROGRAM_ID,
+} from "@solana/spl-token";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { Account, Address, scValToNative } from "stellar-sdk";
 import { z } from "zod";
 
+import { solanaChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { isValidStellarTokenAddress } from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
+import { getSolanaChainConfig } from "../solana/utils/utils";
 import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { simulateCall } from "../stellar/utils/transactions";
@@ -131,6 +140,59 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       };
 
       return result;
+    }
+
+    // Solana tokens
+    if (input.chainId === solanaChainConfig?.id) {
+      try {
+        const chainConfig = await getSolanaChainConfig(ctx);
+        const rpcUrl = chainConfig.config.rpc[0];
+        const connection = new Connection(rpcUrl, "confirmed");
+
+        const mint = new PublicKey(input.tokenAddress);
+        const ownerPk = new PublicKey(input.owner);
+        const ata = getAssociatedTokenAddressSync(
+          mint,
+          ownerPk,
+          true,
+          TOKEN_2022_PROGRAM_ID,
+          ASSOCIATED_TOKEN_PROGRAM_ID
+        );
+
+        const [balResp, mintInfo] = await Promise.all([
+          connection.getTokenAccountBalance(ata).catch(() => null),
+          getMint(connection, mint, "confirmed", TOKEN_2022_PROGRAM_ID).catch(
+            () => null
+          ),
+        ]);
+
+        const decimals = balResp?.value?.decimals ?? mintInfo?.decimals ?? 0;
+        const amount = balResp?.value?.amount ?? "0";
+
+        return {
+          isTokenOwner: false,
+          isTokenMinter: false,
+          tokenBalance: amount,
+          decimals,
+          isTokenPendingOwner: false,
+          hasPendingOwner: false,
+          hasMinterRole: false,
+          hasOperatorRole: false,
+          hasFlowLimiterRole: false,
+        };
+      } catch (_) {
+        return {
+          isTokenOwner: false,
+          isTokenMinter: false,
+          tokenBalance: "0",
+          decimals: 0,
+          isTokenPendingOwner: false,
+          hasPendingOwner: false,
+          hasMinterRole: false,
+          hasOperatorRole: false,
+          hasFlowLimiterRole: false,
+        };
+      }
     }
 
     // Stellar tokens

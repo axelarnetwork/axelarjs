@@ -28,13 +28,19 @@ export const filterEligibleChains = (
   if (!currentChain) return [];
 
   const whitelistedChains = NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM;
-  // Normalize whitelist check
-  const isAllChainsWhitelisted = whitelistedChains[0] === "all";
+  // Normalize whitelist check. If not set, treat as "all"
+  const isAllChainsWhitelisted =
+    !whitelistedChains.length || whitelistedChains[0] === "all";
+
+  const normalizeType = (t?: string) =>
+    t && t.toLowerCase() === "evm" ? "evm" : "vm";
 
   return destinationChains.filter((chain) => {
     const isOriginChainSameAsDestinationChain =
       chain.chain_id === currentChainId;
-    const areDifferentChainTypes = chain.chain_type !== currentChain.chain_type;
+    const areDifferentChainTypes =
+      normalizeType(chain.chain_type) !==
+      normalizeType(currentChain.chain_type);
     const isThisDestinationChainWhitelisted =
       isAllChainsWhitelisted || whitelistedChains.includes(chain.id);
     const isOriginChainWhitelisted =
@@ -61,11 +67,12 @@ export function getNormalizedTwoHopChainConfig(
   combinedComputed: ChainConfigIndex,
   chainId: number
 ): ITSChainConfig {
-  const { indexedById, indexedByChainId, indexedByAlternativeId } = combinedComputed;
+  const { indexedById, indexedByChainId, indexedByAlternativeId } =
+    combinedComputed;
 
   if (axelarChainId !== "axelar") {
     if (!indexedById[axelarChainId]) {
-      return indexedByAlternativeId[axelarChainId]
+      return indexedByAlternativeId[axelarChainId];
     }
     return indexedById[axelarChainId];
   }

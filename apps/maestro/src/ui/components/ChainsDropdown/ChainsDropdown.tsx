@@ -175,13 +175,16 @@ export const ChainIconComponent: FC<Props> = (props) => {
     );
   } else {
     return (
-      <HelpCircleIcon
-        size="24"
-        className={cn(
-          { "-translate-x-1.5": !props.hideLabel },
-          props.chainIconClassName
-        )}
-      />
+      <>
+        <HelpCircleIcon
+          size="24"
+          className={cn(
+            { "-translate-x-1.5": !props.hideLabel },
+            props.chainIconClassName
+          )}
+        />
+        {!props.hideLabel && chain?.name && <span>{chain.name}</span>}
+      </>
     );
   }
 };
@@ -270,9 +273,11 @@ const ChainsDropdown: FC<Props> = (props) => {
   };
 
   const selectedChainForHealth = props.selectedChain || selectedChain;
-  const { status, isLoading } = useSingleRpcHealthStatus(
-    selectedChainForHealth?.chain_name
-  );
+  const healthChainName =
+    selectedChainForHealth?.chain_name ||
+    selectedChainForHealth?.id ||
+    chain?.name;
+  const { status, isLoading } = useSingleRpcHealthStatus(healthChainName);
 
   return (
     <Dropdown $align="end">
@@ -291,7 +296,7 @@ const ChainsDropdown: FC<Props> = (props) => {
           tabIndex={props.compact ? -1 : 0}
         >
           <ChainIconComponent {...props} />
-          {selectedChainForHealth && !props.hideRPCHealthIndicator && (
+          {healthChainName && !props.hideRPCHealthIndicator && (
             <HealthDot status={status} isLoading={isLoading} />
           )}
         </Dropdown.Trigger>

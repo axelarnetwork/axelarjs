@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
+import {
+  useConnection,
+  useWallet as useSolanaWallet,
+} from "@solana/wallet-adapter-react";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {
@@ -8,7 +12,11 @@ import {
   useBalance as useWagmiBalance,
 } from "wagmi";
 
-import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
+import {
+  solanaChainConfig,
+  stellarChainConfig,
+  suiChainConfig,
+} from "~/config/chains/vm-chains";
 import { STELLAR_HORIZON_URL } from "~/server/routers/stellar/utils/config";
 import { useAccount } from "./useAccount";
 
@@ -25,6 +33,9 @@ export function useBalance(): BalanceResult | undefined {
   const suiAccount = useCurrentAccount();
   const { address, chainName } = useAccount();
   const [stellarBalance, setStellarBalance] = useState<string | null>(null);
+  const { connection: solanaConnection } = useConnection();
+  const { publicKey: solanaPublicKey } = useSolanaWallet();
+  const [solanaLamports, setSolanaLamports] = useState<number | null>(null);
 
   // Wagmi balance hook
   const { data: wagmiBalance } = useWagmiBalance({
@@ -56,6 +67,25 @@ export function useBalance(): BalanceResult | undefined {
     }
   }, [chainName, address]);
 
+  useEffect(() => {
+    if (
+      chainName === solanaChainConfig.name &&
+      address &&
+      solanaConnection &&
+      solanaPublicKey
+    ) {
+      const fetchSolBalance = async () => {
+        try {
+          const lamports = await solanaConnection.getBalance(solanaPublicKey);
+          setSolanaLamports(lamports);
+        } catch (error) {
+          setSolanaLamports(null);
+        }
+      };
+      void fetchSolBalance();
+    }
+  }, [chainName, address, solanaConnection, solanaPublicKey]);
+
   const balance = useMemo(() => {
     if (wagmiBalance) {
       return wagmiBalance;
@@ -63,6 +93,20 @@ export function useBalance(): BalanceResult | undefined {
     if (suiBalance) {
       const value = BigInt(suiBalance.totalBalance);
       const { decimals, symbol } = suiChainConfig.nativeCurrency;
+      return {
+        value,
+        formatted: formatUnits(value, decimals),
+        symbol,
+        decimals,
+      };
+    }
+    if (solanaLamports) {
+      const value = BigInt(solanaLamports);
+      const { decimals, symbol } = (
+        solanaChainConfig ?? {
+          nativeCurrency: { decimals: 9, symbol: "SOL" },
+        }
+      ).nativeCurrency as { decimals: number; symbol: string };
       return {
         value,
         formatted: formatUnits(value, decimals),
@@ -81,7 +125,7 @@ export function useBalance(): BalanceResult | undefined {
       };
     }
     return undefined;
-  }, [wagmiBalance, suiBalance, stellarBalance]);
+  }, [wagmiBalance, suiBalance, solanaLamports, stellarBalance]);
 
   return balance;
 }

@@ -26,7 +26,12 @@ import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
 import { z } from "zod";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
+import {
+  SOLANA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+} from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
@@ -65,6 +70,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
   const isStellarChain = props.chain.chain_id === STELLAR_CHAIN_ID;
+  const isSolanaChain = props.chain.chain_id === SOLANA_CHAIN_ID;
   const tokenAddress = props.tokenAddress;
 
   const tokenDetails = [
@@ -82,7 +88,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    ...(wallet && !isSuiChain && !isStellarChain
+    ...(wallet && !isSuiChain && !isStellarChain && !isSolanaChain
       ? [
           [
             "Add Token to Wallet",
@@ -231,6 +237,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       return `${explorer?.url}/coin/${props.tokenAddress}`;
     } else if (props.chain.chain_type.includes("stellar")) {
       return `${explorer?.url}/coin/${props.tokenAddress}`;
+    } else if (isSolanaChain) {
+      return `${explorer?.url}/address/${props.tokenAddress}`;
     } else if (props.chain.id.includes("stellar")) {
       if (props.tokenAddress.includes("-")) {
         return `${explorer?.url}/asset/${props.tokenAddress}`;

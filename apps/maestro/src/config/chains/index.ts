@@ -6,4 +6,7 @@ export * from "./vm-chains";
 
 export const CHAIN_CONFIGS = [...EVM_CHAIN_CONFIGS, ...VM_CHAIN_CONFIGS];
 
-export const WAGMI_CHAIN_CONFIGS = [...EVM_CHAIN_CONFIGS, ...WAGMI_VM_CHAIN_CONFIGS]
+export const WAGMI_CHAIN_CONFIGS = [
+  ...EVM_CHAIN_CONFIGS,
+  ...WAGMI_VM_CHAIN_CONFIGS,
+];

@@ -14,6 +14,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
 import "@mysten/dapp-kit/dist/index.css";
+import "@solana/wallet-adapter-react-ui/styles.css";
 import "~/lib/polyfills";
 import "~/styles/globals.css";
 
@@ -53,6 +54,14 @@ const SuiWalletProviderClient = dynamic(
           {children}
         </mod.WalletProvider>
       ),
+    })),
+  { ssr: false }
+);
+
+const SolanaWalletProviderClient = dynamic(
+  () =>
+    import("~/lib/providers/SolanaWalletProvider").then((mod) => ({
+      default: mod.SolanaWalletProvider,
     })),
   { ssr: false }
 );
@@ -133,13 +142,15 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
               >
                 <StellarWalletProviderClient>
                   <SuiWalletProviderClient>
-                    <AuthProvider>
-                      <MainLayout>
-                        <Component {...pageProps} />
-                      </MainLayout>
-                      <ReactQueryDevtools />
-                      <Toaster />
-                    </AuthProvider>
+                    <SolanaWalletProviderClient>
+                      <AuthProvider>
+                        <MainLayout>
+                          <Component {...pageProps} />
+                        </MainLayout>
+                        <ReactQueryDevtools />
+                        <Toaster />
+                      </AuthProvider>
+                    </SolanaWalletProviderClient>
                   </SuiWalletProviderClient>
                 </StellarWalletProviderClient>
               </SuiClientProvider>

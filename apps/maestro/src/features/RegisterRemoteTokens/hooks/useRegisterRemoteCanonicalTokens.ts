@@ -6,11 +6,18 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
 import type { DeployAndRegisterTransactionState as InterchainDeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
+import { useDeployRemoteCanonicalToken } from "~/features/solanaHooks/useDeployRemoteCanonicalToken";
 import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import {
+  SOLANA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+  useChainId,
+} from "~/lib/hooks";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
@@ -105,6 +112,9 @@ export default function useRegisterRemoteCanonicalTokens(
     registerRemoteInterchainToken: registerRemoteInterchainTokenOnStellar,
   } = useRegisterRemoteInterchainTokenOnStellar();
 
+  const { deployRemoteCanonicalToken } = useDeployRemoteCanonicalToken();
+  const { address: deployerAddress } = useAccount();
+
   const suiInput = {
     axelarChainIds: destinationChainIds,
     originChainId: input.originChainId,
@@ -143,6 +153,15 @@ export default function useRegisterRemoteCanonicalTokens(
       if (chainId === STELLAR_CHAIN_ID) {
         return registerRemoteInterchainTokenOnStellar(stellarInput);
       }
+      if (chainId === SOLANA_CHAIN_ID) {
+        if (!tokenDetails) return;
+        return deployRemoteCanonicalToken({
+          caller: String(deployerAddress ?? ""),
+          tokenAddress: tokenDetails.tokenAddress,
+          destinationChain: destinationChainIds,
+          gasValue: destinationChainIds.map(() => "0"),
+        }).then((r) => r.signature);
+      }
       if (!config) return;
       return mutation.writeContract(config.request);
     },
@@ -152,6 +171,16 @@ export default function useRegisterRemoteCanonicalTokens(
       }
       if (chainId === STELLAR_CHAIN_ID) {
         return registerRemoteInterchainTokenOnStellar(stellarInput);
+      }
+      if (chainId === SOLANA_CHAIN_ID) {
+        if (!tokenDetails) return;
+        const r = await deployRemoteCanonicalToken({
+          caller: String(deployerAddress ?? ""),
+          tokenAddress: tokenDetails.tokenAddress,
+          destinationChain: destinationChainIds,
+          gasValue: destinationChainIds.map(() => "0"),
+        });
+        return r.signature;
       }
       if (!config) return;
       return await mutation.writeContractAsync(config.request);

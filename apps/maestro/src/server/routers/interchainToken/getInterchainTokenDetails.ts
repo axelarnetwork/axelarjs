@@ -2,9 +2,13 @@ import { Asset } from "@stellar/stellar-sdk";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { stellarChainConfig, suiChainConfig } from "~/config/chains";
+import {
+  solanaChainConfig,
+  stellarChainConfig,
+  suiChainConfig,
+} from "~/config/chains";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
+import { SOLANA_CHAIN_ID, STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
@@ -75,7 +79,9 @@ export const getInterchainTokenDetails = publicProcedure
         ? suiChainConfig.axelarChainId
         : input.chainId === STELLAR_CHAIN_ID
           ? stellarChainConfig.axelarChainId
-          : configs.info.id;
+          : input.chainId === SOLANA_CHAIN_ID
+            ? solanaChainConfig?.axelarChainId
+            : configs?.info?.id;
     // if (!configs) {
     //   throw new TRPCError({
     //     code: "NOT_FOUND",

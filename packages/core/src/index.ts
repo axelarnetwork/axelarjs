@@ -129,3 +129,8 @@ export const STELLAR_RPC_URLS = {
   testnet: "https://soroban-testnet.stellar.org",
   mainnet: "https://mainnet.sorobanrpc.com",
 };
+
+export const SOLANA_RPC_URLS = {
+  testnet: "https://api.testnet.solana.com",
+  mainnet: "https://api.mainnet-beta.solana.com",
+};

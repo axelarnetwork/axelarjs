@@ -28,7 +28,16 @@ export const getNativeToken = memoize((axelarChainId: string) => {
   );
 
   if (!chainConfig) {
-    throw new Error(`getNativeToken(): chain ${axelarChainId} does not exist`);
+    // fallback: allow variant ids like "solana-2" to match local "solana"
+    const fallback = CHAIN_CONFIGS.find((chain) =>
+      axelarChainId.toLowerCase().includes(chain.axelarChainId.toLowerCase())
+    );
+    if (!fallback) {
+      throw new Error(
+        `getNativeToken(): chain ${axelarChainId} does not exist`
+      );
+    }
+    return fallback.nativeCurrency.symbol;
   }
 
   return chainConfig.nativeCurrency.symbol;

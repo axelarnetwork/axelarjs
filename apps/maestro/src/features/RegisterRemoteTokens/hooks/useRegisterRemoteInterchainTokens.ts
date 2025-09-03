@@ -5,11 +5,18 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
+import { useDeployRemoteInterchainToken } from "~/features/solanaHooks/useDeployRemoteInterchainToken";
 import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import {
+  SOLANA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+  useChainId,
+} from "~/lib/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -94,6 +101,9 @@ export default function useRegisterRemoteInterchainTokens(
     registerRemoteInterchainToken: registerRemoteInterchainTokenOnStellar,
   } = useRegisterRemoteInterchainTokenOnStellar();
 
+  const { deployRemoteInterchainToken } = useDeployRemoteInterchainToken();
+  const { address: deployerAddress } = useAccount();
+
   if (!tokenDeployment) return;
 
   const suiInput = {
@@ -124,6 +134,16 @@ export default function useRegisterRemoteInterchainTokens(
         return registerRemoteInterchainTokenOnStellar(stellarInput);
       }
 
+      if (chainId === SOLANA_CHAIN_ID) {
+        if (!tokenDeployment) return;
+        return deployRemoteInterchainToken({
+          caller: String(deployerAddress ?? ""),
+          salt: tokenDeployment.salt,
+          destinationChain: destinationChainIds,
+          gasValue: destinationChainIds.map(() => "0"),
+        }).then((r) => r.signature);
+      }
+
       if (!config) return;
 
       return mutation.writeContract(config.request);
@@ -135,6 +155,17 @@ export default function useRegisterRemoteInterchainTokens(
 
       if (chainId === STELLAR_CHAIN_ID) {
         return registerRemoteInterchainTokenOnStellar(stellarInput);
+      }
+
+      if (chainId === SOLANA_CHAIN_ID) {
+        if (!tokenDeployment) return;
+        const r = await deployRemoteInterchainToken({
+          caller: String(deployerAddress ?? ""),
+          salt: tokenDeployment.salt,
+          destinationChain: destinationChainIds,
+          gasValue: destinationChainIds.map(() => "0"),
+        });
+        return r.signature;
       }
 
       if (!config) return;

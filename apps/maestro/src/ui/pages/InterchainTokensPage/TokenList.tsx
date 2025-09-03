@@ -103,9 +103,10 @@ const TokenList: FC<TokenListProps> = ({ sessionAddress }) => {
       </PageTitle>
       <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {filteredTokens.map(([token, chain]) => {
-          const href = `/${getChainNameSlug(chain.chain_id)}/${
-            token.tokenAddress
-          }`;
+          const chainSlug = (chain as any).chain_name
+            ? String((chain as any).chain_name).toLowerCase()
+            : getChainNameSlug((chain as any).chain_id);
+          const href = `/${chainSlug}/${token.tokenAddress}`;
           return (
             <li
               key={`${token.tokenAddress}:${token.tokenId}`}
