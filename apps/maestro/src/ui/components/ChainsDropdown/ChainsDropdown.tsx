@@ -73,6 +73,7 @@ type Props = {
   compact?: boolean;
   hideLabel?: boolean;
   disabled?: boolean;
+  containerClassName?: string;
   triggerClassName?: string;
   chainIconClassName?: string;
   contentClassName?: string;
@@ -275,7 +276,7 @@ const ChainsDropdown: FC<Props> = (props) => {
   );
 
   return (
-    <Dropdown $align="end">
+    <Dropdown $align="end" className={props.containerClassName}>
       {props.renderTrigger?.() ?? (
         <Dropdown.Trigger
           $as="button"
