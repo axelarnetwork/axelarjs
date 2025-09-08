@@ -11,6 +11,7 @@ import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
+import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
 
 import { wagmiConfig } from "~/config/wagmi";
 import { useDisconnect } from "~/lib/hooks";
@@ -48,6 +49,8 @@ export function useWeb3SignIn({
   const { disconnect } = useDisconnect();
   const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
   const currentSuiAccount = useCurrentAccount();
+  const xrplWallet = useXRPLWallet();
+  console.log(xrplWallet);
 
   const signInAddressRef = useRef<string | null>(null);
 
@@ -80,6 +83,7 @@ export function useWeb3SignIn({
 
         onSignInStart?.(address);
         let signature;
+        console.log("Address is", address);
         // 42 is the length of an EVM address
         if (address.length === 42) {
           signature = await signMessageAsync({ message });
