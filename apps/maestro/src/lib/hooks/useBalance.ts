@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
+import {
+  useConnect as useXRPLConnect,
+  useWallet as useXRPLWallet,
+} from "@xrpl-wallet-standard/react";
+import * as xrpl from "xrpl";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {
@@ -8,7 +13,11 @@ import {
   useBalance as useWagmiBalance,
 } from "wagmi";
 
-import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
+import { 
+  stellarChainConfig, 
+  suiChainConfig,
+  xrplChainConfig,
+} from "~/config/chains/vm-chains";
 import { STELLAR_HORIZON_URL } from "~/server/routers/stellar/utils/config";
 import { useAccount } from "./useAccount";
 
@@ -25,6 +34,9 @@ export function useBalance(): BalanceResult | undefined {
   const suiAccount = useCurrentAccount();
   const { address, chainName } = useAccount();
   const [stellarBalance, setStellarBalance] = useState<string | null>(null);
+  const { connect: XRPLConnect } = useXRPLConnect(); // todo: connect to this here?
+  const { wallet: xrplWallet } = useXRPLWallet();
+  const [XRPLDrops, setXRPLDrops] = useState<number | null>(null);
 
   // Wagmi balance hook
   const { data: wagmiBalance } = useWagmiBalance({
@@ -56,6 +68,28 @@ export function useBalance(): BalanceResult | undefined {
     }
   }, [chainName, address]);
 
+  useEffect(() => {
+    if (chainName === xrplChainConfig.name && address && !!xrplWallet?.accounts.at(0)) { // TODO: fix XRPL connection check
+      const fetchXRPLBalance = async () => {
+        const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]); // TODO
+        await client.connect();
+
+        try {
+          const accountInfo = await client.request({
+            command: "account_info",
+            account: address,
+          });
+          // Balance is returned in drops (1 XRP = 1,000,000 drops)
+          const drops = accountInfo.result.account_data.Balance;
+          setXRPLDrops(drops);
+        } finally {
+          client.disconnect();
+        }
+      }
+      fetchXRPLBalance();
+    }
+  }, [chainName, address])
+
   const balance = useMemo(() => {
     if (wagmiBalance) {
       return wagmiBalance;
@@ -80,8 +114,22 @@ export function useBalance(): BalanceResult | undefined {
         decimals,
       };
     }
+    if (XRPLDrops) {
+      const value = BigInt(XRPLDrops);
+      const { decimals, symbol } = (
+        xrplChainConfig ?? {
+          nativeCurrency: { decimals: 6, symbol: "XRP" },
+        }
+      ).nativeCurrency as { decimals: number; symbol: string };
+      return {
+        value,
+        formatted: formatUnits(value, decimals),
+        symbol,
+        decimals,
+      };
+    }
     return undefined;
-  }, [wagmiBalance, suiBalance, stellarBalance]);
+  }, [wagmiBalance, suiBalance, stellarBalance, XRPLDrops]);
 
   return balance;
 }

@@ -4,8 +4,13 @@ import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";
 import { getAddress, getNetwork, isConnected } from "@stellar/freighter-api";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
+import {useConnect as useXRPLConnect, useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
 
-import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
+import { 
+  stellarChainConfig, 
+  suiChainConfig,
+  xrplChainConfig
+} from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import {
   getStellarConnectionState,
@@ -25,6 +30,7 @@ interface CombinedAccountInfo {
   chainName?: string;
   isWrongSuiNetwork?: boolean;
   isWrongStellarNetwork?: boolean;
+  isWrongXRPLNetwork?: boolean;
   isLoadingStellar?: boolean;
 }
 
@@ -34,12 +40,16 @@ export function useAccount(): CombinedAccountInfo {
   const [stellarAccount, setStellarAccount] = useState<string | null>(null);
   const [stellarNetwork, setStellarNetwork] = useState<string | null>(null);
   const [isLoadingStellar, setIsLoadingStellar] = useState(true);
+  const xrplWallet = useXRPLWallet();
+  const { connect: xrplConnection } = useXRPLConnect();
 
   const { data: evmChains } = useEVMChainConfigsQuery();
   const APP_SUI_NETWORK =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "sui:mainnet" : "sui:testnet";
   const APP_STELLAR_NETWORK =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "PUBLIC" : "TESTNET";
+  const APP_XRPL_NETWORK =
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" : NEXT_PUBLIC_NETWORK_ENV === "testnet" ? "testnet" : "devnet";
   const checkFreighterStatus = useCallback(async () => {
     const isStellarConnected = getStellarConnectionState() ?? false;
     if (stellarAccount && isStellarConnected) {
@@ -88,6 +98,7 @@ export function useAccount(): CombinedAccountInfo {
   const isWagmiConnected = wagmiAccount.isConnected;
   const isMystenConnected = !!mystenAccount;
   const isStellarConnected = !!stellarAccount;
+  const isXRPLConnected = xrplWallet.status === "connected" && !!xrplWallet.wallet?.accounts.at(0);
 
   const evmChain = useMemo(
     () => evmChains?.find?.((x) => x.chain_id === wagmiAccount?.chain?.id),
@@ -98,20 +109,23 @@ export function useAccount(): CombinedAccountInfo {
     address:
       wagmiAccount.address ||
       (mystenAccount?.address as `0x${string}`) ||
-      (stellarAccount as string),
-    isConnected: isWagmiConnected || isMystenConnected || isStellarConnected,
+      (stellarAccount as string) || 
+      (xrplWallet.wallet?.accounts.at(0)?.address),
+    isConnected: isWagmiConnected || isMystenConnected || isStellarConnected || isXRPLConnected,
     isDisconnected:
-      !isWagmiConnected && !isMystenConnected && !isStellarConnected,
+      !isWagmiConnected && !isMystenConnected && !isStellarConnected && !isXRPLConnected,
     chain:
       wagmiAccount.chain ||
       (isMystenConnected && suiChainConfig) ||
       (isStellarConnected && stellarChainConfig) ||
+      (isXRPLConnected && xrplChainConfig) ||
       undefined,
     isEvmChain: !!evmChain,
     chainName:
       evmChain?.chain_name ||
       (isMystenConnected && "Sui") ||
       (isStellarConnected && "Stellar") ||
+      (isXRPLConnected && xrplChainConfig.name) ||
       undefined,
     isWrongSuiNetwork:
       isMystenConnected && mystenAccount?.chains[0] !== APP_SUI_NETWORK,
@@ -119,6 +133,10 @@ export function useAccount(): CombinedAccountInfo {
       isStellarConnected &&
       !!stellarNetwork &&
       APP_STELLAR_NETWORK !== stellarNetwork,
+    isWrongXRPLNetwork:
+      isXRPLConnected &&
+      !!xrplConnection &&
+      false, // TODO
     isLoadingStellar,
   };
 }
