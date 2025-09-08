@@ -6,6 +6,12 @@ import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
 export const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
 export const STELLAR_CHAIN_ID =
   NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 109 : 110;
+export const XRPL_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+    ? 114
+    : NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier"
+      ? 116
+      : 115;
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
@@ -150,7 +156,6 @@ const xrplDevnet = {
   },
   name: "XRPL Devnet",
 };
-
 
 export const VM_CHAINS: ExtendedWagmiChainConfig[] = [
   sui,

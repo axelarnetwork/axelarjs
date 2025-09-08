@@ -161,6 +161,18 @@ importers:
       '@web3modal/wagmi':
         specifier: ^4.1.1
         version: 4.2.3(d7aa909769dd2599a58d270523042407)
+      '@xrpl-wallet-adapter/crossmark':
+        specifier: ^0.1.4
+        version: 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      '@xrpl-wallet-adapter/ledger':
+        specifier: ^0.1.0
+        version: 0.1.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      '@xrpl-wallet-adapter/walletconnect':
+        specifier: ^0.2.0
+        version: 0.2.0(@react-native-async-storage/async-storage@1.21.0(react-native@0.76.5(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.2.21)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@6.0.3)))(@types/react@18.2.21)(@vercel/kv@1.0.1)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@6.0.3)
+      '@xrpl-wallet-standard/core':
+        specifier: ^0.1.4
+        version: 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       '@xrpl-wallet-standard/react':
         specifier: ^0.2.4
         version: 0.2.4(@types/react-dom@18.3.5(@types/react@18.2.21))(@types/react@18.2.21)(bufferutil@4.0.8)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(utf-8-validate@6.0.3)
@@ -239,6 +251,9 @@ importers:
       wagmi:
         specifier: ^2.5.12
         version: 2.13.5(@react-native-async-storage/async-storage@1.21.0(react-native@0.76.5(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.2.21)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@6.0.3)))(@tanstack/query-core@5.62.7)(@tanstack/react-query@5.62.7(react@18.3.1))(@types/react@18.2.21)(@vercel/kv@1.0.1)(bufferutil@4.0.8)(immer@10.1.1)(react@18.3.1)(typescript@5.7.2)(utf-8-validate@6.0.3)(viem@2.30.1(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)(zod@3.24.1))(zod@3.24.1)
+      xrpl:
+        specifier: ^4.4.1
+        version: 4.4.1(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       zod:
         specifier: ^3.22.4
         version: 3.24.1
@@ -3377,20 +3392,38 @@ packages:
   '@ledgerhq/devices@8.4.4':
     resolution: {integrity: sha512-sz/ryhe/R687RHtevIE9RlKaV8kkKykUV4k29e7GAVwzHX1gqG+O75cu1NCJUHLbp3eABV5FdvZejqRUlLis9A==}
 
+  '@ledgerhq/devices@8.5.1':
+    resolution: {integrity: sha512-oW75YQQiP2muHveXTuwSAze6CBxJ7jOYILhFiJbsVzmgLPVqtdw4s0bJJlOBft4Aup67yNAjboFCIU7kTYQBFg==}
+
   '@ledgerhq/errors@6.19.1':
     resolution: {integrity: sha512-75yK7Nnit/Gp7gdrJAz0ipp31CCgncRp+evWt6QawQEtQKYEDfGo10QywgrrBBixeRxwnMy1DP6g2oCWRf1bjw==}
+
+  '@ledgerhq/errors@6.25.0':
+    resolution: {integrity: sha512-9cU0dgUyq3Adb1bHAjJnbwl+r+4WBjuPq0k+/DbBNpuYHwcz2xKtRIjLimUJyACjHti3iWwRt1sFcbQDDdI08w==}
 
   '@ledgerhq/hw-app-str@7.0.4':
     resolution: {integrity: sha512-ArKnGCZaGnUPqoKaR9OE+ZGcGARKJLHthl/aybQWOIo952+cQpgcn0mg5yK1Amd9EiKfArCTlLJ3wAafO5d/lw==}
 
+  '@ledgerhq/hw-app-xrp@6.32.4':
+    resolution: {integrity: sha512-7uzU4likFVJGWu1YRrJLDo1K7KMk1FZKlEThThGFsJzWDOx1YAeFm+3WLH6y/xpbrg9DG2bbx2hmwVbTN7W5cg==}
+
+  '@ledgerhq/hw-transport-webhid@6.30.6':
+    resolution: {integrity: sha512-AOzjFv5n1OTMfvEInAZRfLO11G5zfG8pB5zhmjK5d/mVQfFNcKsLZNAC2h4OZZMBtUy8UTT3n03z93e6k6n4pQ==}
+
   '@ledgerhq/hw-transport-webusb@6.29.4':
     resolution: {integrity: sha512-HoGF1LlBT9HEGBQy2XeCHrFdv/FEOZU0+J+yfKcgAQIAiASr2MLvdzwoJbUS8h6Gn+vc+/BjzBSO3JNn7Loqbg==}
+
+  '@ledgerhq/hw-transport@6.31.10':
+    resolution: {integrity: sha512-ruNtkTPMO3rFCaSM+oPTOXXerzxWFZF43pAHVAHhsjiQGhLWzLSkMc7qBEpWIpZPubKRAbWSXR2zXBIJPNy8oQ==}
 
   '@ledgerhq/hw-transport@6.31.4':
     resolution: {integrity: sha512-6c1ir/cXWJm5dCWdq55NPgCJ3UuKuuxRvf//Xs36Bq9BwkV2YaRQhZITAkads83l07NAdR16hkTWqqpwFMaI6A==}
 
   '@ledgerhq/logs@6.12.0':
     resolution: {integrity: sha512-ExDoj1QV5eC6TEbMdLUMMk9cfvNKhhv5gXol4SmULRVCx/3iyCPhJ74nsb3S0Vb+/f+XujBEj3vQn5+cwS0fNA==}
+
+  '@ledgerhq/logs@6.13.0':
+    resolution: {integrity: sha512-4+qRW2Pc8V+btL0QEmdB2X+uyx0kOWMWE1/LWsq5sZy3Q5tpi4eItJS6mB0XL3wGW59RQ+8bchNQQ1OW/va8Og==}
 
   '@lit-labs/ssr-dom-shim@1.2.1':
     resolution: {integrity: sha512-wx4aBmgeGvFmOKucFKY+8VFJSYZxs9poN3SDNQFF6lT6NrQUnHiPB2PWz2sc4ieEcAaYYzN+1uWahEeTq2aRIQ==}
@@ -6195,6 +6228,10 @@ packages:
     resolution: {integrity: sha512-3CijvrO9utx598kjr45hTbbeeykQrQfKmSnxeWOgU25TOEpvcipD/bYDQWIqUv1Oc6KK4YStokSMu/FBNecGUQ==}
     engines: {node: '>=16'}
 
+  '@wallet-standard/base@1.0.1':
+    resolution: {integrity: sha512-1To3ekMfzhYxe0Yhkpri+Fedq0SYcfrOfJi3vbLjMwF2qiKPjTGLwZkf2C9ftdQmxES+hmxhBzTwF4KgcOwf8w==}
+    engines: {node: '>=16'}
+
   '@wallet-standard/base@1.1.0':
     resolution: {integrity: sha512-DJDQhjKmSNVLKWItoKThJS+CsJQjR9AOBOirBVT1F9YpRyC9oYHE+ZnSf8y8bxUphtKqdQMPVQ2mHohYdRvDVQ==}
     engines: {node: '>=16'}
@@ -6207,6 +6244,10 @@ packages:
     resolution: {integrity: sha512-ag0eq5ixy7rz8M5YUWGi/EoIJ69KJ+KILFNunoufgmXVkiISC7+NIZXJYTJrapni4f9twE1hfT+8+IV2CYCvmg==}
     engines: {node: '>=16'}
     hasBin: true
+
+  '@wallet-standard/features@1.0.3':
+    resolution: {integrity: sha512-m8475I6W5LTatTZuUz5JJNK42wFRgkJTB0I9tkruMwfqBF2UN2eomkYNVf9RbrsROelCRzSFmugqjKZBFaubsA==}
+    engines: {node: '>=16'}
 
   '@wallet-standard/features@1.1.0':
     resolution: {integrity: sha512-hiEivWNztx73s+7iLxsuD1sOJ28xtRix58W7Xnz4XzzA/pF0+aicnWgjOdA10doVDEDZdUuZCIIqG96SFNlDUg==}
@@ -6424,6 +6465,18 @@ packages:
 
   '@web3modal/wallet@4.2.3':
     resolution: {integrity: sha512-V+VpwmhQl9qeJMpzNkjpAaxercAsrr1O9oGRjrjD+c0q72NfdcbTalWSbjSQmqabI1M6N06Hw94FkAQuEfVGsg==}
+
+  '@xrpl-wallet-adapter/base@0.1.4':
+    resolution: {integrity: sha512-VR7wlwMs06JGu5WHDLOPzS1RqYRAOZ7XsFvJZvHVUV5pFHnpgE2s1tOxVIyWK0HBFvHvRALHcrT/5c9AoGGBtA==}
+
+  '@xrpl-wallet-adapter/crossmark@0.1.4':
+    resolution: {integrity: sha512-+6y5L2+cUkMXcAtlZMZT/kcX7Fg7UbudGHcVEnnasYdaYq4NxCTOr4CSvnfX9NNF1PI4W3zydfoP/hzTPe94xQ==}
+
+  '@xrpl-wallet-adapter/ledger@0.1.0':
+    resolution: {integrity: sha512-TQeF72LLjc54HIlKJ0B1GFTH7aQItTCUtk4hUn9cczKM8PcyAevwro1r4GPRevwe6lx2n8Zzat+lwQyVHj5EAw==}
+
+  '@xrpl-wallet-adapter/walletconnect@0.2.0':
+    resolution: {integrity: sha512-Yw1ljWR0/DtHazDpCoOUUz4+dHkQ8YqJ6/V0znBdhRHHsRXI20riazt8w6BdCWIsWbkNQRf0ZCzpsss2kgE7Nw==}
 
   '@xrpl-wallet-standard/app@0.1.4':
     resolution: {integrity: sha512-OR99P6aPtbLMw5L2vKVra6/1+hOE5dCJMjhpljeo3eeSjD876hODCH8xU4aM4rEAelsnev/DG75rluFdRaOCBA==}
@@ -16162,7 +16215,16 @@ snapshots:
       rxjs: 7.8.1
       semver: 7.6.3
 
+  '@ledgerhq/devices@8.5.1':
+    dependencies:
+      '@ledgerhq/errors': 6.25.0
+      '@ledgerhq/logs': 6.13.0
+      rxjs: 7.8.1
+      semver: 7.6.3
+
   '@ledgerhq/errors@6.19.1': {}
+
+  '@ledgerhq/errors@6.25.0': {}
 
   '@ledgerhq/hw-app-str@7.0.4':
     dependencies:
@@ -16170,12 +16232,31 @@ snapshots:
       '@ledgerhq/hw-transport': 6.31.4
       bip32-path: 0.4.2
 
+  '@ledgerhq/hw-app-xrp@6.32.4':
+    dependencies:
+      '@ledgerhq/hw-transport': 6.31.10
+      bip32-path: 0.4.2
+
+  '@ledgerhq/hw-transport-webhid@6.30.6':
+    dependencies:
+      '@ledgerhq/devices': 8.5.1
+      '@ledgerhq/errors': 6.25.0
+      '@ledgerhq/hw-transport': 6.31.10
+      '@ledgerhq/logs': 6.13.0
+
   '@ledgerhq/hw-transport-webusb@6.29.4':
     dependencies:
       '@ledgerhq/devices': 8.4.4
       '@ledgerhq/errors': 6.19.1
       '@ledgerhq/hw-transport': 6.31.4
       '@ledgerhq/logs': 6.12.0
+
+  '@ledgerhq/hw-transport@6.31.10':
+    dependencies:
+      '@ledgerhq/devices': 8.5.1
+      '@ledgerhq/errors': 6.25.0
+      '@ledgerhq/logs': 6.13.0
+      events: 3.3.0
 
   '@ledgerhq/hw-transport@6.31.4':
     dependencies:
@@ -16185,6 +16266,8 @@ snapshots:
       events: 3.3.0
 
   '@ledgerhq/logs@6.12.0': {}
+
+  '@ledgerhq/logs@6.13.0': {}
 
   '@lit-labs/ssr-dom-shim@1.2.1': {}
 
@@ -18491,7 +18574,7 @@ snapshots:
     dependencies:
       '@stellar/js-xdr': 3.1.2
       base32.js: 0.1.0
-      bignumber.js: 9.1.2
+      bignumber.js: 9.3.0
       buffer: 6.0.3
       sha.js: 2.4.11
       tweetnacl: 1.0.3
@@ -20319,6 +20402,8 @@ snapshots:
     dependencies:
       '@wallet-standard/base': 1.1.0
 
+  '@wallet-standard/base@1.0.1': {}
+
   '@wallet-standard/base@1.1.0': {}
 
   '@wallet-standard/core@1.1.0':
@@ -20333,6 +20418,10 @@ snapshots:
     dependencies:
       chalk: 5.3.0
       commander: 12.1.0
+
+  '@wallet-standard/features@1.0.3':
+    dependencies:
+      '@wallet-standard/base': 1.1.0
 
   '@wallet-standard/features@1.1.0':
     dependencies:
@@ -21216,6 +21305,71 @@ snapshots:
     dependencies:
       '@web3modal/polyfills': 4.2.3
       zod: 3.22.4
+
+  '@xrpl-wallet-adapter/base@0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)':
+    dependencies:
+      '@wallet-standard/base': 1.0.1
+      '@wallet-standard/features': 1.0.3
+      '@xrpl-wallet-standard/core': 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      '@xrplf/isomorphic': 1.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      ripple-keypairs: 2.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@xrpl-wallet-adapter/crossmark@0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)':
+    dependencies:
+      '@wallet-standard/base': 1.0.1
+      '@xrpl-wallet-adapter/base': 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      '@xrpl-wallet-standard/core': 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@xrpl-wallet-adapter/ledger@0.1.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)':
+    dependencies:
+      '@ledgerhq/hw-app-xrp': 6.32.4
+      '@ledgerhq/hw-transport': 6.31.4
+      '@ledgerhq/hw-transport-webhid': 6.30.6
+      '@ledgerhq/hw-transport-webusb': 6.29.4
+      '@xrpl-wallet-adapter/base': 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      '@xrpl-wallet-standard/core': 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      xrpl: 4.4.1(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@xrpl-wallet-adapter/walletconnect@0.2.0(@react-native-async-storage/async-storage@1.21.0(react-native@0.76.5(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.2.21)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@6.0.3)))(@types/react@18.2.21)(@vercel/kv@1.0.1)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@6.0.3)':
+    dependencies:
+      '@wallet-standard/base': 1.0.1
+      '@walletconnect/modal': 2.7.0(@types/react@18.2.21)(react@18.3.1)
+      '@walletconnect/universal-provider': 2.17.0(@react-native-async-storage/async-storage@1.21.0(react-native@0.76.5(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.2.21)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@6.0.3)))(@vercel/kv@1.0.1)(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      '@walletconnect/utils': 2.17.0(@react-native-async-storage/async-storage@1.21.0(react-native@0.76.5(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.2.21)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@6.0.3)))(@vercel/kv@1.0.1)
+      '@xrpl-wallet-adapter/base': 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      '@xrpl-wallet-standard/core': 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@react-native-async-storage/async-storage'
+      - '@types/react'
+      - '@upstash/redis'
+      - '@vercel/kv'
+      - bufferutil
+      - encoding
+      - ioredis
+      - react
+      - supports-color
+      - utf-8-validate
 
   '@xrpl-wallet-standard/app@0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)':
     dependencies:

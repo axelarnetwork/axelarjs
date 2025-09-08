@@ -2,6 +2,7 @@ import { useDisconnectWallet } from "@mysten/dapp-kit";
 import { useDisconnect as useWagmiDisconnect } from "wagmi";
 
 import { setStellarConnectionState } from "../utils/stellar";
+import { useWallet as useXRPLWallet, useDisconnect as useXRPLDisconnect } from "@xrpl-wallet-standard/react";
 
 interface DisconnectResult {
   disconnect: () => void;
@@ -12,6 +13,7 @@ export function useDisconnect(): DisconnectResult {
   const { disconnect: wagmiDisconnect, error: wagmiError } =
     useWagmiDisconnect();
   const { mutate: suiDisconnect } = useDisconnectWallet();
+  const xrpl = useXRPLWallet();
   let error: Error | null = wagmiError;
 
   const disconnect = () => {
@@ -26,6 +28,11 @@ export function useDisconnect(): DisconnectResult {
 
       // Attempt to disconnect from SUI wallet
       suiDisconnect();
+
+      // Attempt to disconnect from xrpl wallet
+      if (xrpl.status === "connected") {
+        useXRPLDisconnect();
+      }
     } catch (e) {
       error = e as Error;
     }
