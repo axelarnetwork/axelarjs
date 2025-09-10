@@ -1,3 +1,4 @@
+import { PublicKey } from "@solana/web3.js";
 import { getAddress } from "viem";
 import { z } from "zod";
 
@@ -161,4 +162,13 @@ export function isValidStellarTokenAddress(address: string): boolean {
  */
 export function isValidStellarWalletAddress(address: string): boolean {
   return stellarWalletAddress().safeParse(address).success;
+}
+
+export function isValidSolanaAddress(address: string): boolean {
+  try {
+    new PublicKey(address);
+    return true;
+  } catch (err) {
+    return false;
+  }
 }

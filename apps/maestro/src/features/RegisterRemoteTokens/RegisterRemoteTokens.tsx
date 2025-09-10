@@ -6,7 +6,11 @@ import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { GetBalanceReturnType } from "wagmi/actions";
 
-import { stellarChainConfig, suiChainConfig } from "~/config/chains";
+import {
+  solanaChainConfig,
+  stellarChainConfig,
+  suiChainConfig,
+} from "~/config/chains";
 import { useAccount } from "~/lib/hooks";
 import {
   useTransactionState,
@@ -150,9 +154,40 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     txState,
   ]);
 
+  const onSolanaTxComplete = useCallback(async () => {
+    if (txState.status !== "submitted") return;
+    if (!txState.hash) return;
+
+    const remoteTokens = baseRemoteTokens.map((remoteToken) => ({
+      ...remoteToken,
+      deploymentTxHash: txState.hash,
+    }));
+
+    await recordRemoteTokenDeployment({
+      tokenAddress: props.tokenAddress,
+      chainId: props.originChainId ?? -1,
+      axelarChainId: solanaChainConfig.axelarChainId,
+      deploymentMessageId: txState.hash,
+      remoteTokens,
+    });
+
+    setTxState({
+      status: "confirmed",
+      hash: txState.hash,
+    });
+  }, [
+    baseRemoteTokens,
+    props.originChainId,
+    props.tokenAddress,
+    recordRemoteTokenDeployment,
+    setTxState,
+    txState,
+  ]);
+
   const txCompleteCallback: Record<string, () => Promise<void>> = {
     [suiChainConfig.id]: onSuiTxComplete,
     [stellarChainConfig.id]: onStellarTxComplete,
+    [solanaChainConfig.id]: onSolanaTxComplete,
   };
 
   useEffect(

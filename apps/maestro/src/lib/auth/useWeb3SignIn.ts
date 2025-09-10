@@ -8,6 +8,7 @@ import {
 } from "next-auth/react";
 
 import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
+import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
@@ -48,6 +49,7 @@ export function useWeb3SignIn({
   const { disconnect } = useDisconnect();
   const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
   const currentSuiAccount = useCurrentAccount();
+  const solanaWallet = useSolanaWallet();
 
   const signInAddressRef = useRef<string | null>(null);
 
@@ -56,6 +58,7 @@ export function useWeb3SignIn({
 
   // avoid signing in multiple times
   const isSigningInRef = useRef(false);
+  const attemptedAddressesRef = useRef<Set<string>>(new Set());
   const { kit } = useStellarKit();
 
   const {
@@ -95,6 +98,15 @@ export function useWeb3SignIn({
           invariant(kit, "Stellar wallet kit not initialized");
           const result = await kit.signMessage(message);
           signature = result.signedMessage;
+        } else if (
+          solanaWallet?.publicKey?.toBase58?.() === address &&
+          solanaWallet.signMessage
+        ) {
+          // Solana
+          const encodedMessage = new TextEncoder().encode(message);
+          const sig = await solanaWallet.signMessage(encodedMessage);
+          // encode signature as base64 string
+          signature = btoa(String.fromCharCode(...sig));
         }
 
         const response = await signIn("credentials", {
@@ -114,13 +126,20 @@ export function useWeb3SignIn({
         onSignInSuccess?.(response);
 
         isSigningInRef.current = false;
+        attemptedAddressesRef.current.add(address);
       } catch (error) {
         if (error instanceof Error) {
-          disconnect();
-          await signOut();
+          // Only disconnect EVM on error; avoid disconnect loops for Sui/Solana
+          if (address?.length === 42) {
+            disconnect();
+            await signOut();
+          }
 
           signInAddressRef.current = null;
           isSigningInRef.current = false;
+          if (address) {
+            attemptedAddressesRef.current.add(address);
+          }
 
           throw error;
         }
@@ -172,6 +191,36 @@ export function useWeb3SignIn({
     void signInWithWeb3Async(address);
   }, [
     currentSuiAccount,
+    sessionStatus,
+    session?.address,
+    enabled,
+    signInWithWeb3Async,
+  ]);
+
+  // Same check as above, but for Solana
+  useEffect(() => {
+    if (
+      enabled === false ||
+      isSigningInRef.current ||
+      sessionStatus === "loading" ||
+      !solanaWallet?.publicKey
+    ) {
+      return;
+    }
+
+    const address = solanaWallet.publicKey.toBase58();
+
+    if (
+      session?.address === address ||
+      signInAddressRef.current === address ||
+      attemptedAddressesRef.current.has(address)
+    ) {
+      return;
+    }
+
+    void signInWithWeb3Async(address);
+  }, [
+    solanaWallet?.publicKey,
     sessionStatus,
     session?.address,
     enabled,

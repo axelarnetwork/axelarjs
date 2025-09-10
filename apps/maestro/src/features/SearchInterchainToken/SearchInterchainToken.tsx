@@ -14,6 +14,7 @@ import { isAddress } from "viem";
 import { useAccount } from "~/lib/hooks";
 import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import {
+  isValidSolanaAddress,
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
 } from "~/lib/utils/validation";
@@ -54,6 +55,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   const isValidEVMAddress = isAddress(search as `0x${string}`);
   const isValidSuiAddress = isValidSuiTokenAddress(search);
   const isValidStellar = isValidStellarTokenAddress(search);
+  const isValidSolana = isValidSolanaAddress(search);
 
   const chainId = connectedChain?.id ?? selectedChainId;
   const chainName = connectedChain?.name ?? defaultChain?.name;
@@ -109,6 +111,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     (!isValidEVMAddress &&
       !isValidSuiAddress &&
       !isValidStellar &&
+      !isValidSolana &&
       search.length >= 10);
 
   return (

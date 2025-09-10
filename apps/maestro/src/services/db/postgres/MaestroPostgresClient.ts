@@ -39,6 +39,14 @@ export type NewInterchainTokenInput = z.infer<typeof newInterchainTokenSchema>;
 export default class MaestroPostgresClient {
   constructor(private db: DBClient) {}
 
+  private computeRemoteTokenId(input: NewRemoteInterchainTokenInput) {
+    const key =
+      input.tokenAddress && input.tokenAddress !== "0x"
+        ? input.tokenAddress
+        : input.tokenId;
+    return `${input.axelarChainId}:${key}`;
+  }
+
   /**
    * Records the deployment of an interchain token.
    *
@@ -79,12 +87,15 @@ export default class MaestroPostgresClient {
   async recordRemoteInterchainTokenDeployment(
     value: NewRemoteInterchainTokenInput
   ) {
-    await this.db.insert(remoteInterchainTokens).values({
-      ...value,
-      id: `${value.axelarChainId}:${value.tokenAddress}`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    await this.db
+      .insert(remoteInterchainTokens)
+      .values({
+        ...value,
+        id: this.computeRemoteTokenId(value),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing({ target: remoteInterchainTokens.id });
   }
 
   /**
@@ -118,7 +129,7 @@ export default class MaestroPostgresClient {
         .filter(([, v]) => Boolean(v));
 
       const insertValues = values.filter((v) => {
-        const id = `${v.axelarChainId}:${v.tokenAddress}`;
+        const id = this.computeRemoteTokenId(v);
         return !existingTokens.some((t) => t.id === id);
       });
 
@@ -127,7 +138,6 @@ export default class MaestroPostgresClient {
           await tx
             .update(remoteInterchainTokens)
             .set({
-              id: updateValue.id ?? existingToken.id,
               tokenManagerAddress:
                 updateValue.tokenManagerAddress ??
                 existingToken.tokenManagerAddress,
@@ -150,14 +160,17 @@ export default class MaestroPostgresClient {
         return;
       }
 
-      await tx.insert(remoteInterchainTokens).values(
-        insertValues.map((v) => ({
-          ...v,
-          id: `${v.axelarChainId}:${v.tokenAddress}`,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }))
-      );
+      await tx
+        .insert(remoteInterchainTokens)
+        .values(
+          insertValues.map((v) => ({
+            ...v,
+            id: this.computeRemoteTokenId(v),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }))
+        )
+        .onConflictDoNothing({ target: remoteInterchainTokens.id });
     });
   }
 
@@ -372,5 +385,26 @@ export default class MaestroPostgresClient {
       .update(remoteInterchainTokens)
       .set({ tokenAddress, updatedAt: new Date() })
       .where(eq(remoteInterchainTokens.tokenId, tokenId));
+  }
+
+  async updateSolanaRemoteTokenAddresses(inputs: {
+    tokenId: string;
+    tokenAddress: string;
+    tokenManagerAddress: string;
+  }) {
+    await this.db
+      .update(remoteInterchainTokens)
+      .set({
+        deploymentStatus: "confirmed",
+        tokenAddress: inputs.tokenAddress,
+        tokenManagerAddress: inputs.tokenManagerAddress,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(remoteInterchainTokens.tokenId, inputs.tokenId),
+          ilike(remoteInterchainTokens.axelarChainId, "%solana%")
+        )
+      );
   }
 }

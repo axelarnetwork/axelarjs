@@ -7,16 +7,19 @@ import { z } from "zod";
 
 import {
   ExtendedWagmiChainConfig,
+  solanaChainConfig,
   stellarChainConfig,
   suiChainConfig,
 } from "~/config/chains";
 import {
+  isValidSolanaAddress,
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
 } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
+import { getMetadata } from "../solana/utils/utils";
 import {
   getStellarAssetMetadata,
   getStellarChainConfig,
@@ -91,6 +94,29 @@ export const getStellarTokenDetails = async (
   };
 };
 
+async function getSolanaTokenDetails(tokenAddress: string, ctx: Context) {
+  const metadata = await getMetadata(tokenAddress, ctx);
+
+  if (!metadata) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Metadata not found for ${tokenAddress} on chain ${solanaChainConfig.id}`,
+    });
+  }
+
+  const { name: chainName, axelarChainId, axelarChainName } = solanaChainConfig;
+
+  return {
+    name: metadata.name,
+    decimals: metadata.decimals,
+    symbol: metadata.symbol,
+    chainId: solanaChainConfig.id,
+    chainName,
+    axelarChainId,
+    axelarChainName,
+  };
+}
+
 export const getNativeTokenDetails = publicProcedure
   .input(
     z.object({
@@ -99,6 +125,11 @@ export const getNativeTokenDetails = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
+    // Enter here if the token is a Solana token (base58 public key)
+    if (isValidSolanaAddress(input.tokenAddress)) {
+      return await getSolanaTokenDetails(input.tokenAddress, ctx);
+    }
+
     // Enter here if the token is a Sui token
     if (isValidSuiTokenAddress(input.tokenAddress)) {
       const normalizedTokenAddress = normalizeSuiTokenAddress(

@@ -1,7 +1,7 @@
 import { Maybe } from "@axelarjs/utils";
 import { useEffect, useMemo, useState } from "react";
 
-import { indexBy, partition, prop, compose, toLower } from "rambda";
+import { compose, indexBy, partition, prop, toLower } from "rambda";
 
 import { CHAIN_CONFIGS, WAGMI_CHAIN_CONFIGS } from "~/config/chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
@@ -10,6 +10,17 @@ import { trpc } from "~/lib/trpc";
 
 const CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID = indexBy(prop("id"), CHAIN_CONFIGS);
 const WAGMI_CHAIN_CONFIGS_BY_ID = indexBy(prop("id"), WAGMI_CHAIN_CONFIGS);
+
+// Normalize a string id like "solana-2" => "solana"
+const normalizeAxelarId = (v: string | undefined) =>
+  (v ?? "").toLowerCase().split("-")[0];
+
+// Build a set of acceptable VM base ids from local chain configs (e.g., "solana", "sui", "stellar")
+const ACCEPTABLE_VM_BASE_IDS = new Set(
+  CHAIN_CONFIGS.map((c: any) => normalizeAxelarId(c.axelarChainId)).filter(
+    Boolean
+  )
+);
 
 export function useGetChainsConfig(input: { axelarChainId?: string }) {
   return trpc.axelarConfigs.getChainConfigs.useQuery(
@@ -128,7 +139,7 @@ export function useEVMChainConfigsQuery() {
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
-      indexedByAlternativeId: indexBy(compose(toLower,prop("id")), configured),
+      indexedByAlternativeId: indexBy(compose(toLower, prop("id")), configured),
       wagmiChains,
     },
   };
@@ -144,7 +155,11 @@ export function useVMChainConfigsQuery() {
   // Filter out chains that are not configured in the app
   const [configured, unconfigured] = useMemo(() => {
     return partition(
-      (x) => (x.chain_id ?? 0) in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID,
+      (x) =>
+        // numeric internal chain id matches a local chain id
+        (x.chain_id ?? 0) in CHAIN_CONFIGS_BY_AXELAR_CHAIN_ID ||
+        // OR base id (e.g., "solana" from "solana-2") matches a local base id
+        ACCEPTABLE_VM_BASE_IDS.has(normalizeAxelarId(String((x as any).id))),
       data ?? []
     );
   }, [data]);
@@ -172,7 +187,7 @@ export function useVMChainConfigsQuery() {
     computed: {
       indexedByChainId: indexBy(prop("chain_id"), configured),
       indexedById: indexBy(prop("id"), configured),
-      indexedByAlternativeId: indexBy(compose(toLower,prop("id")), configured),
+      indexedByAlternativeId: indexBy(compose(toLower, prop("id")), configured),
     },
   };
 }
