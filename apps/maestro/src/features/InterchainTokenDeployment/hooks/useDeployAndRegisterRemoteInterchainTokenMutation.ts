@@ -36,12 +36,27 @@ import { TOKEN_MANAGER_TYPES } from "../../../lib/drizzle/schema/common";
 import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 // In an effort to keep the codebase without hardcoded chains, we create lists of chains up here
-/** a token address is not needed for these chains */
+/** a token address is not needed if the chain name includes the following strings */
 const CHAINS_WITHOUT_TOKEN_ADDRESS = ["sui", "stellar"];
+/** chains that don't have their deployment draft recorded - check if chain name includes any of these strings */
+const CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING = ["sui", "stellar"];
 /** a multicall is not needed for these chains */
 const CHAIN_IDS_WITHOUT_MULTICALL = [SUI_CHAIN_ID];
-/** chains that don't have their deployment draft recorded */
-const CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING = ["sui", "stellar"];
+
+// Helper functions to check if chain names include specific strings
+const isChainWithoutTokenAddress = (chainId: string | undefined): boolean =>
+  !!chainId &&
+  CHAINS_WITHOUT_TOKEN_ADDRESS.some((chainString) =>
+    chainId.toLowerCase().includes(chainString.toLowerCase())
+  );
+
+const isChainSkipDeploymentDraftRecording = (
+  chainId: string | undefined
+): boolean =>
+  !!chainId &&
+  CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING.some((chainString) =>
+    chainId.toLowerCase().includes(chainString.toLowerCase())
+  );
 
 /*
  * INTERCHAIN TOKEN DEPLOYMENT FLOW
@@ -249,11 +264,11 @@ const useReady = ({
       return;
     }
 
-    const isTokenAddressChain = CHAINS_WITHOUT_TOKEN_ADDRESS.includes(
-      input?.sourceChainId as string
-    );
-
-    if ((!tokenId || !tokenAddress) && input && !isTokenAddressChain) {
+    if (
+      (!tokenId || !tokenAddress) &&
+      input &&
+      !isChainWithoutTokenAddress(input?.sourceChainId)
+    ) {
       setIsReady(false);
       return;
     }
@@ -396,7 +411,7 @@ const useRecordDeployment = ({
     if (
       !input ||
       !tokenAddress ||
-      CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING.includes(input.sourceChainId)
+      isChainSkipDeploymentDraftRecording(input.sourceChainId)
     ) {
       return;
     }
