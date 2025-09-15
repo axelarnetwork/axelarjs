@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
-import { ComponentRef, useMemo, useRef, type FC } from "react";
+import { ComponentRef, useEffect, useMemo, useRef, type FC } from "react";
 import { type FieldError, type SubmitHandler } from "react-hook-form";
 
 import { isValidSuiAddress } from "@mysten/sui/utils";
@@ -35,7 +35,7 @@ import {
 
 const MAX_UINT64 = BigInt(2) ** BigInt(64) - BigInt(1);
 
-const validateMinterAddress = (minter: string, chainId: number) => {
+const validateMinterAddress = (minter: string | undefined, chainId: number) => {
   if (!minter) {
     return {
       type: "validate",
@@ -83,25 +83,36 @@ const TokenDetails: FC = () => {
   const supply = watch("initialSupply");
   const tokenDecimals = watch("tokenDecimals");
 
+  // keep default supply in sync with mintable toggle
+  useEffect(() => {
+    const { getValues, setValue } = state.tokenDetailsForm;
+    if (formState.dirtyFields?.initialSupply) {
+      return;
+    }
+    const currentSupply = getValues("initialSupply");
+    const desired = isMintable ? "0" : "1000000";
+    if (currentSupply !== desired) {
+      setValue("initialSupply", desired, {
+        shouldDirty: false,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    }
+  }, [isMintable, formState.dirtyFields, state.tokenDetailsForm]);
+
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
       return;
     }
 
-    if (minter) {
-      const minterValidation = validateMinterAddress(minter, chainId);
-      if (minterValidation !== true) {
-        return minterValidation;
-      }
+    const minterValidation = validateMinterAddress(minter, chainId);
+    if (minterValidation !== true) {
+      return minterValidation;
     }
   }, [isMintable, minter, chainId]);
 
   const initialSupplyErrorMessage = useMemo<FieldError | undefined>(() => {
-    if (isMintable) {
-      return;
-    }
-
-    if (["0", ""].includes(supply) && !minter) {
+    if (!isMintable && ["0", ""].includes(supply)) {
       return {
         type: "required",
         message: "Fixed supply token requires an initial balance",
@@ -118,7 +129,7 @@ const TokenDetails: FC = () => {
         message: "Supply must be less than 2^64 - 1 for Sui",
       };
     }
-  }, [isMintable, minter, supply, chainId, tokenDecimals]);
+  }, [isMintable, supply, chainId, tokenDecimals]);
 
   const isFormValid = useMemo(() => {
     if (minterErrorMessage || initialSupplyErrorMessage) {
@@ -137,7 +148,7 @@ const TokenDetails: FC = () => {
 
     actions.setTokenDetails({
       ...data,
-      minter: data.isMintable && data.minter ? data.minter : undefined,
+      minter: data.isMintable ? data.minter : undefined,
     });
     actions.nextStep();
   };
@@ -170,43 +181,49 @@ const TokenDetails: FC = () => {
           {Maybe.of(errors.tokenSymbol).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
-          <Label htmlFor="tokenDecimals">Token Decimals</Label>
+          <Label>
+            <Label.Text id="tokenDecimals-label">Token Decimals</Label.Text>
+          </Label>
           <ModalFormInput
             id="tokenDecimals"
             type="number"
             placeholder="Enter your token decimals"
             min={0}
             max={18}
+            aria-labelledby="tokenDecimals-label"
             {...register("tokenDecimals")}
           />
           {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
-          <Label htmlFor="isMintable">
-            <Label.Text className="inline-flex items-center gap-1">
-              Is Mintable?
-              <Tooltip
-                $position="right"
-                $variant="info"
-                tip="When active, the token minter will be able to mint new tokens."
-              >
-                <HelpCircleIcon className="mr-1 h-[1em] text-info" />
-              </Tooltip>
-            </Label.Text>
-            <Label.AltText>
-              <Toggle
-                id="isMintable"
-                $variant="primary"
-                $size="sm"
-                {...register("isMintable")}
-              />
-            </Label.AltText>
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label>
+              <Label.Text className="inline-flex items-center gap-1">
+                Is Mintable?
+                <Tooltip
+                  $position="right"
+                  $variant="info"
+                  tip="When active, the token minter will be able to mint new tokens."
+                >
+                  <HelpCircleIcon className="mr-1 h-[1em] text-info" />
+                </Tooltip>
+              </Label.Text>
+            </Label>
+            <Toggle
+              id="isMintable"
+              $variant="primary"
+              $size="sm"
+              {...register("isMintable")}
+            />
+          </div>
         </FormControl>
         {isMintable && (
           <FormControl>
-            <Label htmlFor="minter">
-              <Label.Text className="inline-flex items-center gap-1">
+            <Label>
+              <Label.Text
+                id="minter-label"
+                className="inline-flex items-center gap-1"
+              >
                 Token Minter
                 <Tooltip
                   $position="right"
@@ -229,52 +246,49 @@ const TokenDetails: FC = () => {
               id="minter"
               placeholder="Enter a secure minter address"
               onKeyDown={preventNonHexInput}
+              aria-labelledby="minter-label"
               {...register("minter")}
             />
             {Maybe.of(minterErrorMessage).mapOrNull(ValidationError)}
           </FormControl>
         )}
         <FormControl>
-          <Label htmlFor="initialSupply">
-            {isMintable
-              ? "Enter initial supply"
-              : "Enter total supply - This will be a fixed supply for the token"}
+          <Label>
+            <Label.Text id="initialSupply-label">
+              {isMintable
+                ? "Enter initial supply"
+                : "Enter total supply - This will be a fixed supply for the token"}
+            </Label.Text>
           </Label>
           <ModalFormInput
             id="initialSupply"
             placeholder={`Enter ${isMintable ? "initial" : "total"} supply`}
             min={0}
             onKeyDown={preventNonNumericInput}
-            {...register("initialSupply", {
-              validate(value) {
-                if (!value || value === "0") {
-                  return "Amount must be greater than 0";
-                }
-
-                return true;
-              },
-            })}
+            aria-labelledby="initialSupply-label"
+            {...register("initialSupply")}
           />
           {Maybe.of(initialSupplyErrorMessage).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
-          <Label htmlFor="salt">
-            <Label.Text>Salt</Label.Text>
-            <Label.AltText>
-              <Tooltip tip="Generate random salt" $position="left">
-                <button
-                  type="button"
-                  onClick={() => actions.generateRandomSalt()}
-                >
-                  <RefreshCwIcon className="h-[1em] hover:text-primary" />
-                </button>
-              </Tooltip>
-            </Label.AltText>
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label>
+              <Label.Text id="salt-label">Salt</Label.Text>
+            </Label>
+            <Tooltip tip="Generate random salt" $position="left">
+              <button
+                type="button"
+                onClick={() => actions.generateRandomSalt()}
+              >
+                <RefreshCwIcon className="h-[1em] hover:text-primary" />
+              </button>
+            </Tooltip>
+          </div>
           <ModalFormInput
             id="salt"
             onKeyDown={preventNonHexInput}
             defaultValue={state.tokenDetailsForm.getValues("salt")}
+            aria-labelledby="salt-label"
             {...register("salt")}
           />
           {Maybe.of(formState.errors.salt).mapOrNull(ValidationError)}
