@@ -58,6 +58,8 @@ const CHAIN_IDS_WITH_REGISTERED_TOKEN_ADDRESS = [HEDERA_CHAIN_ID];
 const CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING = ["sui", "stellar"];
 /** a multicall is not needed for these chains */
 const CHAIN_IDS_WITHOUT_MULTICALL = [SUI_CHAIN_ID];
+/** a multicall is enabled manually for these chains */
+const CHAIN_IDS_WITH_MANUAL_MULTICALL = [HEDERA_CHAIN_ID];
 
 // Helper functions to check if chain names include specific strings
 const isChainWithoutTokenAddress = (chainName: string | undefined): boolean =>
@@ -145,7 +147,7 @@ interface UseMulticallParams {
   chainId: number;
 }
 
-const useMulticallArgs = ({
+const usePrepareMulticall = ({
   input,
   tokenId,
   destinationChainIds,
@@ -187,7 +189,48 @@ const useMulticallArgs = ({
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainIds, chainId]);
 
-  return multicallArgs;
+  const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
+
+  const [isTokenReadyForMulticall, setIsTokenReadyForMulticall] =
+    useState(false);
+
+  useEffect(() => {
+    setIsTokenReadyForMulticall(
+      !CHAIN_IDS_WITH_MANUAL_MULTICALL.includes(chainId)
+    );
+  }, [chainId]);
+
+  console.log({
+    chainId,
+    isTokenReadyForMulticall,
+  });
+
+  // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
+  const isDestinationFeeSet = !destinationChainIds.length || totalGasFee > 0n;
+  const isMutationReady =
+    multicallArgs.length > 0 && isDestinationFeeSet && isTokenReadyForMulticall;
+
+  const { data: prepareMulticall, error: simulationError } =
+    useSimulateInterchainTokenFactoryMulticall({
+      chainId,
+      value: totalGasFee,
+      args: [multicallArgs],
+      query: {
+        enabled: isMutationReady,
+      },
+    });
+
+  if (simulationError) {
+    console.error(
+      "useDeployAndRegisterRemoteInterchainTokenMutation simulation error:",
+      simulationError
+    );
+  }
+
+  return {
+    prepareMulticall,
+    setIsTokenReadyForMulticall,
+  };
 };
 
 const useTokenId = (
@@ -320,7 +363,11 @@ const useReady = ({
   chainId,
 }: UseReadyParams) => {
   useEffect(() => {
-    if (isValidEVMAddress(deployerAddress) && !prepareMulticallRequest) {
+    if (
+      isValidEVMAddress(deployerAddress) &&
+      !prepareMulticallRequest &&
+      chainId !== HEDERA_CHAIN_ID
+    ) {
       setIsReady(false);
       console.warn("Failed to simulate multicall for deploying remote tokens");
       return;
@@ -526,6 +573,7 @@ interface UseRequestDeployTokenParams {
   setRecordDeploymentArgs: (args: RecordInterchainTokenDeploymentInput) => void;
   prepareMulticallRequest: PrepareMulticallRequest | undefined;
   multicall: Multicall;
+  setIsTokenReadyForMulticall: (isTokenReadyForMulticall: boolean) => void;
 }
 
 const useRequestDeployToken = ({
@@ -537,6 +585,7 @@ const useRequestDeployToken = ({
   setRecordDeploymentArgs,
   prepareMulticallRequest,
   multicall,
+  setIsTokenReadyForMulticall,
 }: UseRequestDeployTokenParams) => {
   const { address } = useAccount();
   const { kit } = useStellarKit();
@@ -544,6 +593,14 @@ const useRequestDeployToken = ({
   const { deployToken } = useDeployToken();
 
   const { deployStellarToken } = useDeployStellarToken();
+
+  // Hedera-specific logic
+  const { deployHedera } = useHedera({
+    chainId,
+    prepareMulticallRequest,
+    multicall,
+    setIsTokenReadyForMulticall,
+  });
 
   const deployStellar = useCallback(async () => {
     if (!input) {
@@ -658,9 +715,6 @@ const useRequestDeployToken = ({
     return result;
   }, [input, deployerAddress, setRecordDeploymentArgs, deployToken]);
 
-  // Hedera-specific logic
-  const { prepareHederaDeployment } = useHedera({ chainId });
-
   const writeAsync = useCallback(async () => {
     await recordDeploymentDraft();
 
@@ -672,17 +726,15 @@ const useRequestDeployToken = ({
       return deploySui();
     }
 
+    if (chainId === HEDERA_CHAIN_ID && input) {
+      return deployHedera();
+    }
+
     // Handle EVM deployment
     invariant(
       prepareMulticallRequest !== undefined,
       "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
     );
-
-    if (chainId === HEDERA_CHAIN_ID && input) {
-      // TODO: remove hardcode
-      prepareMulticallRequest.gas = 900000n;
-      await prepareHederaDeployment();
-    }
 
     return multicall.writeContractAsync(prepareMulticallRequest);
   }, [
@@ -693,7 +745,7 @@ const useRequestDeployToken = ({
     recordDeploymentDraft,
     deployStellar,
     deploySui,
-    prepareHederaDeployment,
+    deployHedera,
   ]);
 
   return writeAsync;
@@ -701,9 +753,17 @@ const useRequestDeployToken = ({
 
 interface UseHederaParams {
   chainId: number;
+  prepareMulticallRequest: PrepareMulticallRequest | undefined;
+  multicall: Multicall;
+  setIsTokenReadyForMulticall: (isTokenReadyForMulticall: boolean) => void;
 }
 
-const useHedera = ({ chainId }: UseHederaParams) => {
+const useHedera = ({
+  chainId,
+  prepareMulticallRequest,
+  multicall,
+  setIsTokenReadyForMulticall,
+}: UseHederaParams) => {
   const { address } = useAccount();
 
   // Get token creation price
@@ -769,30 +829,41 @@ const useHedera = ({ chainId }: UseHederaParams) => {
       return;
     }
 
+    // add some margin to the target WHBAR balance
+    const targetMarginTinybars = 1000000n;
+
     const currentWhbarTinybars = whbarBalance;
-    const targetWhbarTinybars = tokenCreationPriceTinybars;
-    const depositWhbar =
+
+    const targetWhbarTinybars =
+      tokenCreationPriceTinybars + targetMarginTinybars;
+
+    const depositWhbarTinybars =
       currentWhbarTinybars < targetWhbarTinybars
         ? targetWhbarTinybars - currentWhbarTinybars
-        : 0n; // Only deposit if needed
+        : 0n;
+
+    const depositValue = depositWhbarTinybars * 10n ** 10n;
 
     console.log("💰 WHBAR Balance Calculation:", {
       targetWhbarTinybars,
-      depositWhbar,
+      depositWhbarTinybars,
+      depositValue,
       whbarBalance,
     });
 
-    // Only proceed with deposit if we need to deposit
-    if (depositWhbar > 0n) {
-      console.log("🚀 Executing WHBAR deposit");
-      await whbarDeposit.writeContractAsync({
-        address: whbarAddress,
-        value: depositWhbar,
-      });
-      console.log("✅ WHBAR deposit completed");
-    } else {
+    if (depositValue <= 0n) {
       console.log("✅ WHBAR balance is sufficient skipping deposit");
+      return;
     }
+
+    console.log("🚀 Executing WHBAR deposit");
+
+    await whbarDeposit.writeContractAsync({
+      address: whbarAddress,
+      value: depositValue,
+    });
+
+    console.log("✅ WHBAR deposit completed");
   }, [
     chainId,
     whbarAddress,
@@ -838,15 +909,53 @@ const useHedera = ({ chainId }: UseHederaParams) => {
     approveAsync,
   ]);
 
-  const prepareHederaDeployment = useCallback(async () => {
+  const [isDeploying, setIsDeploying] = useState(false);
+
+  const deployHedera = useCallback(async () => {
     if (chainId !== HEDERA_CHAIN_ID) return;
+
+    setIsDeploying(false);
 
     await depositWhbarHedera();
     await approveWhbarHedera();
-  }, [chainId, depositWhbarHedera, approveWhbarHedera]);
+
+    setIsTokenReadyForMulticall(true);
+  }, [
+    chainId,
+    depositWhbarHedera,
+    approveWhbarHedera,
+    setIsTokenReadyForMulticall,
+  ]);
+
+  useEffect(() => {
+    console.log("🚀 useEffect deployHedera", {
+      prepareMulticallRequest,
+      isDeploying,
+    });
+
+    if (!prepareMulticallRequest || isDeploying) {
+      return;
+    }
+
+    setIsDeploying(true);
+
+    setIsTokenReadyForMulticall(false);
+
+    // TODO: remove hardcode
+    prepareMulticallRequest.gas = 900000n;
+
+    multicall.writeContractAsync(prepareMulticallRequest).catch((error) => {
+      console.error("useHedera: deployHedera error:", error);
+    });
+  }, [
+    multicall,
+    prepareMulticallRequest,
+    isDeploying,
+    setIsTokenReadyForMulticall,
+  ]);
 
   return {
-    prepareHederaDeployment,
+    deployHedera,
   };
 };
 
@@ -875,35 +984,14 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     combinedComputed,
   });
 
-  const multicallArgs = useMulticallArgs({
-    input,
-    tokenId,
-    destinationChainIds,
-    chainId,
-  });
-
-  const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
-
-  // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
-  const isDestinationFeeSet = !destinationChainIds.length || totalGasFee > 0n;
-  const isMutationReady = multicallArgs.length > 0 && isDestinationFeeSet;
-
-  const { data: prepareMulticall, error: simulationError } =
-    useSimulateInterchainTokenFactoryMulticall({
+  const { prepareMulticall, setIsTokenReadyForMulticall } = usePrepareMulticall(
+    {
+      input,
+      tokenId,
+      destinationChainIds,
       chainId,
-      value: totalGasFee,
-      args: [multicallArgs],
-      query: {
-        enabled: isMutationReady,
-      },
-    });
-
-  if (simulationError) {
-    console.error(
-      "useDeployAndRegisterRemoteInterchainTokenMutation simulation error:",
-      simulationError
-    );
-  }
+    }
+  );
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
@@ -955,6 +1043,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     setRecordDeploymentArgs,
     prepareMulticallRequest,
     multicall,
+    setIsTokenReadyForMulticall,
   });
 
   return {
