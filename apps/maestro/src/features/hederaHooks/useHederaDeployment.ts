@@ -152,11 +152,8 @@ export const useHederaDeployment = ({
 
   // WHBAR approval function - approves WHBAR for token creation
   const approveWhbarHedera = useCallback(async () => {
-    if (!publicClient) {
-      return;
-    }
-
     if (
+      !publicClient ||
       chainId !== HEDERA_CHAIN_ID ||
       !whbarAddress ||
       !tokenCreationPriceTinybars
@@ -213,7 +210,11 @@ export const useHederaDeployment = ({
   ]);
 
   useEffect(() => {
-    if (!prepareMulticallRequest || isProcessingMulticall.current) {
+    if (
+      !prepareMulticallRequest ||
+      isProcessingMulticall.current ||
+      chainId !== HEDERA_CHAIN_ID
+    ) {
       return;
     }
 
@@ -226,7 +227,12 @@ export const useHederaDeployment = ({
     multicall.writeContractAsync(prepareMulticallRequest).catch((error) => {
       console.error("useHedera: deployHedera error:", error);
     });
-  }, [multicall, prepareMulticallRequest, setIsTokenReadyForMulticall]);
+  }, [
+    multicall,
+    prepareMulticallRequest,
+    chainId,
+    setIsTokenReadyForMulticall,
+  ]);
 
   return {
     deployHedera,
