@@ -138,8 +138,6 @@ export const useHederaDeployment = ({
       hash: txHash,
     });
 
-    console.log("✅ WHBAR deposit completed");
-
     return txHash;
   }, [
     chainId,
@@ -172,12 +170,6 @@ export const useHederaDeployment = ({
     const needsWhbarApproval =
       whbarAllowance && approvalAmount && whbarAllowance < approvalAmount;
 
-    console.log("🚀 Approving WHBAR for token creation:", {
-      approvalAmount,
-      whbarAllowance,
-      needsWhbarApproval,
-    });
-
     if (needsWhbarApproval && approvalAmount > 0n) {
       const txHash = await approveAsync({
         address: whbarAddress,
@@ -187,10 +179,6 @@ export const useHederaDeployment = ({
       await publicClient.waitForTransactionReceipt({
         hash: txHash,
       });
-
-      console.log("✅ WHBAR approval completed");
-    } else if (!needsWhbarApproval) {
-      console.log("✅ WHBAR already approved, skipping approval");
     }
   }, [
     chainId,
