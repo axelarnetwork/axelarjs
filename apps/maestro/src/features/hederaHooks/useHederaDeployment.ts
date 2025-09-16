@@ -152,6 +152,10 @@ export const useHederaDeployment = ({
 
   // WHBAR approval function - approves WHBAR for token creation
   const approveWhbarHedera = useCallback(async () => {
+    if (!publicClient) {
+      return;
+    }
+
     if (
       chainId !== HEDERA_CHAIN_ID ||
       !whbarAddress ||
@@ -159,7 +163,10 @@ export const useHederaDeployment = ({
     )
       return;
 
-    const approvalAmount = tokenCreationPriceTinybars;
+    // add some margin to the target WHBAR approval amount
+    const targetTinybarsMargin = 2000000n;
+
+    const approvalAmount = tokenCreationPriceTinybars + targetTinybarsMargin;
 
     // Check if approval is needed
     const needsWhbarApproval =
@@ -167,14 +174,20 @@ export const useHederaDeployment = ({
 
     console.log("🚀 Approving WHBAR for token creation:", {
       approvalAmount,
+      whbarAllowance,
       needsWhbarApproval,
     });
 
     if (needsWhbarApproval && approvalAmount > 0n) {
-      await approveAsync({
+      const txHash = await approveAsync({
         address: whbarAddress,
         args: [interchainTokenFactoryAddress, approvalAmount],
       });
+
+      await publicClient.waitForTransactionReceipt({
+        hash: txHash,
+      });
+
       console.log("✅ WHBAR approval completed");
     } else if (!needsWhbarApproval) {
       console.log("✅ WHBAR already approved, skipping approval");
@@ -184,6 +197,7 @@ export const useHederaDeployment = ({
     whbarAddress,
     tokenCreationPriceTinybars,
     whbarAllowance,
+    publicClient,
     approveAsync,
   ]);
 
