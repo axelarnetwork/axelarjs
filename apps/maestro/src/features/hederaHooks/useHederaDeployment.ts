@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useReadHederaExchangeRatePrecompileTinycentsToTinybars } from "~/lib/contracts/hedera/HederaExchangeRatePrecompile.hooks";
-import {
-  useReadInterchainTokenServiceTokenCreationPrice,
-  useReadInterchainTokenServiceWhbarAddress,
-} from "~/lib/contracts/hedera/HederaInterchainTokenService.hooks";
+import { useReadHederaExchangeRatePrecompileTinycentsToTinybars } from "~/features/hederaHooks/HederaExchangeRatePrecompile.hooks";
 import {
   useReadWhbarAllowance,
   useReadWhbarBalanceOf,
   useWriteWhbarApprove,
   useWriteWhbarDeposit,
-} from "~/lib/contracts/hedera/WHBAR.hooks";
+} from "~/features/hederaHooks/WHBAR.hooks";
+import {
+  useReadInterchainTokenServiceTokenCreationPrice,
+  useReadInterchainTokenServiceWhbarAddress,
+} from "~/lib/contracts/hedera/HederaInterchainTokenService.hooks";
 import {
   interchainTokenFactoryAddress,
   useWriteInterchainTokenFactoryMulticall,
@@ -99,40 +99,30 @@ export const useHederaDeployment = ({
     }
 
     // add some margin to the target WHBAR balance
-    const targetMarginTinybars = 1000000n;
+    const targetTinybarsMargin = 1000000n;
 
     const currentWhbarTinybars = whbarBalance;
 
     const targetWhbarTinybars =
-      tokenCreationPriceTinybars + targetMarginTinybars;
+      tokenCreationPriceTinybars + targetTinybarsMargin;
 
     const depositWhbarTinybars =
       currentWhbarTinybars < targetWhbarTinybars
         ? targetWhbarTinybars - currentWhbarTinybars
         : 0n;
 
-    const depositValue = depositWhbarTinybars * 10n ** 10n;
-
-    console.log("💰 WHBAR Balance Calculation:", {
-      targetWhbarTinybars,
-      depositWhbarTinybars,
-      depositValue,
-      whbarBalance,
-    });
-
-    if (depositValue <= 0n) {
-      console.log("✅ WHBAR balance is sufficient skipping deposit");
+    if (depositWhbarTinybars <= 0n) {
       return;
     }
 
-    console.log("🚀 Executing WHBAR deposit");
+    // scale up the deposit amount by 10^10
+    // https://docs.hedera.com/hedera/core-concepts/smart-contracts/wrapped-hbar-whbar
+    const depositValue = depositWhbarTinybars * 10n ** 10n;
 
     await whbarDeposit.writeContractAsync({
       address: whbarAddress,
       value: depositValue,
     });
-
-    console.log("✅ WHBAR deposit completed");
   }, [
     chainId,
     whbarAddress,
@@ -197,11 +187,6 @@ export const useHederaDeployment = ({
   ]);
 
   useEffect(() => {
-    console.log("🚀 useEffect deployHedera", {
-      prepareMulticallRequest,
-      isDeploying,
-    });
-
     if (!prepareMulticallRequest || isDeploying) {
       return;
     }

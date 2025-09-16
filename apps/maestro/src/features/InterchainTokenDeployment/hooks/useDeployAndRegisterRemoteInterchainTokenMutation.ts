@@ -189,11 +189,6 @@ const usePrepareMulticall = ({
     );
   }, [chainId]);
 
-  console.log({
-    chainId,
-    isTokenReadyForMulticall,
-  });
-
   // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
   const isDestinationFeeSet = !destinationChainIds.length || totalGasFee > 0n;
   const isMutationReady =
@@ -283,16 +278,6 @@ const useTokenAddress = ({
         enabled: Boolean(tokenId) && isWithRegisteredTokenAddress && !!receipt,
       },
     });
-
-  console.log({
-    tokenId,
-    chainName,
-    chainId,
-    isWithTokenAddress,
-    isWithRegisteredTokenAddress,
-    tokenAddress,
-    registeredTokenAddress,
-  });
 
   return tokenAddress ?? registeredTokenAddress;
 };
