@@ -32,6 +32,12 @@ interface UseHederaParams {
   setIsTokenReadyForMulticall: (isTokenReadyForMulticall: boolean) => void;
 }
 
+/*
+ * Hedera deployment flow:
+ * 1. First we need to deposit and approve WHBAR (via deployHedera)
+ * 2. Then we set isTokenReadyForMulticall(true) to signal readiness
+ * 3. When ready, the useEffect runs the actual token deployment multicall
+ */
 export const useHederaDeployment = ({
   chainId,
   prepareMulticallRequest,
@@ -187,12 +193,13 @@ export const useHederaDeployment = ({
     approveAsync,
   ]);
 
-  const isDeploying = useRef(false);
+  /** Keep a ref to prevent the multicall from running multiple times. */
+  const isProcessingMulticall = useRef(false);
 
   const deployHedera = useCallback(async () => {
     if (chainId !== HEDERA_CHAIN_ID) return;
 
-    isDeploying.current = false;
+    isProcessingMulticall.current = false;
 
     // deposit and approve WHBAR in parallel
     await Promise.all([depositWhbarHedera(), approveWhbarHedera()]);
@@ -206,11 +213,11 @@ export const useHederaDeployment = ({
   ]);
 
   useEffect(() => {
-    if (!prepareMulticallRequest || isDeploying.current) {
+    if (!prepareMulticallRequest || isProcessingMulticall.current) {
       return;
     }
 
-    isDeploying.current = true;
+    isProcessingMulticall.current = true;
 
     setIsTokenReadyForMulticall(false);
 
