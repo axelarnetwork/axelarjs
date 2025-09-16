@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
+import { usePublicClient } from "wagmi";
+
 import { useReadHederaExchangeRatePrecompileTinycentsToTinybars } from "~/features/hederaHooks/HederaExchangeRatePrecompile.hooks";
 import {
   useReadWhbarAllowance,
@@ -37,6 +39,7 @@ export const useHederaDeployment = ({
   setIsTokenReadyForMulticall,
 }: UseHederaParams) => {
   const { address } = useAccount();
+  const publicClient = usePublicClient();
 
   // Get token creation price
   const { data: tokenCreationPriceTinycents } =
@@ -92,6 +95,10 @@ export const useHederaDeployment = ({
 
   // WHBAR deposit function - deposits HBAR to get WHBAR
   const depositWhbarHedera = useCallback(async () => {
+    if (!publicClient) {
+      return;
+    }
+
     if (
       chainId !== HEDERA_CHAIN_ID ||
       !whbarAddress ||
@@ -102,7 +109,7 @@ export const useHederaDeployment = ({
     }
 
     // add some margin to the target WHBAR balance
-    const targetTinybarsMargin = 1000000n;
+    const targetTinybarsMargin = 2000000n;
 
     const currentWhbarTinybars = whbarBalance;
 
@@ -122,16 +129,25 @@ export const useHederaDeployment = ({
     // https://docs.hedera.com/hedera/core-concepts/smart-contracts/wrapped-hbar-whbar
     const depositValue = depositWhbarTinybars * 10n ** 10n;
 
-    await whbarDeposit.writeContractAsync({
+    const txHash = await whbarDeposit.writeContractAsync({
       address: whbarAddress,
       value: depositValue,
     });
+
+    await publicClient.waitForTransactionReceipt({
+      hash: txHash,
+    });
+
+    console.log("✅ WHBAR deposit completed");
+
+    return txHash;
   }, [
     chainId,
     whbarAddress,
     whbarDeposit,
     whbarBalance,
     tokenCreationPriceTinybars,
+    publicClient,
   ]);
 
   // WHBAR approval function - approves WHBAR for token creation
