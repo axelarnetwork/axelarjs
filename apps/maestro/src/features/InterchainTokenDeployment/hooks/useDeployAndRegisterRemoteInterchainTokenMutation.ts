@@ -71,15 +71,15 @@ const isChainSkipDeploymentDraftRecording = (
  *
  * 1. INPUT VALIDATION & SETUP
  *    └── useTokenId() ──────────────► Get token ID from salt + deployer
- *    └── useTokenAddress() ──────────► Get token address from token ID
+ *    └── useTokenAddress() ──────────► Get token address from token ID (supports registered tokens for Hedera)
  *    └── useDestinationChainIds() ───► Map destination chains to IDs
  *
  * 2. MULTICALL PREPARATION
- *    └── useMulticallArgs() ─────────► Build encoded function calls
- *    └── useSimulateContract() ──────► Prepare transaction simulation
+ *    └── usePrepareMulticall() ──────► Build encoded function calls and prepare simulation
+ *    └── useSimulateInterchainTokenFactoryMulticall() ──► Prepare transaction simulation
  *
  * 3. READINESS CHECK
- *    └── useReady() ─────────────────► Check if deployment is ready
+ *    └── useReady() ─────────────────► Check if deployment is ready (excludes Hedera manual multicall)
  *
  * 4. DRAFT DEPLOYMENT RECORDING
  *    └── recordDeploymentDraft() ────► Record deployment draft in DB
@@ -87,16 +87,42 @@ const isChainSkipDeploymentDraftRecording = (
  * 5. DEPLOYMENT EXECUTION
  *    ├── Stellar: deployStellar() ────► Deploy on Stellar network
  *    ├── Sui: deploySui() ────────────► Deploy on Sui network
+ *    ├── Hedera: deployHedera() ──────► Deploy on Hedera (WHBAR deposit + approval + multicall)
  *    └── EVM: multicall.writeContractAsync() ──► Deploy via multicall
  *
  * 6. TRANSACTION MONITORING
- *    └── useReceipt() ────────────────► Wait for transaction receipt
+ *    └── useReceipt() ────────────────► Wait for transaction receipt (with deduplication)
  *
  * 7. FINAL DEPLOYMENT RECORDING
+ *    └── useSetEvmDeploymentArgsOnReceipt() ──► Set deployment args when receipt is received
  *    └── useRecordDeployment() ───────► Record final deployment in database
  *
  * 8. STATUS UPDATES
  *    └── onStatusUpdate() ────────────► Update UI with progress
+ *
+ * NETWORK-SPECIFIC INTEGRATIONS:
+ * ==============================
+ *
+ * HEDERA:
+ * - Uses useHederaDeployment() hook which handles:
+ *   - WHBAR deposit (if balance insufficient)
+ *   - WHBAR approval (if allowance insufficient)
+ *   - Token deployment via multicall
+ * - Related files: ~/features/hederaHooks/
+ *
+ * STELLAR:
+ * - Uses useDeployStellarToken() hook which handles:
+ *   - Stellar wallet connection via StellarKit
+ *   - Token creation on Stellar network
+ *   - Remote token registration
+ * - Related files: ~/features/stellarHooks/
+ *
+ * SUI:
+ * - Uses useDeployToken() hook which handles:
+ *   - Token deployment on Sui network
+ *   - Event parsing for deployment results
+ *   - Direct deployment recording (no multicall)
+ * - Related files: ~/features/suiHooks/
  */
 
 type Multicall = ReturnType<typeof useWriteInterchainTokenFactoryMulticall>;
@@ -563,7 +589,15 @@ const useRequestDeployToken = ({
 
   const { deployStellarToken } = useDeployStellarToken();
 
-  // Hedera-specific logic
+  const deployGenericEVM = useCallback(async () => {
+    invariant(
+      prepareMulticallRequest !== undefined,
+      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
+    );
+
+    return multicall.writeContractAsync(prepareMulticallRequest);
+  }, [prepareMulticallRequest, multicall]);
+
   const { deployHedera } = useHederaDeployment({
     chainId,
     prepareMulticallRequest,
@@ -699,19 +733,12 @@ const useRequestDeployToken = ({
       return deployHedera();
     }
 
-    // Handle EVM deployment
-    invariant(
-      prepareMulticallRequest !== undefined,
-      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
-    );
-
-    return multicall.writeContractAsync(prepareMulticallRequest);
+    return deployGenericEVM();
   }, [
     chainId,
     input,
-    multicall,
-    prepareMulticallRequest,
     recordDeploymentDraft,
+    deployGenericEVM,
     deployStellar,
     deploySui,
     deployHedera,
