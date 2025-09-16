@@ -3,9 +3,9 @@ import {
   INTERCHAIN_TOKEN_SERVICE_ENCODERS,
 } from "@axelarjs/evm";
 import { invariant, throttle } from "@axelarjs/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { zeroAddress, type TransactionReceipt } from "viem";
+import { zeroAddress } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
 import { useHederaDeployment } from "~/features/hederaHooks";
@@ -403,27 +403,33 @@ const useSetEvmDeploymentArgsOnReceipt = ({
 }: UseSetEvmDeploymentArgsOnReceiptParams) => {
   const receipt = useReceipt({ multicall });
 
-  const setRecordDeploymentArgsOnReceipt = useCallback(() => {
-    const { transactionHash: txHash, transactionIndex: txIndex } =
-      receipt as TransactionReceipt;
+  // Track processed transactions to prevent duplicates
+  const processedTransactions = useRef(new Set<string>());
+
+  useEffect(() => {
+    if (!receipt) return;
+
+    const { transactionHash: txHash, transactionIndex: txIndex } = receipt;
 
     if (!txHash || !tokenAddress || !tokenId || !deployerAddress || !input) {
-      console.error(
-        "useDeployAndRegisterRemoteInterchainTokenMutation: unable to setRecordDeploymentArgs",
-        {
-          txHash,
-          tokenAddress,
-          tokenId,
-          deployerAddress,
-          input,
-        }
-      );
       return;
     }
 
+    // Create unique key for this transaction
+    const transactionKey = `${txHash}-${txIndex}`;
+
+    // Check if we've already processed this transaction
+    if (processedTransactions.current.has(transactionKey)) {
+      console.log(`Transaction ${transactionKey} already processed, skipping`);
+      return;
+    }
+
+    // Mark this transaction as processed
+    processedTransactions.current.add(transactionKey);
+
     setRecordDeploymentArgs({
       kind: "interchain",
-      deploymentMessageId: `${txHash}-${txIndex}`,
+      deploymentMessageId: transactionKey,
       tokenId: tokenId as string,
       tokenAddress,
       deployerAddress,
@@ -437,24 +443,13 @@ const useSetEvmDeploymentArgsOnReceipt = ({
       tokenManagerAddress: "",
     });
   }, [
-    deployerAddress,
-    input,
+    receipt,
     tokenAddress,
     tokenId,
+    deployerAddress,
+    input,
     setRecordDeploymentArgs,
-    receipt,
   ]);
-
-  useEffect(
-    () => {
-      if (receipt) {
-        setRecordDeploymentArgsOnReceipt();
-      }
-    },
-    // TODO find a better way which doesn't require tokenAddress in the deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt, tokenAddress]
-  );
 };
 
 interface UseRecordDeploymentParams {

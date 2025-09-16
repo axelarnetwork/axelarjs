@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { useReadHederaExchangeRatePrecompileTinycentsToTinybars } from "~/features/hederaHooks/HederaExchangeRatePrecompile.hooks";
 import {
@@ -16,6 +16,9 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { HEDERA_CHAIN_ID, useAccount } from "~/lib/hooks";
+
+// use a constant value as the estimation is not accurate
+const DEPLOYMENT_GAS_COST = 900000n;
 
 type Multicall = ReturnType<typeof useWriteInterchainTokenFactoryMulticall>;
 type PrepareMulticallRequest = Parameters<Multicall["writeContractAsync"]>[0];
@@ -168,12 +171,12 @@ export const useHederaDeployment = ({
     approveAsync,
   ]);
 
-  const [isDeploying, setIsDeploying] = useState(false);
+  const isDeploying = useRef(false);
 
   const deployHedera = useCallback(async () => {
     if (chainId !== HEDERA_CHAIN_ID) return;
 
-    setIsDeploying(false);
+    isDeploying.current = false;
 
     await depositWhbarHedera();
     await approveWhbarHedera();
@@ -187,26 +190,20 @@ export const useHederaDeployment = ({
   ]);
 
   useEffect(() => {
-    if (!prepareMulticallRequest || isDeploying) {
+    if (!prepareMulticallRequest || isDeploying.current) {
       return;
     }
 
-    setIsDeploying(true);
+    isDeploying.current = true;
 
     setIsTokenReadyForMulticall(false);
 
-    // TODO: remove hardcode
-    prepareMulticallRequest.gas = 900000n;
+    prepareMulticallRequest.gas = DEPLOYMENT_GAS_COST;
 
     multicall.writeContractAsync(prepareMulticallRequest).catch((error) => {
       console.error("useHedera: deployHedera error:", error);
     });
-  }, [
-    multicall,
-    prepareMulticallRequest,
-    isDeploying,
-    setIsTokenReadyForMulticall,
-  ]);
+  }, [multicall, prepareMulticallRequest, setIsTokenReadyForMulticall]);
 
   return {
     deployHedera,
