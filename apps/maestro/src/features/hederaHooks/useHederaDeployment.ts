@@ -196,8 +196,8 @@ export const useHederaDeployment = ({
 
     isDeploying.current = false;
 
-    await depositWhbarHedera();
-    await approveWhbarHedera();
+    // deposit and approve WHBAR in parallel
+    await Promise.all([depositWhbarHedera(), approveWhbarHedera()]);
 
     setIsTokenReadyForMulticall(true);
   }, [
