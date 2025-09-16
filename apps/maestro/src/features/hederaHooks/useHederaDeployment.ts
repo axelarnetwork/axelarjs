@@ -102,7 +102,6 @@ export const useHederaDeployment = ({
     if (
       chainId !== HEDERA_CHAIN_ID ||
       !whbarAddress ||
-      !whbarBalance ||
       !tokenCreationPriceTinybars
     ) {
       return;
@@ -111,15 +110,12 @@ export const useHederaDeployment = ({
     // add some margin to the target WHBAR balance
     const targetTinybarsMargin = 2000000n;
 
-    const currentWhbarTinybars = whbarBalance;
+    const currentWhbarTinybars = whbarBalance || 0n;
 
     const targetWhbarTinybars =
       tokenCreationPriceTinybars + targetTinybarsMargin;
 
-    const depositWhbarTinybars =
-      currentWhbarTinybars < targetWhbarTinybars
-        ? targetWhbarTinybars - currentWhbarTinybars
-        : 0n;
+    const depositWhbarTinybars = targetWhbarTinybars - currentWhbarTinybars;
 
     if (depositWhbarTinybars <= 0n) {
       return;
@@ -164,13 +160,15 @@ export const useHederaDeployment = ({
     // add some margin to the target WHBAR approval amount
     const targetTinybarsMargin = 2000000n;
 
+    const currentWhbarAllowance = whbarAllowance || 0n;
+
     const approvalAmount = tokenCreationPriceTinybars + targetTinybarsMargin;
 
     // Check if approval is needed
     const needsWhbarApproval =
-      whbarAllowance && approvalAmount && whbarAllowance < approvalAmount;
+      approvalAmount && currentWhbarAllowance < approvalAmount;
 
-    if (needsWhbarApproval && approvalAmount > 0n) {
+    if (needsWhbarApproval) {
       const txHash = await approveAsync({
         address: whbarAddress,
         args: [interchainTokenFactoryAddress, approvalAmount],
