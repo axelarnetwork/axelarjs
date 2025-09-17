@@ -18,7 +18,7 @@ import {
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress, Maybe } from "@axelarjs/utils";
-import { useMemo, useRef, useState, type FC } from "react";
+import { useEffect, useMemo, useRef, useState, type FC } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import Image from "next/image";
 
@@ -26,7 +26,13 @@ import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
 import { z } from "zod";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { useHederaTokenAssociation } from "~/features/hederaHooks";
+import {
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+} from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
@@ -48,7 +54,7 @@ export type TokenDetailsSectionProps = {
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   let wallet = null;
-  if ((window as any).ethereum) {
+  if (typeof window !== "undefined" && (window as any).ethereum) {
     wallet = createWalletClient({
       transport: custom((window as any).ethereum),
     });
@@ -65,7 +71,77 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
   const isStellarChain = props.chain.chain_id === STELLAR_CHAIN_ID;
-  const tokenAddress = props.tokenAddress;
+  const isHederaChain = props.chain.chain_id === HEDERA_CHAIN_ID;
+  const tokenAddress = props.tokenAddress as `0x${string}`;
+
+  const {
+    checkHederaTokenAssociation,
+    associateHederaToken,
+    dissociateHederaToken,
+  } = useHederaTokenAssociation();
+
+  const { address: connectedAddress } = useAccount();
+  const [isAssociated, setIsAssociated] = useState<boolean | null>(null);
+  const [isCheckingAssociation, setIsCheckingAssociation] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!isHederaChain || !tokenAddress || !connectedAddress || isSubmitting)
+      return;
+
+    async function checkAssociation() {
+      setIsCheckingAssociation(true);
+      try {
+        const result = await checkHederaTokenAssociation(tokenAddress);
+        if (!cancelled) setIsAssociated(Boolean(result));
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) setIsAssociated(null);
+      } finally {
+        setIsCheckingAssociation(false);
+      }
+    }
+
+    void checkAssociation();
+    return () => {
+      cancelled = true;
+    };
+  }, [connectedAddress, tokenAddress, isHederaChain, isSubmitting]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onAssociate = async () => {
+    if (!tokenAddress || !wallet || !connectedAddress) return;
+    try {
+      setIsSubmitting(true);
+      toast.loading("Associating with token");
+      const txHash = await associateHederaToken(tokenAddress);
+      toast.dismiss();
+      toast.success("Associated with token. Transaction hash: " + txHash);
+    } catch (error) {
+      console.error(error);
+      toast.error("Association failed");
+      throw error;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onDissociate = async () => {
+    if (!tokenAddress || !wallet || !connectedAddress) return;
+    try {
+      setIsSubmitting(true);
+      toast.loading("Dissociating from token");
+      const txHash = await dissociateHederaToken(tokenAddress);
+      toast.dismiss();
+      toast.success("Dissociated from token. Transaction hash: " + txHash);
+    } catch (error) {
+      console.error(error);
+      toast.error("Dissociation failed");
+      throw error;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const tokenDetails = [
     ["Name", props.name],
@@ -82,7 +158,51 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    ...(wallet && !isSuiChain && !isStellarChain
+    ...(connectedAddress && wallet && isHederaChain
+      ? [
+          [
+            "Hedera Token Association",
+            <div key="hedera-assoc" className="flex items-center gap-2">
+              {isAssociated === null && !isCheckingAssociation && (
+                <span className="text-warning">
+                  Error checking association. Make sure the address is from a
+                  Hedera account.
+                </span>
+              )}
+              {isAssociated === null && isCheckingAssociation && (
+                <span>Checking token association...</span>
+              )}
+              {isAssociated !== null && (
+                <span>
+                  <span className="text-lg leading-none">
+                    {isAssociated ? " ✓ Associated" : " x Not associated"}
+                  </span>
+                  <LinkButton
+                    key="assoc-action"
+                    href="#"
+                    className="ml-[-10px]"
+                    $variant="link"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      if (isAssociated) {
+                        await onDissociate();
+                      } else {
+                        await onAssociate();
+                      }
+                    }}
+                    disabled={isSubmitting}
+                    hidden={isSubmitting}
+                    $loading={isSubmitting}
+                  >
+                    {isAssociated ? "Disassociate" : "Associate"}
+                  </LinkButton>
+                </span>
+              )}
+            </div>,
+          ],
+        ]
+      : []),
+    ...(wallet && !isSuiChain && !isStellarChain && !isHederaChain
       ? [
           [
             "Add Token to Wallet",
