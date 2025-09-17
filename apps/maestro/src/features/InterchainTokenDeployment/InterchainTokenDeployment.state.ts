@@ -79,7 +79,7 @@ export const INITIAL_STATE = {
     tokenSymbol: "",
     tokenDecimals: 18,
     tokenAddress: undefined as string | undefined,
-    initialSupply: "1000000",
+    initialSupply: "1000000000",
     isMintable: false,
     minter: "" as string | undefined,
     salt: undefined as `0x${string}` | undefined,

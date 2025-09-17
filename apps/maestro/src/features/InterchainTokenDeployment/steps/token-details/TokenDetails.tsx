@@ -16,6 +16,7 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import "~/features/InterchainTokenDeployment";
 
 import {
+  INITIAL_STATE,
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
@@ -90,7 +91,7 @@ const TokenDetails: FC = () => {
       return;
     }
     const currentSupply = getValues("initialSupply");
-    const desired = isMintable ? "0" : "1000000";
+    const desired = isMintable ? "0" : INITIAL_STATE.tokenDetails.initialSupply;
     if (currentSupply !== desired) {
       setValue("initialSupply", desired, {
         shouldDirty: false,
