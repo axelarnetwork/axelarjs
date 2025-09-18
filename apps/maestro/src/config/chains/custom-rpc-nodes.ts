@@ -17,7 +17,7 @@ export const CUSTOM_RPC_NODES: Record<
       // No known public DRPC endpoint
     ], // Flow Mainnet
     fraxtal: ["https://fraxtal.drpc.org"], // Fraxtal Mainnet
-    hedera: ["https://hedera.linkpool.pro"], // Hedera Mainnet
+    hedera: ["https://docs-demo.hedera-mainnet.quiknode.pro"], // TODO: Replace with more reliable public RPC
     immutable: ["https://immutable-zkevm.drpc.org"], // Immutable zkEVM Mainnet
     kava: ["https://kava.drpc.org"], // Kava Mainnet
     linea: ["https://linea.drpc.org"], // Linea Mainnet
