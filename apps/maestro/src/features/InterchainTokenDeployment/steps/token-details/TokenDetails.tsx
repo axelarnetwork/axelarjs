@@ -270,29 +270,26 @@ const TokenDetails: FC = () => {
         )}
         {isMintable && (
           <FormControl>
-            <Label>
-              <Label.Text
-                id="minter-label"
-                className="inline-flex items-center gap-1"
-              >
-                Token Minter
-                <Tooltip
-                  $position="right"
-                  $variant="info"
-                  tip="Choose a secure minter address, e.g. governance, multisig etc. This address will be able to mint the token on any chain."
+            <div className="flex items-center justify-between">
+              <Label>
+                <Label.Text
+                  id="minter-label"
+                  className="inline-flex items-center gap-1"
                 >
-                  <HelpCircleIcon className="mr-1 h-[1em] text-info" />
-                </Tooltip>
-              </Label.Text>
-              <Label.AltText>
-                <button
-                  type="button"
-                  onClick={actions.setCurrentAddressAsMinter}
-                >
-                  Use current address
-                </button>
-              </Label.AltText>
-            </Label>
+                  Token Minter
+                  <Tooltip
+                    $position="right"
+                    $variant="info"
+                    tip="Choose a secure minter address, e.g. governance, multisig etc. This address will be able to mint the token on any chain."
+                  >
+                    <HelpCircleIcon className="mr-1 h-[1em] text-info" />
+                  </Tooltip>
+                </Label.Text>
+              </Label>
+              <button type="button" onClick={actions.setCurrentAddressAsMinter}>
+                Use current address
+              </button>
+            </div>
             <ModalFormInput
               id="minter"
               placeholder="Enter a secure minter address"
