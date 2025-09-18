@@ -599,7 +599,6 @@ const useRequestDeployToken = ({
   }, [prepareMulticallRequest, multicall]);
 
   const { deployHedera } = useHederaDeployment({
-    chainId,
     prepareMulticallRequest,
     multicall,
     setIsTokenReadyForMulticall,

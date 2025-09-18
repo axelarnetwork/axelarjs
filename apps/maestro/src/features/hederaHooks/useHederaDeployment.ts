@@ -17,7 +17,7 @@ import {
   interchainTokenFactoryAddress,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { HEDERA_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { HEDERA_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 
 // use a constant value as the estimation is not accurate
 const DEPLOYMENT_GAS_COST = 900000n;
@@ -26,7 +26,6 @@ type Multicall = ReturnType<typeof useWriteInterchainTokenFactoryMulticall>;
 type PrepareMulticallRequest = Parameters<Multicall["writeContractAsync"]>[0];
 
 interface UseHederaParams {
-  chainId: number;
   prepareMulticallRequest: PrepareMulticallRequest | undefined;
   multicall: Multicall;
   setIsTokenReadyForMulticall: (isTokenReadyForMulticall: boolean) => void;
@@ -39,11 +38,11 @@ interface UseHederaParams {
  * 3. When ready, the useEffect runs the actual token deployment multicall
  */
 export const useHederaDeployment = ({
-  chainId,
   prepareMulticallRequest,
   multicall,
   setIsTokenReadyForMulticall,
 }: UseHederaParams) => {
+  const chainId = useChainId();
   const { address } = useAccount();
   const publicClient = usePublicClient();
 
