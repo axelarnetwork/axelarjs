@@ -62,7 +62,7 @@ export const whbarAbi = [
       { internalType: "address", name: "spender", type: "address" },
     ],
     name: "allowance",
-    outputs: [{ internalType: "uint256", name: "address", type: "uint256" }],
+    outputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
