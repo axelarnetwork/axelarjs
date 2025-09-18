@@ -109,11 +109,12 @@ function useHederaAssociation({
 
   const onAssociate = async () => {
     if (!tokenAddress || !hasWallet || !connectedAddress) return;
+    let loadingToastId: string | undefined;
     try {
       setIsSubmitting(true);
-      toast.loading("Associating with token");
+      loadingToastId = toast.loading("Associating with token");
       const txHash = await associateHederaToken(tokenAddress);
-      toast.dismiss();
+      if (loadingToastId) toast.dismiss(loadingToastId);
       const baseUrl = connectedChain?.blockExplorers?.default.url;
       const txUrl = baseUrl ? `${baseUrl}/tx/${txHash}` : undefined;
       toast.success(
@@ -136,6 +137,7 @@ function useHederaAssociation({
       );
     } catch (error) {
       console.error(error);
+      if (loadingToastId) toast.dismiss(loadingToastId);
       toast.error("Association failed");
       throw error;
     } finally {
@@ -145,11 +147,12 @@ function useHederaAssociation({
 
   const onDissociate = async () => {
     if (!tokenAddress || !hasWallet || !connectedAddress) return;
+    let loadingToastId: string | undefined;
     try {
       setIsSubmitting(true);
-      toast.loading("Dissociating from token");
+      loadingToastId = toast.loading("Dissociating from token");
       const txHash = await dissociateHederaToken(tokenAddress);
-      toast.dismiss();
+      if (loadingToastId) toast.dismiss(loadingToastId);
       const baseUrl = connectedChain?.blockExplorers?.default.url;
       const txUrl = baseUrl ? `${baseUrl}/tx/${txHash}` : undefined;
       toast.success(
@@ -172,6 +175,7 @@ function useHederaAssociation({
       );
     } catch (error) {
       console.error(error);
+      if (loadingToastId) toast.dismiss(loadingToastId);
       toast.error("Dissociation failed");
       throw error;
     } finally {
