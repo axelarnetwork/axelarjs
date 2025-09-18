@@ -1,4 +1,5 @@
 import {
+  Alert,
   Dialog,
   FormControl,
   HelpCircleIcon,
@@ -20,7 +21,12 @@ import {
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import {
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useChainId,
+} from "~/lib/hooks";
 import {
   isValidEVMAddress,
   isValidStellarWalletAddress,
@@ -73,6 +79,7 @@ const validateMinterAddress = (minter: string | undefined, chainId: number) => {
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
   const chainId = useChainId();
+  const isHedera = chainId === HEDERA_CHAIN_ID;
 
   const { register, handleSubmit, formState, watch } = state.tokenDetailsForm;
 
@@ -100,6 +107,32 @@ const TokenDetails: FC = () => {
       });
     }
   }, [isMintable, formState.dirtyFields, state.tokenDetailsForm]);
+
+  // enforce Hedera-specific rules
+  useEffect(() => {
+    if (chainId === HEDERA_CHAIN_ID) {
+      const { setValue, getValues } = state.tokenDetailsForm;
+      const currentIsMintable = getValues("isMintable");
+      const currentSupply = getValues("initialSupply");
+
+      if (currentIsMintable !== true) {
+        setValue("isMintable", true, {
+          shouldDirty: false,
+          shouldTouch: false,
+          shouldValidate: true,
+        });
+      }
+
+      if (currentSupply !== "0") {
+        setValue("initialSupply", "0", {
+          shouldDirty: false,
+          shouldTouch: false,
+          shouldValidate: true,
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chainId]);
 
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
@@ -162,6 +195,19 @@ const TokenDetails: FC = () => {
         className="grid grid-cols-1 sm:gap-2"
         onSubmit={handleSubmit(submitHandler)}
       >
+        {isHedera && (
+          <FormControl>
+            <Alert $status="info">
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold">Hedera Token Deployment</span>
+                <span>
+                  When deploying new tokens on Hedera, a Minter address is
+                  required and the token starts with an initial supply of 0.
+                </span>
+              </div>
+            </Alert>
+          </FormControl>
+        )}
         <FormControl>
           <Label>
             <TokenNameLabelWithTooltip />
@@ -196,28 +242,31 @@ const TokenDetails: FC = () => {
           />
           {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
-        <FormControl>
-          <div className="flex items-center justify-between">
-            <Label>
-              <Label.Text className="inline-flex items-center gap-1">
-                Is Mintable?
-                <Tooltip
-                  $position="right"
-                  $variant="info"
-                  tip="When active, the token minter will be able to mint new tokens."
-                >
-                  <HelpCircleIcon className="mr-1 h-[1em] text-info" />
-                </Tooltip>
-              </Label.Text>
-            </Label>
-            <Toggle
-              id="isMintable"
-              $variant="primary"
-              $size="sm"
-              {...register("isMintable")}
-            />
-          </div>
-        </FormControl>
+        {!isHedera && (
+          <FormControl>
+            <div className="flex items-center justify-between">
+              <Label>
+                <Label.Text className="inline-flex items-center gap-1">
+                  Is Mintable?
+                  <Tooltip
+                    $position="right"
+                    $variant="info"
+                    tip="When active, the token minter will be able to mint new tokens."
+                  >
+                    <HelpCircleIcon className="mr-1 h-[1em] text-info" />
+                  </Tooltip>
+                </Label.Text>
+              </Label>
+              <Toggle
+                id="isMintable"
+                $variant="primary"
+                $size="sm"
+                disabled={chainId === HEDERA_CHAIN_ID}
+                {...register("isMintable")}
+              />
+            </div>
+          </FormControl>
+        )}
         {isMintable && (
           <FormControl>
             <Label>
@@ -253,24 +302,27 @@ const TokenDetails: FC = () => {
             {Maybe.of(minterErrorMessage).mapOrNull(ValidationError)}
           </FormControl>
         )}
-        <FormControl>
-          <Label>
-            <Label.Text id="initialSupply-label">
-              {isMintable
-                ? "Enter initial supply"
-                : "Enter total supply - This will be a fixed supply for the token"}
-            </Label.Text>
-          </Label>
-          <ModalFormInput
-            id="initialSupply"
-            placeholder={`Enter ${isMintable ? "initial" : "total"} supply`}
-            min={0}
-            onKeyDown={preventNonNumericInput}
-            aria-labelledby="initialSupply-label"
-            {...register("initialSupply")}
-          />
-          {Maybe.of(initialSupplyErrorMessage).mapOrNull(ValidationError)}
-        </FormControl>
+        {!isHedera && (
+          <FormControl>
+            <Label>
+              <Label.Text id="initialSupply-label">
+                {isMintable
+                  ? "Enter initial supply"
+                  : "Enter total supply - This will be a fixed supply for the token"}
+              </Label.Text>
+            </Label>
+            <ModalFormInput
+              id="initialSupply"
+              placeholder={`Enter ${isMintable ? "initial" : "total"} supply`}
+              min={0}
+              onKeyDown={preventNonNumericInput}
+              aria-labelledby="initialSupply-label"
+              readOnly={chainId === HEDERA_CHAIN_ID}
+              {...register("initialSupply")}
+            />
+            {Maybe.of(initialSupplyErrorMessage).mapOrNull(ValidationError)}
+          </FormControl>
+        )}
         <FormControl>
           <div className="flex items-center justify-between">
             <Label>
