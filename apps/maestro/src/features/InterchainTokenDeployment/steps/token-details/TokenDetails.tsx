@@ -188,6 +188,8 @@ const TokenDetails: FC = () => {
   };
 
   const { errors } = state.tokenDetailsForm.formState;
+  const showMinterError =
+    formState.dirtyFields?.minter || formState.isSubmitted;
 
   return (
     <>
@@ -299,7 +301,8 @@ const TokenDetails: FC = () => {
               aria-labelledby="minter-label"
               {...register("minter")}
             />
-            {Maybe.of(minterErrorMessage).mapOrNull(ValidationError)}
+            {showMinterError &&
+              Maybe.of(minterErrorMessage).mapOrNull(ValidationError)}
           </FormControl>
         )}
         {!isHedera && (
@@ -352,10 +355,7 @@ const TokenDetails: FC = () => {
         <Dialog.CloseAction onClick={actions.reset}>
           Cancel & exit
         </Dialog.CloseAction>
-        <NextButton
-          disabled={!isFormValid}
-          onClick={() => formSubmitRef.current?.click()}
-        >
+        <NextButton onClick={() => formSubmitRef.current?.click()}>
           <p className="text-indigo-600">Register & Deploy</p>
         </NextButton>
       </Dialog.Actions>
