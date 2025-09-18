@@ -40,7 +40,6 @@ export const CUSTOM_RPC_NODES: Record<
     "base-sepolia": ["https://base-sepolia.drpc.org"], // Base Sepolia
     binance: ["https://bsc-testnet.drpc.org"], // BSC Testnet
     "blast-sepolia": ["https://rpc.ankr.com/blast"], // Blast Sepolia
-    celo: ["https://celo-alfajores.drpc.org"], // Celo Alfajores
     ethereum: ["https://sepolia.drpc.org"], // Ethereum Sepolia
     "ethereum-sepolia": ["https://sepolia.drpc.org"], // Ethereum Sepolia
     "filecoin-2": [], // Filecoin Calibration
