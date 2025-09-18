@@ -50,6 +50,14 @@ const CHAIN_IDS_WITHOUT_MULTICALL = [SUI_CHAIN_ID];
 /** a multicall is enabled manually for these chains */
 const CHAIN_IDS_WITH_MANUAL_MULTICALL = [HEDERA_CHAIN_ID];
 
+/**
+ * This is set if the token doesn't use 18 decimals and the gas value of the multicall
+ * needs to be scaled to match the decimals of the token.
+ */
+const CHAIN_GAS_VALUE_DECIMALS = {
+  [HEDERA_CHAIN_ID]: 8,
+};
+
 // Helper functions to check if chain names include specific strings
 const isChainWithoutTokenAddress = (chainName: string | undefined): boolean =>
   !!chainName &&
@@ -193,11 +201,31 @@ const usePrepareMulticall = ({
       return [deployTxData];
     }
 
+    /** the gas fee is with 18 decimals, but the gasValue is with the decimals of the token */
+    const scaleGasValue = (value18Decimals: bigint | undefined) => {
+      if (!value18Decimals) {
+        return 0n;
+      }
+
+      const chainGasValueDecimals = CHAIN_GAS_VALUE_DECIMALS[chainId];
+
+      if (!chainGasValueDecimals) {
+        return value18Decimals;
+      }
+
+      const targetDecimals = 18;
+      const factor = 10n ** BigInt(targetDecimals - chainGasValueDecimals);
+
+      return value18Decimals / factor;
+    };
+
     const registerTxData = destinationChainIds.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
         destinationChain,
-        gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
+        gasValue: scaleGasValue(
+          input.remoteDeploymentGasFees?.gasFees?.[i].fee
+        ),
       })
     );
 
