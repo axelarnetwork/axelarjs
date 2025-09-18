@@ -1,22 +1,18 @@
 import { usePublicClient } from "wagmi";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import {
   useWriteHederaTokenAssociation,
   useWriteHederaTokenDissociation,
 } from "~/lib/contracts/hedera/HederaTokenServicePrecompile.abi";
 import { HEDERA_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import { trpc } from "~/lib/trpc";
 
 export const useHederaTokenAssociation = () => {
   const { address, chain } = useAccount();
   const chainId = useChainId();
 
   const wallet = usePublicClient();
-
-  const API_URL =
-    NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-      ? "https://mainnet-public.mirrornode.hedera.com/api/v1"
-      : "https://testnet-public.mirrornode.hedera.com/api/v1";
+  const trpcUtils = trpc.useUtils();
 
   const isHederaChain = chainId === HEDERA_CHAIN_ID;
 
@@ -29,24 +25,11 @@ export const useHederaTokenAssociation = () => {
       throw new Error("Hedera Client not ready");
     }
 
-    let result = await fetch(`${API_URL}/tokens/${tokenAddress}`);
-    if (!result.ok) {
-      throw new Error(`API token lookup failed (${result.status})`);
-    }
-
-    const tokenId = ((await result.json()) as { token_id?: string }).token_id;
-    if (!tokenId) {
-      throw new Error("Token not found");
-    }
-
-    result = await fetch(
-      `${API_URL}/accounts/${address}/tokens?token.id=${tokenId}`
-    );
-    if (!result.ok) {
-      throw new Error(`API relationship lookup failed (${result.status})`);
-    }
-    const tokens = ((await result.json()) as { tokens?: any[] }).tokens;
-    return (tokens?.length ?? 0) > 0;
+    const result = await trpcUtils.hedera.checkAssociation.fetch({
+      tokenAddress,
+      accountAddress: address,
+    });
+    return Boolean(result?.isAssociated);
   };
 
   const associateHederaToken = async (tokenAddress: `0x${string}`) => {
