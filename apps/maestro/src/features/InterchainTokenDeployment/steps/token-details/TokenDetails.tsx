@@ -131,8 +131,7 @@ const TokenDetails: FC = () => {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainId]);
+  }, [chainId, isMintable, supply, state.tokenDetailsForm]);
 
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
