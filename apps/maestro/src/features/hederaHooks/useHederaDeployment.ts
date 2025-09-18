@@ -19,9 +19,6 @@ import {
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { HEDERA_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 
-// use a constant value as the estimation is not accurate
-const DEPLOYMENT_GAS_COST = 900000n;
-
 type Multicall = ReturnType<typeof useWriteInterchainTokenFactoryMulticall>;
 type PrepareMulticallRequest = Parameters<Multicall["writeContractAsync"]>[0];
 
@@ -220,8 +217,6 @@ export const useHederaDeployment = ({
     isProcessingMulticall.current = true;
 
     setIsTokenReadyForMulticall(false);
-
-    prepareMulticallRequest.gas = DEPLOYMENT_GAS_COST;
 
     multicall.writeContractAsync(prepareMulticallRequest).catch((error) => {
       console.error("useHedera: deployHedera error:", error);
