@@ -186,18 +186,38 @@ export const useHederaDeployment = ({
     approveAsync,
   ]);
 
-  /** Keep a ref to prevent the multicall from running multiple times. */
+  /** Keep a ref to prevent the multicall from running multiple times */
   const isProcessingMulticall = useRef(false);
+  /**
+   * Promise resolvers for deployHedera, since deployment will start on deployHedera but finish on the effect.
+   * This ref is also used to store if the user has initiated the deployment,
+   * as on unmounting, the useEffect will run automatically (since multicall will have data).
+   */
+  const deployPromiseResolvers = useRef<{
+    resolve: (value: `0x${string}`) => void;
+    reject: (reason?: Error) => void;
+  } | null>(null);
 
   const deployHedera = useCallback(async () => {
     if (chainId !== HEDERA_CHAIN_ID) return;
 
-    isProcessingMulticall.current = false;
+    return new Promise((resolve, reject) => {
+      // Store the promise resolvers
+      deployPromiseResolvers.current = { resolve, reject };
 
-    // deposit and approve WHBAR in parallel
-    await Promise.all([depositWhbarHedera(), approveWhbarHedera()]);
+      isProcessingMulticall.current = false;
 
-    setIsTokenReadyForMulticall(true);
+      // deposit and approve WHBAR in parallel
+      Promise.all([depositWhbarHedera(), approveWhbarHedera()])
+        .then(() => {
+          // Set the token as ready for multicall, so the effect will run
+          setIsTokenReadyForMulticall(true);
+        })
+        .catch((error) => {
+          deployPromiseResolvers.current = null;
+          reject(error);
+        });
+    });
   }, [
     chainId,
     depositWhbarHedera,
@@ -207,9 +227,10 @@ export const useHederaDeployment = ({
 
   useEffect(() => {
     if (
+      chainId !== HEDERA_CHAIN_ID ||
       !prepareMulticallRequest ||
       isProcessingMulticall.current ||
-      chainId !== HEDERA_CHAIN_ID
+      !deployPromiseResolvers.current
     ) {
       return;
     }
@@ -218,15 +239,36 @@ export const useHederaDeployment = ({
 
     setIsTokenReadyForMulticall(false);
 
-    multicall.writeContractAsync(prepareMulticallRequest).catch((error) => {
-      console.error("useHedera: deployHedera error:", error);
-    });
+    multicall
+      .writeContractAsync(prepareMulticallRequest)
+      .then((result) => {
+        deployPromiseResolvers.current?.resolve(result);
+        deployPromiseResolvers.current = null;
+      })
+      .catch((error) => {
+        deployPromiseResolvers.current?.reject(error);
+        deployPromiseResolvers.current = null;
+      });
   }, [
     multicall,
     prepareMulticallRequest,
     chainId,
     setIsTokenReadyForMulticall,
   ]);
+
+  useEffect(() => {
+    return () => {
+      // cleanup on unmount
+      if (chainId !== HEDERA_CHAIN_ID) {
+        return;
+      }
+
+      setIsTokenReadyForMulticall(false);
+
+      deployPromiseResolvers.current?.reject(new Error("Component unmounted"));
+      deployPromiseResolvers.current = null;
+    };
+  }, [setIsTokenReadyForMulticall, chainId]);
 
   return {
     deployHedera,
