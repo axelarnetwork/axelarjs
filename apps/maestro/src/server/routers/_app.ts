@@ -6,6 +6,7 @@ import { axelarConfigsRouter } from "./axelarConfigs";
 import { axelarjsSDKRouter } from "./axelarjsSDK";
 import { gmpRouter } from "./gmp";
 import { healthcheckRouter } from "./healthcheck";
+import { hederaRouter } from "./hedera";
 import { interchainTokenRouter } from "./interchainToken";
 import { messagesRouter } from "./messages";
 import { nativeTokensRouter } from "./nativeTokens";
@@ -28,6 +29,7 @@ export const appRouter = router({
   accounts: accountsRouter,
   sui: suiRouter,
   stellar: stellarRouter,
+  hedera: hederaRouter,
   healthcheck: healthcheckRouter,
 });
 
