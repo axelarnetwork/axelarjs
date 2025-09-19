@@ -29,7 +29,7 @@ interface UseHederaParams {
 }
 
 // use a constant value as the estimation is not accurate
-const DEPLOYMENT_GAS_COST = 15000000n;
+const DEPLOYMENT_GAS_COST = 5000000n;
 
 /*
  * Hedera deployment flow:
