@@ -90,7 +90,6 @@ function useHederaAssociation({
         ),
         { duration: 10000 }
       );
-      await invalidateAssociation();
     } catch (error) {
       console.error(error);
       if (loadingToastId) toast.dismiss(loadingToastId);
@@ -99,6 +98,7 @@ function useHederaAssociation({
       );
     } finally {
       setIsSubmitting(false);
+      await invalidateAssociation();
     }
   };
 
@@ -130,7 +130,6 @@ function useHederaAssociation({
         ),
         { duration: 10000 }
       );
-      await invalidateAssociation();
     } catch (error) {
       console.error(error);
       if (loadingToastId) toast.dismiss(loadingToastId);
@@ -139,6 +138,7 @@ function useHederaAssociation({
       );
     } finally {
       setIsSubmitting(false);
+      await invalidateAssociation();
     }
   };
 

@@ -1,3 +1,4 @@
+import type { TransactionReceipt } from "viem";
 import { usePublicClient } from "wagmi";
 
 import {
@@ -6,6 +7,8 @@ import {
 } from "~/lib/contracts/hedera/HederaTokenServicePrecompile.abi";
 import { HEDERA_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
+
+export const WAIT_FOR_TRANSACTION_RECEIPT_TIMEOUT = 60_000; // 60 seconds
 
 export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
   const { address, chain } = useAccount();
@@ -54,6 +57,7 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
     }
 
     let txHash: `0x${string}` | null = null;
+    let receipt: TransactionReceipt | null = null;
     try {
       txHash = await associate.writeContractAsync({
         args: [address, tokenAddress],
@@ -61,8 +65,9 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
         chainId: HEDERA_CHAIN_ID,
       });
 
-      await wallet.waitForTransactionReceipt({
+      receipt = await wallet.waitForTransactionReceipt({
         hash: txHash,
+        timeout: WAIT_FOR_TRANSACTION_RECEIPT_TIMEOUT,
       });
     } catch (error) {
       console.error(error);
@@ -75,6 +80,10 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
       throw new Error("Failed to associate token");
     }
 
+    if (!receipt) {
+      throw new Error("Failed to get transaction receipt");
+    }
+
     return txHash;
   };
 
@@ -84,6 +93,7 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
     }
 
     let txHash: `0x${string}` | null = null;
+    let receipt: TransactionReceipt | null = null;
     try {
       txHash = await dissociate.writeContractAsync({
         args: [address, tokenAddress],
@@ -91,8 +101,9 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
         chainId: HEDERA_CHAIN_ID,
       });
 
-      await wallet.waitForTransactionReceipt({
+      receipt = await wallet.waitForTransactionReceipt({
         hash: txHash,
+        timeout: WAIT_FOR_TRANSACTION_RECEIPT_TIMEOUT,
       });
     } catch (error) {
       console.error(error);
@@ -103,6 +114,10 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
 
     if (!txHash) {
       throw new Error("Failed to dissociate token");
+    }
+
+    if (!receipt) {
+      throw new Error("Failed to get transaction receipt");
     }
 
     return txHash;
