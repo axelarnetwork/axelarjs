@@ -42,6 +42,31 @@ import {
 
 const MAX_UINT64 = BigInt(2) ** BigInt(64) - BigInt(1);
 
+type Disclaimer = {
+  title: string;
+  description: string;
+};
+
+type ChainRule = {
+  isMintable?: boolean;
+  initialSupply?: string;
+  disclaimer?: Disclaimer;
+  hiddenFields?: ("isMintable" | "initialSupply")[];
+};
+
+const CHAIN_RULES: Record<number, ChainRule> = {
+  [HEDERA_CHAIN_ID]: {
+    isMintable: true,
+    initialSupply: "0",
+    disclaimer: {
+      title: "Hedera Token Deployment",
+      description:
+        "When deploying new tokens on Hedera, a Minter address is required and the token starts with an initial supply of 0.",
+    },
+    hiddenFields: ["isMintable", "initialSupply"],
+  },
+};
+
 const validateMinterAddress = (minter: string | undefined, chainId: number) => {
   if (!minter) {
     return {
@@ -79,7 +104,11 @@ const validateMinterAddress = (minter: string | undefined, chainId: number) => {
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
   const chainId = useChainId();
-  const isHedera = chainId === HEDERA_CHAIN_ID;
+  const chainRules = useMemo(() => CHAIN_RULES[chainId], [chainId]);
+  const isInitialSupplyHidden =
+    chainRules?.hiddenFields?.includes("initialSupply") === true;
+  const hasIsMintableRule = chainRules?.isMintable !== undefined;
+  const hasInitialSupplyRule = chainRules?.initialSupply !== undefined;
 
   const { register, handleSubmit, formState, watch } = state.tokenDetailsForm;
 
@@ -108,30 +137,34 @@ const TokenDetails: FC = () => {
     }
   }, [isMintable, formState.dirtyFields, state.tokenDetailsForm]);
 
-  // enforce Hedera-specific rules
+  // enforce chain-specific rules
   useEffect(() => {
-    if (chainId === HEDERA_CHAIN_ID) {
-      const { setValue, getValues } = state.tokenDetailsForm;
-      const currentIsMintable = getValues("isMintable");
-      const currentSupply = getValues("initialSupply");
+    const { setValue, getValues } = state.tokenDetailsForm;
+    const currentIsMintable = getValues("isMintable");
+    const currentSupply = getValues("initialSupply");
 
-      if (currentIsMintable !== true) {
-        setValue("isMintable", true, {
-          shouldDirty: false,
-          shouldTouch: false,
-          shouldValidate: true,
-        });
-      }
-
-      if (currentSupply !== "0") {
-        setValue("initialSupply", "0", {
-          shouldDirty: false,
-          shouldTouch: false,
-          shouldValidate: true,
-        });
-      }
+    if (hasIsMintableRule && currentIsMintable !== chainRules.isMintable) {
+      setValue("isMintable", chainRules.isMintable!, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: true,
+      });
     }
-  }, [chainId, isMintable, supply, state.tokenDetailsForm]);
+
+    if (hasInitialSupplyRule && currentSupply !== chainRules.initialSupply) {
+      setValue("initialSupply", chainRules.initialSupply!, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: true,
+      });
+    }
+  }, [
+    chainId,
+    hasIsMintableRule,
+    hasInitialSupplyRule,
+    chainRules,
+    state.tokenDetailsForm,
+  ]);
 
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
@@ -145,6 +178,9 @@ const TokenDetails: FC = () => {
   }, [isMintable, minter, chainId]);
 
   const initialSupplyErrorMessage = useMemo<FieldError | undefined>(() => {
+    if (isInitialSupplyHidden) {
+      return;
+    }
     if (!isMintable && ["0", ""].includes(supply)) {
       return {
         type: "required",
@@ -162,7 +198,7 @@ const TokenDetails: FC = () => {
         message: "Supply must be less than 2^64 - 1 for Sui",
       };
     }
-  }, [isMintable, supply, chainId, tokenDecimals]);
+  }, [isMintable, supply, chainId, tokenDecimals, isInitialSupplyHidden]);
 
   const isFormValid = useMemo(() => {
     if (minterErrorMessage || initialSupplyErrorMessage) {
@@ -196,15 +232,14 @@ const TokenDetails: FC = () => {
         className="grid grid-cols-1 sm:gap-2"
         onSubmit={handleSubmit(submitHandler)}
       >
-        {isHedera && (
+        {chainRules?.disclaimer && (
           <FormControl>
             <Alert $status="info">
               <div className="flex flex-col gap-1">
-                <span className="font-semibold">Hedera Token Deployment</span>
-                <span>
-                  When deploying new tokens on Hedera, a Minter address is
-                  required and the token starts with an initial supply of 0.
+                <span className="font-semibold">
+                  {chainRules.disclaimer.title}
                 </span>
+                <span>{chainRules.disclaimer.description}</span>
               </div>
             </Alert>
           </FormControl>
@@ -243,7 +278,7 @@ const TokenDetails: FC = () => {
           />
           {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
-        {!isHedera && (
+        {!chainRules?.hiddenFields?.includes("isMintable") && (
           <FormControl>
             <div className="flex items-center justify-between">
               <Label>
@@ -262,7 +297,7 @@ const TokenDetails: FC = () => {
                 id="isMintable"
                 $variant="primary"
                 $size="sm"
-                disabled={chainId === HEDERA_CHAIN_ID}
+                disabled={hasIsMintableRule}
                 {...register("isMintable")}
               />
             </div>
@@ -301,7 +336,7 @@ const TokenDetails: FC = () => {
               Maybe.of(minterErrorMessage).mapOrNull(ValidationError)}
           </FormControl>
         )}
-        {!isHedera && (
+        {!chainRules?.hiddenFields?.includes("initialSupply") && (
           <FormControl>
             <Label>
               <Label.Text id="initialSupply-label">
@@ -316,7 +351,7 @@ const TokenDetails: FC = () => {
               min={0}
               onKeyDown={preventNonNumericInput}
               aria-labelledby="initialSupply-label"
-              readOnly={chainId === HEDERA_CHAIN_ID}
+              readOnly={hasInitialSupplyRule}
               {...register("initialSupply")}
             />
             {Maybe.of(initialSupplyErrorMessage).mapOrNull(ValidationError)}
