@@ -441,7 +441,12 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...celoSepolia,
-    rpcUrls: createRpcUrlConfig(celoSepolia, ENVIRONMENTS.testnet, [], "celo"),
+    rpcUrls: createRpcUrlConfig(
+      celoSepolia,
+      ENVIRONMENTS.testnet,
+      [],
+      "celo-sepolia"
+    ),
     axelarChainId: "celo-sepolia",
     axelarChainName: "celo-sepolia",
     supportWagmi: true,
