@@ -18,14 +18,7 @@ import {
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress, Maybe } from "@axelarjs/utils";
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FC,
-  type ReactNode,
-} from "react";
+import { useMemo, useRef, useState, type FC, type ReactNode } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import Image from "next/image";
 
@@ -46,7 +39,6 @@ import { ITSChainConfig } from "~/server/chainConfig";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 type UseHederaAssociationArgs = {
-  isHederaChain: boolean;
   tokenAddress: `0x${string}` | undefined;
   connectedChain: Chain | undefined;
   connectedAddress: string | undefined;
@@ -54,58 +46,21 @@ type UseHederaAssociationArgs = {
 };
 
 function useHederaAssociation({
-  isHederaChain,
   tokenAddress,
   connectedChain,
   connectedAddress,
   hasWallet,
 }: UseHederaAssociationArgs) {
   const {
-    checkHederaTokenAssociation,
+    isAssociated,
+    isCheckingAssociation,
+    invalidateAssociation,
     associateHederaToken,
     dissociateHederaToken,
-  } = useHederaTokenAssociation();
+    hasAssociationError,
+  } = useHederaTokenAssociation(tokenAddress);
 
-  const [isAssociated, setIsAssociated] = useState<boolean | null>(null);
-  const [isCheckingAssociation, setIsCheckingAssociation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      !isHederaChain ||
-      !tokenAddress ||
-      !connectedChain ||
-      !connectedAddress ||
-      isSubmitting
-    )
-      return;
-
-    async function checkAssociation(address: `0x${string}`) {
-      setIsCheckingAssociation(true);
-      try {
-        const result = await checkHederaTokenAssociation(address);
-        if (!cancelled) setIsAssociated(Boolean(result));
-      } catch (e) {
-        console.error(e);
-        if (!cancelled) setIsAssociated(null);
-      } finally {
-        setIsCheckingAssociation(false);
-      }
-    }
-
-    void checkAssociation(tokenAddress);
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    connectedChain,
-    connectedAddress,
-    tokenAddress,
-    isHederaChain,
-    isSubmitting,
-  ]);
 
   const onAssociate = async () => {
     if (!tokenAddress || !hasWallet || !connectedAddress) return;
@@ -135,11 +90,13 @@ function useHederaAssociation({
         ),
         { duration: 10000 }
       );
+      await invalidateAssociation();
     } catch (error) {
       console.error(error);
       if (loadingToastId) toast.dismiss(loadingToastId);
-      toast.error("Association failed");
-      throw error;
+      toast.error(
+        error instanceof Error ? error.message : "Association failed"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -173,11 +130,13 @@ function useHederaAssociation({
         ),
         { duration: 10000 }
       );
+      await invalidateAssociation();
     } catch (error) {
       console.error(error);
       if (loadingToastId) toast.dismiss(loadingToastId);
-      toast.error("Dissociation failed");
-      throw error;
+      toast.error(
+        error instanceof Error ? error.message : "Dissociation failed"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -186,6 +145,7 @@ function useHederaAssociation({
   return {
     isAssociated,
     isCheckingAssociation,
+    hasAssociationError,
     isSubmitting,
     onAssociate,
     onDissociate,
@@ -232,11 +192,11 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   const {
     isAssociated,
     isCheckingAssociation,
+    hasAssociationError,
     isSubmitting,
     onAssociate,
     onDissociate,
   } = useHederaAssociation({
-    isHederaChain,
     tokenAddress,
     connectedChain,
     connectedAddress,
@@ -264,41 +224,49 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     tokenDetails.push([
       "Hedera Token Association",
       <div key="hedera-assoc" className="flex items-center gap-2">
-        {isAssociated === null && !isCheckingAssociation && (
+        {hasAssociationError && !isCheckingAssociation && (
           <span className="text-warning">
             Error checking association. Make sure your wallet address belongs to
             a Hedera account.
           </span>
         )}
-        {isAssociated === null && isCheckingAssociation && (
+        {!hasAssociationError && isCheckingAssociation && (
           <span>Checking token association...</span>
         )}
-        {isAssociated !== null && (
-          <span>
-            <span className="text-lg leading-none">
-              {isAssociated ? " ✓ Associated" : " x Not associated"}
+        {!hasAssociationError &&
+          !isCheckingAssociation &&
+          isAssociated !== null && (
+            <span>
+              {isAssociated ? (
+                <span className="text-lg leading-none text-success">
+                  ✓ Associated
+                </span>
+              ) : (
+                <span className="text-lg leading-none text-error">
+                  x Not associated
+                </span>
+              )}
+              <LinkButton
+                key="assoc-action"
+                href="#"
+                className="ml-[-10px]"
+                $variant="link"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  if (isAssociated) {
+                    await onDissociate();
+                  } else {
+                    await onAssociate();
+                  }
+                }}
+                disabled={isSubmitting}
+                hidden={isSubmitting}
+                $loading={isSubmitting}
+              >
+                {isAssociated ? "Disassociate" : "Associate"}
+              </LinkButton>
             </span>
-            <LinkButton
-              key="assoc-action"
-              href="#"
-              className="ml-[-10px]"
-              $variant="link"
-              onClick={async (e) => {
-                e.preventDefault();
-                if (isAssociated) {
-                  await onDissociate();
-                } else {
-                  await onAssociate();
-                }
-              }}
-              disabled={isSubmitting}
-              hidden={isSubmitting}
-              $loading={isSubmitting}
-            >
-              {isAssociated ? "Disassociate" : "Associate"}
-            </LinkButton>
-          </span>
-        )}
+          )}
       </div>,
     ]);
   }

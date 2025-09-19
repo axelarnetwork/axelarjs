@@ -7,7 +7,7 @@ import {
 import { HEDERA_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
-export const useHederaTokenAssociation = () => {
+export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
   const { address, chain } = useAccount();
   const chainId = useChainId();
 
@@ -20,16 +20,33 @@ export const useHederaTokenAssociation = () => {
   const dissociate = useWriteHederaTokenDissociation();
   const isReady = address && isHederaChain && chain && wallet;
 
-  const checkHederaTokenAssociation = async (tokenAddress: `0x${string}`) => {
-    if (!isReady) {
-      throw new Error("Hedera Client not ready");
+  const {
+    data: associationData,
+    isFetching: isCheckingAssociation,
+    isError: hasAssociationError,
+  } = trpc.hedera.checkAssociation.useQuery(
+    {
+      tokenAddress: tokenAddress!,
+      accountAddress: address,
+    },
+    {
+      enabled:
+        Boolean(tokenAddress) &&
+        Boolean(address) &&
+        Boolean(chain) &&
+        Boolean(wallet) &&
+        Boolean(isHederaChain),
+      retry: false,
+      refetchOnWindowFocus: false,
     }
+  );
 
-    const result = await trpcUtils.hedera.checkAssociation.fetch({
+  const invalidateAssociation = async () => {
+    if (!tokenAddress || !address) return;
+    await trpcUtils.hedera.checkAssociation.invalidate({
       tokenAddress,
       accountAddress: address,
     });
-    return Boolean(result?.isAssociated);
   };
 
   const associateHederaToken = async (tokenAddress: `0x${string}`) => {
@@ -93,7 +110,10 @@ export const useHederaTokenAssociation = () => {
   };
 
   return {
-    checkHederaTokenAssociation,
+    isAssociated: associationData?.isAssociated ?? null,
+    isCheckingAssociation,
+    invalidateAssociation,
+    hasAssociationError,
     associateHederaToken,
     dissociateHederaToken,
   };
