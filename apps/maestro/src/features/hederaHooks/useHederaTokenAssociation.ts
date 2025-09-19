@@ -37,7 +37,6 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
         Boolean(wallet) &&
         Boolean(isHederaChain),
       retry: false,
-      refetchOnWindowFocus: false,
     }
   );
 
