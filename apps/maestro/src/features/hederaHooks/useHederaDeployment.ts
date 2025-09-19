@@ -28,6 +28,9 @@ interface UseHederaParams {
   setIsTokenReadyForMulticall: (isTokenReadyForMulticall: boolean) => void;
 }
 
+// use a constant value as the estimation is not accurate
+const DEPLOYMENT_GAS_COST = 15000000n;
+
 /*
  * Hedera deployment flow:
  * 1. First we need to deposit and approve WHBAR (via deployHedera)
@@ -239,8 +242,13 @@ export const useHederaDeployment = ({
 
     setIsTokenReadyForMulticall(false);
 
+    const multicallRequest: PrepareMulticallRequest = {
+      ...prepareMulticallRequest,
+      gas: DEPLOYMENT_GAS_COST,
+    };
+
     multicall
-      .writeContractAsync(prepareMulticallRequest)
+      .writeContractAsync(multicallRequest)
       .then((result) => {
         deployPromiseResolvers.current?.resolve(result);
         deployPromiseResolvers.current = null;
