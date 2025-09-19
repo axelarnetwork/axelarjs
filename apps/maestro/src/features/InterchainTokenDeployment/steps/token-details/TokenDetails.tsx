@@ -104,7 +104,7 @@ const validateMinterAddress = (minter: string | undefined, chainId: number) => {
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
   const chainId = useChainId();
-  const chainRules = useMemo(() => CHAIN_RULES[chainId], [chainId]);
+  const chainRules = CHAIN_RULES[chainId];
   const isInitialSupplyHidden =
     chainRules?.hiddenFields?.includes("initialSupply") === true;
   const hasIsMintableRule = chainRules?.isMintable !== undefined;
