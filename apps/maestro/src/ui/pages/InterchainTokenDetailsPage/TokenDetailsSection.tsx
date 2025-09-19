@@ -39,7 +39,7 @@ import { ITSChainConfig } from "~/server/chainConfig";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
 type UseHederaAssociationArgs = {
-  tokenAddress: `0x${string}` | undefined;
+  tokenAddress: string | undefined;
   connectedChain: Chain | undefined;
   connectedAddress: string | undefined;
   hasWallet: boolean;
@@ -58,7 +58,7 @@ function useHederaAssociation({
     associateHederaToken,
     dissociateHederaToken,
     hasAssociationError,
-  } = useHederaTokenAssociation(tokenAddress);
+  } = useHederaTokenAssociation(tokenAddress as `0x${string}`);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -68,7 +68,7 @@ function useHederaAssociation({
     try {
       setIsSubmitting(true);
       loadingToastId = toast.loading("Associating with token");
-      const txHash = await associateHederaToken(tokenAddress);
+      const txHash = await associateHederaToken(tokenAddress as `0x${string}`);
       if (loadingToastId) toast.dismiss(loadingToastId);
       const baseUrl = connectedChain?.blockExplorers?.default.url;
       const txUrl = baseUrl ? `${baseUrl}/tx/${txHash}` : undefined;
@@ -108,7 +108,7 @@ function useHederaAssociation({
     try {
       setIsSubmitting(true);
       loadingToastId = toast.loading("Dissociating from token");
-      const txHash = await dissociateHederaToken(tokenAddress);
+      const txHash = await dissociateHederaToken(tokenAddress as `0x${string}`);
       if (loadingToastId) toast.dismiss(loadingToastId);
       const baseUrl = connectedChain?.blockExplorers?.default.url;
       const txUrl = baseUrl ? `${baseUrl}/tx/${txHash}` : undefined;
@@ -186,7 +186,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
   const isStellarChain = props.chain.chain_id === STELLAR_CHAIN_ID;
   const isHederaChain = props.chain.chain_id === HEDERA_CHAIN_ID;
-  const tokenAddress = props.tokenAddress as `0x${string}`;
+  const tokenAddress = props.tokenAddress;
 
   const { address: connectedAddress, chain: connectedChain } = useAccount();
   const {
