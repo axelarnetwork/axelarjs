@@ -100,12 +100,9 @@ export const useHederaDeployment = ({
 
   // WHBAR deposit function - deposits HBAR to get WHBAR
   const depositWhbarHedera = useCallback(async () => {
-    if (!publicClient) {
-      return;
-    }
-
     if (
       chainId !== HEDERA_CHAIN_ID ||
+      !publicClient ||
       !whbarAddress ||
       !tokenCreationPriceTinybars
     ) {
