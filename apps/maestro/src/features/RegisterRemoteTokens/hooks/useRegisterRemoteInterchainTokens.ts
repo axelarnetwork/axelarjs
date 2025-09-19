@@ -10,6 +10,7 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -66,11 +67,11 @@ export default function useRegisterRemoteInterchainTokens(
     )
       return [];
 
-    return destinationChainIds.map((chainId, i) =>
+    return destinationChainIds.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
-        destinationChain: chainId,
-        gasValue: gasFeesData.gasFees[i].fee,
+        destinationChain,
+        gasValue: scaleGasValue(chainId, gasFeesData.gasFees[i].fee),
       })
     );
   }, [destinationChainIds, gasFeesData, tokenDeployment, chainId]);

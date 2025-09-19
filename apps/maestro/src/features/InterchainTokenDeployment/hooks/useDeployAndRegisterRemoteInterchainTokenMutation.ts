@@ -32,6 +32,7 @@ import {
 } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
@@ -49,14 +50,6 @@ const CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING = ["sui", "stellar"];
 const CHAIN_IDS_WITHOUT_MULTICALL = [SUI_CHAIN_ID];
 /** a multicall is enabled manually for these chains */
 const CHAIN_IDS_WITH_MANUAL_MULTICALL = [HEDERA_CHAIN_ID];
-
-/**
- * This is set if the token doesn't use 18 decimals and the gas value of the multicall
- * needs to be scaled to match the decimals of the token.
- */
-const CHAIN_GAS_VALUE_DECIMALS = {
-  [HEDERA_CHAIN_ID]: 8,
-};
 
 // Helper functions to check if chain names include specific strings
 const isChainWithoutTokenAddress = (chainName: string | undefined): boolean =>
@@ -201,29 +194,12 @@ const usePrepareMulticall = ({
       return [deployTxData];
     }
 
-    /** the gas fee is with 18 decimals, but the gasValue is with the decimals of the token */
-    const scaleGasValue = (value18Decimals: bigint | undefined) => {
-      if (!value18Decimals) {
-        return 0n;
-      }
-
-      const chainGasValueDecimals = CHAIN_GAS_VALUE_DECIMALS[chainId];
-
-      if (!chainGasValueDecimals) {
-        return value18Decimals;
-      }
-
-      const targetDecimals = 18;
-      const factor = 10n ** BigInt(targetDecimals - chainGasValueDecimals);
-
-      return value18Decimals / factor;
-    };
-
     const registerTxData = destinationChainIds.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
         destinationChain,
         gasValue: scaleGasValue(
+          chainId,
           input.remoteDeploymentGasFees?.gasFees?.[i].fee
         ),
       })
