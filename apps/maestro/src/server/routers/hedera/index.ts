@@ -17,8 +17,8 @@ export const hederaRouter = router({
 
       const API_URL =
         NEXT_PUBLIC_NETWORK_ENV === "mainnet"
-          ? "https://mainnet-public.mirrornode.hedera.com/api/v1"
-          : "https://testnet-public.mirrornode.hedera.com/api/v1";
+          ? "https://mainnet.mirrornode.hedera.com/api/v1"
+          : "https://testnet.mirrornode.hedera.com/api/v1";
 
       const tokenResp = await fetch(`${API_URL}/tokens/${tokenAddress}`);
       if (!tokenResp.ok) {
