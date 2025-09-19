@@ -246,25 +246,22 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
                   x Not associated
                 </span>
               )}
-              <LinkButton
+              <Button
                 key="assoc-action"
-                href="#"
                 className="ml-[-10px]"
                 $variant="link"
+                $loading={isSubmitting}
+                aria-disabled={isSubmitting}
+                tabIndex={isSubmitting ? -1 : 0}
                 onClick={async (e) => {
                   e.preventDefault();
-                  if (isAssociated) {
-                    await onDissociate();
-                  } else {
-                    await onAssociate();
-                  }
+                  if (isSubmitting) return;
+                  if (isAssociated) await onDissociate();
+                  else await onAssociate();
                 }}
-                disabled={isSubmitting}
-                hidden={isSubmitting}
-                $loading={isSubmitting}
               >
                 {isAssociated ? "Disassociate" : "Associate"}
-              </LinkButton>
+              </Button>
             </span>
           )}
       </div>,
