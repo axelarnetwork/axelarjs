@@ -12,7 +12,7 @@ import {
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
-import { useCallback, useMemo, type FC } from "react";
+import { useCallback, useMemo, useState, type FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -20,7 +20,13 @@ import { TransactionExecutionError } from "viem";
 
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
-import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
+import { useHederaTokenAssociation } from "~/features/hederaHooks";
+import {
+  HEDERA_CHAIN_ID,
+  useAccount,
+  useChainId,
+  useSwitchChain,
+} from "~/lib/hooks";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -45,6 +51,125 @@ const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
     </Tooltip>
   );
 };
+
+function useHederaAssociationActions(params: {
+  tokenAddress?: string;
+  baseExplorerUrl?: string;
+}) {
+  const {
+    isAssociated,
+    isCheckingAssociation,
+    hasAssociationError,
+    associateHederaToken,
+    dissociateHederaToken,
+    invalidateAssociation,
+  } = useHederaTokenAssociation(params.tokenAddress as `0x${string}`);
+
+  const [isAssocSubmitting, setIsAssocSubmitting] = useState(false);
+
+  const onAssociate = useCallback(async () => {
+    if (!params.tokenAddress) return;
+    let loadingToastId: string | undefined;
+    try {
+      setIsAssocSubmitting(true);
+      loadingToastId = toast.loading("Associating with token");
+      const txHash = await associateHederaToken(
+        params.tokenAddress as `0x${string}`
+      );
+      if (loadingToastId) toast.dismiss(loadingToastId);
+      const txUrl = params.baseExplorerUrl
+        ? `${params.baseExplorerUrl}/tx/${txHash}`
+        : undefined;
+      toast.success(
+        txUrl ? (
+          <span>
+            Associated with token. Transaction hash:
+            <a
+              href={txUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 underline"
+            >
+              {txHash}
+            </a>
+          </span>
+        ) : (
+          "Associated with token. Transaction hash: " + txHash
+        ),
+        { duration: 10000 }
+      );
+    } catch (error) {
+      if (loadingToastId) toast.dismiss(loadingToastId);
+      toast.error(
+        error instanceof Error ? error.message : "Association failed"
+      );
+    } finally {
+      setIsAssocSubmitting(false);
+      await invalidateAssociation();
+    }
+  }, [
+    associateHederaToken,
+    params.baseExplorerUrl,
+    params.tokenAddress,
+    invalidateAssociation,
+  ]);
+
+  const onDissociate = useCallback(async () => {
+    if (!params.tokenAddress) return;
+    let loadingToastId: string | undefined;
+    try {
+      setIsAssocSubmitting(true);
+      loadingToastId = toast.loading("Dissociating from token");
+      const txHash = await dissociateHederaToken(
+        params.tokenAddress as `0x${string}`
+      );
+      if (loadingToastId) toast.dismiss(loadingToastId);
+      const txUrl = params.baseExplorerUrl
+        ? `${params.baseExplorerUrl}/tx/${txHash}`
+        : undefined;
+      toast.success(
+        txUrl ? (
+          <span>
+            Dissociated from token. Transaction hash:
+            <a
+              href={txUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 underline"
+            >
+              {txHash}
+            </a>
+          </span>
+        ) : (
+          "Dissociated from token. Transaction hash: " + txHash
+        ),
+        { duration: 10000 }
+      );
+    } catch (error) {
+      if (loadingToastId) toast.dismiss(loadingToastId);
+      toast.error(
+        error instanceof Error ? error.message : "Dissociation failed"
+      );
+    } finally {
+      setIsAssocSubmitting(false);
+      await invalidateAssociation();
+    }
+  }, [
+    dissociateHederaToken,
+    params.baseExplorerUrl,
+    params.tokenAddress,
+    invalidateAssociation,
+  ]);
+
+  return {
+    isAssociated,
+    isCheckingAssociation,
+    hasAssociationError,
+    isAssocSubmitting,
+    onAssociate,
+    onDissociate,
+  } as const;
+}
 
 export type Props = TokenInfo & {
   hasRemoteTokens: boolean;
@@ -103,6 +228,18 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   }, [props.chainId, switchChain]);
 
   const isSourceChain = chainId === props.chainId;
+  const isHederaChain = props.chainId === HEDERA_CHAIN_ID;
+  const {
+    isAssociated,
+    isCheckingAssociation,
+    hasAssociationError,
+    isAssocSubmitting,
+    onAssociate,
+    onDissociate,
+  } = useHederaAssociationActions({
+    tokenAddress: props.tokenAddress,
+    baseExplorerUrl: props.chain?.blockExplorers?.[0]?.url,
+  });
 
   const switchChainButton = (
     <Button
@@ -191,6 +328,57 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             </Badge>
           )}
         </Card.Title>
+
+        {isHederaChain && address && (
+          <div className="mb-2 flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
+            {hasAssociationError && !isCheckingAssociation ? (
+              <span className="text-warning">
+                Error checking association. Make sure your wallet address
+                belongs to a Hedera account.
+              </span>
+            ) : isCheckingAssociation || isAssociated === null ? (
+              <span>Checking association status...</span>
+            ) : !isSourceChain ? (
+              <div className="flex w-full items-center justify-between">
+                <span>
+                  Switch to {props.chain?.name ?? "Hedera"} to manage
+                  association
+                </span>
+                {switchChainButton}
+              </div>
+            ) : (
+              <div className="flex w-full items-center justify-between">
+                <span>
+                  {isAssociated ? (
+                    <span className="text-lg leading-none text-success">
+                      ✓ Associated
+                    </span>
+                  ) : (
+                    <span className="text-lg leading-none text-error">
+                      x Not associated
+                    </span>
+                  )}
+                </span>
+                <Button
+                  $size="xs"
+                  $variant="primary"
+                  className="absolute right-6"
+                  $loading={isAssocSubmitting}
+                  aria-disabled={isAssocSubmitting}
+                  tabIndex={isAssocSubmitting ? -1 : 0}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    if (isAssocSubmitting) return;
+                    if (isAssociated) await onDissociate();
+                    else await onAssociate();
+                  }}
+                >
+                  {isAssociated ? "Dissociate" : "Associate"}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         {!balance?.tokenBalance ? (
           !address ? null : (

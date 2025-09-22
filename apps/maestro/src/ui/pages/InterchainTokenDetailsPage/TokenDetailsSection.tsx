@@ -22,11 +22,10 @@ import { useMemo, useRef, useState, type FC, type ReactNode } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import Image from "next/image";
 
-import { createWalletClient, custom, type Chain } from "viem";
+import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
 import { z } from "zod";
 
-import { useHederaTokenAssociation } from "~/features/hederaHooks";
 import {
   HEDERA_CHAIN_ID,
   STELLAR_CHAIN_ID,
@@ -37,120 +36,6 @@ import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
-
-type UseHederaAssociationArgs = {
-  tokenAddress: string | undefined;
-  connectedChain: Chain | undefined;
-  connectedAddress: string | undefined;
-  hasWallet: boolean;
-};
-
-function useHederaAssociation({
-  tokenAddress,
-  connectedChain,
-  connectedAddress,
-  hasWallet,
-}: UseHederaAssociationArgs) {
-  const {
-    isAssociated,
-    isCheckingAssociation,
-    invalidateAssociation,
-    associateHederaToken,
-    dissociateHederaToken,
-    hasAssociationError,
-  } = useHederaTokenAssociation(tokenAddress as `0x${string}`);
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const onAssociate = async () => {
-    if (!tokenAddress || !hasWallet || !connectedAddress) return;
-    let loadingToastId: string | undefined;
-    try {
-      setIsSubmitting(true);
-      loadingToastId = toast.loading("Associating with token");
-      const txHash = await associateHederaToken(tokenAddress as `0x${string}`);
-      if (loadingToastId) toast.dismiss(loadingToastId);
-      const baseUrl = connectedChain?.blockExplorers?.default.url;
-      const txUrl = baseUrl ? `${baseUrl}/tx/${txHash}` : undefined;
-      toast.success(
-        txUrl ? (
-          <span>
-            Associated with token. Transaction hash:
-            <a
-              href={txUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1 underline"
-            >
-              {txHash}
-            </a>
-          </span>
-        ) : (
-          "Associated with token. Transaction hash: " + txHash
-        ),
-        { duration: 10000 }
-      );
-    } catch (error) {
-      console.error(error);
-      if (loadingToastId) toast.dismiss(loadingToastId);
-      toast.error(
-        error instanceof Error ? error.message : "Association failed"
-      );
-    } finally {
-      setIsSubmitting(false);
-      await invalidateAssociation();
-    }
-  };
-
-  const onDissociate = async () => {
-    if (!tokenAddress || !hasWallet || !connectedAddress) return;
-    let loadingToastId: string | undefined;
-    try {
-      setIsSubmitting(true);
-      loadingToastId = toast.loading("Dissociating from token");
-      const txHash = await dissociateHederaToken(tokenAddress as `0x${string}`);
-      if (loadingToastId) toast.dismiss(loadingToastId);
-      const baseUrl = connectedChain?.blockExplorers?.default.url;
-      const txUrl = baseUrl ? `${baseUrl}/tx/${txHash}` : undefined;
-      toast.success(
-        txUrl ? (
-          <span>
-            Dissociated from token. Transaction hash:
-            <a
-              href={txUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1 underline"
-            >
-              {txHash}
-            </a>
-          </span>
-        ) : (
-          "Dissociated from token. Transaction hash: " + txHash
-        ),
-        { duration: 10000 }
-      );
-    } catch (error) {
-      console.error(error);
-      if (loadingToastId) toast.dismiss(loadingToastId);
-      toast.error(
-        error instanceof Error ? error.message : "Dissociation failed"
-      );
-    } finally {
-      setIsSubmitting(false);
-      await invalidateAssociation();
-    }
-  };
-
-  return {
-    isAssociated,
-    isCheckingAssociation,
-    hasAssociationError,
-    isSubmitting,
-    onAssociate,
-    onDissociate,
-  } as const;
-}
 
 export type TokenDetailsSectionProps = {
   name: string;
@@ -188,21 +73,6 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   const isHederaChain = props.chain.chain_id === HEDERA_CHAIN_ID;
   const tokenAddress = props.tokenAddress;
 
-  const { address: connectedAddress, chain: connectedChain } = useAccount();
-  const {
-    isAssociated,
-    isCheckingAssociation,
-    hasAssociationError,
-    isSubmitting,
-    onAssociate,
-    onDissociate,
-  } = useHederaAssociation({
-    tokenAddress,
-    connectedChain,
-    connectedAddress,
-    hasWallet: Boolean(wallet),
-  });
-
   const tokenDetails: Array<[string, ReactNode]> = [
     ["Name", props.name],
     ["Symbol", props.symbol],
@@ -219,54 +89,6 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       </CopyToClipboardButton>,
     ],
   ];
-
-  if (connectedAddress && wallet && isHederaChain) {
-    tokenDetails.push([
-      "Hedera Token Association",
-      <div key="hedera-assoc" className="flex items-center gap-2">
-        {hasAssociationError && !isCheckingAssociation && (
-          <span className="text-warning">
-            Error checking association. Make sure your wallet address belongs to
-            a Hedera account.
-          </span>
-        )}
-        {!hasAssociationError && isCheckingAssociation && (
-          <span>Checking token association...</span>
-        )}
-        {!hasAssociationError &&
-          !isCheckingAssociation &&
-          isAssociated !== null && (
-            <span>
-              {isAssociated ? (
-                <span className="text-lg leading-none text-success">
-                  ✓ Associated
-                </span>
-              ) : (
-                <span className="text-lg leading-none text-error">
-                  x Not associated
-                </span>
-              )}
-              <Button
-                key="assoc-action"
-                className="ml-[-10px]"
-                $variant="link"
-                $loading={isSubmitting}
-                aria-disabled={isSubmitting}
-                tabIndex={isSubmitting ? -1 : 0}
-                onClick={async (e) => {
-                  e.preventDefault();
-                  if (isSubmitting) return;
-                  if (isAssociated) await onDissociate();
-                  else await onAssociate();
-                }}
-              >
-                {isAssociated ? "Disassociate" : "Associate"}
-              </Button>
-            </span>
-          )}
-      </div>,
-    ]);
-  }
 
   if (wallet && !isSuiChain && !isStellarChain && !isHederaChain) {
     tokenDetails.push([
