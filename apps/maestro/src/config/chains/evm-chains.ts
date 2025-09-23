@@ -64,8 +64,8 @@ const ENVIRONMENTS = {
   testnet: "testnet",
 } as const;
 
-/** the registered contract is used */
-export const CHAIN_IDS_WITH_REGISTERED_TOKEN_ADDRESS = [HEDERA_CHAIN_ID];
+/** the token address can only be queried on chain after the deployment */
+export const CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS = [HEDERA_CHAIN_ID];
 
 const xrplEvm = defineChain({
   id: 1440000,
