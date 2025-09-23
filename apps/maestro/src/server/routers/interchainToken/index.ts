@@ -17,6 +17,7 @@ import { recoverDeploymentMessageIdByTokenId } from "./recoverDeploymentMessageI
 import { searchInterchainToken } from "./searchInterchainToken";
 import { setInterchainTokenIconUrl } from "./setInterchainTokenIconUrl";
 import { updateEVMRemoteTokenAddress } from "./updateEVMRemoteAddresses";
+import { updateRegisteredEVMRemoteAddress } from "./updateRegisteredEVMRemoteAddress";
 import { updateStellarRemoteTokenAddresses } from "./updateStellarRemoteTokenAddresses";
 import { updateSuiRemoteTokenAddresses } from "./updateSuiRemoteTokenAddresses";
 
@@ -38,6 +39,7 @@ export const interchainTokenRouter = router({
   recoverDeploymentMessageIdByTokenId,
   setInterchainTokenIconUrl,
   updateEVMRemoteTokenAddress,
+  updateRegisteredEVMRemoteAddress,
   updateSuiRemoteTokenAddresses,
   getInterchainTokenBalanceForOwner,
   updateStellarRemoteTokenAddresses,

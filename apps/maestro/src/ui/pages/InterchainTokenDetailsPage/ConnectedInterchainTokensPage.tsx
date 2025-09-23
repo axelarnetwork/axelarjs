@@ -136,6 +136,8 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     useState(false);
   const [isAlreadyUpdatingRemoteStellar, setAlreadyUpdatingRemoteStellar] =
     useState(false);
+  const [isAlreadyUpdatingRemoteHedera, setAlreadyUpdatingRemoteHedera] =
+    useState(false);
   const { address } = useAccount();
   const chainId = useChainId();
   const { isAuthenticated } = useIsAuthenticated();
@@ -294,6 +296,9 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   const { mutateAsync: updateEVMAddresses } =
     trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
 
+  const { mutateAsync: updateRegisteredEVMAddresses } =
+    trpc.interchainToken.updateRegisteredEVMRemoteAddress.useMutation();
+
   // Update Sui remote token addresses
   // the address is wrong on the Sui chain on deployment because it's the EVM address,
   // we wait for the tx to be executed then we update the address on the Sui chain
@@ -382,6 +387,52 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     props.tokenId,
     refetchPageData,
     updateStellarAddresses,
+  ]);
+
+  // Update Hedera remote token addresses
+  // the address is wrong on the Hedera chain on deployment because it's the EVM address,
+  // we wait for the tx to be executed then we update the address on the Hedera chain
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const hederaChain = interchainToken?.matchingTokens?.find((x) =>
+      x.chain?.id.includes("hedera")
+    );
+
+    if (
+      !isAlreadyUpdatingRemoteHedera &&
+      hederaChain &&
+      interchainToken?.matchingTokens?.some(
+        (x) =>
+          x.chain?.id === hederaChain?.chain?.id &&
+          x.tokenAddress === props.tokenAddress &&
+          x.isRegistered
+      ) &&
+      props.tokenId
+    ) {
+      setAlreadyUpdatingRemoteHedera(true);
+      updateRegisteredEVMAddresses({
+        tokenId: props.tokenId,
+        axelarChainId: hederaChain.chain.id,
+      })
+        .then(() => {
+          setAlreadyUpdatingRemoteHedera(false);
+          refetchPageData();
+        })
+        .catch(() => {
+          setTimeout(() => {
+            setAlreadyUpdatingRemoteHedera(false);
+          }, 5000); // space requests while waiting for the tx to be executed and data to be available on hedera chain
+        });
+    }
+  }, [
+    isAuthenticated,
+    interchainToken?.matchingTokens,
+    isAlreadyUpdatingRemoteHedera,
+    props.tokenAddress,
+    props.tokenId,
+    refetchPageData,
+    updateRegisteredEVMAddresses,
   ]);
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
