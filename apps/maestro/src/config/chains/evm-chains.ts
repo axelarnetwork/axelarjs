@@ -16,7 +16,6 @@ import {
   bscTestnet,
   celo,
   celoAlfajores,
-  Chain,
   fantom,
   fantomTestnet,
   filecoin,
@@ -54,56 +53,13 @@ import {
 } from "viem/chains";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
-import { CUSTOM_RPC_NODES } from "./custom-rpc-nodes";
-
-export interface ExtendedWagmiChainConfig extends Chain {
-  axelarChainId: string;
-  axelarChainName: string;
-  supportWagmi: boolean;
-  environment: "mainnet" | "testnet" | "devnet-amplifier";
-}
+import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
   devnet: "devnet-amplifier",
   testnet: "testnet",
 } as const;
-
-export function createRpcUrlConfig(
-  chainIdOrChain: string | Chain,
-  environment: "mainnet" | "testnet" | "devnet-amplifier",
-  extras: string[] = [],
-  axelarChainId?: string
-) {
-  // Handle the case where a Chain object is provided
-  let chainId: string;
-  let baseUrls: string[];
-
-  if (typeof chainIdOrChain === "string") {
-    // VM chains configuration case
-    chainId = chainIdOrChain;
-    baseUrls = [];
-  } else {
-    // EVM chain configuration case
-    chainId = axelarChainId || "";
-    baseUrls = Array.from(chainIdOrChain.rpcUrls.default.http);
-  }
-
-  // custom RPC overrides for all environments
-  const customNodes =
-    CUSTOM_RPC_NODES[environment]?.[chainId.toLowerCase()] ?? [];
-
-  // build unified URL list with custom nodes and extras
-  const combinedUrls = [...extras, ...baseUrls];
-  const urls = customNodes.length
-    ? [...customNodes, ...combinedUrls]
-    : combinedUrls;
-
-  return {
-    default: { http: urls },
-    public: { http: urls },
-  };
-}
 
 const xrplEvm = defineChain({
   id: 1440000,
