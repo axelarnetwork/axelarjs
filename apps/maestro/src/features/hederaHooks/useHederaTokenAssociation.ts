@@ -10,7 +10,10 @@ import { trpc } from "~/lib/trpc";
 
 export const WAIT_FOR_TRANSACTION_RECEIPT_TIMEOUT = 60_000; // 60 seconds
 
-export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
+export const useHederaTokenAssociation = (
+  tokenAddress?: `0x${string}`,
+  options?: { accountAddress?: string; enabled?: boolean }
+) => {
   const { address, chain } = useAccount();
   const chainId = useChainId();
 
@@ -23,31 +26,38 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
   const dissociate = useWriteHederaTokenDissociation();
   const isReady = address && isHederaChain && chain && wallet;
 
+  const accountAddressToCheck = options?.accountAddress ?? address;
+
   const {
     data: associationData,
     isFetching: isCheckingAssociation,
     isError: hasAssociationError,
   } = trpc.hedera.checkAssociation.useQuery(
     {
-      tokenAddress: tokenAddress!,
-      accountAddress: address,
+      tokenAddress: tokenAddress ?? "",
+      accountAddress: accountAddressToCheck ?? "",
     },
     {
       enabled:
+        (options?.enabled ?? true) &&
         Boolean(tokenAddress) &&
-        Boolean(address) &&
-        Boolean(chain) &&
-        Boolean(wallet) &&
-        Boolean(isHederaChain),
+        Boolean(accountAddressToCheck) &&
+        // If checking for arbitrary account (override provided), no wallet/chain requirements
+        (options?.accountAddress
+          ? true
+          : Boolean(address) &&
+            Boolean(chain) &&
+            Boolean(wallet) &&
+            Boolean(isHederaChain)),
       retry: false,
     }
   );
 
   const invalidateAssociation = async () => {
-    if (!tokenAddress || !address) return;
+    if (!tokenAddress || !accountAddressToCheck) return;
     await trpcUtils.hedera.checkAssociation.invalidate({
       tokenAddress,
-      accountAddress: address,
+      accountAddress: accountAddressToCheck,
     });
   };
 
@@ -105,6 +115,7 @@ export const useHederaTokenAssociation = (tokenAddress?: `0x${string}`) => {
         hash: txHash,
         timeout: WAIT_FOR_TRANSACTION_RECEIPT_TIMEOUT,
       });
+      console.log("receipt", receipt);
     } catch (error) {
       console.error(error);
       throw new Error(
