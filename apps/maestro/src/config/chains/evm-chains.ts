@@ -52,14 +52,20 @@ import {
   xrplevmTestnet,
 } from "viem/chains";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
+
+export const HEDERA_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 295 : 296;
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
   devnet: "devnet-amplifier",
   testnet: "testnet",
 } as const;
+
+/** the registered contract is used */
+export const CHAIN_IDS_WITH_REGISTERED_TOKEN_ADDRESS = [HEDERA_CHAIN_ID];
 
 const xrplEvm = defineChain({
   id: 1440000,

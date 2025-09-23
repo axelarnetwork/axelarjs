@@ -2,8 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import { suiChainConfig } from "~/config/chains";
-import { STELLAR_CHAIN_ID } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, suiChainConfig } from "~/config/chains";
 import { normalizeStellarTokenAddress } from "~/lib/utils/stellar";
 import { protectedProcedure } from "~/server/trpc";
 import type { NewRemoteInterchainTokenInput } from "~/services/db/postgres";
