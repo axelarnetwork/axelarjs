@@ -367,10 +367,6 @@ const useUpdateRemoteRegisteredEVM = ({
       ) &&
       tokenId
     ) {
-      console.log(
-        "updating remote registered EVM address",
-        registeredEVMChain.chain.id
-      );
       setAlreadyUpdatingRemoteRegisteredEVM(true);
       updateRegisteredEVMAddresses({
         tokenId,
