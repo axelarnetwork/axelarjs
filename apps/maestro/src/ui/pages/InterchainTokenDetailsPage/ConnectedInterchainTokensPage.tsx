@@ -204,7 +204,7 @@ const useUpdateRemoteSui = ({
     onSuccess,
   ]);
 
-  const { mutateAsync: updateEVMAddresses } =
+  const { mutateAsync: updateEVMRemoteTokenAddress } =
     trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
 
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
@@ -228,7 +228,7 @@ const useUpdateRemoteSui = ({
         !isUpdating[x.chain?.id ?? ""]
       ) {
         setChainUpdateStatus(x.chain?.id, true);
-        updateEVMAddresses({
+        updateEVMRemoteTokenAddress({
           tokenId: tokenId as `0x${string}`,
           axelarChainId: x.chain?.id,
         })
@@ -249,7 +249,7 @@ const useUpdateRemoteSui = ({
     chainId,
     tokenAddress,
     tokenId,
-    updateEVMAddresses,
+    updateEVMRemoteTokenAddress,
     isUpdating,
     onSuccess,
     setChainUpdateStatus,
@@ -343,8 +343,8 @@ const useUpdateRemoteRegisteredEVM = ({
 
   const { isAuthenticated } = useIsAuthenticated();
 
-  const { mutateAsync: updateRegisteredEVMAddresses } =
-    trpc.interchainToken.updateRegisteredEVMRemoteAddress.useMutation();
+  const { mutateAsync: updateEVMRemoteTokenAddress } =
+    trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
 
   // Update remote registered EVM token addresses
   // the address is wrong on the Hedera chain on deployment because it's the EVM address,
@@ -368,7 +368,7 @@ const useUpdateRemoteRegisteredEVM = ({
       tokenId
     ) {
       setAlreadyUpdatingRemoteRegisteredEVM(true);
-      updateRegisteredEVMAddresses({
+      updateEVMRemoteTokenAddress({
         tokenId,
         axelarChainId: registeredEVMChain.chain.id,
       })
@@ -389,7 +389,7 @@ const useUpdateRemoteRegisteredEVM = ({
     tokenAddress,
     tokenId,
     onSuccess,
-    updateRegisteredEVMAddresses,
+    updateEVMRemoteTokenAddress,
   ]);
 };
 
