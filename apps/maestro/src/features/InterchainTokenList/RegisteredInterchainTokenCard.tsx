@@ -12,7 +12,7 @@ import {
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
-import { useCallback, useMemo, useState, type FC } from "react";
+import { useCallback, useMemo, useState, type FC, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -55,6 +55,7 @@ const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
 function useHederaAssociationActions(params: {
   tokenAddress?: string;
   baseExplorerUrl?: string;
+  enabled?: boolean;
 }) {
   const {
     isAssociated,
@@ -63,7 +64,9 @@ function useHederaAssociationActions(params: {
     associateHederaToken,
     dissociateHederaToken,
     invalidateAssociation,
-  } = useHederaTokenAssociation(params.tokenAddress as `0x${string}`);
+  } = useHederaTokenAssociation(params.tokenAddress as `0x${string}`, {
+    enabled: params.enabled,
+  });
 
   const [isAssocSubmitting, setIsAssocSubmitting] = useState(false);
 
@@ -171,6 +174,132 @@ function useHederaAssociationActions(params: {
   } as const;
 }
 
+type HederaAssociationProps = {
+  tokenAddress?: `0x${string}`;
+  baseExplorerUrl?: string;
+  chainName?: string;
+  isSourceChain: boolean;
+  switchChainButton: ReactNode;
+  tokenBalance?: string;
+  isBalanceAvailable: boolean;
+};
+
+const HederaAssociation: FC<HederaAssociationProps> = (props) => {
+  const {
+    isAssociated,
+    isCheckingAssociation,
+    hasAssociationError,
+    isAssocSubmitting,
+    onAssociate,
+    onDissociate,
+  } = useHederaAssociationActions({
+    tokenAddress: props.tokenAddress,
+    baseExplorerUrl: props.baseExplorerUrl,
+    enabled: props.isSourceChain,
+  });
+
+  const isBlockedByBalance =
+    Boolean(isAssociated) &&
+    props.tokenBalance !== undefined &&
+    BigInt(props.tokenBalance) > 0n;
+
+  let fieldContent: ReactNode;
+
+  if (!props.isSourceChain) {
+    fieldContent = (
+      <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
+        <div className="flex w-full items-center justify-between">
+          <span>
+            Switch to {props.chainName ?? "Hedera"} to manage association
+          </span>
+          {props.switchChainButton}
+        </div>
+      </div>
+    );
+  } else if (hasAssociationError && !isCheckingAssociation) {
+    fieldContent = (
+      <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
+        <span className="text-warning">
+          Error checking association. Make sure your wallet address belongs to a
+          Hedera account.
+        </span>
+      </div>
+    );
+  } else if (
+    !props.isBalanceAvailable ||
+    isCheckingAssociation ||
+    isAssociated === null
+  ) {
+    fieldContent = (
+      <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
+        <span className="mx-auto">Checking association status...</span>
+      </div>
+    );
+  } else {
+    fieldContent = (
+      <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
+        <div className="flex w-full items-center justify-between">
+          <span>
+            {isAssociated ? (
+              <span className="text-success">✓ Associated</span>
+            ) : (
+              <span className="text-error">x Not associated</span>
+            )}
+          </span>
+          <Button
+            $size="xs"
+            $variant="primary"
+            className="min-w-24"
+            $loading={isAssocSubmitting}
+            aria-disabled={isAssocSubmitting}
+            disabled={isAssocSubmitting || isBlockedByBalance}
+            tabIndex={isAssocSubmitting ? -1 : 0}
+            onClick={async (e) => {
+              e.preventDefault();
+              if (isAssocSubmitting) return;
+              if (isAssociated) {
+                if (props.tokenBalance === undefined) {
+                  toast.error("Balance not loaded. Please try again.");
+                  return;
+                }
+                if (BigInt(props.tokenBalance) > 0n) {
+                  toast.error(
+                    "Cannot dissociate while holding a balance. Balance must be 0."
+                  );
+                  return;
+                }
+                await onDissociate();
+              } else await onAssociate();
+            }}
+          >
+            {isAssociated ? "Dissociate" : "Associate"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Card.Actions className="justify-between">
+        <div className="flex items-center space-x-2">
+          <span>Association Status</span>
+          {isBlockedByBalance && (
+            <Tooltip
+              tip="Cannot dissociate while holding a balance"
+              $variant="info"
+              $position="top"
+            >
+              <InfoIcon className="h-[1em] w-[1em] text-info" />
+            </Tooltip>
+          )}
+        </div>
+      </Card.Actions>
+      <div className="w-full">{fieldContent}</div>
+    </>
+  );
+};
+
 export type Props = TokenInfo & {
   hasRemoteTokens: boolean;
   originTokenAddress?: `0x${string}`;
@@ -229,17 +358,6 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
   const isSourceChain = chainId === props.chainId;
   const isHederaChain = props.chainId === HEDERA_CHAIN_ID;
-  const {
-    isAssociated,
-    isCheckingAssociation,
-    hasAssociationError,
-    isAssocSubmitting,
-    onAssociate,
-    onDissociate,
-  } = useHederaAssociationActions({
-    tokenAddress: props.tokenAddress,
-    baseExplorerUrl: props.chain?.blockExplorers?.[0]?.url,
-  });
 
   const switchChainButton = (
     <Button
@@ -328,57 +446,6 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             </Badge>
           )}
         </Card.Title>
-
-        {isHederaChain && address && (
-          <div className="mb-2 flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
-            {hasAssociationError && !isCheckingAssociation ? (
-              <span className="text-warning">
-                Error checking association. Make sure your wallet address
-                belongs to a Hedera account.
-              </span>
-            ) : isCheckingAssociation || isAssociated === null ? (
-              <span>Checking association status...</span>
-            ) : !isSourceChain ? (
-              <div className="flex w-full items-center justify-between">
-                <span>
-                  Switch to {props.chain?.name ?? "Hedera"} to manage
-                  association
-                </span>
-                {switchChainButton}
-              </div>
-            ) : (
-              <div className="flex w-full items-center justify-between">
-                <span>
-                  {isAssociated ? (
-                    <span className="text-lg leading-none text-success">
-                      ✓ Associated
-                    </span>
-                  ) : (
-                    <span className="text-lg leading-none text-error">
-                      x Not associated
-                    </span>
-                  )}
-                </span>
-                <Button
-                  $size="xs"
-                  $variant="primary"
-                  className="absolute right-6"
-                  $loading={isAssocSubmitting}
-                  aria-disabled={isAssocSubmitting}
-                  tabIndex={isAssocSubmitting ? -1 : 0}
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    if (isAssocSubmitting) return;
-                    if (isAssociated) await onDissociate();
-                    else await onAssociate();
-                  }}
-                >
-                  {isAssociated ? "Dissociate" : "Associate"}
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
 
         {!balance?.tokenBalance ? (
           !address ? null : (
@@ -529,6 +596,18 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             })}
           </CopyToClipboardButton>
         </Card.Actions>
+
+        {isHederaChain && address && (
+          <HederaAssociation
+            tokenAddress={props.tokenAddress}
+            baseExplorerUrl={props.chain?.blockExplorers?.[0]?.url}
+            chainName={props.chain?.name}
+            isSourceChain={isSourceChain}
+            switchChainButton={switchChainButton}
+            tokenBalance={balance?.tokenBalance}
+            isBalanceAvailable={Boolean(balance?.tokenBalance)}
+          />
+        )}
         {isMainnet && dex && (
           <Card.Actions className="mt-2 flex flex-col justify-between">
             Add Liquidity
