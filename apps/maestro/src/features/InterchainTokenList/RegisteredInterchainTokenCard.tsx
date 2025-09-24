@@ -12,7 +12,7 @@ import {
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
-import { useCallback, useMemo, useState, type FC, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -38,6 +38,7 @@ import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
+import { HederaAssociation } from "./HederaAssociation";
 import type { TokenInfo } from "./types";
 
 const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
@@ -53,132 +54,6 @@ const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
     <Tooltip tip={tip} aria-label={tip} $position="left">
       <Badge $size="sm" $variant={props.isOriginToken ? "success" : "info"} />
     </Tooltip>
-  );
-};
-
-type HederaAssociationProps = {
-  chainName?: string;
-  isSourceChain: boolean;
-  switchChainButton: ReactNode;
-  tokenBalance?: string;
-  isBalanceAvailable: boolean;
-  isAssociated: boolean | null;
-  isCheckingAssociation: boolean;
-  hasAssociationError: boolean;
-  isAssocSubmitting: boolean;
-  onAssociate: () => Promise<void> | void;
-  onDissociate: () => Promise<void> | void;
-};
-
-const HederaAssociation: FC<HederaAssociationProps> = (props) => {
-  const {
-    isAssociated,
-    isCheckingAssociation,
-    hasAssociationError,
-    isAssocSubmitting,
-    onAssociate,
-    onDissociate,
-  } = props;
-
-  const isBlockedByBalance =
-    Boolean(isAssociated) &&
-    props.tokenBalance !== undefined &&
-    BigInt(props.tokenBalance) > 0n;
-
-  let fieldContent: ReactNode;
-
-  if (!props.isSourceChain) {
-    fieldContent = (
-      <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
-        <div className="flex w-full items-center justify-between">
-          <span>
-            Switch to {props.chainName ?? "Hedera"} to manage association
-          </span>
-          {props.switchChainButton}
-        </div>
-      </div>
-    );
-  } else if (hasAssociationError && !isCheckingAssociation) {
-    fieldContent = (
-      <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
-        <span className="text-warning">
-          Error checking association. Make sure your wallet address belongs to a
-          Hedera account.
-        </span>
-      </div>
-    );
-  } else if (
-    !props.isBalanceAvailable ||
-    isCheckingAssociation ||
-    isAssociated === null
-  ) {
-    fieldContent = (
-      <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
-        <span className="mx-auto">Checking association status...</span>
-      </div>
-    );
-  } else {
-    fieldContent = (
-      <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 dark:bg-base-100">
-        <div className="flex w-full items-center justify-between">
-          <span>
-            {isAssociated ? (
-              <span className="text-success">✓ Associated</span>
-            ) : (
-              <span className="text-error">✗ Not associated</span>
-            )}
-          </span>
-          <Button
-            $size="xs"
-            $variant="primary"
-            className="min-w-24"
-            $loading={isAssocSubmitting}
-            aria-disabled={isAssocSubmitting}
-            disabled={isAssocSubmitting || isBlockedByBalance}
-            tabIndex={isAssocSubmitting ? -1 : 0}
-            onClick={async (e) => {
-              e.preventDefault();
-              if (isAssocSubmitting) return;
-              if (isAssociated) {
-                if (props.tokenBalance === undefined) {
-                  toast.error("Balance not loaded. Please try again.");
-                  return;
-                }
-                if (BigInt(props.tokenBalance) > 0n) {
-                  toast.error(
-                    "Cannot dissociate while holding a balance. Balance must be 0."
-                  );
-                  return;
-                }
-                await onDissociate();
-              } else await onAssociate();
-            }}
-          >
-            {isAssociated ? "Dissociate" : "Associate"}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <Card.Actions className="justify-between">
-        <div className="flex items-center space-x-2">
-          <span>Association Status</span>
-          {isBlockedByBalance && (
-            <Tooltip
-              tip="Cannot dissociate while holding a balance"
-              $variant="info"
-              $position="top"
-            >
-              <InfoIcon className="h-[1em] w-[1em] text-info" />
-            </Tooltip>
-          )}
-        </div>
-      </Card.Actions>
-      <div className="w-full">{fieldContent}</div>
-    </>
   );
 };
 
