@@ -12,6 +12,7 @@ import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
+import { useManageInterchainTokenContainer } from "../../ManageInterchainToken.state";
 import { useMintInterchainTokenState } from "./MintInterchainToken.state";
 
 type FormState = {
@@ -34,6 +35,8 @@ export const MintInterchainToken: FC = () => {
     { setTxState, mintTokenAsync },
   ] = useMintInterchainTokenState();
 
+  const [, manageActions] = useManageInterchainTokenContainer();
+
   const mintTokens = useMintTokens();
   const mintStellarTokens = useMintStellarTokens();
 
@@ -47,13 +50,13 @@ export const MintInterchainToken: FC = () => {
 
     const adjustedAmount = parseUnits(
       data.amountToMint,
-      erc20Details?.decimals || 18
+      erc20Details?.decimals ?? 18
     );
 
     try {
       if (chainId === SUI_CHAIN_ID) {
         const result = await mintTokens({
-          amount: BigInt(adjustedAmount),
+          amount: adjustedAmount,
           coinType: tokenAddress,
           tokenId: tokenId,
         });
@@ -61,7 +64,10 @@ export const MintInterchainToken: FC = () => {
           setTxState({
             status: "confirmed",
           });
-          toast.success("Successfully minted interchain tokens");
+          toast.success(
+            `Successfully minted interchain tokens. Tx: ${result.digest}`
+          );
+          manageActions.closeModal();
         }
       } else if (chainId === STELLAR_CHAIN_ID) {
         const result = await mintStellarTokens({
@@ -77,7 +83,10 @@ export const MintInterchainToken: FC = () => {
             chainId,
           });
 
-          toast.success("Successfully minted interchain tokens");
+          toast.success(
+            `Successfully minted interchain tokens. Tx: ${result.hash}`
+          );
+          manageActions.closeModal();
         }
       } else {
         const txHash = await mintTokenAsync({
@@ -90,6 +99,14 @@ export const MintInterchainToken: FC = () => {
             hash: txHash,
             chainId,
           });
+          const explorer = (window as any)?.wagmi?.config?.chains?.find(
+            (x: any) => x?.id === chainId
+          )?.blockExplorers?.default?.url;
+          if (explorer) {
+            toast.success(
+              `Mint tx submitted. View tx: ${explorer}/tx/${txHash}`
+            );
+          }
         }
       }
     } catch (error) {
@@ -100,6 +117,7 @@ export const MintInterchainToken: FC = () => {
         setTxState({
           status: "idle",
         });
+        manageActions.closeModal();
         return;
       }
 
@@ -107,6 +125,8 @@ export const MintInterchainToken: FC = () => {
         status: "reverted",
         error: error as Error,
       });
+      toast.error("Failed to mint tokens");
+      manageActions.closeModal();
     }
   };
 
