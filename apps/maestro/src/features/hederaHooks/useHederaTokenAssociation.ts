@@ -115,7 +115,6 @@ export const useHederaTokenAssociation = (
         hash: txHash,
         timeout: WAIT_FOR_TRANSACTION_RECEIPT_TIMEOUT,
       });
-      console.log("receipt", receipt);
     } catch (error) {
       console.error(error);
       throw new Error(
