@@ -8,7 +8,12 @@ import { parseUnits, TransactionExecutionError } from "viem";
 
 import useMintStellarTokens from "~/features/stellarHooks/useMintStellarTokens";
 import useMintTokens from "~/features/suiHooks/useMintTokens";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import {
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+  useAccount,
+  useChainId,
+} from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
@@ -29,6 +34,7 @@ export const MintInterchainToken: FC = () => {
   });
 
   const chainId = useChainId();
+  const { chain } = useAccount();
 
   const [
     { txState, accountAddress, erc20Details, isMinting, tokenAddress, tokenId },
@@ -50,7 +56,7 @@ export const MintInterchainToken: FC = () => {
 
     const adjustedAmount = parseUnits(
       data.amountToMint,
-      erc20Details?.decimals ?? 18
+      erc20Details?.decimals || 18
     );
 
     try {
@@ -99,9 +105,7 @@ export const MintInterchainToken: FC = () => {
             hash: txHash,
             chainId,
           });
-          const explorer = (window as any)?.wagmi?.config?.chains?.find(
-            (x: any) => x?.id === chainId
-          )?.blockExplorers?.default?.url;
+          const explorer = chain?.blockExplorers?.default?.url;
           if (explorer) {
             toast.success(
               `Mint tx submitted. View tx: ${explorer}/tx/${txHash}`
