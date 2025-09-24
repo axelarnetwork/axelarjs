@@ -9,7 +9,7 @@ import { zeroAddress } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
 import {
-  CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
+  EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
   HEDERA_CHAIN_ID,
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
@@ -277,7 +277,7 @@ const useTokenAddress = ({
 }: UseTokenAddressParams) => {
   const isWithTokenAddress = !isChainWithoutTokenAddress(chainName);
   const isWithNonDeterministicTokenAddress =
-    CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(chainId);
+    EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(chainId);
 
   const receipt = useReceipt({
     multicall,

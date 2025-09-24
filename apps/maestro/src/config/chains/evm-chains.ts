@@ -64,8 +64,12 @@ const ENVIRONMENTS = {
   testnet: "testnet",
 } as const;
 
-/** the token address can only be queried on chain after the deployment */
-export const CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS = [HEDERA_CHAIN_ID];
+/**
+ * The token address can only be queried on chain after the deployment
+ */
+export const EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS = [
+  HEDERA_CHAIN_ID,
+];
 
 const xrplEvm = defineChain({
   id: 1440000,

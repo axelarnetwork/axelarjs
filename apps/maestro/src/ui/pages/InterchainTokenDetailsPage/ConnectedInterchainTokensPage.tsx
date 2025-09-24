@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 
 import {
-  CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
+  EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
   SUI_CHAIN_ID,
 } from "~/config/chains";
 import {
@@ -302,26 +302,20 @@ const useUpdateRemoteEVM = ({
   useEffect(() => {
     if (!isAuthenticated) return;
 
+    // also, update the address for the EVM chains that have a non-deterministic token address
     interchainToken?.matchingTokens?.forEach((x) => {
-      // check if the EVM token address is the same as sui, which is wrong
-      const isSui = chainId === SUI_CHAIN_ID && !x.chain?.id.includes("sui");
-      // also, update the address for the EVM chains that have a non-deterministic token address
-      const isEvm =
-        CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(
-          x.chain?.chain_id
-        ) && x.isRegistered;
+      const updateToken = () => {
+        if (isUpdating[x.chain?.id ?? ""]) {
+          return;
+        }
 
-      if (
-        (isSui || isEvm) &&
-        x.tokenAddress === tokenAddress &&
-        !isUpdating[x.chain?.id ?? ""]
-      ) {
         setChainUpdateStatus(x.chain?.id, true);
         updateEVMRemoteTokenAddress({
           tokenId: tokenId as `0x${string}`,
           axelarChainId: x.chain?.id,
         })
           .then(() => {
+            console.log("updated token address for", x.chain?.id);
             setChainUpdateStatus(x.chain?.id, false);
             onSuccess();
           })
@@ -330,6 +324,38 @@ const useUpdateRemoteEVM = ({
               setChainUpdateStatus(x.chain?.id, false);
             }, 5000);
           });
+      };
+
+      // check if the EVM token address is the same as sui, which is wrong
+      // NOTE: maybe also check that the destination chain is actually an EVM chain
+      const shouldUpdateSui =
+        chainId === SUI_CHAIN_ID &&
+        !x.chain?.id.includes("sui") &&
+        x.tokenAddress === tokenAddress;
+
+      if (shouldUpdateSui) {
+        updateToken();
+        return;
+      }
+
+      const isSourceEVMNonDeterministic =
+        EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(chainId);
+      const isDestinationEVMNonDeterministic =
+        EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(
+          x.chain?.chain_id
+        );
+
+      // 1. If source chain is non-deterministic, update matchingTokens where the addresses match
+      // 2. If source chain is deterministic, update matchingTokens where the addresses match AND the destination chain is non-deterministic
+      const shouldUpdateToken = isSourceEVMNonDeterministic
+        ? x.tokenAddress === tokenAddress && x.chain?.chain_id !== chainId
+        : x.tokenAddress === tokenAddress && isDestinationEVMNonDeterministic;
+
+      const shouldUpdateEVM = shouldUpdateToken && x.isRegistered;
+
+      if (shouldUpdateEVM) {
+        updateToken();
+        return;
       }
     });
   }, [
