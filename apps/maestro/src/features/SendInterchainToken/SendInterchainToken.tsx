@@ -216,6 +216,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
     [state.txState.status]
   );
 
+  // no-op: association blocking handled by mustBlockForHederaAssociation
+
   const txHash = useMemo(
     () =>
       state.txState.status === "submitted" ? state.txState.hash : undefined,
@@ -498,9 +500,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     if (hasDestinationAssociationError) {
                       return "Error checking Hedera association";
                     }
-                    if (isDestinationAssociated === false) {
-                      return "Destination Hedera account is not associated with this token";
-                    }
+                    // Do not fail field validation solely due to association status.
+                    // We block submission and show a warning elsewhere.
                   }
 
                   return true;
@@ -509,38 +510,40 @@ export const SendInterchainToken: FC<Props> = (props) => {
             />
             {isDestinationHedera && destinationAddress && (
               <div className="mt-2">
-                {isCheckingDestinationAssociation ? (
+                {isCheckingDestinationAssociation && (
                   <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 text-xs dark:bg-base-100">
                     <span className="mx-auto">
                       Checking Hedera association...
                     </span>
                   </div>
-                ) : isDestinationAssociated ? null : (
-                  <Alert
-                    icon={<InfoIcon />}
-                    $status="warning"
-                    className="my-2 rounded-xl p-3"
-                  >
-                    <div className="flex flex-col gap-2">
-                      <span>
-                        The destination Hedera account is not associated with
-                        this token.
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs">
-                          The recipient can associate by opening this page:
-                        </span>
-                        <CopyToClipboardButton
-                          $size="sm"
-                          $variant="ghost"
-                          copyText={currentUrl}
-                        >
-                          Copy link
-                        </CopyToClipboardButton>
-                      </div>
-                    </div>
-                  </Alert>
                 )}
+                {!isCheckingDestinationAssociation &&
+                  isDestinationAssociated !== true && (
+                    <Alert
+                      icon={<InfoIcon />}
+                      $status="warning"
+                      className="my-2 rounded-xl p-3"
+                    >
+                      <div className="flex flex-col gap-2">
+                        <span>
+                          The destination Hedera account is not associated with
+                          this token.
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs">
+                            The recipient can associate by opening this page:
+                          </span>
+                          <CopyToClipboardButton
+                            $size="sm"
+                            $variant="ghost"
+                            copyText={currentUrl}
+                          >
+                            Copy link
+                          </CopyToClipboardButton>
+                        </div>
+                      </div>
+                    </Alert>
+                  )}
               </div>
             )}
           </FormControl>
@@ -584,7 +587,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 </Label.AltText>
               )}
             </Label>
-            {buttonStatus === "error" ? (
+            {buttonStatus === "error" && !mustBlockForHederaAssociation ? (
               <Alert role="alert" $status="error">
                 {buttonChildren}
               </Alert>
