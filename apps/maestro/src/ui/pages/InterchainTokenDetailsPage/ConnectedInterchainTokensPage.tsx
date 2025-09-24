@@ -305,17 +305,16 @@ const useUpdateRemoteEVM = ({
     // also, update the address for the EVM chains that have a non-deterministic token address
     interchainToken?.matchingTokens?.forEach((x) => {
       const updateToken = () => {
-        if (isUpdating[x.chain?.id ?? ""]) {
+        if (isUpdating[x.chain?.id ?? ""] || !tokenId) {
           return;
         }
 
         setChainUpdateStatus(x.chain?.id, true);
         updateEVMRemoteTokenAddress({
-          tokenId: tokenId as `0x${string}`,
+          tokenId,
           axelarChainId: x.chain?.id,
         })
           .then(() => {
-            console.log("updated token address for", x.chain?.id);
             setChainUpdateStatus(x.chain?.id, false);
             onSuccess();
           })
