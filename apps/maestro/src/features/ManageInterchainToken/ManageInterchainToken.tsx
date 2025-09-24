@@ -14,7 +14,7 @@ import {
   ManageInterchainTokenProvider,
   useManageInterchainTokenContainer,
   type InterchainTokenAction,
-} from "./ManageInterchaintoken.state";
+} from "./ManageInterchainToken.state";
 
 const StepLoading = () => (
   <div className="grid h-64 place-items-center">
@@ -62,11 +62,13 @@ type Props = {
   balance: bigint;
   tokenAddress: `0x${string}`;
   tokenId: `0x${string}`;
+  tokenManagerAddress?: `0x${string}`;
   isTokenOwner: boolean;
   isTokenMinter: boolean;
-  isTokenPendingOnwer: boolean;
+  isTokenPendingOwner: boolean;
   hasPendingOwner: boolean;
   onClose?: () => void;
+  canMint?: boolean; // optional, defaults to true
 };
 
 type Option = {
@@ -86,6 +88,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
       value: "mint",
       icon: <CoinsIcon className="h-7 w-7 md:h-8 md:w-8" />,
       isVisible: (props) => props.isTokenMinter,
+      disabled: props.canMint === false,
     },
     {
       label: "Transfer Rate Limit Operator",
@@ -121,11 +124,7 @@ export const ManageInterchainToken: FC<Props> = (props) => {
         }
       }}
     >
-      <Modal.Body
-        className={cn("flex flex-col gap-4", {
-          "": state.selectedAction === "mint",
-        })}
-      >
+      <Modal.Body className={cn("flex flex-col gap-4")}>
         {CurrentStep ? (
           <CurrentStep />
         ) : (
@@ -140,7 +139,9 @@ export const ManageInterchainToken: FC<Props> = (props) => {
                   <li key={option.value}>
                     <Button
                       className="grid h-24 w-full place-items-center gap-2.5 p-3 md:h-32"
-                      onClick={actions.selectAction.bind(null, option.value)}
+                      onClick={() => {
+                        actions.selectAction(option.value);
+                      }}
                       disabled={option.disabled}
                     >
                       {option.icon}
@@ -149,6 +150,15 @@ export const ManageInterchainToken: FC<Props> = (props) => {
                   </li>
                 ))}
             </ul>
+            {options.some(
+              (o) => o.value === "mint" && o.isVisible(props) && o.disabled
+            ) && (
+              <p className="mt-1 text-sm text-error">
+                Minting is disabled because your Hedera account is not
+                associated with this token. Use the Association Status on the
+                card to associate, then try again.
+              </p>
+            )}
           </>
         )}
       </Modal.Body>
@@ -156,17 +166,23 @@ export const ManageInterchainToken: FC<Props> = (props) => {
   );
 };
 
-const WithManageInterchainTokenProvider: FC<Props> = (props) => (
-  <ManageInterchainTokenProvider
-    initialState={{
+const WithManageInterchainTokenProvider: FC<Props> = (props) => {
+  const memoizedInitialState = useMemo(
+    () => ({
       ...INITIAL_STATE,
       tokenAddress: props.tokenAddress,
       tokenId: props.tokenId,
-    }}
-  >
-    <ManageInterchainToken {...props} />
-  </ManageInterchainTokenProvider>
-);
+      tokenManagerAddress: props.tokenManagerAddress ?? "0x",
+    }),
+    [props.tokenAddress, props.tokenId, props.tokenManagerAddress]
+  );
+
+  return (
+    <ManageInterchainTokenProvider initialState={memoizedInitialState}>
+      <ManageInterchainToken {...props} />
+    </ManageInterchainTokenProvider>
+  );
+};
 
 export default WithManageInterchainTokenProvider;
 
