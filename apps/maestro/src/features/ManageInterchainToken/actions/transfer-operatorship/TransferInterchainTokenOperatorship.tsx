@@ -23,7 +23,7 @@ import { SUI_CHAIN_ID, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useTransferOperatorshipMutation } from "../../hooks/useTransferOperatorshipMutation";
-import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
+import { useManageInterchainTokenContainer } from "../../ManageInterchainToken.state";
 
 type FormState = {
   recipientAddress: `0x${string}`;
