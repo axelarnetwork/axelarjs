@@ -9,6 +9,7 @@ import {
 import { useMemo, type ComponentType, type FC } from "react";
 import dynamic from "next/dynamic";
 
+import { HEDERA_CHAIN_ID, useChainId } from "~/lib/hooks";
 import {
   INITIAL_STATE,
   ManageInterchainTokenProvider,
@@ -81,6 +82,7 @@ type Option = {
 
 export const ManageInterchainToken: FC<Props> = (props) => {
   const [state, actions] = useManageInterchainTokenContainer();
+  const chainId = useChainId();
 
   const options: Option[] = [
     {
@@ -150,15 +152,16 @@ export const ManageInterchainToken: FC<Props> = (props) => {
                   </li>
                 ))}
             </ul>
-            {options.some(
-              (o) => o.value === "mint" && o.isVisible(props) && o.disabled
-            ) && (
-              <p className="mt-1 text-sm text-error">
-                Minting is disabled because your Hedera account is not
-                associated with this token. Use the Association Status on the
-                card to associate, then try again.
-              </p>
-            )}
+            {chainId === HEDERA_CHAIN_ID &&
+              options.some(
+                (o) => o.value === "mint" && o.isVisible(props) && o.disabled
+              ) && (
+                <p className="mt-1 text-sm text-error">
+                  Minting is disabled because your Hedera account is not
+                  associated with this token. Use the Association Status on the
+                  card to associate, then try again.
+                </p>
+              )}
           </>
         )}
       </Modal.Body>
