@@ -20,8 +20,9 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
+import { HEDERA_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import { useHederaTokenAssociation } from "~/features/hederaHooks";
-import { HEDERA_CHAIN_ID, SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,

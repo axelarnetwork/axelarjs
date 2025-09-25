@@ -17,16 +17,16 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import "~/features/InterchainTokenDeployment";
 
 import {
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
+import {
   INITIAL_STATE,
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
-import {
-  HEDERA_CHAIN_ID,
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useChainId,
-} from "~/lib/hooks";
+import { useChainId } from "~/lib/hooks";
 import {
   isValidEVMAddress,
   isValidStellarWalletAddress,

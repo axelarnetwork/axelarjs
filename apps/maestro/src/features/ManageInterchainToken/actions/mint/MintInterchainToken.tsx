@@ -6,14 +6,10 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { parseUnits, TransactionExecutionError } from "viem";
 
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import useMintStellarTokens from "~/features/stellarHooks/useMintStellarTokens";
 import useMintTokens from "~/features/suiHooks/useMintTokens";
-import {
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useAccount,
-  useChainId,
-} from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";

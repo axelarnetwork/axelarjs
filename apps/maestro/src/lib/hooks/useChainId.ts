@@ -3,16 +3,9 @@ import { useMemo } from "react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useChainId as useWagmiChainId } from "wagmi";
 
-// Sui's chain ID
-import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import { getStellarConnectionState } from "~/lib/utils/stellar";
 import { useAccount } from "./useAccount";
-
-export const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
-export const STELLAR_CHAIN_ID =
-  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 109 : 110;
-export const HEDERA_CHAIN_ID =
-  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 295 : 296;
 
 // TODO: check if this is the best way to use chain ids, maybe we should combine it with chain type
 export function useChainId(): number {

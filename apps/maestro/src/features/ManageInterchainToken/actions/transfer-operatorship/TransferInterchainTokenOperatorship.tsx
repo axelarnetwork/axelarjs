@@ -18,8 +18,9 @@ import {
 } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import { SUI_CHAIN_ID } from "~/config/chains";
 import { useWriteTokenManagerTransferOperatorship } from "~/lib/contracts/TokenManager.hooks";
-import { SUI_CHAIN_ID, useChainId, useTransactionState } from "~/lib/hooks";
+import { useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { useTransferOperatorshipMutation } from "../../hooks/useTransferOperatorshipMutation";
