@@ -74,8 +74,8 @@ const Review: FC = () => {
       return router.asPath;
     }
 
-    if (txTokenAddress) {
-      return `/${chainConfig?.id.toLowerCase()}/${txTokenAddress}`;
+    if (txTokenAddress && chainConfig?.id) {
+      return `/${chainConfig.id.toLowerCase()}/${txTokenAddress}`;
     }
 
     return "";
