@@ -155,7 +155,6 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
         "https://ethereum-sepolia-rpc.publicnode.com",
         "https://endpoints.omniatech.io/v1/eth/sepolia/public",
         "https://1rpc.io/sepolia",
-        "https://eth-sepolia.public.blastapi.io",
       ],
       "ethereum-sepolia"
     ),
