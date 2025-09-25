@@ -2,6 +2,19 @@ import { z } from "zod";
 
 import { protectedProcedure } from "~/server/trpc";
 
+/**
+ * Updates the remote token address for EVM chains (like Hedera) by querying the
+ * InterchainTokenService contract's registeredTokenAddress function.
+ *
+ * This is particularly useful when the token address is not known at deployment time,
+ * which can happen with registered tokens where the actual deployed address is
+ * determined by the InterchainTokenService contract after the deployment transaction
+ * is executed.
+ *
+ * @param input.tokenId - The token ID to look up
+ * @param input.axelarChainId - The Axelar chain ID to query
+ * @returns Promise that resolves when the database is updated with the correct token address
+ */
 export const updateEVMRemoteTokenAddress = protectedProcedure
   .input(
     z.object({

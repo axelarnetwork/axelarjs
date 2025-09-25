@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { usePublicClient } from "wagmi";
 
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 import { useReadHederaExchangeRatePrecompileTinycentsToTinybars } from "~/features/hederaHooks/HederaExchangeRatePrecompile.hooks";
 import {
   useReadWhbarAllowance,
@@ -17,7 +18,7 @@ import {
   interchainTokenFactoryAddress,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { HEDERA_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment";
 
 type Multicall = ReturnType<typeof useWriteInterchainTokenFactoryMulticall>;
