@@ -3,9 +3,10 @@ import { useEffect, useRef } from "react";
 import { isAddress } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 import { useWriteIerc20MintableBurnableMint } from "~/lib/contracts/IERC20MintableBurnable.hooks";
 import { useWriteTokenManagerMintToken } from "~/lib/contracts/TokenManager.hooks";
-import { HEDERA_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { trpc } from "~/lib/trpc";
 import { useManageInterchainTokenContainer } from "../../ManageInterchainToken.state";
