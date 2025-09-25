@@ -52,6 +52,7 @@ type ChainRule = {
   initialSupply?: string;
   disclaimer?: Disclaimer;
   hiddenFields?: ("isMintable" | "initialSupply")[];
+  maxDecimals?: number;
 };
 
 const CHAIN_RULES: Record<number, ChainRule> = {
@@ -61,9 +62,10 @@ const CHAIN_RULES: Record<number, ChainRule> = {
     disclaimer: {
       title: "Hedera Token Deployment",
       description:
-        "When deploying new tokens on Hedera, a Minter address is required and the token starts with an initial supply of 0.",
+        "When deploying new tokens on Hedera, a Minter address is required, the token starts with an initial supply of 0 and the token decimals are capped at 8.",
     },
     hiddenFields: ["isMintable", "initialSupply"],
+    maxDecimals: 8,
   },
 };
 
@@ -119,6 +121,7 @@ const TokenDetails: FC = () => {
   const minter = watch("minter");
   const supply = watch("initialSupply");
   const tokenDecimals = watch("tokenDecimals");
+  const maxDecimals = chainRules?.maxDecimals ?? 18;
 
   // keep default supply in sync with mintable toggle
   useEffect(() => {
@@ -142,6 +145,7 @@ const TokenDetails: FC = () => {
     const { setValue, getValues } = state.tokenDetailsForm;
     const currentIsMintable = getValues("isMintable");
     const currentSupply = getValues("initialSupply");
+    const currentDecimals = Number(getValues("tokenDecimals"));
 
     if (hasIsMintableRule && currentIsMintable !== chainRules.isMintable) {
       setValue("isMintable", chainRules.isMintable!, {
@@ -155,6 +159,16 @@ const TokenDetails: FC = () => {
       setValue("initialSupply", chainRules.initialSupply!, {
         shouldDirty: false,
         shouldTouch: false,
+        shouldValidate: true,
+      });
+    }
+
+    // clamp decimals to chain max (e.g., Hedera 8)
+    const ruleMax = chainRules?.maxDecimals ?? 18;
+    if (Number.isFinite(currentDecimals) && currentDecimals > ruleMax) {
+      setValue("tokenDecimals", ruleMax, {
+        shouldDirty: true,
+        shouldTouch: true,
         shouldValidate: true,
       });
     }
@@ -272,9 +286,18 @@ const TokenDetails: FC = () => {
             type="number"
             placeholder="Enter your token decimals"
             min={0}
-            max={18}
+            max={maxDecimals}
             aria-labelledby="tokenDecimals-label"
-            {...register("tokenDecimals")}
+            {...register("tokenDecimals", {
+              valueAsNumber: true,
+              min: { value: 0, message: "Decimals must be >= 0" },
+              max: {
+                value: maxDecimals,
+                message: chainRules?.maxDecimals
+                  ? `Max ${chainRules.maxDecimals} decimals on ${chainRules?.disclaimer?.title?.split(" ")[0] ?? "this chain"}`
+                  : `Decimals must be <= ${maxDecimals}`,
+              },
+            })}
           />
           {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
@@ -322,13 +345,20 @@ const TokenDetails: FC = () => {
                 </Label.Text>
               </Label>
               <button type="button" onClick={actions.setCurrentAddressAsMinter}>
-                Use current address
+                <span aria-label="Use current address as minter">
+                  Use current address
+                </span>
               </button>
             </div>
             <ModalFormInput
               id="minter"
               placeholder="Enter a secure minter address"
-              onKeyDown={preventNonHexInput}
+              onKeyDown={(e) => {
+                if (chainId === STELLAR_CHAIN_ID || chainId === SUI_CHAIN_ID) {
+                  return; // allow non-hex input for Stellar/Sui
+                }
+                return preventNonHexInput(e);
+              }}
               aria-labelledby="minter-label"
               {...register("minter")}
             />

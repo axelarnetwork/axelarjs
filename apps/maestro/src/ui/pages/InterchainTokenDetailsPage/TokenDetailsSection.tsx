@@ -18,7 +18,7 @@ import {
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress, Maybe } from "@axelarjs/utils";
-import { useMemo, useRef, useState, type FC } from "react";
+import { useMemo, useRef, useState, type FC, type ReactNode } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import Image from "next/image";
 
@@ -26,7 +26,11 @@ import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
 import { z } from "zod";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import {
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
@@ -49,7 +53,7 @@ export type TokenDetailsSectionProps = {
 
 const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   let wallet = null;
-  if ((window as any).ethereum) {
+  if (typeof window !== "undefined" && (window as any).ethereum) {
     wallet = createWalletClient({
       transport: custom((window as any).ethereum),
     });
@@ -66,9 +70,10 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
   const isStellarChain = props.chain.chain_id === STELLAR_CHAIN_ID;
+  const isHederaChain = props.chain.chain_id === HEDERA_CHAIN_ID;
   const tokenAddress = props.tokenAddress;
 
-  const tokenDetails = [
+  const tokenDetails: Array<[string, ReactNode]> = [
     ["Name", props.name],
     ["Symbol", props.symbol],
     ["Decimals", props.decimals],
@@ -83,143 +88,136 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
         {maskAddress(tokenAddress)}
       </CopyToClipboardButton>,
     ],
-    ...(wallet && !isSuiChain && !isStellarChain
-      ? [
-          [
-            "Add Token to Wallet",
+  ];
+
+  if (wallet && !isSuiChain && !isStellarChain && !isHederaChain) {
+    tokenDetails.push([
+      "Add Token to Wallet",
+      <LinkButton
+        key="add-to-wallet"
+        href="#"
+        className="ml-[-10px]"
+        $variant="link"
+        onClick={async () => {
+          try {
+            await watchAsset(wallet, {
+              type: "ERC20",
+              options: {
+                address: props.tokenAddress,
+                decimals: props.decimals,
+                symbol: props.symbol,
+                image: meta?.iconUrl,
+              },
+            });
+          } catch (_e) {
+            // noop because the error is raised when the user cancels the popup dialog
+          }
+        }}
+      >
+        Add
+      </LinkButton>,
+    ]);
+  }
+
+  if (props.deploymentMessageId) {
+    if (props.tokenManagerAddress) {
+      tokenDetails.push([
+        "Token Manager",
+        <CopyToClipboardButton
+          key="token-manager"
+          $size="sm"
+          $variant="ghost"
+          copyText={props.tokenManagerAddress}
+        >
+          {maskAddress(props.tokenManagerAddress)}
+        </CopyToClipboardButton>,
+      ]);
+    }
+
+    if (props.tokenId) {
+      tokenDetails.push([
+        "Token ID",
+        <div key="token-id" className="flex items-center">
+          <CopyToClipboardButton
+            $size="sm"
+            $variant="ghost"
+            copyText={props.tokenId}
+          >
+            {maskAddress(props.tokenId)}
+          </CopyToClipboardButton>
+          <Tooltip
+            tip="TokenId is a common key used to identify an interchain token across all chains"
+            $variant="primary"
+            $position="bottom"
+          >
+            <InfoIcon className="h-[1em] w-[1em] text-primary" />
+          </Tooltip>
+        </div>,
+      ]);
+
+      if (props.wasDeployedByAccount && props.claimOwnershipFormLink) {
+        tokenDetails.push([
+          "Token Ownership Claim Request",
+          <LinkButton
+            key="token-ownership-claim"
+            target="_blank"
+            className="ml-[-10px]"
+            $variant="link"
+            href={props.claimOwnershipFormLink}
+          >
+            Link
+          </LinkButton>,
+        ]);
+      }
+
+      if (props.wasDeployedByAccount) {
+        tokenDetails.push([
+          "Add Your Token on Squid",
+          <div key="add-token-squid" className="flex items-center">
             <LinkButton
-              key="add-to-wallet"
-              href="#"
+              target="_blank"
               className="ml-[-10px]"
               $variant="link"
-              onClick={async () => {
-                try {
-                  await watchAsset(wallet, {
-                    type: "ERC20",
-                    options: {
-                      address: props.tokenAddress,
-                      decimals: props.decimals,
-                      symbol: props.symbol,
-                      image: meta?.iconUrl,
-                    },
-                  });
-                } catch (_e) {
-                  // noop because the error is raised when the user cancels the popup dialog
-                }
-              }}
+              href="https://github.com/axelarnetwork/axelar-configs "
             >
-              Add
-            </LinkButton>,
-          ],
-        ]
-      : []),
-    ...Maybe.of(props.tokenManagerAddress).mapOr([], (tokenManagerAddress) =>
-      !props.deploymentMessageId
-        ? [[]]
-        : [
-            [
-              "Token Manager",
-              <CopyToClipboardButton
-                key="token-manager"
-                $size="sm"
-                $variant="ghost"
-                copyText={tokenManagerAddress}
-              >
-                {maskAddress(tokenManagerAddress)}
-              </CopyToClipboardButton>,
-            ],
-          ]
-    ),
-    ...Maybe.of(props.tokenId).mapOr([], (tokenId) =>
-      !props.deploymentMessageId
-        ? [[]]
-        : [
-            [
-              "Token ID",
-              <div key="token-id" className="flex items-center">
-                <CopyToClipboardButton
-                  $size="sm"
-                  $variant="ghost"
-                  copyText={tokenId}
-                >
-                  {maskAddress(tokenId)}
-                </CopyToClipboardButton>
-                <Tooltip
-                  tip="TokenId is a common key used to identify an interchain token across all chains"
-                  $variant="primary"
-                  $position="bottom"
-                >
-                  <InfoIcon className="h-[1em] w-[1em] text-primary" />
-                </Tooltip>
-              </div>,
-            ],
-            [
-              "Token Ownership Claim Request",
-              props.wasDeployedByAccount && props.claimOwnershipFormLink && (
-                <LinkButton
-                  target="_blank"
-                  className="ml-[-10px]"
-                  $variant="link"
-                  href={props.claimOwnershipFormLink}
-                >
-                  Link
-                </LinkButton>
-              ),
-            ],
-            [
-              "Add Your Token on Squid",
-              props.wasDeployedByAccount && (
-                <div className="flex items-center">
-                  <LinkButton
-                    target="_blank"
-                    className="ml-[-10px]"
-                    $variant="link"
-                    href="https://github.com/axelarnetwork/axelar-configs "
-                  >
-                    Link
-                  </LinkButton>
-                  <Tooltip
-                    $as={Indicator}
-                    $variant="primary"
-                    $position="right"
-                    tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
-                  >
-                    <InfoIcon className="h-[1em] w-[1em] text-primary" />
-                  </Tooltip>
-                </div>
-              ),
-            ],
-          ]
-    ),
-    ...Maybe.of(props.tokenManagerAddress).mapOr([], () =>
-      !props.deploymentMessageId
-        ? [[]]
-        : [
-            [
-              "Apply for coordinated marketing with Axelar",
-              props.wasDeployedByAccount && (
-                <div className="flex items-center">
-                  <LinkButton
-                    target="_blank"
-                    className="ml-[-10px]"
-                    $variant="link"
-                    href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
-                  >
-                    Link
-                  </LinkButton>
-                  <Tooltip
-                    tip="If you want to jointly market your newly created token with us, reach out to us via this form, and we will reach out"
-                    $variant="primary"
-                    $position="bottom"
-                  >
-                    <InfoIcon className="h-[1em] w-[1em] text-primary" />
-                  </Tooltip>
-                </div>
-              ),
-            ],
-          ]
-    ),
-  ];
+              Link
+            </LinkButton>
+            <Tooltip
+              $as={Indicator}
+              $variant="primary"
+              $position="right"
+              tip="Squid is a platform that allows any token to be swapped between blockchains, and unlocks access to apps across chains in a single click. Create a PR there to request your token to be listed on Squid"
+            >
+              <InfoIcon className="h-[1em] w-[1em] text-primary" />
+            </Tooltip>
+          </div>,
+        ]);
+      }
+    }
+
+    if (props.wasDeployedByAccount) {
+      tokenDetails.push([
+        "Apply for coordinated marketing with Axelar",
+        <div key="apply-coordinated-marketing" className="flex items-center">
+          <LinkButton
+            target="_blank"
+            className="ml-[-10px]"
+            $variant="link"
+            href="https://haz8ao8c4f2.typeform.com/to/pqm6CTC3"
+          >
+            Link
+          </LinkButton>
+          <Tooltip
+            tip="If you want to jointly market your newly created token with us, reach out to us via this form, and we will reach out"
+            $variant="primary"
+            $position="bottom"
+          >
+            <InfoIcon className="h-[1em] w-[1em] text-primary" />
+          </Tooltip>
+        </div>,
+      ]);
+    }
+  }
 
   const sanitizedTokenDetails = tokenDetails.filter(([, value]) =>
     Boolean(value)
