@@ -276,10 +276,10 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       );
 
       let isTokenOwner = owner === balanceOwner;
-      let isTokenMinter = isTokenMinterRead as boolean;
-      let hasMinterRole = hasMinterRoleRead as boolean;
-      let hasOperatorRole = hasOperatorRoleRead as boolean;
-      const hasFlowLimiterRole = hasFlowLimiterRoleRead as boolean;
+      let isTokenMinter = isTokenMinterRead;
+      let hasMinterRole = hasMinterRoleRead;
+      let hasOperatorRole = hasOperatorRoleRead;
+      const hasFlowLimiterRole = hasFlowLimiterRoleRead;
 
       // Hedera fallback: owner/minter interfaces may not be available on HTS wrappers.
       // Use DB-recorded deployer/minter to infer roles when on Hedera.

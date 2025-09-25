@@ -93,56 +93,59 @@ export function useMintInterchainTokenState() {
               )
             )
           );
-        } else {
-          toast.success("Successfully minted interchain tokens");
+          return;
         }
-      } else if (isReceiptError || (receipt && receipt.status !== "success")) {
-        setTxState({ status: "reverted", error: new Error("tx reverted") });
-        if (explorer && hash) {
-          toast.error(
-            createElement(
-              "span",
-              null,
-              "Mint failed. View tx:",
-              createElement(
-                "a",
-                {
-                  href: `${explorer}/tx/${hash}`,
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  className: "ml-1 underline",
-                },
-                hash
-              )
-            )
-          );
-        } else {
-          toast.error("Mint transaction failed");
-        }
-      } else {
-        setTxState({ status: "reverted", error: new Error("tx reverted") });
-        if (explorer && hash) {
-          toast.error(
-            createElement(
-              "span",
-              null,
-              "Mint failed. View tx:",
-              createElement(
-                "a",
-                {
-                  href: `${explorer}/tx/${hash}`,
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  className: "ml-1 underline",
-                },
-                hash
-              )
-            )
-          );
-        } else {
-          toast.error("Mint transaction failed");
-        }
+        toast.success("Successfully minted interchain tokens");
+        return;
       }
+
+      if (isReceiptError || (receipt && receipt.status !== "success")) {
+        setTxState({ status: "reverted", error: new Error("tx reverted") });
+        if (explorer && hash) {
+          toast.error(
+            createElement(
+              "span",
+              null,
+              "Mint failed. View tx:",
+              createElement(
+                "a",
+                {
+                  href: `${explorer}/tx/${hash}`,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  className: "ml-1 underline",
+                },
+                hash
+              )
+            )
+          );
+          return;
+        }
+        toast.error("Mint transaction failed");
+        return;
+      }
+
+      setTxState({ status: "reverted", error: new Error("tx reverted") });
+      if (explorer && hash) {
+        toast.error(
+          createElement(
+            "span",
+            null,
+            "Mint failed. View tx:",
+            createElement(
+              "a",
+              {
+                href: `${explorer}/tx/${hash}`,
+                target: "_blank",
+                rel: "noopener noreferrer",
+                className: "ml-1 underline",
+              },
+              hash
+            )
+          )
+        );
+      }
+      toast.error("Mint transaction failed");
     }
 
     handleReceipt()
@@ -151,7 +154,7 @@ export function useMintInterchainTokenState() {
         setTxState({ status: "reverted", error: err as Error });
       })
       .finally(() => {
-        handledHashRef.current = (hash as string) ?? null;
+        handledHashRef.current = hash;
         manageActions.closeModal();
       });
   }, [
