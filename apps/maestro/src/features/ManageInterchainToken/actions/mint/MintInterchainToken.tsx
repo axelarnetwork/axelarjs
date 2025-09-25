@@ -45,7 +45,7 @@ export const MintInterchainToken: FC = () => {
 
   const mintTokens = useMintTokens();
   const mintStellarTokens = useMintStellarTokens();
-  const handledToastKeyRef = useRef<string | null>(null);
+  const handledNotificationKeyRef = useRef<string | null>(null);
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
@@ -74,7 +74,10 @@ export const MintInterchainToken: FC = () => {
             chainId,
           });
         }
-      } else if (chainId === STELLAR_CHAIN_ID) {
+        return;
+      }
+
+      if (chainId === STELLAR_CHAIN_ID) {
         const result = await mintStellarTokens({
           amount: adjustedAmount.toString(),
           tokenAddress: tokenAddress,
@@ -88,18 +91,19 @@ export const MintInterchainToken: FC = () => {
             chainId,
           });
         }
-      } else {
-        const txHash = await mintTokenAsync({
-          address: tokenAddress,
-          args: [accountAddress, adjustedAmount],
+        return;
+      }
+
+      const txHash = await mintTokenAsync({
+        address: tokenAddress,
+        args: [accountAddress, adjustedAmount],
+      });
+      if (txHash) {
+        setTxState({
+          status: "submitted",
+          hash: txHash,
+          chainId,
         });
-        if (txHash) {
-          setTxState({
-            status: "submitted",
-            hash: txHash,
-            chainId,
-          });
-        }
       }
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
@@ -133,10 +137,10 @@ export const MintInterchainToken: FC = () => {
         ? (txState.receipt?.transactionHash ?? txState.hash)
         : txState.hash;
     const toastKey = `${txState.status}:${txHash ?? ""}:${chain?.id ?? ""}`;
-    if (handledToastKeyRef.current === toastKey) {
+    if (handledNotificationKeyRef.current === toastKey) {
       return;
     }
-    handledToastKeyRef.current = toastKey;
+    handledNotificationKeyRef.current = toastKey;
 
     if (txState.status === "confirmed") {
       if (explorer && txHash) {
