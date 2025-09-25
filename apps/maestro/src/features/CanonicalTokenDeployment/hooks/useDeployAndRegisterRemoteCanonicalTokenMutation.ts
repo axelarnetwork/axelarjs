@@ -6,6 +6,7 @@ import { reduce } from "rambda";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import { useRegisterStellarTokenWithContractDeployment } from "~/features/stellarHooks";
 import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
 import {
@@ -17,12 +18,7 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import {
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useAccount,
-  useChainId,
-} from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { isValidEVMAddress } from "~/lib/utils/validation";

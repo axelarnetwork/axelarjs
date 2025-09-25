@@ -18,7 +18,8 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
-import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { SUI_CHAIN_ID } from "~/config/chains";
+import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,

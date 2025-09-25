@@ -52,14 +52,24 @@ import {
   xrplevmTestnet,
 } from "viem/chains";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
+
+export const HEDERA_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 295 : 296;
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
   devnet: "devnet-amplifier",
   testnet: "testnet",
 } as const;
+
+/**
+ * The token address can only be queried on chain after the deployment
+ */
+export const EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS = [
+  HEDERA_CHAIN_ID,
+];
 
 const xrplEvm = defineChain({
   id: 1440000,

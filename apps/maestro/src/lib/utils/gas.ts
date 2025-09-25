@@ -1,4 +1,4 @@
-import { HEDERA_CHAIN_ID } from "../hooks";
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 
 /**
  * This is set if the token doesn't use 18 decimals and the gas value of the multicall

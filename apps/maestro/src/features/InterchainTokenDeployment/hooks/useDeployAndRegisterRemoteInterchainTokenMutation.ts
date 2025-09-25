@@ -8,6 +8,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { zeroAddress } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import {
+  EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
 import { useHederaDeployment } from "~/features/hederaHooks";
 import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
@@ -23,13 +29,7 @@ import {
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
-import {
-  HEDERA_CHAIN_ID,
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useAccount,
-  useChainId,
-} from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
 import { scaleGasValue } from "~/lib/utils/gas";
@@ -42,8 +42,6 @@ import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeploy
 // In an effort to keep the codebase without hardcoded chains, we create lists of chains up here
 /** a token address is not needed in advance if the chain name includes the following strings */
 const CHAINS_WITHOUT_TOKEN_ADDRESS = ["sui", "stellar", "hedera"];
-/** the registered contract is used */
-const CHAIN_IDS_WITH_REGISTERED_TOKEN_ADDRESS = [HEDERA_CHAIN_ID];
 /** chains that don't have their deployment draft recorded - check if chain name includes any of these strings */
 const CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING = ["sui", "stellar"];
 /** a multicall is not needed for these chains */
@@ -72,7 +70,7 @@ const isChainSkipDeploymentDraftRecording = (
  *
  * 1. INPUT VALIDATION & SETUP
  *    └── useTokenId() ──────────────► Get token ID from salt + deployer
- *    └── useTokenAddress() ──────────► Get token address from token ID (supports registered tokens for Hedera)
+ *    └── useTokenAddress() ──────────► Get token address from token ID (supports non-deterministic tokens for Hedera)
  *    └── useDestinationChainIds() ───► Map destination chains to IDs
  *
  * 2. MULTICALL PREPARATION
@@ -278,12 +276,12 @@ const useTokenAddress = ({
   multicall,
 }: UseTokenAddressParams) => {
   const isWithTokenAddress = !isChainWithoutTokenAddress(chainName);
-  const isWithRegisteredTokenAddress =
-    CHAIN_IDS_WITH_REGISTERED_TOKEN_ADDRESS.includes(chainId);
+  const isWithNonDeterministicTokenAddress =
+    EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(chainId);
 
   const receipt = useReceipt({
     multicall,
-    enabled: Boolean(tokenId) && isWithRegisteredTokenAddress,
+    enabled: Boolean(tokenId) && isWithNonDeterministicTokenAddress,
   });
 
   const { data: tokenAddress } =
@@ -295,7 +293,7 @@ const useTokenAddress = ({
         enabled:
           Boolean(tokenId) &&
           isWithTokenAddress &&
-          !isWithRegisteredTokenAddress,
+          !isWithNonDeterministicTokenAddress,
       },
     });
 
@@ -305,7 +303,8 @@ const useTokenAddress = ({
         tokenId: tokenId as `0x${string}`,
       }),
       query: {
-        enabled: Boolean(tokenId) && isWithRegisteredTokenAddress && !!receipt,
+        enabled:
+          Boolean(tokenId) && isWithNonDeterministicTokenAddress && !!receipt,
       },
     });
 
@@ -450,7 +449,6 @@ const useSetEvmDeploymentArgsOnReceipt = ({
 
     // Check if we've already processed this transaction
     if (processedTransactions.current.has(transactionKey)) {
-      console.log(`Transaction ${transactionKey} already processed, skipping`);
       return;
     }
 
