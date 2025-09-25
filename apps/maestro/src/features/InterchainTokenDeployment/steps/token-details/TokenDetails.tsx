@@ -382,7 +382,7 @@ const TokenDetails: FC = () => {
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
       </form>
-      <Dialog.Actions className="sticky bottom-0 bg-inherit">
+      <Dialog.Actions className="sticky bottom-0 bg-inherit pt-2">
         <Dialog.CloseAction onClick={actions.reset}>
           Cancel & exit
         </Dialog.CloseAction>
