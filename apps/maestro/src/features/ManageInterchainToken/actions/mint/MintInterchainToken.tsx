@@ -1,7 +1,7 @@
 import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
-import { useMemo, type FC } from "react";
+import { useEffect, useMemo, useRef, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { parseUnits, TransactionExecutionError } from "viem";
@@ -45,6 +45,7 @@ export const MintInterchainToken: FC = () => {
 
   const mintTokens = useMintTokens();
   const mintStellarTokens = useMintStellarTokens();
+  const handledToastKeyRef = useRef<string | null>(null);
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
@@ -69,11 +70,9 @@ export const MintInterchainToken: FC = () => {
         if (result.digest) {
           setTxState({
             status: "confirmed",
+            hash: result.digest,
+            chainId,
           });
-          toast.success(
-            `Successfully minted interchain tokens. Tx: ${result.digest}`
-          );
-          manageActions.closeModal();
         }
       } else if (chainId === STELLAR_CHAIN_ID) {
         const result = await mintStellarTokens({
@@ -88,11 +87,6 @@ export const MintInterchainToken: FC = () => {
             hash: result.hash,
             chainId,
           });
-
-          toast.success(
-            `Successfully minted interchain tokens. Tx: ${result.hash}`
-          );
-          manageActions.closeModal();
         }
       } else {
         const txHash = await mintTokenAsync({
@@ -105,17 +99,13 @@ export const MintInterchainToken: FC = () => {
             hash: txHash,
             chainId,
           });
-          const explorer = chain?.blockExplorers?.default?.url;
-          if (explorer) {
-            toast.success(
-              `Mint tx submitted. View tx: ${explorer}/tx/${txHash}`
-            );
-          }
         }
       }
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
-        toast.error(`Failed to mint tokens: ${error.cause.shortMessage}`);
+        toast.error(`Failed to mint tokens: ${error.cause.shortMessage}`, {
+          duration: 10000,
+        });
         logger.error(`Failed to mint tokens: ${error.cause.message}`);
 
         setTxState({
@@ -129,10 +119,72 @@ export const MintInterchainToken: FC = () => {
         status: "reverted",
         error: error as Error,
       });
-      toast.error("Failed to mint tokens");
-      manageActions.closeModal();
     }
   };
+
+  useEffect(() => {
+    if (txState.status !== "confirmed" && txState.status !== "reverted") {
+      return;
+    }
+
+    const explorer = chain?.blockExplorers?.default?.url;
+    const txHash =
+      txState.status === "confirmed"
+        ? (txState.receipt?.transactionHash ?? txState.hash)
+        : txState.hash;
+    const toastKey = `${txState.status}:${txHash ?? ""}:${chain?.id ?? ""}`;
+    if (handledToastKeyRef.current === toastKey) {
+      return;
+    }
+    handledToastKeyRef.current = toastKey;
+
+    if (txState.status === "confirmed") {
+      if (explorer && txHash) {
+        toast.success(
+          <span>
+            Mint confirmed. View tx:
+            <a
+              href={`${explorer}/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 underline"
+            >
+              {txHash}
+            </a>
+          </span>,
+          { duration: 10000 }
+        );
+      } else {
+        toast.success("Successfully minted interchain tokens", {
+          duration: 10000,
+        });
+      }
+      manageActions.closeModal();
+      return;
+    }
+
+    if (txState.status === "reverted") {
+      if (explorer && txHash) {
+        toast.error(
+          <span>
+            Mint failed. View tx:
+            <a
+              href={`${explorer}/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 underline"
+            >
+              {txHash}
+            </a>
+          </span>,
+          { duration: 10000 }
+        );
+      } else {
+        toast.error("Mint transaction failed", { duration: 10000 });
+      }
+      manageActions.closeModal();
+    }
+  }, [txState, chain, manageActions]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {

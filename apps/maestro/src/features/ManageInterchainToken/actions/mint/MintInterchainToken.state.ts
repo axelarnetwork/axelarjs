@@ -1,5 +1,4 @@
-import { toast } from "@axelarjs/ui/toaster";
-import { createElement, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { isAddress } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
@@ -14,8 +13,7 @@ import { useManageInterchainTokenContainer } from "../../ManageInterchainToken.s
 export function useMintInterchainTokenState() {
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
-  const { address: accountAddress, chain } = useAccount();
-  const explorer = chain?.blockExplorers?.default?.url;
+  const { address: accountAddress } = useAccount();
 
   const [managerState] = useManageInterchainTokenContainer();
 
@@ -43,9 +41,6 @@ export function useMintInterchainTokenState() {
   } = useWriteTokenManagerMintToken({});
 
   const trpcContext = trpc.useUtils();
-
-  const [, manageActions] = useManageInterchainTokenContainer();
-
   const hash = evmMintTxHash ?? hederaMintTxHash;
   const handledHashRef = useRef<string | null>(null);
 
@@ -61,8 +56,11 @@ export function useMintInterchainTokenState() {
   });
 
   useEffect(() => {
-    if (!hash || isReceiptPending || isReceiptFetching) return;
+    if (!hash) return;
     if (handledHashRef.current === hash) return;
+    if (!(isReceiptSuccess || isReceiptError)) return;
+
+    handledHashRef.current = hash;
 
     async function handleReceipt() {
       if (isReceiptSuccess && receipt && receipt.status === "success") {
@@ -75,88 +73,19 @@ export function useMintInterchainTokenState() {
           }
         );
         setTxState({ status: "confirmed", receipt });
-        if (explorer && receipt.transactionHash) {
-          toast.success(
-            createElement(
-              "span",
-              null,
-              "Mint confirmed. View tx:",
-              createElement(
-                "a",
-                {
-                  href: `${explorer}/tx/${receipt.transactionHash}`,
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  className: "ml-1 underline",
-                },
-                receipt.transactionHash
-              )
-            )
-          );
-          return;
-        }
-        toast.success("Successfully minted interchain tokens");
         return;
       }
 
       if (isReceiptError || (receipt && receipt.status !== "success")) {
         setTxState({ status: "reverted", error: new Error("tx reverted") });
-        if (explorer && hash) {
-          toast.error(
-            createElement(
-              "span",
-              null,
-              "Mint failed. View tx:",
-              createElement(
-                "a",
-                {
-                  href: `${explorer}/tx/${hash}`,
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  className: "ml-1 underline",
-                },
-                hash
-              )
-            )
-          );
-          return;
-        }
-        toast.error("Mint transaction failed");
         return;
       }
-
-      setTxState({ status: "reverted", error: new Error("tx reverted") });
-      if (explorer && hash) {
-        toast.error(
-          createElement(
-            "span",
-            null,
-            "Mint failed. View tx:",
-            createElement(
-              "a",
-              {
-                href: `${explorer}/tx/${hash}`,
-                target: "_blank",
-                rel: "noopener noreferrer",
-                className: "ml-1 underline",
-              },
-              hash
-            )
-          )
-        );
-      }
-      toast.error("Mint transaction failed");
     }
 
-    handleReceipt()
-      .catch((err) => {
-        console.error("useMintInterchainTokenState: handleReceipt", err);
-        setTxState({ status: "reverted", error: err as Error });
-      })
-      .finally(() => {
-        handledHashRef.current = hash;
-        manageActions.closeModal();
-      });
+    handleReceipt().catch((err) => {
+      console.error("useMintInterchainTokenState: handleReceipt", err);
+      setTxState({ status: "reverted", error: err as Error });
+    });
   }, [
     isReceiptSuccess,
     isReceiptError,
@@ -167,14 +96,11 @@ export function useMintInterchainTokenState() {
     setTxState,
     evmMintTxHash,
     hederaMintTxHash,
-    manageActions,
     chainId,
     managerState.tokenAddress,
     accountAddress,
-    chain?.blockExplorers?.default?.url,
     hash,
     trpcContext.interchainToken.getInterchainTokenBalanceForOwner,
-    explorer,
   ]);
 
   const state = {
@@ -198,7 +124,6 @@ export function useMintInterchainTokenState() {
           !managerState.tokenManagerAddress ||
           managerState.tokenManagerAddress === "0x"
         ) {
-          toast.error("Token manager address not found for Hedera token");
           throw new Error("Missing token manager address");
         }
         return mintTokenManagerAsync({
