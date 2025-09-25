@@ -9,7 +9,8 @@ import {
 import { useMemo, type ComponentType, type FC } from "react";
 import dynamic from "next/dynamic";
 
-import { HEDERA_CHAIN_ID, useChainId } from "~/lib/hooks";
+import { HEDERA_CHAIN_ID } from "~/config/chains";
+import { useChainId } from "~/lib/hooks";
 import {
   INITIAL_STATE,
   ManageInterchainTokenProvider,

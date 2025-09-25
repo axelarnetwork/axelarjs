@@ -18,15 +18,11 @@ import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useHederaTokenAssociation } from "~/features/hederaHooks";
-import {
-  HEDERA_CHAIN_ID,
-  useAccount,
-  useChainId,
-  useSwitchChain,
-} from "~/lib/hooks";
+import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
 import {
   isTokenAddressIncompatibleWithOwner,
   normalizeTokenAddressForCompatibility,

@@ -1,11 +1,12 @@
 import type { TransactionReceipt } from "viem";
 import { usePublicClient } from "wagmi";
 
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 import {
   useWriteHederaTokenAssociation,
   useWriteHederaTokenDissociation,
 } from "~/lib/contracts/hedera/HederaTokenServicePrecompile.abi";
-import { HEDERA_CHAIN_ID, useAccount, useChainId } from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 
 export const WAIT_FOR_TRANSACTION_RECEIPT_TIMEOUT = 60_000; // 60 seconds
