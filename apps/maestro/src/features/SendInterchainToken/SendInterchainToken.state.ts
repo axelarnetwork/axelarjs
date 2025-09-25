@@ -92,6 +92,12 @@ export function useSendInterchainTokenState(props: {
     [toChainId, eligibleTargetChains]
   );
 
+  const selectedToMatchingToken = useMemo(() => {
+    const matchingTokens = originInterchainToken?.matchingTokens ?? [];
+    const chainId = selectedToChain?.chain_id;
+    return matchingTokens.find((x) => x.chainId === chainId);
+  }, [originInterchainToken?.matchingTokens, selectedToChain?.chain_id]);
+
   const [, { addTransaction }] = useTransactionsContainer();
 
   const balance = useBalance();
@@ -194,6 +200,9 @@ export function useSendInterchainTokenState(props: {
         0,
         (x) => x.estimatedWaitTimeInMinutes
       ),
+      destinationTokenAddress: selectedToMatchingToken?.tokenAddress as
+        | `0x${string}`
+        | undefined,
     },
     {
       setIsModalOpen,
