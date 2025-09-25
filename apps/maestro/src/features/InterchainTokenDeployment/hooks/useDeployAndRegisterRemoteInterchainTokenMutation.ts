@@ -37,7 +37,7 @@ import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
-import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
+import { type DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 // In an effort to keep the codebase without hardcoded chains, we create lists of chains up here
 /** a token address is not needed in advance if the chain name includes the following strings */
@@ -573,6 +573,7 @@ interface UseRequestDeployTokenParams {
   prepareMulticallRequest: PrepareMulticallRequest | undefined;
   multicall: Multicall;
   setIsTokenReadyForMulticall: (isTokenReadyForMulticall: boolean) => void;
+  onStatusUpdate: (status: DeployAndRegisterTransactionState) => void;
 }
 
 const useRequestDeployToken = ({
@@ -585,6 +586,7 @@ const useRequestDeployToken = ({
   prepareMulticallRequest,
   multicall,
   setIsTokenReadyForMulticall,
+  onStatusUpdate,
 }: UseRequestDeployTokenParams) => {
   const { address } = useAccount();
   const { kit } = useStellarKit();
@@ -606,6 +608,7 @@ const useRequestDeployToken = ({
     prepareMulticallRequest,
     multicall,
     setIsTokenReadyForMulticall,
+    onStatusUpdate,
   });
 
   const deployStellar = useCallback(async () => {
@@ -835,6 +838,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     prepareMulticallRequest,
     multicall,
     setIsTokenReadyForMulticall,
+    onStatusUpdate,
   });
 
   return {
