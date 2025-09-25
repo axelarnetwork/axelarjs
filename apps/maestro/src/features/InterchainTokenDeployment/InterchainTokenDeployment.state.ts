@@ -7,13 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
 import { z } from "zod";
 
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
-import {
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useAccount,
-  useChainId,
-} from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { numericString } from "~/lib/utils/validation";
 import { DeployTokenResult } from "../suiHooks/useDeployToken";

@@ -26,7 +26,8 @@ import { createWalletClient, custom } from "viem";
 import { watchAsset } from "viem/actions";
 import { z } from "zod";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";

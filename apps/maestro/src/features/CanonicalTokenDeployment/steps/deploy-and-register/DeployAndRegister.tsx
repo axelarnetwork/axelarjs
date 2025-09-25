@@ -1,7 +1,7 @@
 import { Alert, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
-import React, {
+import {
   ComponentRef,
   useCallback,
   useMemo,
@@ -13,16 +13,12 @@ import React, {
 import { parseUnits } from "viem";
 import { WriteContractData } from "wagmi/query";
 
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { RegisterCanonicalTokenResult } from "~/features/suiHooks/useRegisterCanonicalToken";
 import { useTransactionsContainer } from "~/features/Transactions";
-import {
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useBalance,
-  useChainId,
-} from "~/lib/hooks";
+import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
 import { filterEligibleChains } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -95,7 +91,7 @@ export const Step3: FC = () => {
         console.warn("gas prices not loaded");
         return;
       }
-      
+
       actions.setIsDeploying(true);
 
       invariant(sourceChain, "source chain not found");
