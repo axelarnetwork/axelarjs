@@ -41,11 +41,11 @@ export function useStep3ChainSelectionState() {
     isLoading: isRemoteDeploymentGasFeeLoading,
     isError: isRemoteDeploymentGasFeeError,
   } = useEstimateGasFeeMultipleChainsQuery({
-    sourceChainId,
+    sourceChain: sourceChainId,
     destinationChainIds: rootState.selectedChains,
     gasLimit: Number(NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT),
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
-    // gasMultiplier: 1.1,
+    totalFeeMultiplier: 1.2,
   });
 
   useEffect(() => {
