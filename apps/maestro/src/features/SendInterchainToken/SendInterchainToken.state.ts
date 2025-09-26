@@ -1,6 +1,7 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
@@ -62,6 +63,9 @@ export function useSendInterchainTokenState(props: {
       props.sourceChain.chain_type,
     ]
   );
+
+  const shouldUseTokenService =
+    props.sourceChain.chain_id === HEDERA_CHAIN_ID || isApprovalRequired;
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
@@ -160,7 +164,7 @@ export function useSendInterchainTokenState(props: {
 
   const { sendTokenAsync, isSending, txState } = useMemo(
     () =>
-      isApprovalRequired
+      shouldUseTokenService
         ? {
             sendTokenAsync: tokenServiceSendTokenAsync,
             isSending: isTokenServiceTransfering,
@@ -172,7 +176,7 @@ export function useSendInterchainTokenState(props: {
             txState: interchainTransferTxState,
           },
     [
-      isApprovalRequired,
+      shouldUseTokenService,
       tokenServiceSendTokenAsync,
       isTokenServiceTransfering,
       tokenServiceTxState,

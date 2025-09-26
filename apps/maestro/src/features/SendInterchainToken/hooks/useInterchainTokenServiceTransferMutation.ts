@@ -10,13 +10,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 import { useBlockNumber, useWaitForTransactionReceipt } from "wagmi";
 
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
   useReadInterchainTokenAllowance,
   useReadInterchainTokenDecimals,
   useWriteInterchainTokenApprove,
 } from "~/lib/contracts/InterchainToken.hooks";
-import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
+import {
+  useReadInterchainTokenServiceTokenManagerAddress,
+  useWriteInterchainTokenServiceInterchainTransfer,
+} from "~/lib/contracts/InterchainTokenService.hooks";
 import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
@@ -48,9 +52,24 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { address } = useAccount();
 
+  const { data: tokenManagerAddress } =
+    useReadInterchainTokenServiceTokenManagerAddress({
+      args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.tokenManagerAddress.args({
+        tokenId: config.tokenId,
+      }),
+      query: {
+        enabled: chainId === HEDERA_CHAIN_ID && Boolean(config.tokenId),
+      },
+    });
+
+  const approvalSpender =
+    chainId === HEDERA_CHAIN_ID
+      ? ((tokenManagerAddress as `0x${string}`) ?? "0x")
+      : NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
+
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
     config.tokenAddress as `0x${string}`,
-    NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS
+    approvalSpender
   );
 
   const {
@@ -179,7 +198,7 @@ export function useInterchainTokenServiceTransferMutation(
           await approveInterchainTokenAsync({
             address: config.tokenAddress as `0x${string}`,
             args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
-              spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+              spender: approvalSpender,
               amount: approvedAmountRef.current,
             }),
           });
