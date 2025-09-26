@@ -32,7 +32,7 @@ import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
-import { scaleGasValue } from "~/lib/utils/gas";
+import { Gas } from "~/lib/utils/gas";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
@@ -196,17 +196,20 @@ const usePrepareMulticall = ({
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
         destinationChain,
-        gasValue: scaleGasValue(
-          chainId,
-          input.remoteDeploymentGasFees?.gasFees?.[i].fee
-        ),
+        gasValue: new Gas(
+          input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
+          { chainId }
+        ).valueChainDecimals,
       })
     );
 
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainIds, chainId]);
 
-  const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
+  const totalGasFee = new Gas(
+    input?.remoteDeploymentGasFees?.totalGasFee ?? 0n,
+    { chainId }
+  ).value;
 
   const [isTokenReadyForMulticall, setIsTokenReadyForMulticall] =
     useState(false);
