@@ -4,13 +4,18 @@ import { z } from "zod";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
-  destinationChainIds: z.array(z.string()),
-  sourceChainId: z.string(),
-  gasLimit: z.number(),
-  gasMultiplier: z.union([z.number(), z.literal("auto")]).optional(),
-  executeData: z.string().optional(),
-  isGMPExpressTransaction: z.boolean().optional(),
-  minGasPrice: z.string().optional(),
+  estimateGasFeeParams: z.object({
+    destinationChainIds: z.array(z.string()),
+    sourceChain: z.string(),
+    gasLimit: z.number(),
+    /** Will be used for the API request, and it only affects the execution fee */
+    gasMultiplier: z.union([z.number(), z.literal("auto")]).optional(),
+    executeData: z.string().optional(),
+    isGMPExpressTransaction: z.boolean().optional(),
+    minGasPrice: z.string().optional(),
+  }),
+  /** Multiplies the final result of the gas fee */
+  totalFeeMultiplier: z.number().optional(),
 });
 
 export type EstimateGasFeeMultipleChainsInput = z.infer<typeof INPUT_SCHEMA>;
@@ -21,13 +26,8 @@ export const estimateGasFeesMultipleChains = publicProcedure
     try {
       const response =
         await ctx.services.axelarjsSDK.estimateGasFeeMultipleChains({
-          destinationChainIds: input.destinationChainIds,
-          sourceChainId: input.sourceChainId,
-          gasLimit: input.gasLimit,
-          gasMultiplier: input.gasMultiplier,
-          executeData: input.executeData,
-          isGMPExpressTransaction: input.isGMPExpressTransaction,
-          minGasPrice: input.minGasPrice,
+          estimateGasFeeParams: input.estimateGasFeeParams,
+          totalFeeMultiplier: input.totalFeeMultiplier,
         });
 
       return response;

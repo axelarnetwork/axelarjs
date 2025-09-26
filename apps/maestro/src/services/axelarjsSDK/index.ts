@@ -15,19 +15,20 @@ export const client = new AxelarQueryAPI({
   environment: process.env.NEXT_PUBLIC_NETWORK_ENV as Environment,
 });
 
-async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
+async function estimateGasFee({
+  totalFeeMultiplier,
+  estimateGasFeeParams,
+}: EstimateGasFeeInput): Promise<bigint> {
   const hopParams = [
     {
-      ...params,
-      sourceChain: params.sourceChainId,
+      ...estimateGasFeeParams,
       destinationChain: "axelar",
-      gasLimit: params.gasLimit.toString(),
+      gasLimit: estimateGasFeeParams.gasLimit.toString(),
     },
     {
-      ...params,
+      ...estimateGasFeeParams,
       sourceChain: "axelar",
-      destinationChain: params.destinationChainId,
-      gasLimit: params.gasLimit.toString(),
+      gasLimit: estimateGasFeeParams.gasLimit.toString(),
     },
   ];
 
@@ -35,10 +36,11 @@ async function estimateGasFee(params: EstimateGasFeeInput): Promise<bigint> {
 
   // FEE_MULTIPLIER is a number with 3 decimals max e.g. 1.875
   // TODO: find a better way to handle conditional gas fee based on the destination chain
-  const gasMultiplier = Number(params.gasMultiplier) || FEE_MULTIPLIER;
-  const multiplier = params.destinationChainId.includes("stellar")
-    ? 1.5
-    : gasMultiplier;
+  let multiplier = totalFeeMultiplier || FEE_MULTIPLIER;
+
+  if (estimateGasFeeParams.destinationChain.includes("stellar")) {
+    multiplier = 1.5;
+  }
 
   const finalValue =
     (BigInt(fee as string) * BigInt(multiplier * 1000)) / 1000n;
@@ -50,31 +52,34 @@ async function estimateGasFeeMultipleChains(
   params: EstimateGasFeeMultipleChainsInput
 ) {
   const results = await Promise.all([
-    ...params.destinationChainIds.map((destinationChainId) =>
+    ...params.estimateGasFeeParams.destinationChainIds.map((destinationChain) =>
       estimateGasFee({
         ...params,
-        destinationChainId,
+        estimateGasFeeParams: {
+          ...params.estimateGasFeeParams,
+          destinationChain,
+        },
       })
         .then((fee) => {
           // temporary fix to multiply the gas fee for ethereum-sepolia by 2.5 - prevent insufficient gas error
           let adjustedFee = fee;
-          if (destinationChainId === "ethereum-sepolia") {
+          if (destinationChain === "ethereum-sepolia") {
             adjustedFee = (fee * 5n) / 2n;
           }
 
           return {
             status: "success" as const,
             fee: adjustedFee,
-            sourceChainId: params.sourceChainId,
-            destinationChainId,
+            sourceChainId: params.estimateGasFeeParams.sourceChain,
+            destinationChainId: destinationChain,
           };
         })
         .catch((error) => ({
           status: "error" as const,
           error: error instanceof Error ? error.message : "Unknown error",
           fee: 0n,
-          sourceChainId: params.sourceChainId,
-          destinationChainId,
+          sourceChainId: params.estimateGasFeeParams.sourceChain,
+          destinationChain,
         }))
     ),
   ]);
