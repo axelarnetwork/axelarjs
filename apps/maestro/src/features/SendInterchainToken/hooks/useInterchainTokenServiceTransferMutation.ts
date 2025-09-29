@@ -25,6 +25,9 @@ import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
 
+// Chains that should use the Token Manager as the spender for approvals
+const CHAINS_USING_TOKEN_MANAGER_AS_SPENDER = [HEDERA_CHAIN_ID];
+
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
   tokenId: `0x${string}`;
@@ -46,6 +49,9 @@ export function useInterchainTokenServiceTransferMutation(
   const chainId = useChainId();
   const [txState, setTxState] = useTransactionState();
 
+  const shouldUseTokenManagerAsSpender =
+    CHAINS_USING_TOKEN_MANAGER_AS_SPENDER.includes(chainId);
+
   const { data: decimals } = useReadInterchainTokenDecimals({
     address: config.tokenAddress as `0x${string}`,
   });
@@ -58,14 +64,13 @@ export function useInterchainTokenServiceTransferMutation(
         tokenId: config.tokenId,
       }),
       query: {
-        enabled: chainId === HEDERA_CHAIN_ID && Boolean(config.tokenId),
+        enabled: shouldUseTokenManagerAsSpender && Boolean(config.tokenId),
       },
     });
 
-  const approvalSpender =
-    chainId === HEDERA_CHAIN_ID
-      ? ((tokenManagerAddress as `0x${string}`) ?? "0x")
-      : NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
+  const approvalSpender = shouldUseTokenManagerAsSpender
+    ? ((tokenManagerAddress as `0x${string}`) ?? "0x")
+    : NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
 
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
     config.tokenAddress as `0x${string}`,

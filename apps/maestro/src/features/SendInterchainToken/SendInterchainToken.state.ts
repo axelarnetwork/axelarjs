@@ -22,6 +22,9 @@ import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
 
+// Chains that should force using Interchain Token Service path
+const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
+
 export function useSendInterchainTokenState(props: {
   tokenAddress: string;
   originTokenAddress?: `0x${string}`;
@@ -65,7 +68,8 @@ export function useSendInterchainTokenState(props: {
   );
 
   const shouldUseTokenService =
-    props.sourceChain.chain_id === HEDERA_CHAIN_ID || isApprovalRequired;
+    CHAINS_REQUIRING_TOKEN_SERVICE.includes(props.sourceChain.chain_id) ||
+    isApprovalRequired;
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
