@@ -70,15 +70,15 @@ async function estimateGasFeeMultipleChains(
           return {
             status: "success" as const,
             fee: adjustedFee,
-            sourceChainId: params.estimateGasFeeParams.sourceChain,
-            destinationChainId: destinationChain,
+            sourceChain: params.estimateGasFeeParams.sourceChain,
+            destinationChain,
           };
         })
         .catch((error) => ({
           status: "error" as const,
           error: error instanceof Error ? error.message : "Unknown error",
           fee: 0n,
-          sourceChainId: params.estimateGasFeeParams.sourceChain,
+          sourceChain: params.estimateGasFeeParams.sourceChain,
           destinationChain,
         }))
     ),

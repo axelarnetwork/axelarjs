@@ -105,12 +105,13 @@ export function useSendInterchainTokenState(props: {
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
 
   const { data: gas } = useEstimateGasFeeQuery({
-    sourceChainId: props.sourceChain.id,
-    destinationChainId: selectedToChain?.id,
+    sourceChain: props.sourceChain.id,
+    destinationChain: selectedToChain?.id,
     sourceChainTokenSymbol: nativeTokenSymbol,
     gasLimit: NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
     gasMultiplier: "auto",
+    totalFeeMultiplier: 1.2,
   });
 
   const hasInsufficientGasBalance = useMemo(() => {
