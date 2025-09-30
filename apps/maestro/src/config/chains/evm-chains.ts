@@ -15,7 +15,6 @@ import {
   bsc,
   bscTestnet,
   celo,
-  celoAlfajores,
   fantom,
   fantomTestnet,
   filecoin,
@@ -127,6 +126,26 @@ const hyperEVMTestnet = defineChain({
     default: {
       name: "HyperEVMScan",
       url: "https://hyperevmscan.io/",
+    },
+  },
+  testnet: true,
+});
+
+const celoSepolia = defineChain({
+  id: 11142220,
+  name: "Celo Sepolia",
+  nativeCurrency: {
+    name: "Celo",
+    symbol: "CELO",
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: { http: ["https://forno.celo-sepolia.celo-testnet.org"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Celo Sepolia Explorer",
+      url: "https://celo-sepolia.blockscout.com",
     },
   },
   testnet: true,
@@ -386,15 +405,15 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     environment: ENVIRONMENTS.mainnet,
   },
   {
-    ...celoAlfajores,
+    ...celoSepolia,
     rpcUrls: createRpcUrlConfig(
-      celoAlfajores,
+      celoSepolia,
       ENVIRONMENTS.testnet,
       [],
-      "celo"
+      "celo-sepolia"
     ),
-    axelarChainId: "celo",
-    axelarChainName: "celo",
+    axelarChainId: "celo-sepolia",
+    axelarChainName: "celo-sepolia",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
   },
