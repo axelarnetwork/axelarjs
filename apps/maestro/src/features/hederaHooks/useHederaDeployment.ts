@@ -19,6 +19,7 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
+import { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment";
 
 type Multicall = ReturnType<typeof useWriteInterchainTokenFactoryMulticall>;
 type PrepareMulticallRequest = Parameters<Multicall["writeContractAsync"]>[0];
@@ -27,10 +28,58 @@ interface UseHederaParams {
   prepareMulticallRequest: PrepareMulticallRequest | undefined;
   multicall: Multicall;
   setIsTokenReadyForMulticall: (isTokenReadyForMulticall: boolean) => void;
+  onStatusUpdate: (status: DeployAndRegisterTransactionState) => void;
 }
 
 // use a constant value as the estimation is not accurate
 const DEPLOYMENT_GAS_COST = 5000000n;
+
+const useStatusUpdate = (
+  onStatusUpdate: (status: DeployAndRegisterTransactionState) => void
+) => {
+  const currentStepRef = useRef(1);
+  const totalStepsRef = useRef(3);
+
+  const onInitStatus = useCallback(() => {
+    currentStepRef.current = 1;
+    totalStepsRef.current = 3;
+    onStatusUpdate?.({
+      type: "pending_approval",
+      step: currentStepRef.current,
+      totalSteps: totalStepsRef.current,
+    });
+  }, [onStatusUpdate]);
+
+  const onSignatureCompleted = useCallback(() => {
+    currentStepRef.current = Math.min(
+      currentStepRef.current + 1,
+      totalStepsRef.current
+    );
+    onStatusUpdate?.({
+      type: "pending_approval",
+      step: currentStepRef.current,
+      totalSteps: totalStepsRef.current,
+    });
+  }, [onStatusUpdate]);
+
+  const onSignatureNotNeeded = useCallback(() => {
+    totalStepsRef.current = Math.max(
+      totalStepsRef.current - 1,
+      currentStepRef.current
+    );
+    onStatusUpdate?.({
+      type: "pending_approval",
+      step: currentStepRef.current,
+      totalSteps: totalStepsRef.current,
+    });
+  }, [onStatusUpdate]);
+
+  return {
+    onInitStatus,
+    onSignatureCompleted,
+    onSignatureNotNeeded,
+  };
+};
 
 /*
  * Hedera deployment flow:
@@ -42,10 +91,14 @@ export const useHederaDeployment = ({
   prepareMulticallRequest,
   multicall,
   setIsTokenReadyForMulticall,
+  onStatusUpdate,
 }: UseHederaParams) => {
   const chainId = useChainId();
   const { address } = useAccount();
   const publicClient = usePublicClient();
+
+  const { onInitStatus, onSignatureCompleted, onSignatureNotNeeded } =
+    useStatusUpdate(onStatusUpdate);
 
   // Get token creation price
   const { data: tokenCreationPriceTinycents } =
@@ -76,24 +129,26 @@ export const useHederaDeployment = ({
   });
 
   // Get WHBAR balance
-  const { data: whbarBalance } = useReadWhbarBalanceOf({
-    address: whbarAddress,
-    chainId: HEDERA_CHAIN_ID,
-    args: address ? [address] : undefined,
-    query: {
-      enabled: chainId === HEDERA_CHAIN_ID && !!address && !!whbarAddress,
-    },
-  });
+  const { data: whbarBalance, refetch: refetchWhbarBalance } =
+    useReadWhbarBalanceOf({
+      address: whbarAddress,
+      chainId: HEDERA_CHAIN_ID,
+      args: address ? [address] : undefined,
+      query: {
+        enabled: chainId === HEDERA_CHAIN_ID && !!address && !!whbarAddress,
+      },
+    });
 
   // Get WHBAR allowance
-  const { data: whbarAllowance } = useReadWhbarAllowance({
-    address: whbarAddress,
-    chainId: HEDERA_CHAIN_ID,
-    args: address ? [address, interchainTokenFactoryAddress] : undefined,
-    query: {
-      enabled: chainId === HEDERA_CHAIN_ID && !!address && !!whbarAddress,
-    },
-  });
+  const { data: whbarAllowance, refetch: refetchWhbarAllowance } =
+    useReadWhbarAllowance({
+      address: whbarAddress,
+      chainId: HEDERA_CHAIN_ID,
+      args: address ? [address, interchainTokenFactoryAddress] : undefined,
+      query: {
+        enabled: chainId === HEDERA_CHAIN_ID && !!address && !!whbarAddress,
+      },
+    });
 
   // WHBAR hooks
   const whbarDeposit = useWriteWhbarDeposit();
@@ -121,6 +176,7 @@ export const useHederaDeployment = ({
     const depositWhbarTinybars = targetWhbarTinybars - currentWhbarTinybars;
 
     if (depositWhbarTinybars <= 0n) {
+      onSignatureNotNeeded();
       return;
     }
 
@@ -132,6 +188,8 @@ export const useHederaDeployment = ({
       address: whbarAddress,
       value: depositValue,
     });
+
+    onSignatureCompleted();
 
     await publicClient.waitForTransactionReceipt({
       hash: txHash,
@@ -145,6 +203,8 @@ export const useHederaDeployment = ({
     whbarBalance,
     tokenCreationPriceTinybars,
     publicClient,
+    onSignatureCompleted,
+    onSignatureNotNeeded,
   ]);
 
   // WHBAR approval function - approves WHBAR for token creation
@@ -174,9 +234,13 @@ export const useHederaDeployment = ({
         args: [interchainTokenFactoryAddress, approvalAmount],
       });
 
+      onSignatureCompleted();
+
       await publicClient.waitForTransactionReceipt({
         hash: txHash,
       });
+    } else {
+      onSignatureNotNeeded();
     }
   }, [
     chainId,
@@ -185,6 +249,8 @@ export const useHederaDeployment = ({
     whbarAllowance,
     publicClient,
     approveAsync,
+    onSignatureCompleted,
+    onSignatureNotNeeded,
   ]);
 
   /** Keep a ref to prevent the multicall from running multiple times */
@@ -202,6 +268,8 @@ export const useHederaDeployment = ({
   const deployHedera = useCallback(async () => {
     if (chainId !== HEDERA_CHAIN_ID) return;
 
+    onInitStatus();
+
     return new Promise((resolve, reject) => {
       // Store the promise resolvers
       deployPromiseResolvers.current = { resolve, reject };
@@ -216,6 +284,16 @@ export const useHederaDeployment = ({
         })
         .catch((error) => {
           deployPromiseResolvers.current = null;
+
+          // refetch WHBAR allowance and balance, since one of those promises could have succeeded
+          refetchWhbarAllowance().catch((error) => {
+            console.error("useHederaDeployment: deployHedera", error);
+          });
+
+          refetchWhbarBalance().catch((error) => {
+            console.error("useHederaDeployment: deployHedera", error);
+          });
+
           reject(error);
         });
     });
@@ -223,7 +301,10 @@ export const useHederaDeployment = ({
     chainId,
     depositWhbarHedera,
     approveWhbarHedera,
+    onInitStatus,
     setIsTokenReadyForMulticall,
+    refetchWhbarAllowance,
+    refetchWhbarBalance,
   ]);
 
   useEffect(() => {
