@@ -15,7 +15,6 @@ import {
   bsc,
   bscTestnet,
   celo,
-  Chain,
   fantom,
   fantomTestnet,
   filecoin,
