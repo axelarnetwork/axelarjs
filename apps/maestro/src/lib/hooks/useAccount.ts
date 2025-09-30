@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";

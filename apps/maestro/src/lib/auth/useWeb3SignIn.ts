@@ -1,3 +1,5 @@
+'use client'
+
 import { debounce, invariant } from "@axelarjs/utils";
 import { useEffect, useRef } from "react";
 import {

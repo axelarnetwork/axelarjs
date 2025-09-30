@@ -1,3 +1,5 @@
+'use client'
+
 import { useDisconnectWallet } from "@mysten/dapp-kit";
 import { useDisconnect as useWagmiDisconnect } from "wagmi";
 

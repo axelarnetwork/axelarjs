@@ -16,6 +16,9 @@ const nextConfig = {
   images: {
     remotePatterns: HOSTNAMES.map((hostname) => ({ hostname })),
   },
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
   transpilePackages: ['@xrpl-wallet-standard/core'],
   compiler: {
     styledComponents: true,

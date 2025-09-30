@@ -1,3 +1,5 @@
+'use client'
+
 import { Button, HourglassIcon, Tooltip, XIcon } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { Maybe } from "@axelarjs/utils";

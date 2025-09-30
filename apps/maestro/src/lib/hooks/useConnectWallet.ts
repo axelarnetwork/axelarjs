@@ -1,3 +1,5 @@
+'use client'
+
 import toast from "@axelarjs/ui/toaster";
 import { useLocalStorageState } from "@axelarjs/utils/react/usePersistedState";
 import { useEffect } from "react";
