@@ -109,14 +109,15 @@ export function useSendInterchainTokenState(props: {
 
   const [, { addTransaction }] = useTransactionsContainer();
 
+  const rawWalletBalance = useBalance();
   const balance = scaleGasValue(
     props.sourceChain.chain_id,
-    useBalance()?.value ?? 0n
+    rawWalletBalance?.value ?? 0n
   );
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
 
-  let { data: gas } = useEstimateGasFeeQuery({
+  const rawEstimateGasFeeData = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
     destinationChainId: selectedToChain?.id,
     sourceChainTokenSymbol: nativeTokenSymbol,
@@ -125,7 +126,10 @@ export function useSendInterchainTokenState(props: {
     gasMultiplier: "auto",
   });
 
-  gas = scaleGasValue(props.sourceChain.chain_id, gas);
+  const gas = scaleGasValue(
+    props.sourceChain.chain_id,
+    rawEstimateGasFeeData.data
+  );
 
   const hasInsufficientGasBalance = useMemo(() => {
     if (!balance || !gas) {

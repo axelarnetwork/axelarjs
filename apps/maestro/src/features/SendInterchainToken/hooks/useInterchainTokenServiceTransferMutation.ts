@@ -69,7 +69,7 @@ export function useInterchainTokenServiceTransferMutation(
     });
 
   const approvalSpender = shouldUseTokenManagerAsSpender
-    ? ((tokenManagerAddress as `0x${string}`) ?? "0x")
+    ? (tokenManagerAddress ?? "0x")
     : NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
 
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
