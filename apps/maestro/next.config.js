@@ -16,6 +16,10 @@ const nextConfig = {
   images: {
     remotePatterns: HOSTNAMES.map((hostname) => ({ hostname })),
   },
+  transpilePackages: ['@xrpl-wallet-standard/core'],
+  compiler: {
+    styledComponents: true,
+  }
 };
 
 const withBundleAnalyzer = bundleAnalyzer({

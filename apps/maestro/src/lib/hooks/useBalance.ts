@@ -5,7 +5,7 @@ import {
   useConnect as useXRPLConnect,
   useWallet as useXRPLWallet,
 } from "@xrpl-wallet-standard/react";
-import * as xrpl from "xrpl";
+//import * as xrpl from "xrpl";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {
@@ -71,7 +71,7 @@ export function useBalance(): BalanceResult | undefined {
   useEffect(() => {
     if (chainName === xrplChainConfig.name && address && !!xrplWallet?.accounts.at(0)) { // TODO: fix XRPL connection check
       const fetchXRPLBalance = async () => {
-        const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]); // TODO
+        /*const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]); // TODO
         await client.connect();
 
         try {
@@ -84,7 +84,7 @@ export function useBalance(): BalanceResult | undefined {
           setXRPLDrops(drops);
         } finally {
           client.disconnect();
-        }
+        }*/
       }
       fetchXRPLBalance();
     }
