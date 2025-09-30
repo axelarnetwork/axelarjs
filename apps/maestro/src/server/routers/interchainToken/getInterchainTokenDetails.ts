@@ -2,9 +2,13 @@ import { Asset } from "@stellar/stellar-sdk";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { stellarChainConfig, suiChainConfig } from "~/config/chains";
+import {
+  STELLAR_CHAIN_ID,
+  stellarChainConfig,
+  SUI_CHAIN_ID,
+  suiChainConfig,
+} from "~/config/chains";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";

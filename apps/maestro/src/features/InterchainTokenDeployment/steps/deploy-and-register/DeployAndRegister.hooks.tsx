@@ -5,11 +5,8 @@ import { FormEventHandler, useCallback, useMemo } from "react";
 import { parseUnits } from "viem";
 import { WriteContractData } from "wagmi/query";
 
-import {
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useChainId,
-} from "../../../../lib/hooks";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import { useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "../../../../lib/transactions/handlers";
 import { DeployTokenResultStellar } from "../../../stellarHooks";
 import { DeployTokenResult } from "../../../suiHooks/useDeployToken";

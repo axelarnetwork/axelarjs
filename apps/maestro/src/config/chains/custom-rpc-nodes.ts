@@ -17,6 +17,7 @@ export const CUSTOM_RPC_NODES: Record<
       // No known public DRPC endpoint
     ], // Flow Mainnet
     fraxtal: ["https://fraxtal.drpc.org"], // Fraxtal Mainnet
+    hedera: ["https://hedera-mainnet.rpc.axelar.dev"], // Hedera Mainnet
     immutable: ["https://immutable-zkevm.drpc.org"], // Immutable zkEVM Mainnet
     kava: ["https://kava.drpc.org"], // Kava Mainnet
     linea: ["https://linea.drpc.org"], // Linea Mainnet
@@ -46,6 +47,7 @@ export const CUSTOM_RPC_NODES: Record<
     fantom: [], // No known public DRPC endpoint for Fantom Testnet
     flow: [], // No known public DRPC endpoint for Flow Testnet
     fraxtal: ["https://fraxtal-testnet.drpc.org"], // Fraxtal Testnet
+    hedera: ["https://hedera-testnet.rpc.axelar.dev"], // Hedera Testnet
     immutable: [], // Immutable zkEVM Testnet
     kava: ["https://kava-testnet.drpc.org"], // Kava Testnet
     linea: ["https://linea-sepolia.drpc.org"], // Linea Sepolia

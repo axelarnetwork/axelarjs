@@ -3,13 +3,21 @@ import {
   INTERCHAIN_TOKEN_SERVICE_ENCODERS,
 } from "@axelarjs/evm";
 import { invariant, throttle } from "@axelarjs/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { zeroAddress, type TransactionReceipt } from "viem";
+import { zeroAddress } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
+import {
+  EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
+import { useHederaDeployment } from "~/features/hederaHooks";
 import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
+import { useReadInterchainTokenServiceRegisteredTokenAddress } from "~/lib/contracts/hedera/HederaInterchainTokenService.hooks";
 import {
   useReadInterchainTokenFactoryInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
@@ -20,34 +28,32 @@ import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
 } from "~/lib/drizzle/schema";
-import {
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useAccount,
-  useChainId,
-} from "~/lib/hooks";
+import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
-import { TOKEN_MANAGER_TYPES } from "../../../lib/drizzle/schema/common";
-import type { DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
+import { type DeployAndRegisterTransactionState } from "../InterchainTokenDeployment.state";
 
 // In an effort to keep the codebase without hardcoded chains, we create lists of chains up here
-/** a token address is not needed if the chain name includes the following strings */
-const CHAINS_WITHOUT_TOKEN_ADDRESS = ["sui", "stellar"];
+/** a token address is not needed in advance if the chain name includes the following strings */
+const CHAINS_WITHOUT_TOKEN_ADDRESS = ["sui", "stellar", "hedera"];
 /** chains that don't have their deployment draft recorded - check if chain name includes any of these strings */
 const CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING = ["sui", "stellar"];
 /** a multicall is not needed for these chains */
 const CHAIN_IDS_WITHOUT_MULTICALL = [SUI_CHAIN_ID];
+/** a multicall is enabled manually for these chains */
+const CHAIN_IDS_WITH_MANUAL_MULTICALL = [HEDERA_CHAIN_ID];
 
 // Helper functions to check if chain names include specific strings
-const isChainWithoutTokenAddress = (chainId: string | undefined): boolean =>
-  !!chainId &&
+const isChainWithoutTokenAddress = (chainName: string | undefined): boolean =>
+  !!chainName &&
   CHAINS_WITHOUT_TOKEN_ADDRESS.some((chainString) =>
-    chainId.toLowerCase().includes(chainString.toLowerCase())
+    chainName.toLowerCase().includes(chainString.toLowerCase())
   );
 
 const isChainSkipDeploymentDraftRecording = (
@@ -64,15 +70,15 @@ const isChainSkipDeploymentDraftRecording = (
  *
  * 1. INPUT VALIDATION & SETUP
  *    └── useTokenId() ──────────────► Get token ID from salt + deployer
- *    └── useTokenAddress() ──────────► Get token address from token ID
+ *    └── useTokenAddress() ──────────► Get token address from token ID (supports non-deterministic tokens for Hedera)
  *    └── useDestinationChainIds() ───► Map destination chains to IDs
  *
  * 2. MULTICALL PREPARATION
- *    └── useMulticallArgs() ─────────► Build encoded function calls
- *    └── useSimulateContract() ──────► Prepare transaction simulation
+ *    └── usePrepareMulticall() ──────► Build encoded function calls and prepare simulation
+ *    └── useSimulateInterchainTokenFactoryMulticall() ──► Prepare transaction simulation
  *
  * 3. READINESS CHECK
- *    └── useReady() ─────────────────► Check if deployment is ready
+ *    └── useReady() ─────────────────► Check if deployment is ready (excludes Hedera manual multicall)
  *
  * 4. DRAFT DEPLOYMENT RECORDING
  *    └── recordDeploymentDraft() ────► Record deployment draft in DB
@@ -80,16 +86,42 @@ const isChainSkipDeploymentDraftRecording = (
  * 5. DEPLOYMENT EXECUTION
  *    ├── Stellar: deployStellar() ────► Deploy on Stellar network
  *    ├── Sui: deploySui() ────────────► Deploy on Sui network
+ *    ├── Hedera: deployHedera() ──────► Deploy on Hedera (WHBAR deposit + approval + multicall)
  *    └── EVM: multicall.writeContractAsync() ──► Deploy via multicall
  *
  * 6. TRANSACTION MONITORING
- *    └── useReceipt() ────────────────► Wait for transaction receipt
+ *    └── useReceipt() ────────────────► Wait for transaction receipt (with deduplication)
  *
  * 7. FINAL DEPLOYMENT RECORDING
+ *    └── useSetEvmDeploymentArgsOnReceipt() ──► Set deployment args when receipt is received
  *    └── useRecordDeployment() ───────► Record final deployment in database
  *
  * 8. STATUS UPDATES
  *    └── onStatusUpdate() ────────────► Update UI with progress
+ *
+ * NETWORK-SPECIFIC INTEGRATIONS:
+ * ==============================
+ *
+ * HEDERA:
+ * - Uses useHederaDeployment() hook which handles:
+ *   - WHBAR deposit (if balance insufficient)
+ *   - WHBAR approval (if allowance insufficient)
+ *   - Token deployment via multicall
+ * - Related files: ~/features/hederaHooks/
+ *
+ * STELLAR:
+ * - Uses useDeployStellarToken() hook which handles:
+ *   - Stellar wallet connection via StellarKit
+ *   - Token creation on Stellar network
+ *   - Remote token registration
+ * - Related files: ~/features/stellarHooks/
+ *
+ * SUI:
+ * - Uses useDeployToken() hook which handles:
+ *   - Token deployment on Sui network
+ *   - Event parsing for deployment results
+ *   - Direct deployment recording (no multicall)
+ * - Related files: ~/features/suiHooks/
  */
 
 type Multicall = ReturnType<typeof useWriteInterchainTokenFactoryMulticall>;
@@ -129,7 +161,7 @@ interface UseMulticallParams {
   chainId: number;
 }
 
-const useMulticallArgs = ({
+const usePrepareMulticall = ({
   input,
   tokenId,
   destinationChainIds,
@@ -164,14 +196,53 @@ const useMulticallArgs = ({
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         ...commonArgs,
         destinationChain,
-        gasValue: input.remoteDeploymentGasFees?.gasFees?.[i].fee ?? 0n,
+        gasValue: scaleGasValue(
+          chainId,
+          input.remoteDeploymentGasFees?.gasFees?.[i].fee
+        ),
       })
     );
 
     return [deployTxData, ...registerTxData];
   }, [input, tokenId, destinationChainIds, chainId]);
 
-  return multicallArgs;
+  const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
+
+  const [isTokenReadyForMulticall, setIsTokenReadyForMulticall] =
+    useState(false);
+
+  useEffect(() => {
+    setIsTokenReadyForMulticall(
+      !CHAIN_IDS_WITH_MANUAL_MULTICALL.includes(chainId)
+    );
+  }, [chainId]);
+
+  // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
+  const isDestinationFeeSet = !destinationChainIds.length || totalGasFee > 0n;
+  const isMutationReady =
+    multicallArgs.length > 0 && isDestinationFeeSet && isTokenReadyForMulticall;
+
+  const { data: prepareMulticall, error: simulationError } =
+    useSimulateInterchainTokenFactoryMulticall({
+      chainId,
+      value: totalGasFee,
+      args: [multicallArgs],
+      query: {
+        enabled: isMutationReady,
+      },
+    });
+
+  if (simulationError) {
+    console.error(
+      "useDeployAndRegisterRemoteInterchainTokenMutation simulation error:",
+      simulationError
+    );
+  }
+
+  return {
+    prepareMulticall,
+    setIsTokenReadyForMulticall,
+  };
 };
 
 const useTokenId = (
@@ -191,18 +262,53 @@ const useTokenId = (
   return tokenId;
 };
 
-const useTokenAddress = (tokenId: `0x${string}` | undefined) => {
+interface UseTokenAddressParams {
+  tokenId: `0x${string}` | undefined;
+  chainName: string | undefined;
+  chainId: number;
+  multicall: Multicall | undefined;
+}
+
+const useTokenAddress = ({
+  tokenId,
+  chainName,
+  chainId,
+  multicall,
+}: UseTokenAddressParams) => {
+  const isWithTokenAddress = !isChainWithoutTokenAddress(chainName);
+  const isWithNonDeterministicTokenAddress =
+    EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(chainId);
+
+  const receipt = useReceipt({
+    multicall,
+    enabled: Boolean(tokenId) && isWithNonDeterministicTokenAddress,
+  });
+
   const { data: tokenAddress } =
     useReadInterchainTokenServiceInterchainTokenAddress({
       args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTokenAddress.args({
         tokenId: tokenId as `0x${string}`,
       }),
       query: {
-        enabled: Boolean(tokenId),
+        enabled:
+          Boolean(tokenId) &&
+          isWithTokenAddress &&
+          !isWithNonDeterministicTokenAddress,
       },
     });
 
-  return tokenAddress;
+  const { data: registeredTokenAddress } =
+    useReadInterchainTokenServiceRegisteredTokenAddress({
+      args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.registeredTokenAddress.args({
+        tokenId: tokenId as `0x${string}`,
+      }),
+      query: {
+        enabled:
+          Boolean(tokenId) && isWithNonDeterministicTokenAddress && !!receipt,
+      },
+    });
+
+  return tokenAddress ?? registeredTokenAddress;
 };
 
 interface UseDestinationChainIdsParams {
@@ -246,6 +352,7 @@ interface UseReadyParams {
   deployerAddress: string;
   prepareMulticallRequest: PrepareMulticallRequest | undefined;
   setIsReady: (isReady: boolean) => void;
+  chainId: number;
 }
 
 /** sets isReady to true if the deployment is ready */
@@ -256,9 +363,14 @@ const useReady = ({
   deployerAddress,
   prepareMulticallRequest,
   setIsReady,
+  chainId,
 }: UseReadyParams) => {
   useEffect(() => {
-    if (isValidEVMAddress(deployerAddress) && !prepareMulticallRequest) {
+    if (
+      isValidEVMAddress(deployerAddress) &&
+      !prepareMulticallRequest &&
+      chainId !== HEDERA_CHAIN_ID
+    ) {
       setIsReady(false);
       console.warn("Failed to simulate multicall for deploying remote tokens");
       return;
@@ -282,10 +394,26 @@ const useReady = ({
     input?.sourceChainId,
     prepareMulticallRequest,
     setIsReady,
+    chainId,
   ]);
 };
 
 interface UseReceiptParams {
+  multicall: Multicall | undefined;
+  enabled?: boolean;
+}
+
+const useReceipt = ({ multicall, enabled }: UseReceiptParams) => {
+  const { data: receipt } = useWaitForTransactionReceipt({
+    hash: multicall?.data,
+    query: {
+      enabled: Boolean(multicall?.data) && enabled,
+    },
+  });
+  return receipt;
+};
+
+interface UseSetEvmDeploymentArgsOnReceiptParams {
   input: UseDeployAndRegisterInterchainTokenInput | undefined;
   tokenId: `0x${string}` | undefined;
   tokenAddress: `0x${string}` | undefined;
@@ -294,65 +422,62 @@ interface UseReceiptParams {
   setRecordDeploymentArgs: (args: RecordInterchainTokenDeploymentInput) => void;
 }
 
-const useReceipt = ({
+const useSetEvmDeploymentArgsOnReceipt = ({
   input,
   tokenId,
   tokenAddress,
   deployerAddress,
   multicall,
   setRecordDeploymentArgs,
-}: UseReceiptParams) => {
-  const { data: receipt } = useWaitForTransactionReceipt({
-    hash: multicall?.data,
-  });
+}: UseSetEvmDeploymentArgsOnReceiptParams) => {
+  const receipt = useReceipt({ multicall });
 
-  const onReceipt = useCallback(
-    ({
-      transactionHash: txHash,
-      transactionIndex: txIndex,
-    }: TransactionReceipt) => {
-      if (!txHash || !tokenAddress || !tokenId || !deployerAddress || !input) {
-        console.error(
-          "useDeployAndRegisterRemoteInterchainTokenMutation: unable to setRecordDeploymentArgs",
-          {
-            txHash,
-            tokenAddress,
-            tokenId,
-            deployerAddress,
-            input,
-          }
-        );
-        return;
-      }
+  // Track processed transactions to prevent duplicates
+  const processedTransactions = useRef(new Set<string>());
 
-      setRecordDeploymentArgs({
-        kind: "interchain",
-        deploymentMessageId: `${txHash}-${txIndex}`,
-        tokenId: tokenId as string,
-        tokenAddress,
-        deployerAddress,
-        salt: input.salt,
-        tokenName: input.tokenName,
-        tokenSymbol: input.tokenSymbol,
-        tokenDecimals: input.decimals,
-        axelarChainId: input.sourceChainId,
-        originalMinterAddress: input.minterAddress,
-        destinationAxelarChainIds: input.destinationChainIds,
-        tokenManagerAddress: "",
-      });
-    },
-    [deployerAddress, input, tokenAddress, tokenId, setRecordDeploymentArgs]
-  );
+  useEffect(() => {
+    if (!receipt) return;
 
-  useEffect(
-    () => {
-      if (receipt) {
-        onReceipt(receipt);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [receipt]
-  );
+    const { transactionHash: txHash, transactionIndex: txIndex } = receipt;
+
+    if (!txHash || !tokenAddress || !tokenId || !deployerAddress || !input) {
+      return;
+    }
+
+    // Create unique key for this transaction
+    const transactionKey = `${txHash}-${txIndex}`;
+
+    // Check if we've already processed this transaction
+    if (processedTransactions.current.has(transactionKey)) {
+      return;
+    }
+
+    // Mark this transaction as processed
+    processedTransactions.current.add(transactionKey);
+
+    setRecordDeploymentArgs({
+      kind: "interchain",
+      deploymentMessageId: transactionKey,
+      tokenId: tokenId as string,
+      tokenAddress,
+      deployerAddress,
+      salt: input.salt,
+      tokenName: input.tokenName,
+      tokenSymbol: input.tokenSymbol,
+      tokenDecimals: input.decimals,
+      axelarChainId: input.sourceChainId,
+      originalMinterAddress: input.minterAddress,
+      destinationAxelarChainIds: input.destinationChainIds,
+      tokenManagerAddress: "",
+    });
+  }, [
+    receipt,
+    tokenAddress,
+    tokenId,
+    deployerAddress,
+    input,
+    setRecordDeploymentArgs,
+  ]);
 };
 
 interface UseRecordDeploymentParams {
@@ -445,6 +570,8 @@ interface UseRequestDeployTokenParams {
   setRecordDeploymentArgs: (args: RecordInterchainTokenDeploymentInput) => void;
   prepareMulticallRequest: PrepareMulticallRequest | undefined;
   multicall: Multicall;
+  setIsTokenReadyForMulticall: (isTokenReadyForMulticall: boolean) => void;
+  onStatusUpdate: (status: DeployAndRegisterTransactionState) => void;
 }
 
 const useRequestDeployToken = ({
@@ -456,6 +583,8 @@ const useRequestDeployToken = ({
   setRecordDeploymentArgs,
   prepareMulticallRequest,
   multicall,
+  setIsTokenReadyForMulticall,
+  onStatusUpdate,
 }: UseRequestDeployTokenParams) => {
   const { address } = useAccount();
   const { kit } = useStellarKit();
@@ -463,6 +592,22 @@ const useRequestDeployToken = ({
   const { deployToken } = useDeployToken();
 
   const { deployStellarToken } = useDeployStellarToken();
+
+  const deployGenericEVM = useCallback(async () => {
+    invariant(
+      prepareMulticallRequest !== undefined,
+      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
+    );
+
+    return multicall.writeContractAsync(prepareMulticallRequest);
+  }, [prepareMulticallRequest, multicall]);
+
+  const { deployHedera } = useHederaDeployment({
+    prepareMulticallRequest,
+    multicall,
+    setIsTokenReadyForMulticall,
+    onStatusUpdate,
+  });
 
   const deployStellar = useCallback(async () => {
     if (!input) {
@@ -588,21 +733,19 @@ const useRequestDeployToken = ({
       return deploySui();
     }
 
-    // Handle EVM deployment
-    invariant(
-      prepareMulticallRequest !== undefined,
-      "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
-    );
+    if (chainId === HEDERA_CHAIN_ID && input) {
+      return deployHedera();
+    }
 
-    return multicall.writeContractAsync(prepareMulticallRequest);
+    return deployGenericEVM();
   }, [
     chainId,
     input,
-    multicall,
-    prepareMulticallRequest,
     recordDeploymentDraft,
+    deployGenericEVM,
     deployStellar,
     deploySui,
+    deployHedera,
   ]);
 
   return writeAsync;
@@ -626,7 +769,6 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     useState<RecordInterchainTokenDeploymentInput>();
 
   const tokenId = useTokenId(input, deployerAddress);
-  const tokenAddress = useTokenAddress(tokenId);
 
   const { destinationChainIds } = useDestinationChainIds({
     input,
@@ -634,30 +776,24 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     combinedComputed,
   });
 
-  const multicallArgs = useMulticallArgs({
-    input,
-    tokenId,
-    destinationChainIds,
-    chainId,
-  });
-
-  const totalGasFee = input?.remoteDeploymentGasFees?.totalGasFee ?? 0n;
-  // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
-  const isDestinationFeeSet = !destinationChainIds.length || totalGasFee > 0n;
-  const isMutationReady = multicallArgs.length > 0 && isDestinationFeeSet;
-
-  const { data: prepareMulticall } = useSimulateInterchainTokenFactoryMulticall(
+  const { prepareMulticall, setIsTokenReadyForMulticall } = usePrepareMulticall(
     {
+      input,
+      tokenId,
+      destinationChainIds,
       chainId,
-      value: totalGasFee,
-      args: [multicallArgs],
-      query: {
-        enabled: isMutationReady,
-      },
     }
   );
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
+
+  const tokenAddress = useTokenAddress({
+    tokenId,
+    chainName:
+      combinedComputed.indexedById[input?.sourceChainId ?? chainId]?.chain_name,
+    chainId,
+    multicall,
+  });
 
   const prepareMulticallRequest = prepareMulticall?.request;
 
@@ -668,9 +804,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     deployerAddress,
     prepareMulticallRequest,
     setIsReady,
+    chainId,
   });
 
-  useReceipt({
+  useSetEvmDeploymentArgsOnReceipt({
     input,
     tokenId,
     tokenAddress,
@@ -698,7 +835,13 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     setRecordDeploymentArgs,
     prepareMulticallRequest,
     multicall,
+    setIsTokenReadyForMulticall,
+    onStatusUpdate,
   });
 
-  return { ...multicall, writeAsync, isReady };
+  return {
+    ...multicall,
+    writeAsync,
+    isReady,
+  };
 }

@@ -52,15 +52,11 @@ import {
   xrplevmTestnet,
 } from "viem/chains";
 
-import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
-import { CUSTOM_RPC_NODES } from "./custom-rpc-nodes";
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
+import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
 
-export interface ExtendedWagmiChainConfig extends Chain {
-  axelarChainId: string;
-  axelarChainName: string;
-  supportWagmi: boolean;
-  environment: "mainnet" | "testnet" | "devnet-amplifier";
-}
+export const HEDERA_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 295 : 296;
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
@@ -68,41 +64,12 @@ const ENVIRONMENTS = {
   testnet: "testnet",
 } as const;
 
-export function createRpcUrlConfig(
-  chainIdOrChain: string | Chain,
-  environment: "mainnet" | "testnet" | "devnet-amplifier",
-  extras: string[] = [],
-  axelarChainId?: string
-) {
-  // Handle the case where a Chain object is provided
-  let chainId: string;
-  let baseUrls: string[];
-
-  if (typeof chainIdOrChain === "string") {
-    // VM chains configuration case
-    chainId = chainIdOrChain;
-    baseUrls = [];
-  } else {
-    // EVM chain configuration case
-    chainId = axelarChainId || "";
-    baseUrls = Array.from(chainIdOrChain.rpcUrls.default.http);
-  }
-
-  // custom RPC overrides for all environments
-  const customNodes =
-    CUSTOM_RPC_NODES[environment]?.[chainId.toLowerCase()] ?? [];
-
-  // build unified URL list with custom nodes and extras
-  const combinedUrls = [...extras, ...baseUrls];
-  const urls = customNodes.length
-    ? [...customNodes, ...combinedUrls]
-    : combinedUrls;
-
-  return {
-    default: { http: urls },
-    public: { http: urls },
-  };
-}
+/**
+ * The token address can only be queried on chain after the deployment
+ */
+export const EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS = [
+  HEDERA_CHAIN_ID,
+];
 
 const xrplEvm = defineChain({
   id: 1440000,
@@ -208,7 +175,6 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
         "https://ethereum-sepolia-rpc.publicnode.com",
         "https://endpoints.omniatech.io/v1/eth/sepolia/public",
         "https://1rpc.io/sepolia",
-        "https://eth-sepolia.public.blastapi.io",
       ],
       "ethereum-sepolia"
     ),
