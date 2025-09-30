@@ -23,7 +23,6 @@ import {
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
-import { scaleGasValue } from "~/lib/utils/gas";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
 
 // Chains that should use the Token Manager as the spender for approvals
@@ -116,7 +115,7 @@ export function useInterchainTokenServiceTransferMutation(
               : ((destinationAddress as `0x${string}`) ?? address),
             amount: approvedAmountRef.current,
             metadata: "0x",
-            gasValue: scaleGasValue(chainId, config.gas ?? 0n),
+            gasValue: config.gas ?? 0n,
           }),
           value: config.gas,
         });

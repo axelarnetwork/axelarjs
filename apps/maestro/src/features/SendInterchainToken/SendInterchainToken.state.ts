@@ -9,6 +9,7 @@ import {
 import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -108,11 +109,14 @@ export function useSendInterchainTokenState(props: {
 
   const [, { addTransaction }] = useTransactionsContainer();
 
-  const balance = useBalance();
+  const balance = scaleGasValue(
+    props.sourceChain.chain_id,
+    useBalance()?.value ?? 0n
+  );
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
 
-  const { data: gas } = useEstimateGasFeeQuery({
+  let { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
     destinationChainId: selectedToChain?.id,
     sourceChainTokenSymbol: nativeTokenSymbol,
@@ -121,11 +125,13 @@ export function useSendInterchainTokenState(props: {
     gasMultiplier: "auto",
   });
 
+  gas = scaleGasValue(props.sourceChain.chain_id, gas);
+
   const hasInsufficientGasBalance = useMemo(() => {
     if (!balance || !gas) {
       return false;
     }
-    return gas > balance.value;
+    return gas > balance;
   }, [balance, gas]);
 
   const {
