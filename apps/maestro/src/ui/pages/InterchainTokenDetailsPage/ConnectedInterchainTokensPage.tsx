@@ -586,11 +586,11 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   const { data: gasFees, isLoading: isGasPriceQueryLoading } =
     useEstimateGasFeeMultipleChainsQuery({
-      sourceChainId: interchainToken?.chain?.id ?? "",
+      sourceChain: interchainToken?.chain?.id ?? "",
       destinationChainIds,
       executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
       gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
-      // gasMultiplier: 1.1,
+      totalFeeMultiplier: 1.2,
     });
 
   const originToken = useMemo(

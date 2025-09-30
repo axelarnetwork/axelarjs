@@ -42,8 +42,8 @@ export const Step3: FC = () => {
       (state.remoteDeploymentGasFees?.gasFees ?? []).reduce(
         ([succeeded, errored], x): [string[], string[]] =>
           x.status === "success"
-            ? [[...succeeded, x.destinationChainId], errored]
-            : [succeeded, [...errored, x.destinationChainId]],
+            ? [[...succeeded, x.destinationChain], errored]
+            : [succeeded, [...errored, x.destinationChain]],
         [[], []] as [string[], string[]]
       ),
     [state.remoteDeploymentGasFees?.gasFees]

@@ -58,10 +58,10 @@ export default function useRegisterRemoteCanonicalTokens(
 
   const { data: gasFeesData } = useEstimateGasFeeMultipleChainsQuery({
     destinationChainIds,
-    sourceChainId: sourceChain?.id ?? "0",
+    sourceChain: sourceChain?.id ?? "0",
     gasLimit: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
-    gasMultiplier: 1.2,
+    totalFeeMultiplier: 1.2,
   });
 
   const multicallArgs = useMemo(() => {

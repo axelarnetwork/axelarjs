@@ -7,22 +7,48 @@ import type {
 
 const staleTime = 1000 * 60 * 2; // 2 minutes
 
-export function useEstimateGasFeeQuery(input: EstimateGasFeeInput) {
-  return trpc.axelarjsSDK.estimateGasFee.useQuery(input, {
-    enabled:
-      Boolean(input.destinationChainId) &&
-      input.destinationChainId !== "undefined",
-    staleTime: 1000,
-  });
+type UseEstimateGasFeeQueryInput =
+  EstimateGasFeeInput["estimateGasFeeParams"] & {
+    totalFeeMultiplier: EstimateGasFeeInput["totalFeeMultiplier"];
+  };
+
+export function useEstimateGasFeeQuery(input: UseEstimateGasFeeQueryInput) {
+  const { totalFeeMultiplier, ...estimateGasFeeParams } = input;
+
+  return trpc.axelarjsSDK.estimateGasFee.useQuery(
+    {
+      estimateGasFeeParams,
+      totalFeeMultiplier,
+    },
+    {
+      enabled:
+        Boolean(input.destinationChain) &&
+        input.destinationChain !== "undefined",
+      staleTime: 1000,
+    }
+  );
 }
 
+type UseEstimateGasFeeMultipleChainsQueryInput =
+  EstimateGasFeeMultipleChainsInput["estimateGasFeeParams"] & {
+    totalFeeMultiplier: EstimateGasFeeMultipleChainsInput["totalFeeMultiplier"];
+  };
+
 export function useEstimateGasFeeMultipleChainsQuery(
-  input: EstimateGasFeeMultipleChainsInput
+  input: UseEstimateGasFeeMultipleChainsQueryInput
 ) {
-  return trpc.axelarjsSDK.estimateGasFeesMultipleChains.useQuery(input, {
-    enabled: Boolean(input.destinationChainIds?.length),
-    staleTime: 1000,
-  });
+  const { totalFeeMultiplier, ...estimateGasFeeParams } = input;
+
+  return trpc.axelarjsSDK.estimateGasFeesMultipleChains.useQuery(
+    {
+      estimateGasFeeParams,
+      totalFeeMultiplier,
+    },
+    {
+      enabled: Boolean(estimateGasFeeParams.destinationChainIds?.length),
+      staleTime: 1000,
+    }
+  );
 }
 
 export function useChainInfoQuery(input: GetChainInfoInput) {

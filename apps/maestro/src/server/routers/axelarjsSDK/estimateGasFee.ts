@@ -4,14 +4,20 @@ import { z } from "zod";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
-  destinationChainId: z.string(),
-  sourceChainId: z.string(),
-  sourceChainTokenSymbol: z.string().optional(),
-  gasLimit: z.number(),
-  gasMultiplier: z.union([z.number(), z.literal("auto")]).optional(),
-  isGMPExpressTransaction: z.boolean().optional(),
-  minGasPrice: z.string().optional(),
-  executeData: z.string().optional(),
+  estimateGasFeeParams: z.object({
+    destinationChain: z.string(),
+    sourceChain: z.string(),
+    sourceChainTokenSymbol: z.string().optional(),
+    gasLimit: z.number(),
+    /** Will be used for the API request, and it only affects the execution fee */
+    gasMultiplier: z.union([z.number(), z.literal("auto")]).optional(),
+    isGMPExpressTransaction: z.boolean().optional(),
+    minGasPrice: z.string().optional(),
+    executeData: z.string().optional(),
+  }),
+
+  /** Multiplies the final result of the gas fee */
+  totalFeeMultiplier: z.number().optional(),
 });
 
 export type EstimateGasFeeInput = z.infer<typeof INPUT_SCHEMA>;
@@ -21,14 +27,8 @@ export const estimateGasFee = publicProcedure
   .query(async ({ ctx, input }) => {
     try {
       const response = await ctx.services.axelarjsSDK.estimateGasFee({
-        destinationChainId: input.destinationChainId,
-        sourceChainId: input.sourceChainId,
-        sourceChainTokenSymbol: input.sourceChainTokenSymbol,
-        gasLimit: input.gasLimit,
-        gasMultiplier: input.gasMultiplier,
-        isGMPExpressTransaction: input.isGMPExpressTransaction,
-        minGasPrice: input.minGasPrice,
-        executeData: input.executeData,
+        estimateGasFeeParams: input.estimateGasFeeParams,
+        totalFeeMultiplier: input.totalFeeMultiplier,
       });
 
       return response;
