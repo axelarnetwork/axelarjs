@@ -11,8 +11,9 @@ import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
-import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
+import { useSignTransaction as useXRPLSignTransaction } from "@xrpl-wallet-standard/react";
 
+import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { wagmiConfig } from "~/config/wagmi";
 import { useDisconnect } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
@@ -49,8 +50,7 @@ export function useWeb3SignIn({
   const { disconnect } = useDisconnect();
   const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
   const currentSuiAccount = useCurrentAccount();
-  const xrplWallet = useXRPLWallet();
-  console.log(xrplWallet);
+  const xrplSignTransaction = useXRPLSignTransaction();
 
   const signInAddressRef = useRef<string | null>(null);
 
@@ -99,6 +99,16 @@ export function useWeb3SignIn({
           invariant(kit, "Stellar wallet kit not initialized");
           const result = await kit.signMessage(message);
           signature = result.signedMessage;
+        } else if (address.startsWith("r")) {
+          // XRPL
+
+          let xrplNetwork = `xrpl:${xrplChainConfig.environment}`;
+          if(xrplChainConfig.environment === 'devnet-amplifier') {
+            xrplNetwork = 'xrpl:devnet';
+          }
+
+          const result = await xrplSignTransaction(tx, xrplNetwork);
+          // don't know how to get the signature tbh
         }
 
         const response = await signIn("credentials", {

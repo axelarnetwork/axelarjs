@@ -13,6 +13,7 @@ export function useDisconnect(): DisconnectResult {
   const { disconnect: wagmiDisconnect, error: wagmiError } =
     useWagmiDisconnect();
   const { mutate: suiDisconnect } = useDisconnectWallet();
+  const xrplDisconnect = useXRPLDisconnect();
   const xrpl = useXRPLWallet();
   let error: Error | null = wagmiError;
 
@@ -30,8 +31,10 @@ export function useDisconnect(): DisconnectResult {
       suiDisconnect();
 
       // Attempt to disconnect from xrpl wallet
+      console.log("XRPL Wallet status on disconnect:", xrpl.status);
       if (xrpl.status === "connected") {
-        useXRPLDisconnect();
+        console.log("Disconnecting XRPL Wallet (fr)");
+        xrplDisconnect();
       }
     } catch (e) {
       error = e as Error;

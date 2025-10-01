@@ -112,6 +112,7 @@ export const xrpl = {
     },
   },
   supportWagmi: false,
+  xrplNetwork: 'xrpl:mainnet',
 };
 
 const xrplTestnet = {
@@ -128,6 +129,7 @@ const xrplTestnet = {
   },
   environment: ENVIRONMENTS.testnet,
   name: "XRPL Testnet",
+  xrplNetwork: 'xrpl:testnet',
 };
 
 const xrplDevnet = {
@@ -145,6 +147,7 @@ const xrplDevnet = {
     },
   },
   name: "XRPL Devnet",
+  xrplNetwork: 'xrpl:devnet',
 };
 
 
@@ -176,6 +179,6 @@ export const stellarChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
   chain.axelarChainId.includes("stellar")
 ) as ExtendedWagmiChainConfig;
 
-export const xrplChainConfig = VM_CHAIN_CONFIGS.find((chain) => {
-  chain.axelarChainId.includes("xrpl");
-}) as ExtendedWagmiChainConfig;
+export const xrplChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
+  chain.axelarChainId.includes("xrpl")
+) as ExtendedWagmiChainConfig;
