@@ -15,11 +15,9 @@ export default function WalletProvider({
 
   useEffect(() => {
     setRendered(true);
-    console.log("Setting rendered to true");
   }, [])
 
   useEffect(() => {
-    console.log("Effect called, rendered is", rendered);
     if (rendered) {
       setXRPLlRegisterWallets([
         new CrossmarkWallet(),
@@ -38,8 +36,6 @@ export default function WalletProvider({
         }),
         new XamanWallet('a9bf63cf-6798-4eef-bc6f-50ea5d2818b2'),
       ]);
-      console.log("XRPL Wallets registered");
-      console.log(xrplRegisterWallets);
     }
   }, [rendered, setXRPLlRegisterWallets])
 

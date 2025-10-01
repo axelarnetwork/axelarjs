@@ -102,12 +102,8 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
       }
     };
 
-    const wallets = useXRPLWallets();
-    console.log("XRPL Wallets available in modal:", wallets);
-
     const printRegisteredWallets = () => {
       console.log(getRegisterdXRPLWallets());
-      console.log("XRPL Wallets available in modal:", wallets);
     };
 
     return (

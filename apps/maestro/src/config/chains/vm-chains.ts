@@ -122,6 +122,7 @@ export const xrpl = {
     },
   },
   supportWagmi: false,
+  xrplNetwork: "xrpl:mainnet",
 };
 
 const xrplTestnet = {
@@ -138,6 +139,7 @@ const xrplTestnet = {
   },
   environment: ENVIRONMENTS.testnet,
   name: "XRPL Testnet",
+  xrplNetwork: "xrpl:testnet",
 };
 
 const xrplDevnet = {
@@ -155,6 +157,7 @@ const xrplDevnet = {
     },
   },
   name: "XRPL Devnet",
+  xrplNetwork: "xrpl:devnet",
 };
 
 export const VM_CHAINS: ExtendedWagmiChainConfig[] = [
