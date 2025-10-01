@@ -31,7 +31,8 @@
     "drizzle:push": "pnpm drizzle-kit push:pg",
     "drizzle:studio": "pnpm drizzle-kit studio",
     "postinstall": "patch-package",
-    "release": "tsx scripts/release.ts"
+    "release": "tsx scripts/release.ts",
+    "xrpl:tokensync": "tsx scripts/XRPLTokenSync.ts"
   },
   "dependencies": {
     "@axelar-network/axelar-cgp-sui": "0.0.0-snapshot.424bc13",
