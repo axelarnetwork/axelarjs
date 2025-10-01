@@ -16,7 +16,15 @@ const nextConfig = {
   images: {
     remotePatterns: HOSTNAMES.map((hostname) => ({ hostname })),
   },
-  transpilePackages: ['@xrpl-wallet-standard/core'],
+    transpilePackages: [
+    '@xrpl-wallet-standard/core',
+    '@xrpl-wallet-standard/react',
+    '@xrpl-wallet-adapter/base',
+    '@xrpl-wallet-adapter/crossmark',
+    '@xrpl-wallet-adapter/ledger',
+    '@xrpl-wallet-adapter/walletconnect',
+    '@xrpl-wallet-adapter/xaman',
+  ],
   compiler: {
     styledComponents: true,
   }
