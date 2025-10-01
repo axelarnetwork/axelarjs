@@ -1,17 +1,19 @@
 import { Button, Dialog, FormControl, Label, TextInput } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant } from "@axelarjs/utils";
-import { useMemo, type FC } from "react";
+import { useEffect, useMemo, useRef, type FC } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { parseUnits, TransactionExecutionError } from "viem";
 
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import useMintStellarTokens from "~/features/stellarHooks/useMintStellarTokens";
 import useMintTokens from "~/features/suiHooks/useMintTokens";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { preventNonNumericInput } from "~/lib/utils/validation";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
+import { useManageInterchainTokenContainer } from "../../ManageInterchainToken.state";
 import { useMintInterchainTokenState } from "./MintInterchainToken.state";
 
 type FormState = {
@@ -28,14 +30,18 @@ export const MintInterchainToken: FC = () => {
   });
 
   const chainId = useChainId();
+  const { chain } = useAccount();
 
   const [
     { txState, accountAddress, erc20Details, isMinting, tokenAddress, tokenId },
     { setTxState, mintTokenAsync },
   ] = useMintInterchainTokenState();
 
+  const [, manageActions] = useManageInterchainTokenContainer();
+
   const mintTokens = useMintTokens();
   const mintStellarTokens = useMintStellarTokens();
+  const handledNotificationKeyRef = useRef<string | null>(null);
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
@@ -53,17 +59,21 @@ export const MintInterchainToken: FC = () => {
     try {
       if (chainId === SUI_CHAIN_ID) {
         const result = await mintTokens({
-          amount: BigInt(adjustedAmount),
+          amount: adjustedAmount,
           coinType: tokenAddress,
           tokenId: tokenId,
         });
         if (result.digest) {
           setTxState({
             status: "confirmed",
+            hash: result.digest,
+            chainId,
           });
-          toast.success("Successfully minted interchain tokens");
         }
-      } else if (chainId === STELLAR_CHAIN_ID) {
+        return;
+      }
+
+      if (chainId === STELLAR_CHAIN_ID) {
         const result = await mintStellarTokens({
           amount: adjustedAmount.toString(),
           tokenAddress: tokenAddress,
@@ -76,30 +86,32 @@ export const MintInterchainToken: FC = () => {
             hash: result.hash,
             chainId,
           });
+        }
+        return;
+      }
 
-          toast.success("Successfully minted interchain tokens");
-        }
-      } else {
-        const txHash = await mintTokenAsync({
-          address: tokenAddress,
-          args: [accountAddress, adjustedAmount],
+      const txHash = await mintTokenAsync({
+        address: tokenAddress,
+        args: [accountAddress, adjustedAmount],
+      });
+      if (txHash) {
+        setTxState({
+          status: "submitted",
+          hash: txHash,
+          chainId,
         });
-        if (txHash) {
-          setTxState({
-            status: "submitted",
-            hash: txHash,
-            chainId,
-          });
-        }
       }
     } catch (error) {
       if (error instanceof TransactionExecutionError) {
-        toast.error(`Failed to mint tokens: ${error.cause.shortMessage}`);
+        toast.error(`Failed to mint tokens: ${error.cause.shortMessage}`, {
+          duration: 10000,
+        });
         logger.error(`Failed to mint tokens: ${error.cause.message}`);
 
         setTxState({
           status: "idle",
         });
+        manageActions.closeModal();
         return;
       }
 
@@ -109,6 +121,70 @@ export const MintInterchainToken: FC = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (txState.status !== "confirmed" && txState.status !== "reverted") {
+      return;
+    }
+
+    const explorer = chain?.blockExplorers?.default?.url;
+    const txHash =
+      txState.status === "confirmed"
+        ? (txState.receipt?.transactionHash ?? txState.hash)
+        : txState.hash;
+    const toastKey = `${txState.status}:${txHash ?? ""}:${chain?.id ?? ""}`;
+    if (handledNotificationKeyRef.current === toastKey) {
+      return;
+    }
+    handledNotificationKeyRef.current = toastKey;
+
+    if (txState.status === "confirmed") {
+      if (explorer && txHash) {
+        toast.success(
+          <span>
+            Mint confirmed. View tx:
+            <a
+              href={`${explorer}/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 underline"
+            >
+              {txHash}
+            </a>
+          </span>,
+          { duration: 10000 }
+        );
+      } else {
+        toast.success("Successfully minted interchain tokens", {
+          duration: 10000,
+        });
+      }
+      manageActions.closeModal();
+      return;
+    }
+
+    if (txState.status === "reverted") {
+      if (explorer && txHash) {
+        toast.error(
+          <span>
+            Mint failed. View tx:
+            <a
+              href={`${explorer}/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1 underline"
+            >
+              {txHash}
+            </a>
+          </span>,
+          { duration: 10000 }
+        );
+      } else {
+        toast.error("Mint transaction failed", { duration: 10000 });
+      }
+      manageActions.closeModal();
+    }
+  }, [txState, chain, manageActions]);
 
   const buttonChildren = useMemo(() => {
     switch (txState.status) {

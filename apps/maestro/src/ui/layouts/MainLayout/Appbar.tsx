@@ -16,11 +16,10 @@ import {
 import { useIsSticky } from "@axelarjs/ui/hooks";
 import { cn } from "@axelarjs/ui/utils";
 import { maskAddress } from "@axelarjs/utils";
-import React, { useEffect, type FC } from "react";
+import { useEffect, type FC } from "react";
 import Identicon, { jsNumberForAddress } from "react-jazzicon";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 import { APP_NAME } from "~/config/app";
 import { stellarChainConfig } from "~/config/chains/vm-chains";
@@ -40,7 +39,6 @@ const Appbar: FC<AppbarProps> = (props) => {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
   const { chain } = useAccount();
-  const router = useRouter();
 
   const isSticky = useIsSticky(100);
 
@@ -150,41 +148,42 @@ const Appbar: FC<AppbarProps> = (props) => {
         >
           <MenuIcon className="h-6 w-6" />
         </Button>
-        <LinkButton
-          className="text-md flex items-center gap-2 font-semibold uppercase sm:text-lg"
-          onClick={() => router.push("/")}
-          $variant="ghost"
-        >
-          <Image
-            src="/logos/logo_axelar_full.svg"
-            width={200}
-            height={20}
-            className="h-6 w-auto dark:invert"
-            alt="axelar logo"
-          />
-          <Indicator>
-            <span>{APP_NAME}</span>
-            {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" ? (
-              <Indicator.Item
-                $size="xs"
-                $variant="success"
-                $position="bottom"
-                className="translate-x-2 translate-y-4 lowercase sm:translate-y-2"
-              >
-                {NEXT_PUBLIC_NETWORK_ENV}
-              </Indicator.Item>
-            ) : (
-              <Indicator.Item
-                $size="xs"
-                $variant="primary"
-                $position="bottom"
-                className="translate-x-2 translate-y-2 lowercase"
-              >
-                beta
-              </Indicator.Item>
-            )}
-          </Indicator>
-        </LinkButton>
+        <Link href="/">
+          <LinkButton
+            className="text-md flex items-center gap-2 font-semibold uppercase sm:text-lg"
+            $variant="ghost"
+          >
+            <Image
+              src="/logos/logo_axelar_full.svg"
+              width={200}
+              height={20}
+              className="h-6 w-auto dark:invert"
+              alt="axelar logo"
+            />
+            <Indicator>
+              <span>{APP_NAME}</span>
+              {NEXT_PUBLIC_NETWORK_ENV !== "mainnet" ? (
+                <Indicator.Item
+                  $size="xs"
+                  $variant="success"
+                  $position="bottom"
+                  className="translate-x-2 translate-y-4 lowercase sm:translate-y-2"
+                >
+                  {NEXT_PUBLIC_NETWORK_ENV}
+                </Indicator.Item>
+              ) : (
+                <Indicator.Item
+                  $size="xs"
+                  $variant="primary"
+                  $position="bottom"
+                  className="translate-x-2 translate-y-2 lowercase"
+                >
+                  beta
+                </Indicator.Item>
+              )}
+            </Indicator>
+          </LinkButton>
+        </Link>
       </Navbar.Start>
       <Navbar.End>
         <div className="hidden items-center gap-2 md:flex">
