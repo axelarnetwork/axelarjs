@@ -117,6 +117,12 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
             console.error("Failed to verify Stellar signature:", error);
           }
         }
+        else if (address.startsWith("r")) {
+          // xrpl address
+          // TODO-XRPL
+          // Check if the credentials that we received is a transaction that was created just like in the frontend
+          // Then, verify the signature against the address
+        }
 
         if (!isMessageSigned) {
           return null;
