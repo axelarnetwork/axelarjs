@@ -12,6 +12,10 @@ import { getSignInMessage } from "~/server/routers/auth/createSignInMessage";
 import MaestroKVClient, { AccountStatus } from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres/MaestroPostgresClient";
 
+// TODO-XRPL: Restrict to only necessary imports
+import * as xrpl from "xrpl"
+import * as binary from "ripple-binary-codec"
+
 export type Web3Session = {
   address: string;
   accountStatus: AccountStatus;
@@ -119,9 +123,30 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
         }
         else if (address.startsWith("r")) {
           // xrpl address
-          // TODO-XRPL
+
           // Check if the credentials that we received is a transaction that was created just like in the frontend
           // Then, verify the signature against the address
+          
+          const encodedTx = signature; // this is the signed transaction blob that we received from the client
+          const tx = binary.decode(encodedTx); // decode it to get the transaction object
+
+          if (!tx.Memos || tx.Memos.length === 0) {
+            console.warn("No memos found in the transaction");
+            return null;
+          }
+          
+          const signerPulicKey = tx.SigningPubKey;
+          console.warn("Signer public key from transaction:", signerPulicKey);
+          const memo = tx.Memos[0].Memo;
+          const memoHex = memo.MemoData;
+          const memoData = Buffer.from(memoHex, "hex").toString("utf8");
+
+          console.warn("Reconstructed memo from transaction:", memoData, message);
+          isMessageSigned = 
+            (memoData === message) // require that the memo matches the challenge (we don't care about the other data)
+            && (xrpl.verifySignature(encodedTx, signerPulicKey)) // AND that the signature is valid
+            && (xrpl.deriveAddress(signerPulicKey) === address); // AND that the public key matches the address
+          console.log("isMessageSigned:", isMessageSigned);
         }
 
         if (!isMessageSigned) {
