@@ -1,5 +1,5 @@
 import { Button, Modal, type ButtonProps } from "@axelarjs/ui";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useRef } from "react";
 
 import type { ISupportedWallet } from "@creit.tech/stellar-wallets-kit";
 import { ConnectModal } from "@mysten/dapp-kit";
@@ -7,6 +7,69 @@ import { ConnectModal } from "@mysten/dapp-kit";
 import { useAuth } from "~/contexts/AuthContext";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import ConnectWalletButton from "../ConnectWalletButton/ConnectWalletButton";
+
+import { ConnectButton as XRPLConnectWalletButton } from "@xrpl-wallet-standard/react";
+import { getRegisterdXRPLWallets } from "@xrpl-wallet-standard/app";
+import { useWallets as useXRPLWallets, useAccount as useXRPLAccount, useConnect as useXRPLConnect, useDisconnect as useXRPLDisconnect } from '@xrpl-wallet-standard/react'
+
+import { ConnectModal as XRPLConnectModal } from "../XRPLWalletList/ConnectModal";
+
+/*export const XRPLWalletButton = ({ $size, $variant }) => {
+  const wallets = useXRPLWallets();
+  const { connect: connectXRPL } = useXRPLConnect();
+
+  return (
+   <div className="flex flex-col gap-y-2">
+      {wallets.map((w, i) => (
+        <button key={i} onClick={() => connectXRPL(w)} className="w-full" $size={$size} $variant={$variant}>
+          <div className="w-fit h-6 bg-blue-600 hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-xl flex items-center font-display text-white whitespace-nowrap gap-x-1.5 px-2.5 py-1">
+            <Image
+              src={w.icon}
+              alt=""
+              width={16}
+              height={16}
+            />
+            {w.name}
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+};
+// use with: <XRPLWalletButton $size={$size} $variant={$variant} />
+*/
+
+// the default button:
+// <XRPLConnectWalletButton></XRPLConnectWalletButton> 
+
+export function XRPLWallet({ children, className }) {
+
+  const wallets = useXRPLWallets()
+  const account = useXRPLAccount()
+  const { connect: connectXRPL } = useXRPLConnect()
+  const disconnectXRPL = useXRPLDisconnect()
+
+  console.log("Available wallets are:", wallets);
+
+  return (
+    <div className="flex flex-col gap-y-2">
+      <div>ASDF</div>
+      {wallets.map((w, i) => (
+        <button key={i} onClick={() => connectXRPL(w)} className="w-full">
+          <div className="w-fit h-6 bg-blue-600 hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-xl flex items-center font-display text-white whitespace-nowrap gap-x-1.5 px-2.5 py-1">
+            <Image
+              src={w.icon}
+              alt=""
+              width={16}
+              height={16}
+            />
+            {w.name}
+          </div>
+        </button>
+      ))}
+    </div>)
+}
+// use with <XRPLWallet></XRPLWallet>
 
 const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -38,6 +101,15 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
         console.error("Failed to connect Stellar wallet:", error);
       }
     };
+
+    const wallets = useXRPLWallets();
+    console.log("XRPL Wallets available in modal:", wallets);
+
+    const printRegisteredWallets = () => {
+      console.log(getRegisterdXRPLWallets());
+      console.log("XRPL Wallets available in modal:", wallets);
+    };
+
     return (
       <Modal
         open={isModalOpen}
@@ -83,6 +155,19 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
           >
             Stellar
           </Button>
+          <Button onClick={printRegisteredWallets}>Print XRPL Wallets</Button>
+          <XRPLConnectModal
+            trigger={
+              <Button
+                $size={$size}
+                $variant={$variant}
+                className="w-full"
+                aria-label="Open wallet connection modal for XRPL"
+              >
+                XRPL
+              </Button>
+            }
+          />
         </Modal.Body>
       </Modal>
     );

@@ -14,10 +14,12 @@ export default function WalletProvider({
   const [xrplRegisterWallets, setXRPLlRegisterWallets] = useState(null)
 
   useEffect(() => {
-    setRendered(true)
+    setRendered(true);
+    console.log("Setting rendered to true");
   }, [])
 
   useEffect(() => {
+    console.log("Effect called, rendered is", rendered);
     if (rendered) {
       setXRPLlRegisterWallets([
         new CrossmarkWallet(),
@@ -34,8 +36,10 @@ export default function WalletProvider({
           desktopWallets: [],
           mobileWallets: [],
         }),
-        new XamanWallet('8f1280ed-374c-4b49-86ee-6dfbcdd4563f'),
+        new XamanWallet('a9bf63cf-6798-4eef-bc6f-50ea5d2818b2'),
       ]);
+      console.log("XRPL Wallets registered");
+      console.log(xrplRegisterWallets);
     }
   }, [rendered, setXRPLlRegisterWallets])
 
