@@ -32,7 +32,7 @@
     "drizzle:studio": "pnpm drizzle-kit studio",
     "postinstall": "patch-package",
     "release": "tsx scripts/release.ts",
-    "xrpl:tokensync": "tsx scripts/XRPLTokenSync.ts"
+    "synctokens": "tsx scripts/syncTokens.ts"
   },
   "dependencies": {
     "@axelar-network/axelar-cgp-sui": "0.0.0-snapshot.424bc13",
@@ -109,6 +109,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/node": "^20.11.30",
     "@types/nprogress": "^0.2.3",
+    "@types/pg": "^8.15.5",
     "@types/react": "18.2.21",
     "@types/react-dom": "^18.2.22",
     "@types/swagger-ui-react": "^4.18.3",
