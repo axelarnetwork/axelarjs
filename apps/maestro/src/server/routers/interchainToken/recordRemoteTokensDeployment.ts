@@ -2,11 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { z } from "zod";
 
-import {
-  EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
-  STELLAR_CHAIN_ID,
-  suiChainConfig,
-} from "~/config/chains";
+import { suiChainConfig } from "~/config/chains";
+import { STELLAR_CHAIN_ID } from "~/lib/hooks";
 import { normalizeStellarTokenAddress } from "~/lib/utils/stellar";
 import { protectedProcedure } from "~/server/trpc";
 import type { NewRemoteInterchainTokenInput } from "~/services/db/postgres";
@@ -94,12 +91,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
         let tokenManagerAddress: string = "0x";
         let tokenAddress: string = "0x";
 
-        if (
-          remoteConfig.wagmi?.supportWagmi &&
-          !EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(
-            remoteConfig.info.chain_id
-          )
-        ) {
+        if (remoteConfig.wagmi?.supportWagmi) {
           // Create appropriate client based on chain type
           const itsClient = ctx.contracts.createInterchainTokenServiceClient(
             remoteConfig.wagmi
@@ -125,7 +117,7 @@ export const recordRemoteTokensDeployment = protectedProcedure
               .catch(always("0x")),
           ]);
         } else {
-          // Use placeholders for non-deterministic EVM chains and Sui and Stellar, to be updated later
+          // Use placeholders for Sui and Stellar, to be updated later
           tokenAddress = originToken.tokenAddress;
           tokenManagerAddress = originToken.tokenManagerAddress ?? "0x";
         }

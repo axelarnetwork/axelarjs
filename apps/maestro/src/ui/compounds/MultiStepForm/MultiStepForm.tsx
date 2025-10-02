@@ -187,14 +187,13 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   return (
     <Dialog
       onClose={handleClose}
-      className="top-[64px] max-h-[calc(100vh-64px)]"
       renderTrigger={(props) => (
         <TriggerButton {...props} disabled={disabled}>
           {triggerLabel}
         </TriggerButton>
       )}
     >
-      <Dialog.Body $as="section" className="overflow-x-hidden">
+      <Dialog.Body $as="section">
         <Dialog.CornerCloseAction
           onClick={handleClose}
           disabled={disableClose}

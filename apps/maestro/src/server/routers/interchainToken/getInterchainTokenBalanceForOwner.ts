@@ -4,10 +4,6 @@ import { Account, Address, scValToNative } from "stellar-sdk";
 import { z } from "zod";
 
 import { suiClient as client } from "~/lib/clients/suiClient";
-import {
-  isTokenAddressIncompatibleWithOwner,
-  normalizeTokenAddressForCompatibility,
-} from "~/lib/utils/addressCompatibility";
 import { isValidStellarTokenAddress } from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
@@ -67,15 +63,13 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    const normalizedTokenAddress = normalizeTokenAddressForCompatibility(
-      input.tokenAddress
-    );
+    const normalizedTokenAddress = input.tokenAddress?.includes(":")
+      ? input.tokenAddress.split(":")[0] // use only the first part of the address for sui
+      : input.tokenAddress;
     // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
     // To check sui for example, they need to connect with a sui wallet
-    const isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
-      normalizedTokenAddress,
-      input.owner
-    );
+    const isIncompatibleChain =
+      normalizedTokenAddress?.length !== input.owner?.length;
     if (isIncompatibleChain) {
       return {
         isTokenOwner: false,
@@ -112,12 +106,14 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         InterchainTokenServiceV0
       );
 
-      let decimals = coinInfo?.decimals ?? 0;
+      let decimals = coinInfo?.decimals;
       // Get the coin metadata
 
       await queryCoinMetadata(input.tokenAddress)
-        .then((metadata) => (decimals = metadata?.decimals ?? decimals))
-        .catch(() => undefined);
+        .then((metadata) => (decimals = metadata?.decimals))
+        .catch((e) => {
+          console.log("error in queryCoinMetadata", e);
+        });
 
       const isOperator = input.owner === coinInfo?.operator;
       const isDistributor = input.owner === coinInfo?.distributor;
@@ -251,10 +247,10 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       );
 
       const [
-        isTokenMinterRead,
-        hasMinterRoleRead,
-        hasOperatorRoleRead,
-        hasFlowLimiterRoleRead,
+        isTokenMinter,
+        hasMinterRole,
+        hasOperatorRole,
+        hasFlowLimiterRole,
       ] = await Promise.all(
         [
           itClient.reads.isMinter({
@@ -275,36 +271,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         ].map((p) => p.catch(always(false)))
       );
 
-      let isTokenOwner = owner === balanceOwner;
-      let isTokenMinter = isTokenMinterRead;
-      let hasMinterRole = hasMinterRoleRead;
-      let hasOperatorRole = hasOperatorRoleRead;
-      const hasFlowLimiterRole = hasFlowLimiterRoleRead;
-
-      // Hedera fallback: owner/minter interfaces may not be available on HTS wrappers.
-      // Use DB-recorded deployer/minter to infer roles when on Hedera.
-      if (chainConfig.axelarChainId === "hedera") {
-        try {
-          const tokenRecord =
-            await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
-              "hedera",
-              tokenAddress
-            );
-          const dbIsOwner =
-            tokenRecord?.deployerAddress?.toLowerCase() ===
-            balanceOwner.toLowerCase();
-          const dbIsMinter =
-            tokenRecord?.originalMinterAddress?.toLowerCase() ===
-            balanceOwner.toLowerCase();
-
-          isTokenOwner = isTokenOwner || Boolean(dbIsOwner);
-          isTokenMinter = isTokenMinter || Boolean(dbIsMinter);
-          hasMinterRole = hasMinterRole || Boolean(dbIsMinter);
-          hasOperatorRole = hasOperatorRole || Boolean(dbIsOwner);
-        } catch {
-          // noop: best-effort fallback
-        }
-      }
+      const isTokenOwner = owner === balanceOwner;
 
       return {
         isTokenOwner,

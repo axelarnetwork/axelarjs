@@ -1,11 +1,7 @@
 import { STELLAR_RPC_URLS, SUI_RPC_URLS } from "@axelarjs/core";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
-import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
-
-export const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
-export const STELLAR_CHAIN_ID =
-  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 109 : 110;
+import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./evm-chains";
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",

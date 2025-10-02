@@ -4,7 +4,6 @@
 @tailwind screens;
 
 @layer utilities {
-
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -12,10 +11,8 @@
 
   /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
-    /* IE and Edge */
-    -ms-overflow-style: none;
-    /* Firefox */
-    scrollbar-width: none;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 
   .clamp {
@@ -59,7 +56,6 @@
   ::-webkit-scrollbar-thumb {
     @apply rounded bg-gray-600;
   }
-
   ::-webkit-scrollbar-track {
     @apply rounded bg-transparent;
   }
@@ -69,11 +65,6 @@
   input[type="search"]::-webkit-search-results-button,
   input[type="search"]::-webkit-search-results-decoration {
     -webkit-appearance: none;
-  }
-
-  /* Add placeholder color styling */
-  input::placeholder {
-    @apply opacity-60;
   }
 
   input::-webkit-outer-spin-button,

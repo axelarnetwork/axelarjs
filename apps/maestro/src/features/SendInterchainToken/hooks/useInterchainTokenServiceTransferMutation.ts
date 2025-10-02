@@ -10,23 +10,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 import { useBlockNumber, useWaitForTransactionReceipt } from "wagmi";
 
-import { HEDERA_CHAIN_ID } from "~/config/chains";
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
   useReadInterchainTokenAllowance,
   useReadInterchainTokenDecimals,
   useWriteInterchainTokenApprove,
 } from "~/lib/contracts/InterchainToken.hooks";
-import {
-  useReadInterchainTokenServiceTokenManagerAddress,
-  useWriteInterchainTokenServiceInterchainTransfer,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
-
-// Chains that should use the Token Manager as the spender for approvals
-const CHAINS_USING_TOKEN_MANAGER_AS_SPENDER = [HEDERA_CHAIN_ID];
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -49,32 +42,15 @@ export function useInterchainTokenServiceTransferMutation(
   const chainId = useChainId();
   const [txState, setTxState] = useTransactionState();
 
-  const shouldUseTokenManagerAsSpender =
-    CHAINS_USING_TOKEN_MANAGER_AS_SPENDER.includes(chainId);
-
   const { data: decimals } = useReadInterchainTokenDecimals({
     address: config.tokenAddress as `0x${string}`,
   });
 
   const { address } = useAccount();
 
-  const { data: tokenManagerAddress } =
-    useReadInterchainTokenServiceTokenManagerAddress({
-      args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.tokenManagerAddress.args({
-        tokenId: config.tokenId,
-      }),
-      query: {
-        enabled: shouldUseTokenManagerAsSpender && Boolean(config.tokenId),
-      },
-    });
-
-  const approvalSpender = shouldUseTokenManagerAsSpender
-    ? (tokenManagerAddress ?? "0x")
-    : NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
-
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
     config.tokenAddress as `0x${string}`,
-    approvalSpender
+    NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS
   );
 
   const {
@@ -203,7 +179,7 @@ export function useInterchainTokenServiceTransferMutation(
           await approveInterchainTokenAsync({
             address: config.tokenAddress as `0x${string}`,
             args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
-              spender: approvalSpender,
+              spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
               amount: approvedAmountRef.current,
             }),
           });
