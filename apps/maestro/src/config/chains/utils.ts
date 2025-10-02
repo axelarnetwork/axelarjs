@@ -69,6 +69,7 @@ const createServerRpcUrlConfig = (
   const envValue = process.env[envKey];
   if (envValue) {
     serverOnlyUrls.push(envValue);
+    console.log(`Using server-only URL for chain: ${chainId} (${envKey})`);
   }
 
   // custom RPC overrides for all environments
