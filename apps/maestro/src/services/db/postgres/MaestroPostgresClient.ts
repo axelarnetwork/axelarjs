@@ -367,10 +367,19 @@ export default class MaestroPostgresClient {
     }
   }
 
-  async updateEVMRemoteTokenAddress(tokenId: string, tokenAddress: string) {
+  async updateEVMRemoteTokenAddress(
+    tokenId: string,
+    tokenAddress: string,
+    axelarChainId: string
+  ) {
     await this.db
       .update(remoteInterchainTokens)
       .set({ tokenAddress, updatedAt: new Date() })
-      .where(eq(remoteInterchainTokens.tokenId, tokenId));
+      .where(
+        and(
+          eq(remoteInterchainTokens.tokenId, tokenId),
+          eq(remoteInterchainTokens.axelarChainId, axelarChainId)
+        )
+      );
   }
 }

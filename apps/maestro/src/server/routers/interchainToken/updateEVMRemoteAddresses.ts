@@ -37,6 +37,7 @@ export const updateEVMRemoteTokenAddress = protectedProcedure
 
     return ctx.persistence.postgres.updateEVMRemoteTokenAddress(
       input.tokenId,
-      tokenAddress
+      tokenAddress,
+      input.axelarChainId
     );
   });
