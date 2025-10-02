@@ -15,6 +15,8 @@ import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { simulateCall } from "../stellar/utils/transactions";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
+import { xrplChainConfig } from "~/config/chains";
+import * as xrpl from "xrpl";
 
 // Helper function to call Stellar contract methods and handle errors
 async function callStellarContractMethod<T>({
@@ -217,6 +219,60 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         };
       }
     }
+
+    if (input.chainId === xrplChainConfig?.id) {
+      try {
+          // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
+          const [currency, issuer] = input.tokenAddress.split(":");
+          if (!currency || !issuer) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
+            });
+          }
+
+          const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
+          await client.connect();
+          const response = await client.request({
+            command: "account_lines",
+            account: input.owner,
+          });
+
+          await client.disconnect();
+          console.log("Result is:", response.result);
+
+          // Find the line that matches the token
+          const line = response.result.lines.find(
+            l => l.currency === currency && l.account === issuer
+          );
+
+          
+
+        return {
+          isTokenOwner: false,
+          isTokenMinter: false,
+          tokenBalance: line ? line.balance : "0",
+          decimals: 15, // TODO: fetch actual decimals
+          isTokenPendingOwner: false,
+          hasPendingOwner: false,
+          hasMinterRole: false,
+          hasOperatorRole: false,
+          hasFlowLimiterRole: false,
+        };
+      } catch (_) {
+        return {
+          isTokenOwner: false,
+          isTokenMinter: false,
+          tokenBalance: "0",
+          decimals: 0,
+          isTokenPendingOwner: false,
+          hasPendingOwner: false,
+          hasMinterRole: false,
+          hasOperatorRole: false,
+          hasFlowLimiterRole: false,
+        };
+    }
+
     // This is for ERC20 tokens
     const balanceOwner = input.owner as `0x${string}`;
     const tokenAddress = input.tokenAddress as `0x${string}`;
