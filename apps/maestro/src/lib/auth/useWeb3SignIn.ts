@@ -88,7 +88,6 @@ export function useWeb3SignIn({
 
         onSignInStart?.(address);
         let signature;
-        console.log("Address is", address);
         // 42 is the length of an EVM address
         if (address.length === 42) {
           signature = await signMessageAsync({ message });
@@ -108,11 +107,6 @@ export function useWeb3SignIn({
           // XRPL
           console.log("Signing using this XRPL account now");
 
-          let xrplNetwork = `xrpl:${xrplChainConfig.environment}`;
-          if(xrplChainConfig.environment === 'devnet-amplifier') {
-            xrplNetwork = 'xrpl:devnet';
-          }
-          console.log("Using XRPL network", xrplNetwork);
           // things are more difficult for xrpl, since the wallet library does not allow to sign arbitrary messages
           // we have to create a transaction, sign it and extract the signature from there
           // at the same time, we must make sure that the transaction is not valid on the network
@@ -126,13 +120,15 @@ export function useWeb3SignIn({
             ],
             // make it explicitly expired / un-submittable:
             LastLedgerSequence: 0,
-            Sequence: 0,  // (optional) impossible sequence
+            Sequence: 0,  // impossible sequence
             Fee: "0"
           };
           console.log("Signing this XRPL transaction", tx);
 
-          const result = await xrplSignTransaction(tx, xrplNetwork as XRPLIdentifierString);
+          const result = await xrplSignTransaction(tx, `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? '0' : process.env.NEXT_PUBLIC_NETWORK_ENV === 'devnet-amplifier' ? '2' : '1'}`);
+          console.log("XRPL sign transaction result", result);
           signature = result.signed_tx_blob;
+          console.log("XRPL signature (signed tx blob)", signature);
         }
         console.log("Checking signature:", signature);
         const response = await signIn("credentials", {
@@ -219,8 +215,6 @@ export function useWeb3SignIn({
 
   // Same check as above, but for XRPL
   useEffect(() => {
-    console.log("Currently signing in?", isSigningInRef.current);
-    console.log("XRPL Wallet changed", xrplWallet, enabled, isSigningInRef.current, sessionStatus, xrplWallet?.accounts?.length);
     if (
       enabled === false ||
       isSigningInRef.current ||
@@ -231,14 +225,12 @@ export function useWeb3SignIn({
     }
 
     const address = xrplWallet.accounts[0].address;
-    console.log("Sign in now? XRPL Address is", address);
     if (
       session?.address === address ||
       signInAddressRef.current === address
     ) {
       return;
     }
-    console.log("Sign in now!");
 
     void signInWithWeb3Async(address);
   }, [

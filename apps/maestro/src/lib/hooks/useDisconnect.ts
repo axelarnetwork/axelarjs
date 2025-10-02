@@ -31,9 +31,7 @@ export function useDisconnect(): DisconnectResult {
       suiDisconnect();
 
       // Attempt to disconnect from xrpl wallet
-      console.log("XRPL Wallet status on disconnect:", xrpl.status);
       if (xrpl.status === "connected") {
-        console.log("Disconnecting XRPL Wallet (fr)");
         xrplDisconnect();
       }
     } catch (e) {

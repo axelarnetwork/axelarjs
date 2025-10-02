@@ -4,6 +4,7 @@ import { WalletConnectWallet } from '@xrpl-wallet-adapter/walletconnect'
 import { XamanWallet } from '@xrpl-wallet-adapter/xaman'
 import { WalletProvider as StandardWalletProvider } from '@xrpl-wallet-standard/react'
 import { useEffect, useState } from 'react'
+import { xrplChainConfig } from '~/config/chains'
 
 export default function WalletProvider({
   children,
@@ -20,20 +21,14 @@ export default function WalletProvider({
   useEffect(() => {
     if (rendered) {
       setXRPLlRegisterWallets([
-        new CrossmarkWallet(),
-        new LedgerWallet(),
-        new WalletConnectWallet({
-          projectId: '85ad846d8aa771cd56c2bbbf30f7a183',
-          metadata: {
-            name: 'React App',
-            description: 'React App for WalletConnect',
-            url: 'https://walletconnect.com/',
-            icons: ['https://avatars.githubusercontent.com/u/37784886'],
-          },
-          networks: ['xrpl:mainnet'],
+        //new CrossmarkWallet(),
+        //new LedgerWallet(),
+        /*new WalletConnectWallet({
+          projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+          networks: [(xrplChainConfig as any).xrplNetwork],
           desktopWallets: [],
           mobileWallets: [],
-        }),
+        }),*/
         new XamanWallet('a9bf63cf-6798-4eef-bc6f-50ea5d2818b2'),
       ]);
     }
