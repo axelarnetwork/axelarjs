@@ -5,7 +5,7 @@ import {
   useConnect as useXRPLConnect,
   useWallet as useXRPLWallet,
 } from "@xrpl-wallet-standard/react";
-//import * as xrpl from "xrpl";
+import * as xrpl from "xrpl";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {
@@ -34,7 +34,6 @@ export function useBalance(): BalanceResult | undefined {
   const suiAccount = useCurrentAccount();
   const { address, chainName } = useAccount();
   const [stellarBalance, setStellarBalance] = useState<string | null>(null);
-  const { connect: XRPLConnect } = useXRPLConnect(); // todo: connect to this here?
   const { wallet: xrplWallet } = useXRPLWallet();
   const [XRPLDrops, setXRPLDrops] = useState<number | null>(null);
 
@@ -69,9 +68,11 @@ export function useBalance(): BalanceResult | undefined {
   }, [chainName, address]);
 
   useEffect(() => {
-    if (chainName === xrplChainConfig.name && address && !!xrplWallet?.accounts.at(0)) { // TODO: fix XRPL connection check
+    console.log("Running XRPL get balance effect:", chainName, xrplChainConfig.name, address, xrplWallet);
+
+    if (chainName === xrplChainConfig.name && address && xrplWallet?.accounts.length) { // TODO: fix XRPL connection check
       const fetchXRPLBalance = async () => {
-        /*const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]); // TODO
+        const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
         await client.connect();
 
         try {
@@ -80,11 +81,12 @@ export function useBalance(): BalanceResult | undefined {
             account: address,
           });
           // Balance is returned in drops (1 XRP = 1,000,000 drops)
-          const drops = accountInfo.result.account_data.Balance;
+          const drops = parseInt(accountInfo.result.account_data.Balance);
           setXRPLDrops(drops);
+          console.log("Fetched XRPL balance in drops:", drops);
         } finally {
           client.disconnect();
-        }*/
+        }
       }
       fetchXRPLBalance();
     }
