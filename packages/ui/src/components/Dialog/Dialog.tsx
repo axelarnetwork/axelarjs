@@ -72,7 +72,6 @@ const DialogRoot: FC<DialogProps> = (props) => {
       {trigger}
       <StyledDialog
         ref={dialogRef}
-        className={props.className}
         open={state.isOpen}
         onClose={() => {
           actions.close();

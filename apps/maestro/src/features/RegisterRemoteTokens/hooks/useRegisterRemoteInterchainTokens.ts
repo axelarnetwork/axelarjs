@@ -1,7 +1,6 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -10,8 +9,7 @@ import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { useChainId } from "~/lib/hooks";
-import { scaleGasValue } from "~/lib/utils/gas";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
@@ -68,11 +66,11 @@ export default function useRegisterRemoteInterchainTokens(
     )
       return [];
 
-    return destinationChainIds.map((destinationChain, i) =>
+    return destinationChainIds.map((chainId, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
-        destinationChain,
-        gasValue: scaleGasValue(chainId, gasFeesData.gasFees[i].fee),
+        destinationChain: chainId,
+        gasValue: gasFeesData.gasFees[i].fee,
       })
     );
   }, [destinationChainIds, gasFeesData, tokenDeployment, chainId]);
