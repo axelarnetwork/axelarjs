@@ -337,6 +337,11 @@ const useUpdateRemoteEVM = ({
         return;
       }
 
+      // only handle registered tokens
+      if (!x.isRegistered) {
+        return;
+      }
+
       const isSourceEVMNonDeterministic =
         EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(chainId);
       const isDestinationEVMNonDeterministic =
@@ -350,9 +355,7 @@ const useUpdateRemoteEVM = ({
         ? x.tokenAddress === tokenAddress && x.chain?.chain_id !== chainId
         : x.tokenAddress === tokenAddress && isDestinationEVMNonDeterministic;
 
-      const shouldUpdateEVM = shouldUpdateToken && x.isRegistered;
-
-      if (shouldUpdateEVM) {
+      if (shouldUpdateToken) {
         updateToken();
         return;
       }
