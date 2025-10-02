@@ -113,7 +113,7 @@ export const xrpl = {
     decimals: 6,
   },
   rpcUrls: createRpcUrlConfig("xrpl", ENVIRONMENTS.mainnet, [
-    "https://xrpl.ws/", // TODO: don't declare it here
+    "wss://xrplcluster.com",
   ]),
   blockExplorers: {
     default: {
@@ -129,7 +129,7 @@ const xrplTestnet = {
   ...xrpl,
   id: 115,
   rpcUrls: createRpcUrlConfig("xrpl", ENVIRONMENTS.testnet, [
-    "https://s.altnet.rippletest.net:51234", // TODO: don't declare it here
+    "wss://s.altnet.rippletest.net:51233/",
   ]),
   blockExplorers: {
     default: {
@@ -148,7 +148,7 @@ const xrplDevnet = {
   axelarChainId: "xrpl-dev",
   environment: ENVIRONMENTS.devnet,
   rpcUrls: createRpcUrlConfig("xrpl", ENVIRONMENTS.testnet, [
-    "https://s.devnet.rippletest.net:51234/", // TODO: don't declare it here
+    "wss://s.devnet.rippletest.net:51233/",
   ]),
   blockExplorers: {
     default: {
