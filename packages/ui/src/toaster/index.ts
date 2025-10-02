@@ -7,7 +7,11 @@ export default toast;
 Toaster.defaultProps = {
   position: "top-right",
   toastOptions: {
-    style: {},
+    style: {
+      maxWidth: "800px",
+      whiteSpace: "nowrap",
+      overflowX: "auto",
+    },
     success: {
       className: "!ring ring-success !bg-green-100",
     },
