@@ -23,10 +23,12 @@ import {
 } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
 
 // Chains that should use the Token Manager as the spender for approvals
 const CHAINS_USING_TOKEN_MANAGER_AS_SPENDER = [HEDERA_CHAIN_ID];
+const CHAINS_SCALED_GAS = [HEDERA_CHAIN_ID];
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -51,6 +53,8 @@ export function useInterchainTokenServiceTransferMutation(
 
   const shouldUseTokenManagerAsSpender =
     CHAINS_USING_TOKEN_MANAGER_AS_SPENDER.includes(chainId);
+
+  const shouldScaleGas = CHAINS_SCALED_GAS.includes(chainId);
 
   const { data: decimals } = useReadInterchainTokenDecimals({
     address: config.tokenAddress as `0x${string}`,
@@ -115,9 +119,11 @@ export function useInterchainTokenServiceTransferMutation(
               : ((destinationAddress as `0x${string}`) ?? address),
             amount: approvedAmountRef.current,
             metadata: "0x",
-            gasValue: config.gas ?? 0n,
+            gasValue: shouldScaleGas
+              ? scaleGasValue(chainId, config.gas)
+              : (config.gas ?? 0n),
           }),
-          value: config.gas,
+          value: config.gas ?? 0n,
         });
 
         if (txHash) {
@@ -186,7 +192,14 @@ export function useInterchainTokenServiceTransferMutation(
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
     mutationFn: async ({ amount, destinationAddress }) => {
       // allow token transfers with decimals === 0 but not undefined
-      if (!(decimals !== undefined && address && config.gas)) {
+      if (
+        decimals === undefined ||
+        !address ||
+        config.gas === undefined ||
+        !approvalSpender
+      ) {
+        toast.error("Transfer not ready: missing information");
+        setTxState({ status: "idle" });
         return;
       }
 

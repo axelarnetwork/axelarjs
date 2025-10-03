@@ -270,8 +270,15 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         status: "idle",
       });
 
-      toast.error(`Transaction failed: ${error.cause?.shortMessage}`);
-      logger.error("Failed to register remote tokens", error.cause);
+      toast.error(
+        `Failed to register remote tokens: ${
+          error?.cause?.shortMessage ??
+          error?.shortMessage ??
+          error?.message ??
+          "Unknown error"
+        }`
+      );
+      logger.error("Failed to register remote tokens", error);
     }
   }, [registerTokensAsync, setTxState, props.originChainId]);
 
