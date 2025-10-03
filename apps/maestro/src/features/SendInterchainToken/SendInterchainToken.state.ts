@@ -9,7 +9,6 @@ import {
 import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
-import { scaleGasValue } from "~/lib/utils/gas";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -25,6 +24,9 @@ import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMuta
 
 // Chains that should force using Interchain Token Service path
 const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
+const CHAINS_GAS_FEE_DECIMALS = {
+  [HEDERA_CHAIN_ID]: 18,
+};
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: string;
@@ -109,15 +111,11 @@ export function useSendInterchainTokenState(props: {
 
   const [, { addTransaction }] = useTransactionsContainer();
 
-  const rawWalletBalance = useBalance();
-  const balance = scaleGasValue(
-    props.sourceChain.chain_id,
-    rawWalletBalance?.value ?? 0n
-  );
+  const balance = useBalance();
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
 
-  const rawEstimateGasFeeData = useEstimateGasFeeQuery({
+  const { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
     destinationChainId: selectedToChain?.id,
     sourceChainTokenSymbol: nativeTokenSymbol,
@@ -126,16 +124,11 @@ export function useSendInterchainTokenState(props: {
     gasMultiplier: "auto",
   });
 
-  const gas = scaleGasValue(
-    props.sourceChain.chain_id,
-    rawEstimateGasFeeData.data
-  );
-
   const hasInsufficientGasBalance = useMemo(() => {
     if (!balance || !gas) {
       return false;
     }
-    return gas > balance;
+    return gas > balance.value;
   }, [balance, gas]);
 
   const {
@@ -209,7 +202,9 @@ export function useSendInterchainTokenState(props: {
       eligibleTargetChains,
       tokenSymbol,
       gasFee: Maybe.of(gas).mapOrUndefined((gasValue) => {
-        const decimals = props.sourceChain.native_token.decimals;
+        const decimals =
+          CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
+          props.sourceChain.native_token.decimals;
         return toNumericString(gasValue, decimals);
       }),
       nativeTokenSymbol,
