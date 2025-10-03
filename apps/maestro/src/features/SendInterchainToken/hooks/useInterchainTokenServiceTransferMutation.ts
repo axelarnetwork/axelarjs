@@ -168,6 +168,7 @@ export function useInterchainTokenServiceTransferMutation(
       config.tokenId,
       interchainTransferAsync,
       setTxState,
+      shouldScaleGas,
     ]
   );
 

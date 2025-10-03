@@ -24,6 +24,9 @@ import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMuta
 
 // Chains that should force using Interchain Token Service path
 const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
+const CHAINS_GAS_FEE_DECIMALS = {
+  [HEDERA_CHAIN_ID]: 18,
+};
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: string;
@@ -199,7 +202,9 @@ export function useSendInterchainTokenState(props: {
       eligibleTargetChains,
       tokenSymbol,
       gasFee: Maybe.of(gas).mapOrUndefined((gasValue) => {
-        const decimals = props.sourceChain.native_token.decimals;
+        const decimals =
+          CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
+          props.sourceChain.native_token.decimals;
         return toNumericString(gasValue, decimals);
       }),
       nativeTokenSymbol,
