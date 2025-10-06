@@ -55,7 +55,7 @@ export default function HomePage() {
           id="main-content"
         >
           {shouldRenderTestnetBanner && (
-            <Dialog open onClose={handleDismissBanner} className="bg-warning">
+            <Dialog open onClose={handleDismissBanner}>
               <Dialog.Body className="bg-warning text-warning-content">
                 <Dialog.CornerCloseAction onClick={handleDismissBanner} />
                 <Alert $status="warning">

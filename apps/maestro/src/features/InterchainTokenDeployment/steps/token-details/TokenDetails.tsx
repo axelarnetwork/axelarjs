@@ -1,4 +1,5 @@
 import {
+  Alert,
   Dialog,
   FormControl,
   HelpCircleIcon,
@@ -8,7 +9,7 @@ import {
   Tooltip,
 } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
-import { ComponentRef, useMemo, useRef, type FC } from "react";
+import { ComponentRef, useEffect, useMemo, useRef, type FC } from "react";
 import { type FieldError, type SubmitHandler } from "react-hook-form";
 
 import { isValidSuiAddress } from "@mysten/sui/utils";
@@ -16,10 +17,16 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import "~/features/InterchainTokenDeployment";
 
 import {
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
+import {
+  INITIAL_STATE,
   useInterchainTokenDeploymentStateContainer,
   type TokenDetailsFormState,
 } from "~/features/InterchainTokenDeployment";
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, useChainId } from "~/lib/hooks";
+import { useChainId } from "~/lib/hooks";
 import {
   isValidEVMAddress,
   isValidStellarWalletAddress,
@@ -35,7 +42,34 @@ import {
 
 const MAX_UINT64 = BigInt(2) ** BigInt(64) - BigInt(1);
 
-const validateMinterAddress = (minter: string, chainId: number) => {
+type Disclaimer = {
+  title: string;
+  description: string;
+};
+
+type ChainRule = {
+  isMintable?: boolean;
+  initialSupply?: string;
+  disclaimer?: Disclaimer;
+  hiddenFields?: ("isMintable" | "initialSupply")[];
+  maxDecimals?: number;
+};
+
+const CHAIN_RULES: Record<number, ChainRule> = {
+  [HEDERA_CHAIN_ID]: {
+    isMintable: true,
+    initialSupply: "0",
+    disclaimer: {
+      title: "Hedera Token Deployment",
+      description:
+        "When deploying new tokens on Hedera, a Minter address is required, the token starts with an initial supply of 0 and the token decimals are capped at 8.",
+    },
+    hiddenFields: ["isMintable", "initialSupply"],
+    maxDecimals: 8,
+  },
+};
+
+const validateMinterAddress = (minter: string | undefined, chainId: number) => {
   if (!minter) {
     return {
       type: "validate",
@@ -72,6 +106,11 @@ const validateMinterAddress = (minter: string, chainId: number) => {
 const TokenDetails: FC = () => {
   const { state, actions } = useInterchainTokenDeploymentStateContainer();
   const chainId = useChainId();
+  const chainRules = CHAIN_RULES[chainId];
+  const isInitialSupplyHidden =
+    chainRules?.hiddenFields?.includes("initialSupply") === true;
+  const hasIsMintableRule = chainRules?.isMintable !== undefined;
+  const hasInitialSupplyRule = chainRules?.initialSupply !== undefined;
 
   const { register, handleSubmit, formState, watch } = state.tokenDetailsForm;
 
@@ -82,26 +121,81 @@ const TokenDetails: FC = () => {
   const minter = watch("minter");
   const supply = watch("initialSupply");
   const tokenDecimals = watch("tokenDecimals");
+  const maxDecimals = chainRules?.maxDecimals ?? 18;
+
+  // keep default supply in sync with mintable toggle
+  useEffect(() => {
+    const { getValues, setValue } = state.tokenDetailsForm;
+    if (formState.dirtyFields?.initialSupply) {
+      return;
+    }
+    const currentSupply = getValues("initialSupply");
+    const desired = isMintable ? "0" : INITIAL_STATE.tokenDetails.initialSupply;
+    if (currentSupply !== desired) {
+      setValue("initialSupply", desired, {
+        shouldDirty: false,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    }
+  }, [isMintable, formState.dirtyFields, state.tokenDetailsForm]);
+
+  // enforce chain-specific rules
+  useEffect(() => {
+    const { setValue, getValues } = state.tokenDetailsForm;
+    const currentIsMintable = getValues("isMintable");
+    const currentSupply = getValues("initialSupply");
+    const currentDecimals = Number(getValues("tokenDecimals"));
+
+    if (hasIsMintableRule && currentIsMintable !== chainRules.isMintable) {
+      setValue("isMintable", chainRules.isMintable!, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: true,
+      });
+    }
+
+    if (hasInitialSupplyRule && currentSupply !== chainRules.initialSupply) {
+      setValue("initialSupply", chainRules.initialSupply!, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: true,
+      });
+    }
+
+    // clamp decimals to chain max (e.g., Hedera 8)
+    const ruleMax = chainRules?.maxDecimals ?? 18;
+    if (Number.isFinite(currentDecimals) && currentDecimals > ruleMax) {
+      setValue("tokenDecimals", ruleMax, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    }
+  }, [
+    chainId,
+    hasIsMintableRule,
+    hasInitialSupplyRule,
+    chainRules,
+    state.tokenDetailsForm,
+  ]);
 
   const minterErrorMessage = useMemo<FieldError | undefined>(() => {
     if (!isMintable) {
       return;
     }
 
-    if (minter) {
-      const minterValidation = validateMinterAddress(minter, chainId);
-      if (minterValidation !== true) {
-        return minterValidation;
-      }
+    const minterValidation = validateMinterAddress(minter, chainId);
+    if (minterValidation !== true) {
+      return minterValidation;
     }
   }, [isMintable, minter, chainId]);
 
   const initialSupplyErrorMessage = useMemo<FieldError | undefined>(() => {
-    if (isMintable) {
+    if (isInitialSupplyHidden) {
       return;
     }
-
-    if (["0", ""].includes(supply) && !minter) {
+    if (!isMintable && ["0", ""].includes(supply)) {
       return {
         type: "required",
         message: "Fixed supply token requires an initial balance",
@@ -118,7 +212,7 @@ const TokenDetails: FC = () => {
         message: "Supply must be less than 2^64 - 1 for Sui",
       };
     }
-  }, [isMintable, minter, supply, chainId, tokenDecimals]);
+  }, [isMintable, supply, chainId, tokenDecimals, isInitialSupplyHidden]);
 
   const isFormValid = useMemo(() => {
     if (minterErrorMessage || initialSupplyErrorMessage) {
@@ -137,12 +231,14 @@ const TokenDetails: FC = () => {
 
     actions.setTokenDetails({
       ...data,
-      minter: data.isMintable && data.minter ? data.minter : undefined,
+      minter: data.isMintable ? data.minter : undefined,
     });
     actions.nextStep();
   };
 
   const { errors } = state.tokenDetailsForm.formState;
+  const showMinterError =
+    formState.dirtyFields?.minter || formState.isSubmitted;
 
   return (
     <>
@@ -150,6 +246,18 @@ const TokenDetails: FC = () => {
         className="grid grid-cols-1 sm:gap-2"
         onSubmit={handleSubmit(submitHandler)}
       >
+        {chainRules?.disclaimer && (
+          <FormControl>
+            <Alert $status="info">
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold">
+                  {chainRules.disclaimer.title}
+                </span>
+                <span>{chainRules.disclaimer.description}</span>
+              </div>
+            </Alert>
+          </FormControl>
+        )}
         <FormControl>
           <Label>
             <TokenNameLabelWithTooltip />
@@ -170,125 +278,145 @@ const TokenDetails: FC = () => {
           {Maybe.of(errors.tokenSymbol).mapOrNull(ValidationError)}
         </FormControl>
         <FormControl>
-          <Label htmlFor="tokenDecimals">Token Decimals</Label>
+          <Label>
+            <Label.Text id="tokenDecimals-label">Token Decimals</Label.Text>
+          </Label>
           <ModalFormInput
             id="tokenDecimals"
             type="number"
             placeholder="Enter your token decimals"
             min={0}
-            max={18}
-            {...register("tokenDecimals")}
+            max={maxDecimals}
+            aria-labelledby="tokenDecimals-label"
+            {...register("tokenDecimals", {
+              valueAsNumber: true,
+              min: { value: 0, message: "Decimals must be >= 0" },
+              max: {
+                value: maxDecimals,
+                message: chainRules?.maxDecimals
+                  ? `Max ${chainRules.maxDecimals} decimals on ${chainRules?.disclaimer?.title?.split(" ")[0] ?? "this chain"}`
+                  : `Decimals must be <= ${maxDecimals}`,
+              },
+            })}
           />
           {Maybe.of(errors.tokenDecimals).mapOrNull(ValidationError)}
         </FormControl>
-        <FormControl>
-          <Label htmlFor="isMintable">
-            <Label.Text className="inline-flex items-center gap-1">
-              Is Mintable?
-              <Tooltip
-                $position="right"
-                $variant="info"
-                tip="When active, the token minter will be able to mint new tokens."
-              >
-                <HelpCircleIcon className="mr-1 h-[1em] text-info" />
-              </Tooltip>
-            </Label.Text>
-            <Label.AltText>
+        {!chainRules?.hiddenFields?.includes("isMintable") && (
+          <FormControl>
+            <div className="flex items-center justify-between">
+              <Label>
+                <Label.Text className="inline-flex items-center gap-1">
+                  Is Mintable?
+                  <Tooltip
+                    $position="right"
+                    $variant="info"
+                    tip="When active, the token minter will be able to mint new tokens."
+                  >
+                    <HelpCircleIcon className="mr-1 h-[1em] text-info" />
+                  </Tooltip>
+                </Label.Text>
+              </Label>
               <Toggle
                 id="isMintable"
                 $variant="primary"
                 $size="sm"
+                disabled={hasIsMintableRule}
                 {...register("isMintable")}
               />
-            </Label.AltText>
-          </Label>
-        </FormControl>
+            </div>
+          </FormControl>
+        )}
         {isMintable && (
           <FormControl>
-            <Label htmlFor="minter">
-              <Label.Text className="inline-flex items-center gap-1">
-                Token Minter
-                <Tooltip
-                  $position="right"
-                  $variant="info"
-                  tip="Choose a secure minter address, e.g. governance, multisig etc. This address will be able to mint the token on any chain."
+            <div className="flex items-center justify-between">
+              <Label>
+                <Label.Text
+                  id="minter-label"
+                  className="inline-flex items-center gap-1"
                 >
-                  <HelpCircleIcon className="mr-1 h-[1em] text-info" />
-                </Tooltip>
-              </Label.Text>
-              <Label.AltText>
-                <button
-                  type="button"
-                  onClick={actions.setCurrentAddressAsMinter}
-                >
+                  Token Minter
+                  <Tooltip
+                    $position="right"
+                    $variant="info"
+                    tip="Choose a secure minter address, e.g. governance, multisig etc. This address will be able to mint the token on any chain."
+                  >
+                    <HelpCircleIcon className="mr-1 h-[1em] text-info" />
+                  </Tooltip>
+                </Label.Text>
+              </Label>
+              <button type="button" onClick={actions.setCurrentAddressAsMinter}>
+                <span aria-label="Use current address as minter">
                   Use current address
-                </button>
-              </Label.AltText>
-            </Label>
+                </span>
+              </button>
+            </div>
             <ModalFormInput
               id="minter"
               placeholder="Enter a secure minter address"
-              onKeyDown={preventNonHexInput}
+              onKeyDown={(e) => {
+                if (chainId === STELLAR_CHAIN_ID || chainId === SUI_CHAIN_ID) {
+                  return; // allow non-hex input for Stellar/Sui
+                }
+                return preventNonHexInput(e);
+              }}
+              aria-labelledby="minter-label"
               {...register("minter")}
             />
-            {Maybe.of(minterErrorMessage).mapOrNull(ValidationError)}
+            {showMinterError &&
+              Maybe.of(minterErrorMessage).mapOrNull(ValidationError)}
+          </FormControl>
+        )}
+        {!chainRules?.hiddenFields?.includes("initialSupply") && (
+          <FormControl>
+            <Label>
+              <Label.Text id="initialSupply-label">
+                {isMintable
+                  ? "Enter initial supply"
+                  : "Enter total supply - This will be a fixed supply for the token"}
+              </Label.Text>
+            </Label>
+            <ModalFormInput
+              id="initialSupply"
+              placeholder={`Enter ${isMintable ? "initial" : "total"} supply`}
+              min={0}
+              onKeyDown={preventNonNumericInput}
+              aria-labelledby="initialSupply-label"
+              readOnly={hasInitialSupplyRule}
+              {...register("initialSupply")}
+            />
+            {Maybe.of(initialSupplyErrorMessage).mapOrNull(ValidationError)}
           </FormControl>
         )}
         <FormControl>
-          <Label htmlFor="initialSupply">
-            {isMintable
-              ? "Enter initial supply"
-              : "Enter total supply - This will be a fixed supply for the token"}
-          </Label>
-          <ModalFormInput
-            id="initialSupply"
-            placeholder={`Enter ${isMintable ? "initial" : "total"} supply`}
-            min={0}
-            onKeyDown={preventNonNumericInput}
-            {...register("initialSupply", {
-              validate(value) {
-                if (!value || value === "0") {
-                  return "Amount must be greater than 0";
-                }
-
-                return true;
-              },
-            })}
-          />
-          {Maybe.of(initialSupplyErrorMessage).mapOrNull(ValidationError)}
-        </FormControl>
-        <FormControl>
-          <Label htmlFor="salt">
-            <Label.Text>Salt</Label.Text>
-            <Label.AltText>
-              <Tooltip tip="Generate random salt" $position="left">
-                <button
-                  type="button"
-                  onClick={() => actions.generateRandomSalt()}
-                >
-                  <RefreshCwIcon className="h-[1em] hover:text-primary" />
-                </button>
-              </Tooltip>
-            </Label.AltText>
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label>
+              <Label.Text id="salt-label">Salt</Label.Text>
+            </Label>
+            <Tooltip tip="Generate random salt" $position="left">
+              <button
+                type="button"
+                onClick={() => actions.generateRandomSalt()}
+              >
+                <RefreshCwIcon className="h-[1em] hover:text-primary" />
+              </button>
+            </Tooltip>
+          </div>
           <ModalFormInput
             id="salt"
             onKeyDown={preventNonHexInput}
             defaultValue={state.tokenDetailsForm.getValues("salt")}
+            aria-labelledby="salt-label"
             {...register("salt")}
           />
           {Maybe.of(formState.errors.salt).mapOrNull(ValidationError)}
         </FormControl>
         <button type="submit" ref={formSubmitRef} />
       </form>
-      <Dialog.Actions>
+      <Dialog.Actions className="sticky bottom-0 bg-inherit pt-2">
         <Dialog.CloseAction onClick={actions.reset}>
           Cancel & exit
         </Dialog.CloseAction>
-        <NextButton
-          disabled={!isFormValid}
-          onClick={() => formSubmitRef.current?.click()}
-        >
+        <NextButton onClick={() => formSubmitRef.current?.click()}>
           <p className="text-indigo-600">Register & Deploy</p>
         </NextButton>
       </Dialog.Actions>

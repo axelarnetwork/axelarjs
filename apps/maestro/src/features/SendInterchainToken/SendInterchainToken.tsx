@@ -1,8 +1,10 @@
 import {
   Alert,
   Button,
+  CopyToClipboardButton,
   EyeIcon,
   FormControl,
+  InfoIcon,
   Label,
   Modal,
   TextInput,
@@ -18,7 +20,9 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
-import { SUI_CHAIN_ID, useAccount } from "~/lib/hooks";
+import { HEDERA_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import { useHederaTokenAssociation } from "~/features/hederaHooks";
+import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,
@@ -79,12 +83,48 @@ export const SendInterchainToken: FC<Props> = (props) => {
     originTokenChainId: props.originTokenChainId,
   });
 
+  const isDestinationHedera =
+    state.selectedToChain?.chain_id === HEDERA_CHAIN_ID;
+  const {
+    isAssociated: isDestinationAssociated,
+    isCheckingAssociation: isCheckingDestinationAssociation,
+    hasAssociationError: hasDestinationAssociationError,
+  } = useHederaTokenAssociation(state.destinationTokenAddress, {
+    accountAddress: destinationAddress,
+    enabled: isDestinationHedera && Boolean(destinationAddress),
+  });
+
   const amountToTransfer = watch("amountToTransfer");
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+  const mustBlockForHederaAssociation = useMemo(
+    () =>
+      isDestinationHedera &&
+      Boolean(destinationAddress) &&
+      (isCheckingDestinationAssociation ||
+        isDestinationAssociated !== true ||
+        hasDestinationAssociationError),
+    [
+      destinationAddress,
+      hasDestinationAssociationError,
+      isCheckingDestinationAssociation,
+      isDestinationAssociated,
+      isDestinationHedera,
+    ]
+  );
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
 
     invariant(state.selectedToChain, "selectedToChain is undefined");
+
+    if (state.selectedToChain.chain_id === HEDERA_CHAIN_ID) {
+      if (isDestinationAssociated === false) {
+        toast.error(
+          "The destination Hedera account is not associated with this token. Please associate it before sending."
+        );
+        return;
+      }
+    }
 
     await actions.sendTokenAsync(
       {
@@ -176,6 +216,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
       state.txState.status !== "idle" && state.txState.status !== "reverted",
     [state.txState.status]
   );
+
+  // no-op: association blocking handled by mustBlockForHederaAssociation
 
   const txHash = useMemo(
     () =>
@@ -455,10 +497,56 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     return "Invalid EVM address";
                   }
 
+                  if (state.selectedToChain.chain_id === HEDERA_CHAIN_ID) {
+                    if (hasDestinationAssociationError) {
+                      return "Error checking Hedera association";
+                    }
+                    // Do not fail field validation solely due to association status.
+                    // We block submission and show a warning elsewhere.
+                  }
+
                   return true;
                 },
               })}
             />
+            {isDestinationHedera && destinationAddress && (
+              <div className="mt-2">
+                {isCheckingDestinationAssociation && (
+                  <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 text-xs dark:bg-base-100">
+                    <span className="mx-auto">
+                      Checking Hedera association...
+                    </span>
+                  </div>
+                )}
+                {!isCheckingDestinationAssociation &&
+                  isDestinationAssociated !== true && (
+                    <Alert
+                      icon={<InfoIcon />}
+                      $status="warning"
+                      className="my-2 rounded-xl p-3"
+                    >
+                      <div className="flex flex-col gap-2">
+                        <span>
+                          The destination Hedera account is not associated with
+                          this token.
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs">
+                            The recipient can associate by opening this page:
+                          </span>
+                          <CopyToClipboardButton
+                            $size="sm"
+                            $variant="ghost"
+                            copyText={currentUrl}
+                          >
+                            Copy link
+                          </CopyToClipboardButton>
+                        </div>
+                      </div>
+                    </Alert>
+                  )}
+              </div>
+            )}
           </FormControl>
 
           {state.txState.status === "idle" &&
@@ -500,7 +588,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 </Label.AltText>
               )}
             </Label>
-            {buttonStatus === "error" ? (
+            {buttonStatus === "error" && !mustBlockForHederaAssociation ? (
               <Alert role="alert" $status="error">
                 {buttonChildren}
               </Alert>
@@ -511,7 +599,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 disabled={
                   !formState.isValid ||
                   isFormDisabled ||
-                  state.hasInsufficientGasBalance
+                  state.hasInsufficientGasBalance ||
+                  mustBlockForHederaAssociation
                 }
                 $loading={state.isSending}
               >

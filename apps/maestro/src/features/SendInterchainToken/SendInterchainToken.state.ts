@@ -1,6 +1,7 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
@@ -20,6 +21,12 @@ import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
+
+// Chains that should force using Interchain Token Service path
+const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
+const CHAINS_GAS_FEE_DECIMALS = {
+  [HEDERA_CHAIN_ID]: 18,
+};
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: string;
@@ -63,6 +70,10 @@ export function useSendInterchainTokenState(props: {
     ]
   );
 
+  const shouldUseTokenService =
+    CHAINS_REQUIRING_TOKEN_SERVICE.includes(props.sourceChain.chain_id) ||
+    isApprovalRequired;
+
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
 
@@ -91,6 +102,12 @@ export function useSendInterchainTokenState(props: {
       eligibleTargetChains[0],
     [toChainId, eligibleTargetChains]
   );
+
+  const selectedToMatchingToken = useMemo(() => {
+    const matchingTokens = originInterchainToken?.matchingTokens ?? [];
+    const chainId = selectedToChain?.chain_id;
+    return matchingTokens.find((x) => x.chainId === chainId);
+  }, [originInterchainToken?.matchingTokens, selectedToChain?.chain_id]);
 
   const [, { addTransaction }] = useTransactionsContainer();
 
@@ -154,7 +171,7 @@ export function useSendInterchainTokenState(props: {
 
   const { sendTokenAsync, isSending, txState } = useMemo(
     () =>
-      isApprovalRequired
+      shouldUseTokenService
         ? {
             sendTokenAsync: tokenServiceSendTokenAsync,
             isSending: isTokenServiceTransfering,
@@ -166,7 +183,7 @@ export function useSendInterchainTokenState(props: {
             txState: interchainTransferTxState,
           },
     [
-      isApprovalRequired,
+      shouldUseTokenService,
       tokenServiceSendTokenAsync,
       isTokenServiceTransfering,
       tokenServiceTxState,
@@ -185,7 +202,9 @@ export function useSendInterchainTokenState(props: {
       eligibleTargetChains,
       tokenSymbol,
       gasFee: Maybe.of(gas).mapOrUndefined((gasValue) => {
-        const decimals = props.sourceChain.native_token.decimals;
+        const decimals =
+          CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
+          props.sourceChain.native_token.decimals;
         return toNumericString(gasValue, decimals);
       }),
       nativeTokenSymbol,
@@ -194,6 +213,9 @@ export function useSendInterchainTokenState(props: {
         0,
         (x) => x.estimatedWaitTimeInMinutes
       ),
+      destinationTokenAddress: selectedToMatchingToken?.tokenAddress as
+        | `0x${string}`
+        | undefined,
     },
     {
       setIsModalOpen,
