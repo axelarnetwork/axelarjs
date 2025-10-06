@@ -135,27 +135,34 @@ export default function useRegisterRemoteCanonicalTokens(
     onStatusUpdate: statusUpdateAdapter,
   };
 
+  let writeContract;
+  if (chainId === SUI_CHAIN_ID) {
+    writeContract = () => registerRemoteInterchainTokenOnSui(suiInput);
+  } else if (chainId === STELLAR_CHAIN_ID) {
+    writeContract = () => registerRemoteInterchainTokenOnStellar(stellarInput);
+  } else if (config) {
+    writeContract = () => mutation.writeContract(config.request);
+  } else {
+    writeContract = undefined;
+  }
+
+  let writeContractAsync;
+  if (chainId === SUI_CHAIN_ID) {
+    writeContractAsync = async () =>
+      registerRemoteInterchainTokenOnSui(suiInput);
+  } else if (chainId === STELLAR_CHAIN_ID) {
+    writeContractAsync = async () =>
+      registerRemoteInterchainTokenOnStellar(stellarInput);
+  } else if (config) {
+    writeContractAsync = async () =>
+      await mutation.writeContractAsync(config.request);
+  } else {
+    writeContractAsync = undefined;
+  }
+
   return {
     ...mutation,
-    writeContract: () => {
-      if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnSui(suiInput);
-      }
-      if (chainId === STELLAR_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnStellar(stellarInput);
-      }
-      if (!config) return;
-      return mutation.writeContract(config.request);
-    },
-    writeContractAsync: async () => {
-      if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnSui(suiInput);
-      }
-      if (chainId === STELLAR_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnStellar(stellarInput);
-      }
-      if (!config) return;
-      return await mutation.writeContractAsync(config.request);
-    },
+    writeContract,
+    writeContractAsync,
   };
 }

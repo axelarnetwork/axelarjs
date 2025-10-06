@@ -237,9 +237,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         status: "awaiting_approval",
       });
 
-      const txPromise = registerTokensAsync();
-
-      const result = await txPromise;
+      const result = await registerTokensAsync();
 
       if (!result) {
         throw new Error("registerTokensAsync returned undefined");
@@ -293,6 +291,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       return `Insufficient ${
         props.originChain?.native_token?.symbol ?? ""
       } balance for gas fees`;
+    if (!registerTokensAsync) return "Preparing transaction...";
     switch (txState.status) {
       case "idle":
         return (
@@ -313,6 +312,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     txState.status,
     hasEnoughGasBalance,
     props.originChain,
+    registerTokensAsync,
   ]);
 
   return hasEnoughGasBalance ? (
