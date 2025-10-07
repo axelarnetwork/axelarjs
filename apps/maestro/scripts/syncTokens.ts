@@ -73,8 +73,11 @@ async function main() {
   for (const [tokenId, tokenInfo] of Object.entries(assets)) {
     // check if this token is a custom token
     if(tokenInfo.type != "customInterchain" && tokenInfo.type != "interchain") {//if (!/^0x[a-fA-F0-9]{64}$/.test(tokenId)) {
-      console.log(`Skipping token ${tokenId} of type ${tokenInfo.type}`);
+      //console.log(`Skipping token ${tokenId} of type ${tokenInfo.type}`);
       continue;
+    }
+    if (tokenInfo.type == "customInterchain") {
+      tokenInfo.type = "interchain"; // normalize to interchain
     }
 
     // check if this token is already in the interchain_tokens database
@@ -144,7 +147,7 @@ async function main() {
           tokenInfo.originAxelarChainId,
           tokenInfo.name,
           tokenInfo.prettySymbol,
-          originalChain.decimals, // decimals from the original chain object
+          tokenInfo.decimals, // decimals from the original chain object
           tokenInfo.details?.deploymentMessageId ?? null,
           tokenInfo.details?.deployer ?? null,
           originalChain.tokenManager ?? null,
