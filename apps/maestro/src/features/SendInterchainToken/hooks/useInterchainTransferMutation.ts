@@ -13,6 +13,8 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
+import { useConnect as useXRPLConnect, useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
+import { useXRPLInterchainTransfer } from "~/features/xrplHooks/useXRPLInterchainTransfer";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -37,6 +39,8 @@ export function useInterchainTransferMutation(
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
   const { address } = useAccount();
+  const { xrplConnection } = useXRPLConnection();
+  const { xrplWallet } = useXRPLWallet();
 
   const { sendToken: sendStellarToken } = useSendStellarToken();
 
@@ -44,6 +48,12 @@ export function useInterchainTransferMutation(
     useWriteInterchainTokenInterchainTransfer();
 
   const { mutateAsync: getSendTokenTx } = trpc.sui.getSendTokenTx.useMutation({
+    onError(error) {
+      console.log("error in getSendTokenTx", error.message);
+    },
+  });
+
+  const { mutateAsync: getXRPLSendTokenTx } = trpc.xrpl.getInterchainTransferTxBytes.useMutation({
     onError(error) {
       console.log("error in getSendTokenTx", error.message);
     },
@@ -99,7 +109,21 @@ export function useInterchainTransferMutation(
             transaction: sendTokenTxJSON,
           });
           txHash = receipt.digest;
-        } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
+        } else if (config.sourceChainName.toLowerCase().includes("xrpl") && !config.sourceChainName.toLowerCase().includes("evm")) {
+
+          const xrplInterchainTransfer = useXRPLInterchainTransfer();
+
+          xrplInterchainTransfer({
+            caller: address,
+            tokenId: tokenId,
+            tokenAddress: config.tokenAddress,
+            destinationChain: config.destinationChainName,
+            destinationAddress: encodedRecipient,
+            amount: bnAmount.toString(),
+            gasValue: config.gas.toString() ?? "0",
+          });
+        }
+        else if (config.sourceChainName.toLowerCase().includes("stellar")) {
           const result = await sendStellarToken.mutateAsync({
             caller: address,
             tokenId: tokenId,

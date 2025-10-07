@@ -18,7 +18,7 @@ import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 
-import { HEDERA_CHAIN_ID } from "~/config/chains";
+import { HEDERA_CHAIN_ID, xrplChainConfig } from "~/config/chains";
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useHederaTokenAssociation } from "~/features/hederaHooks";
@@ -68,10 +68,13 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   );
   // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
   // To check sui for example, they need to connect with a sui wallet
-  const isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
+  let isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
     normalizedTokenAddress,
     address
   );
+  if (chainId === xrplChainConfig.id) {
+    isIncompatibleChain = !props.tokenAddress?.includes(".");
+  }
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
