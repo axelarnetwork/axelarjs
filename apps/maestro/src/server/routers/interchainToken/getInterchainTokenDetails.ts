@@ -7,6 +7,7 @@ import {
   stellarChainConfig,
   SUI_CHAIN_ID,
   suiChainConfig,
+  xrplChainConfig,
 } from "~/config/chains";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
@@ -144,6 +145,23 @@ export const getInterchainTokenDetails = publicProcedure
           `[getInterchainTokenDetails] Error converting address format:`,
           error
         );
+      }
+    }
+
+    if (!tokenRecord && input.chainId === xrplChainConfig.id) {
+      console.log(
+        `[getInterchainTokenDetails] Token not found with original address on XRPL, trying alternative format`
+      );
+      if (input.tokenAddress === "xrp") {
+        // in that case, this is the native XRP token
+        console.log("Attempting to find the native XRP token record");
+        tokenRecord =
+          await ctx.persistence.postgres.getInterchainTokenByTokenId(
+            "0xba5a21ca88ef6bba2bfff5088994f90e1077e2a1cc3dcc38bd261f00fce2824f"
+          ); // TODO: derive?
+        console.log("Found:", tokenRecord);
+      } else {
+        console.error("Failed to find this XRPL token:", input.tokenAddress);
       }
     }
 

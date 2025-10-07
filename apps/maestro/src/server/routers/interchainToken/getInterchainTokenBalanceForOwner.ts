@@ -1,8 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { Account, Address, scValToNative } from "stellar-sdk";
+import * as xrpl from "xrpl";
 import { z } from "zod";
 
+import { xrplChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import {
   isTokenAddressIncompatibleWithOwner,
@@ -15,8 +17,6 @@ import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { simulateCall } from "../stellar/utils/transactions";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
-import { xrplChainConfig } from "~/config/chains";
-import * as xrpl from "xrpl";
 
 // Helper function to call Stellar contract methods and handle errors
 async function callStellarContractMethod<T>({
@@ -74,10 +74,12 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     );
     // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
     // To check sui for example, they need to connect with a sui wallet
-    const isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
-      normalizedTokenAddress,
-      input.owner
-    );
+    let isIncompatibleChain =
+      normalizedTokenAddress?.length !== input.owner?.length;
+    if (input.owner[0] === "r") {
+      // xrpl address
+      isIncompatibleChain = !input.tokenAddress?.includes(".");
+    }
     if (isIncompatibleChain) {
       return {
         isTokenOwner: false,
@@ -219,34 +221,42 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         };
       }
     }
+    console.log("Fetching token balance for", input);
 
     if (input.chainId === xrplChainConfig?.id) {
+      console.log("Fetching XRPL token balance for", input);
       try {
-          // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
-          const [currency, issuer] = input.tokenAddress.split(":");
-          if (!currency || !issuer) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
-            });
-          }
-
-          const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-          await client.connect();
-          const response = await client.request({
-            command: "account_lines",
-            account: input.owner,
+        // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
+        const [currency, issuer] = input.tokenAddress.split(".");
+        if (!currency || !issuer) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
           });
+        }
+        console.log("Connecting now", input);
 
-          await client.disconnect();
-          console.log("Result is:", response.result);
+        const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
+        await client.connect();
 
-          // Find the line that matches the token
-          const line = response.result.lines.find(
-            l => l.currency === currency && l.account === issuer
-          );
+        console.log("Requesting now", input);
 
-          
+        const response = await client.request({
+          command: "account_lines",
+          account: input.owner,
+        });
+
+        console.log("Response is", response);
+
+        await client.disconnect();
+        console.log("Result is:", response.result);
+
+        // Find the line that matches the token
+        const line = response.result.lines.find(
+          (l) => l.currency === currency && l.account === issuer
+        );
+
+        console.log("Line is", line);
 
         return {
           isTokenOwner: false,
@@ -271,6 +281,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           hasOperatorRole: false,
           hasFlowLimiterRole: false,
         };
+      }
     }
 
     // This is for ERC20 tokens
