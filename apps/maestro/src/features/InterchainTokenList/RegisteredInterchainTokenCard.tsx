@@ -29,6 +29,7 @@ import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnershi
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
 import type { TokenInfo } from "./types";
+import { xrplChainConfig } from "~/config/chains";
 
 const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
   props
@@ -61,8 +62,11 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     : props.tokenAddress;
   // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
   // To check sui for example, they need to connect with a sui wallet
-  const isIncompatibleChain =
+  let isIncompatibleChain =
     normalizedTokenAddress?.length !== address?.length;
+  if (chainId === xrplChainConfig.id) {
+    isIncompatibleChain = !props.tokenAddress?.includes(".");
+  }
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,

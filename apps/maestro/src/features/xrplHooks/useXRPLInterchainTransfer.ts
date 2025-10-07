@@ -1,0 +1,87 @@
+import { useWallet, useSignAndSubmitTransaction } from "@xrpl-wallet-standard/react";
+import { useMutation } from "@tanstack/react-query";
+import * as xrpl from "xrpl";
+
+import { trpc } from "~/lib/trpc";
+import { xrplChainConfig } from "~/config/chains";
+
+export interface XRPLInterchainTransferParams {
+    caller: string;
+    tokenId: string; // 0x-prefixed hex
+    tokenAddress: string; // mint base58
+    destinationChain: string;
+    destinationAddress: string; // hex-encoded recipient for EVM, bytes for others already handled upstream
+    amount: string; // base units
+    gasValue?: string; // drops
+    onStatusUpdate?: (status: {
+        type: "pending_approval" | "sending" | "sent" | "idle";
+        txHash?: string;
+    }) => void;
+}
+
+export function useXRPLInterchainTransfer() {
+    const { wallet, status } = useWallet();
+    const signAndSubmit = useSignAndSubmitTransaction();
+    
+
+    // TODO: check status?
+    console.log("wallet:", wallet, "status:", status);
+
+    const buildTx = trpc.xrpl.getInterchainTransferTxBytes.useMutation();
+
+    const mutation = useMutation<{ txHash: string }, Error, XRPLInterchainTransferParams>({
+        mutationFn: async (params) => {
+            if (!wallet) {
+                throw new Error("Wallet not connected or connection unavailable");
+            }
+            params.onStatusUpdate?.({ type: "pending_approval" });
+
+            const { txBase64 } = await buildTx.mutateAsync({
+                caller: params.caller,
+                tokenId: params.tokenId,
+                tokenAddress: params.tokenAddress,
+                destinationChain: params.destinationChain,
+                destinationAddress: params.destinationAddress,
+                amount: params.amount,
+                gasValue: params.gasValue ?? "0",
+            });
+
+            const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type
+
+            console.log("Decoded tx:", tx);
+
+            const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
+            await client.connect();
+            
+            let preparedTx;
+            try {
+                preparedTx = await client.autofill(tx);
+                const sim = await client.simulate(preparedTx);
+
+                console.log("Simulation result:", sim);
+            }
+            catch (error) {
+                console.error("Error during XRPL transaction simulation:", error);
+                throw error;
+            }
+
+            try {
+                const result = await signAndSubmit(preparedTx, `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? '0' : process.env.NEXT_PUBLIC_NETWORK_ENV === 'devnet-amplifier' ? '2' : '1'}`);
+                const txHash = result.tx_hash;
+                console.log("Submitted transaction successfully:", txHash);
+                params.onStatusUpdate?.({ type: "sending", txHash: txHash });
+
+                return { txHash };
+            }
+            catch (error) {
+                console.error("Error during XRPL transaction signing/submission:", error);
+                throw error;
+            }
+        },
+    });
+
+    const interchainTransfer = async (params: XRPLInterchainTransferParams) =>
+    mutation.mutateAsync(params);
+
+    return interchainTransfer;
+}

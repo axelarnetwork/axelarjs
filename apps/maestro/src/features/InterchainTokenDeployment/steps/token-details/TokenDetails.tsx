@@ -32,6 +32,7 @@ import {
   TokenNameLabelWithTooltip,
   ValidationError,
 } from "~/ui/compounds/MultiStepForm";
+import { xrplChainConfig } from "~/config/chains";
 
 const MAX_UINT64 = BigInt(2) ** BigInt(64) - BigInt(1);
 
@@ -57,6 +58,8 @@ const validateMinterAddress = (minter: string, chainId: number) => {
         message: "Invalid Stellar minter address",
       };
     }
+  } else if (chainId === xrplChainConfig.id) {
+    // don't know how to validate xrpl address yet
   } else {
     if (!isValidEVMAddress(minter)) {
       return {
