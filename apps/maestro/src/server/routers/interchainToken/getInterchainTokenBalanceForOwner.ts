@@ -70,8 +70,11 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       : input.tokenAddress;
     // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
     // To check sui for example, they need to connect with a sui wallet
-    const isIncompatibleChain =
+    let isIncompatibleChain =
       normalizedTokenAddress?.length !== input.owner?.length;
+    if (input.owner[0] === "r") { // xrpl address
+      isIncompatibleChain = !input.tokenAddress?.includes(".");
+    }
     if (isIncompatibleChain) {
       return {
         isTokenOwner: false,
@@ -215,24 +218,32 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         };
       }
     }
+    console.log("Fetching token balance for", input);
 
     if (input.chainId === xrplChainConfig?.id) {
+      console.log("Fetching XRPL token balance for", input);
       try {
           // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
-          const [currency, issuer] = input.tokenAddress.split(":");
+          const [currency, issuer] = input.tokenAddress.split(".");
           if (!currency || !issuer) {
             throw new TRPCError({
               code: "BAD_REQUEST",
               message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
             });
           }
+           console.log("Connecting now", input);
 
           const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
           await client.connect();
+
+          console.log("Requesting now", input);
+
           const response = await client.request({
             command: "account_lines",
             account: input.owner,
           });
+
+          console.log("Response is", response);
 
           await client.disconnect();
           console.log("Result is:", response.result);
@@ -242,6 +253,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
             l => l.currency === currency && l.account === issuer
           );
 
+          console.log("Line is", line);
           
 
         return {
@@ -255,7 +267,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           hasOperatorRole: false,
           hasFlowLimiterRole: false,
         };
-      } catch (_) {
+      } 
+      catch (_) {
         return {
           isTokenOwner: false,
           isTokenMinter: false,
@@ -267,6 +280,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           hasOperatorRole: false,
           hasFlowLimiterRole: false,
         };
+      }
     }
 
     // This is for ERC20 tokens
