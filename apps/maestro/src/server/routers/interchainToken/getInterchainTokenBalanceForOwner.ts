@@ -10,6 +10,7 @@ import { isTokenAddressIncompatibleWithOwner } from "~/lib/utils/addressCompatib
 import {
   isValidStellarTokenAddress,
   isValidXRPLTokenAddress,
+  isValidXRPLWalletAddress,
 } from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
@@ -75,9 +76,10 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       input.tokenAddress,
       input.owner
     );
-    if (input.owner[0] === "r") {
-      // xrpl address
-      isIncompatibleChain = !input.tokenAddress?.includes(".");
+    console.log("getInterchainTokenBalanceForOwner");
+    if (isValidXRPLWalletAddress(input.owner)) { // xrpl address
+      isIncompatibleChain = !isValidXRPLTokenAddress(input.tokenAddress);
+      console.log("isIncompatibleChain for xrpl", isIncompatibleChain, input.owner);
     }
     if (isIncompatibleChain) {
       return {
@@ -220,54 +222,73 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         };
       }
     }
-    console.log("Fetching token balance for", input);
+    //console.log("Fetching token balance for", input);
 
     if (isValidXRPLTokenAddress(input.tokenAddress)) {
-      console.log("Fetching XRPL token balance for", input);
+      //console.log("Fetching XRPL token balance for", input);
       try {
-        // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
-        const [currency, issuer] = input.tokenAddress.split(".");
-        if (!currency || !issuer) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
+          const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
+          await client.connect();
+          if (input.tokenAddress === "XRP") {
+            // fetch XRP balance
+            const balance = await client.getXrpBalance(input.owner);
+            //console.log(balance);
+
+            const balanceInDrops = balance * (10**xrplChainConfig.nativeCurrency.decimals);
+
+            return {
+              isTokenOwner: false,
+              isTokenMinter: false,
+              tokenBalance: `${balanceInDrops}`,
+              decimals: 6,
+              isTokenPendingOwner: false,
+              hasPendingOwner: false,
+              hasMinterRole: false,
+              hasOperatorRole: false,
+              hasFlowLimiterRole: false,
+            };
+          }
+
+          // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
+          const [currency, issuer] = input.tokenAddress.split(".");
+          if (!currency || !issuer) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
+            });
+          }
+          console.log("Connecting now", input);
+
+          console.log("Requesting now", input);
+
+          const response = await client.request({
+            command: "account_lines",
+            account: input.owner,
           });
-        }
-        console.log("Connecting now", input);
 
-        const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-        await client.connect();
+          console.log("Response is", response);
 
-        console.log("Requesting now", input);
+          await client.disconnect();
+          console.log("Result is:", response.result);
 
-        const response = await client.request({
-          command: "account_lines",
-          account: input.owner,
-        });
+          // Find the line that matches the token
+          const line = response.result.lines.find(
+            (l) => l.currency === currency && l.account === issuer
+          );
 
-        console.log("Response is", response);
+          console.log("Line is", line);
 
-        await client.disconnect();
-        console.log("Result is:", response.result);
-
-        // Find the line that matches the token
-        const line = response.result.lines.find(
-          (l) => l.currency === currency && l.account === issuer
-        );
-
-        console.log("Line is", line);
-
-        return {
-          isTokenOwner: false,
-          isTokenMinter: false,
-          tokenBalance: line ? line.balance : "0",
-          decimals: 15, // TODO: fetch actual decimals
-          isTokenPendingOwner: false,
-          hasPendingOwner: false,
-          hasMinterRole: false,
-          hasOperatorRole: false,
-          hasFlowLimiterRole: false,
-        };
+          return {
+            isTokenOwner: false,
+            isTokenMinter: false,
+            tokenBalance: line ? line.balance : "0",
+            decimals: 15, // TODO: fetch actual decimals
+            isTokenPendingOwner: false,
+            hasPendingOwner: false,
+            hasMinterRole: false,
+            hasOperatorRole: false,
+            hasFlowLimiterRole: false,
+          }
       } catch (_) {
         return {
           isTokenOwner: false,

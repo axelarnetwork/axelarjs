@@ -35,7 +35,7 @@ export function useBalance(): BalanceResult | undefined {
   const { address, chainName } = useAccount();
   const [stellarBalance, setStellarBalance] = useState<string | null>(null);
   const { wallet: xrplWallet } = useXRPLWallet();
-  const [XRPLDrops, setXRPLDrops] = useState<number | null>(null);
+  const [XRPLDrops, setXRPLDrops] = useState<string | null>(null);
 
   // Wagmi balance hook
   const { data: wagmiBalance } = useWagmiBalance({
@@ -81,8 +81,9 @@ export function useBalance(): BalanceResult | undefined {
             account: address,
           });
           // Balance is returned in drops (1 XRP = 1,000,000 drops)
-          const drops = parseInt(accountInfo.result.account_data.Balance);
-          setXRPLDrops(drops);
+          const drops = parseInt(accountInfo.result.account_data.Balance) * (10**xrplChainConfig.nativeCurrency.decimals);
+          
+          setXRPLDrops(`${drops}`);
           console.log("Fetched XRPL balance in drops:", drops);
         } finally {
           client.disconnect();
