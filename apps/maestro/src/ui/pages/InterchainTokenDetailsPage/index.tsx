@@ -11,11 +11,13 @@ import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
 
 const InterchainTokensPage: FC = () => {
+  console.log("Got query", useRouter().query);
   const { tokenAddress } = useRouter().query as {
     chainName: string;
     tokenAddress: `0x${string}`;
   };
 
+  console.log("Got tokenAddress", tokenAddress);
   const routeChain = useChainFromRoute();
   const {
     data: interchainToken,
@@ -25,6 +27,8 @@ const InterchainTokensPage: FC = () => {
     chainId: routeChain?.id,
     tokenAddress,
   });
+
+  console.log("Got interchainToken", interchainToken);
 
   const { data: interchainTokenDetails } = useInterchainTokenDetailsQuery({
     chainId: routeChain?.id,

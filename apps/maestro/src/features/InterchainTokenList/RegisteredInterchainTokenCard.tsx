@@ -27,6 +27,7 @@ import {
   isTokenAddressIncompatibleWithOwner,
   normalizeTokenAddressForCompatibility,
 } from "~/lib/utils/addressCompatibility";
+import { isValidXRPLTokenAddress } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -72,15 +73,31 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     normalizedTokenAddress,
     address
   );
-  if (chainId === xrplChainConfig.id) {
-    isIncompatibleChain = !props.tokenAddress?.includes(".");
+  if (props.chainId === xrplChainConfig.id) {
+    isIncompatibleChain = !isValidXRPLWalletAddress(address);
+    console.log(
+      "isIncompatibleChain for xrpl",
+      isIncompatibleChain,
+      address,
+      normalizedTokenAddress
+    );
   }
+  console.log(
+    "isIncompatibleChain",
+    isIncompatibleChain,
+    chainId,
+    props.chainId,
+    normalizedTokenAddress,
+    address
+  );
+  console.log("disabled:", !props.isRegistered || isIncompatibleChain);
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
     disabled: !props.isRegistered || isIncompatibleChain,
   });
+  console.log("balance result", result);
   const balance = result?.data;
 
   const { explorerUrl, explorerName } = useMemo(() => {

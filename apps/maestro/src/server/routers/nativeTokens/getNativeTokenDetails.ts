@@ -9,10 +9,12 @@ import {
   ExtendedWagmiChainConfig,
   stellarChainConfig,
   suiChainConfig,
+  xrplChainConfig,
 } from "~/config/chains";
 import {
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
+  isValidXRPLTokenAddress,
 } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
@@ -91,6 +93,26 @@ export const getStellarTokenDetails = async (
   };
 };
 
+async function getXRPLTokenDetails(tokenAddress: string, ctx: Context) {
+  let name = tokenAddress;
+  let symbol = tokenAddress;
+  if (tokenAddress !== "XRP") {
+    symbol = tokenAddress.split(".")[0];
+  }
+
+  const { name: chainName, axelarChainId, axelarChainName } = xrplChainConfig;
+
+  return {
+    name: name,
+    decimals: 15,
+    symbol: symbol,
+    chainId: xrplChainConfig.id,
+    chainName,
+    axelarChainId,
+    axelarChainName,
+  };
+}
+
 export const getNativeTokenDetails = publicProcedure
   .input(
     z.object({
@@ -108,6 +130,10 @@ export const getNativeTokenDetails = publicProcedure
         normalizedTokenAddress,
         input.chainId as number
       );
+    }
+
+    if (isValidXRPLTokenAddress(input.tokenAddress)) {
+      return getXRPLTokenDetails(input.tokenAddress, ctx);
     }
 
     // Enter here if the token is a Stellar token

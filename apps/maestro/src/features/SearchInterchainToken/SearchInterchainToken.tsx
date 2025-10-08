@@ -16,6 +16,7 @@ import useQueryStringState from "~/lib/hooks/useQueryStringStyate";
 import {
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
+  isValidXRPLTokenAddress,
 } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
@@ -54,6 +55,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   const isValidEVMAddress = isAddress(search as `0x${string}`);
   const isValidSuiAddress = isValidSuiTokenAddress(search);
   const isValidStellar = isValidStellarTokenAddress(search);
+  const isValidXRPL = isValidXRPLTokenAddress(search);
 
   const chainId = connectedChain?.id ?? selectedChainId;
   const chainName = connectedChain?.name ?? defaultChain?.name;
@@ -109,6 +111,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
     (!isValidEVMAddress &&
       !isValidSuiAddress &&
       !isValidStellar &&
+      !isValidXRPL &&
       search.length >= 10);
 
   return (

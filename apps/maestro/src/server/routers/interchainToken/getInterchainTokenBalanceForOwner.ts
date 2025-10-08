@@ -10,7 +10,10 @@ import {
   isTokenAddressIncompatibleWithOwner,
   normalizeTokenAddressForCompatibility,
 } from "~/lib/utils/addressCompatibility";
-import { isValidStellarTokenAddress } from "~/lib/utils/validation";
+import {
+  isValidStellarTokenAddress,
+  isValidXRPLTokenAddress,
+} from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
 import { getStellarChainConfig } from "../stellar/utils";
@@ -223,7 +226,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     }
     console.log("Fetching token balance for", input);
 
-    if (input.chainId === xrplChainConfig?.id) {
+    if (isValidXRPLTokenAddress(input.tokenAddress)) {
       console.log("Fetching XRPL token balance for", input);
       try {
         // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"

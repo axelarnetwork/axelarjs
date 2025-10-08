@@ -3,7 +3,6 @@ import { XRPLChainConfig } from "@axelarjs/api";
 import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import type { Context } from "~/server/context";
-import BigNumber from "bignumber.js";
 
 import * as xrpl from "xrpl";
 
