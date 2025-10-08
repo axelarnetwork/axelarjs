@@ -162,3 +162,34 @@ export function isValidStellarTokenAddress(address: string): boolean {
 export function isValidStellarWalletAddress(address: string): boolean {
   return stellarWalletAddress().safeParse(address).success;
 }
+
+const XRPL_ADDRESS_REGEX = /^r[a-km-zA-HJ-NP-Z1-9]{25,34}$/;
+const XRPL_TOKEN_REGEX = /^[A-Za-z0-9]\.r[a-km-zA-HJ-NP-Z1-9]{25,34}$/;
+
+export const xrplTokenAddress = () =>
+  z
+    .string()
+    .regex(XRPL_TOKEN_REGEX, "Invalid XRPL token address")
+    .or(
+      z
+        .literal("XRP")
+    );
+
+export const xrplWalletAddress = () =>
+  z
+    .string()
+    .regex(XRPL_ADDRESS_REGEX, "Invalid XRPL wallet address");
+
+export function isValidXRPLTokenAddress(address: string): boolean {
+  return xrplTokenAddress().safeParse(address).success;
+}
+
+/**
+ * Checks if a string is a valid Stellar wallet address (account public key)
+ * Stellar wallet addresses start with 'G' and are 56 characters long in base32 encoding
+ * @param address The address to check
+ * @returns boolean indicating if the address is a valid Stellar wallet address
+ */
+export function isValidXRPLWalletAddress(address: string): boolean {
+  return xrplWalletAddress().safeParse(address).success;
+}
