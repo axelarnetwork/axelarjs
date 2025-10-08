@@ -4,7 +4,7 @@ import { Account, Address, scValToNative } from "stellar-sdk";
 import { z } from "zod";
 
 import { suiClient as client } from "~/lib/clients/suiClient";
-import { isValidStellarTokenAddress, isValidXRPLTokenAddress } from "~/lib/utils/validation";
+import { isValidStellarTokenAddress, isValidXRPLTokenAddress, isValidXRPLWalletAddress } from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
 import { getStellarChainConfig } from "../stellar/utils";
@@ -72,8 +72,10 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     // To check sui for example, they need to connect with a sui wallet
     let isIncompatibleChain =
       normalizedTokenAddress?.length !== input.owner?.length;
-    if (input.owner[0] === "r") { // xrpl address
-      isIncompatibleChain = !input.tokenAddress?.includes(".");
+    console.log("getInterchainTokenBalanceForOwner");
+    if (isValidXRPLWalletAddress(input.owner)) { // xrpl address
+      isIncompatibleChain = !isValidXRPLTokenAddress(input.tokenAddress);
+      console.log("isIncompatibleChain for xrpl", isIncompatibleChain, input.owner, normalizedTokenAddress);
     }
     if (isIncompatibleChain) {
       return {
@@ -218,11 +220,33 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         };
       }
     }
-    console.log("Fetching token balance for", input);
+    //console.log("Fetching token balance for", input);
 
     if (isValidXRPLTokenAddress(input.tokenAddress)) {
-      console.log("Fetching XRPL token balance for", input);
+      //console.log("Fetching XRPL token balance for", input);
       try {
+          const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
+          await client.connect();
+          if (input.tokenAddress === "XRP") {
+            // fetch XRP balance
+            const balance = await client.getXrpBalance(input.owner);
+            //console.log(balance);
+
+            const balanceInDrops = balance * (10**xrplChainConfig.nativeCurrency.decimals);
+
+            return {
+              isTokenOwner: false,
+              isTokenMinter: false,
+              tokenBalance: `${balanceInDrops}`,
+              decimals: 6,
+              isTokenPendingOwner: false,
+              hasPendingOwner: false,
+              hasMinterRole: false,
+              hasOperatorRole: false,
+              hasFlowLimiterRole: false,
+            };
+          }
+
           // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
           const [currency, issuer] = input.tokenAddress.split(".");
           if (!currency || !issuer) {
@@ -231,10 +255,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
               message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
             });
           }
-           console.log("Connecting now", input);
-
-          const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-          await client.connect();
+          console.log("Connecting now", input);
 
           console.log("Requesting now", input);
 
