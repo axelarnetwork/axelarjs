@@ -39,8 +39,8 @@ export function useInterchainTransferMutation(
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
   const { address } = useAccount();
-  const { xrplConnection } = useXRPLConnection();
-  const { xrplWallet } = useXRPLWallet();
+  const { connect: xrplConnection } = useXRPLConnect();
+  const { wallet: xrplWallet } = useXRPLWallet();
 
   const { sendToken: sendStellarToken } = useSendStellarToken();
 
