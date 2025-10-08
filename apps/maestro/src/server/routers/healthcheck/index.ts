@@ -21,6 +21,8 @@ async function checkRpcNode(
         method = "sui_getTotalTransactionBlocks";
       } else if (chainNameLower === "stellar" || chainNameLower.includes("stellar")) {
         method = "getVersionInfo";
+      } else if (chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
+        method = "server_info";
       }
 
       const response = await fetch(url, {
