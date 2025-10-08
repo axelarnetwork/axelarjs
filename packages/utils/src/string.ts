@@ -17,13 +17,22 @@ export const unSluggify = (value: string) =>
 export const maskAddress = (
   address: string,
   opts?: {
-    segmentA: number;
-    segmentB: number;
+    segmentA?: number;
+    segmentB?: number;
   }
-) =>
-  `${address.slice(0, opts?.segmentA ?? 6)}...${address.slice(
-    opts?.segmentB ?? -4
-  )}`;
+) => {
+  const segA = Math.max(0, opts?.segmentA ?? 6);
+  const segB = Math.min(0, opts?.segmentB ?? -4);
+
+  // If the address is too short to reasonably mask, return it unchanged
+  if (address.length <= segA + (-segB) + 3) {
+    return address;
+  }
+
+  const prefix = address.slice(0, segA);
+  const suffix = address.slice(segB);
+  return `${prefix}...${suffix}`;
+};
 
 export function generateRandomHash(bits: 8 | 16 | 24 | 32 = 32): `0x${string}` {
   const bytes = window.crypto.getRandomValues(new Uint8Array(bits));
