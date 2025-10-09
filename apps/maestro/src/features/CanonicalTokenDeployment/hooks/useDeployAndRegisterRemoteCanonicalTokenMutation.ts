@@ -6,7 +6,11 @@ import { reduce } from "rambda";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import {
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
 import { useRegisterStellarTokenWithContractDeployment } from "~/features/stellarHooks";
 import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
 import {
@@ -72,41 +76,42 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       },
     });
 
-  const { destinationChainNames } = useMemo(() => {
+  const destinationChainNames = useMemo(() => {
+    if (!input) return [] as string[];
     const index = combinedComputed.indexedById;
-
-    const destinationChainNames =
-      input?.destinationChainIds.map(
-        (destinationChainId) =>
-          index[destinationChainId]?.chain_name ?? "Unknown"
-      ) ?? [];
-
-    return {
-      destinationChainNames,
-    };
-  }, [combinedComputed.indexedById, input?.destinationChainIds]);
+    return input.destinationChainIds.map(
+      (destinationChainId) => index[destinationChainId]?.chain_name ?? "Unknown"
+    );
+  }, [combinedComputed.indexedById, input]);
 
   const multicallArgs = useMemo(() => {
-    // This is only used for EVM chains
-    if (!input || !tokenId || !isValidEVMAddress(input.tokenAddress)) {
-      return [];
-    }
+    if (!input) return [] as `0x${string}`[];
+    if (!isValidEVMAddress(input.tokenAddress)) return [] as `0x${string}`[];
 
     const deployTxData =
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.registerCanonicalInterchainToken.data({
         tokenAddress: input.tokenAddress,
       });
 
-    if (!input.destinationChainIds.length) {
-      // early return case, no remote chains
-      return [deployTxData];
+    if (input.destinationChainIds.length === 0) return [deployTxData];
+
+    const hasGasFees = Array.isArray(input.remoteDeploymentGasFees);
+    if (!hasGasFees)
+      throw new Error("Gas fees not provided for remote deployment");
+
+    const lengthMatches =
+      input.remoteDeploymentGasFees.length === input.destinationChainIds.length;
+    if (!lengthMatches) {
+      throw new Error(
+        "remoteDeploymentGasFees length does not match destinationChainIds"
+      );
     }
 
     const registerTxData = destinationChainNames.map((destinationChain, i) => {
-      const gasValue = input.remoteDeploymentGasFees[i] ?? 0n;
+      const gasValue = input.remoteDeploymentGasFees[i];
 
       const args = {
-        originalTokenAddress: input.tokenAddress as `0x{string}`,
+        originalTokenAddress: input.tokenAddress as `0x${string}`,
         destinationChain,
         gasValue,
       };
@@ -117,17 +122,12 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
 
     return [deployTxData, ...registerTxData];
-  }, [input, tokenId, destinationChainNames]);
+  }, [input, destinationChainNames]);
 
   const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
     0n,
     reduce((a, b) => a + b, 0n)
   );
-
-  const isMutationReady =
-    multicallArgs.length > 0 &&
-    // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
-    (!destinationChainNames.length || totalGasFee > 0n);
 
   const { data, error: simulationError } =
     useSimulateInterchainTokenFactoryMulticall({
@@ -135,24 +135,13 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       value: totalGasFee,
       args: [multicallArgs],
       query: {
-        enabled: isMutationReady,
+        enabled:
+          multicallArgs.length > 0 &&
+          chainId !== SUI_CHAIN_ID &&
+          chainId !== STELLAR_CHAIN_ID &&
+          chainId !== HEDERA_CHAIN_ID,
       },
     });
-
-  if (simulationError) {
-    console.log(
-      "useDeployAndRegisterRemoteCanonicalTokenMutation simulation:",
-      {
-        data: !!data,
-        request: !!data?.request,
-        simulationError,
-        isMutationReady,
-        totalGasFee: totalGasFee.toString(),
-        multicallArgs: multicallArgs.length,
-        multicallArgsDetails: multicallArgs,
-      }
-    );
-  }
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
@@ -251,76 +240,99 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const writeAsync = useCallback(async () => {
     await recordDeploymentDraft();
-
-    if (chainId === SUI_CHAIN_ID && input) {
-      const gasValues = input.remoteDeploymentGasFees;
-      const result = await registerCanonicalToken({
-        destinationChains: input.destinationChainIds,
-        coinType: input.tokenAddress,
-        gasValues,
-      });
-      if (result?.digest && result.deploymentMessageId) {
-        const token: any = result?.events?.[0]?.parsedJson;
-        setRecordDeploymentArgs({
-          kind: "canonical",
-          deploymentMessageId: result.deploymentMessageId,
-          tokenId: token.token_id?.id,
-          deployerAddress,
-          tokenName: input.tokenName,
-          tokenSymbol: input.tokenSymbol,
-          tokenDecimals: input.decimals,
-          tokenManagerType: result.tokenManagerType,
-          axelarChainId: input.sourceChainId,
-          destinationAxelarChainIds: input.destinationChainIds,
-          tokenManagerAddress: result.tokenManagerAddress,
-          tokenAddress: input.tokenAddress,
-        });
-        return result;
-      }
-    }
-
-    if (chainId === STELLAR_CHAIN_ID && input) {
-      if (!kit) {
-        throw new Error("Stellar wallet not connected");
-      }
-      const result = await registerTokenWithContractDeployment({
-        kit,
-        tokenAddress: input.tokenAddress,
-        destinationChains: input.destinationChainIds,
-        gasValues: input.remoteDeploymentGasFees,
-        onStatusUpdate: (status) => {
-          // Forward status updates to the UI
-          if (config.onStatusUpdate) {
-            config.onStatusUpdate(status);
-          }
-        },
-      });
-
-      if (result?.tokenRegistration?.hash) {
-        setRecordDeploymentArgs({
-          kind: "canonical",
-          deploymentMessageId:
-            result?.tokenRegistration?.deploymentMessageId ||
-            result?.tokenRegistration?.hash,
-          tokenId: result.tokenRegistration.tokenId,
-          deployerAddress,
-          tokenName: input.tokenName,
-          tokenSymbol: input.tokenSymbol,
-          tokenDecimals: input.decimals,
-          tokenManagerType: result.tokenRegistration.tokenManagerType,
-          axelarChainId: input.sourceChainId,
-          destinationAxelarChainIds: input.destinationChainIds,
-          tokenAddress: result.tokenRegistration.tokenAddress,
-          tokenManagerAddress: result.tokenRegistration.tokenManagerAddress,
-        });
-        return result.tokenRegistration;
-      }
-    } else {
+    // If input is missing, fall back to default EVM flow with prepared request
+    if (!input) {
       invariant(
         data?.request !== undefined,
-        `useDeployAndRegisterRemoteCanonicalTokenMutation: prepareMulticall?.request is not defined, chainId: ${chainId}, input: ${JSON.stringify(input)}`
+        `useDeployAndRegisterRemoteCanonicalTokenMutation: prepared request is undefined (chainId: ${chainId})`
       );
       return await multicall.writeContractAsync(data.request);
+    }
+
+    switch (chainId) {
+      case SUI_CHAIN_ID: {
+        const gasValues = input.remoteDeploymentGasFees;
+        const result = await registerCanonicalToken({
+          destinationChains: input.destinationChainIds,
+          coinType: input.tokenAddress,
+          gasValues,
+        });
+        if (result?.digest && result.deploymentMessageId) {
+          const token: any = result?.events?.[0]?.parsedJson;
+          setRecordDeploymentArgs({
+            kind: "canonical",
+            deploymentMessageId: result.deploymentMessageId,
+            tokenId: token.token_id?.id,
+            deployerAddress,
+            tokenName: input.tokenName,
+            tokenSymbol: input.tokenSymbol,
+            tokenDecimals: input.decimals,
+            tokenManagerType: result.tokenManagerType,
+            axelarChainId: input.sourceChainId,
+            destinationAxelarChainIds: input.destinationChainIds,
+            tokenManagerAddress: result.tokenManagerAddress,
+            tokenAddress: input.tokenAddress,
+          });
+          return result;
+        }
+        break;
+      }
+      case STELLAR_CHAIN_ID: {
+        if (!kit) {
+          throw new Error("Stellar wallet not connected");
+        }
+        const result = await registerTokenWithContractDeployment({
+          kit,
+          tokenAddress: input.tokenAddress,
+          destinationChains: input.destinationChainIds,
+          gasValues: input.remoteDeploymentGasFees,
+          onStatusUpdate: (status) => {
+            if (config.onStatusUpdate) {
+              config.onStatusUpdate(status);
+            }
+          },
+        });
+
+        if (result?.tokenRegistration?.hash) {
+          setRecordDeploymentArgs({
+            kind: "canonical",
+            deploymentMessageId:
+              result?.tokenRegistration?.deploymentMessageId ||
+              result?.tokenRegistration?.hash,
+            tokenId: result.tokenRegistration.tokenId,
+            deployerAddress,
+            tokenName: input.tokenName,
+            tokenSymbol: input.tokenSymbol,
+            tokenDecimals: input.decimals,
+            tokenManagerType: result.tokenRegistration.tokenManagerType,
+            axelarChainId: input.sourceChainId,
+            destinationAxelarChainIds: input.destinationChainIds,
+            tokenAddress: result.tokenRegistration.tokenAddress,
+            tokenManagerAddress: result.tokenRegistration.tokenManagerAddress,
+          });
+          return result.tokenRegistration;
+        }
+        break;
+      }
+      case HEDERA_CHAIN_ID: {
+        // Hedera: skip prepare/simulation but still submit the transaction
+        if (!multicallArgs.length) {
+          throw new Error(
+            "No calls prepared for multicall; cannot submit transaction on Hedera"
+          );
+        }
+        return await multicall.writeContractAsync({
+          args: [multicallArgs],
+          value: totalGasFee,
+        } as any);
+      }
+      default: {
+        invariant(
+          data?.request !== undefined,
+          `useDeployAndRegisterRemoteCanonicalTokenMutation: prepared request is undefined (chainId: ${chainId})`
+        );
+        return await multicall.writeContractAsync(data.request);
+      }
     }
   }, [
     data,
@@ -333,20 +345,22 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     registerTokenWithContractDeployment,
     kit,
     config,
+    multicallArgs,
+    totalGasFee,
   ]);
 
   const write = useCallback(() => {
-    if (!multicall.writeContract || !data) {
+    if (!multicall.writeContract || !data?.request) {
       throw new Error(
-        "useDeployAndRegisterRemoteCanonicalTokenMutation: multicall.write is not defined"
+        "useDeployAndRegisterRemoteCanonicalTokenMutation: write or prepared request is undefined"
       );
     }
 
     recordDeploymentDraft()
-      .then(() => data && multicall.writeContract(data.request))
+      .then(() => multicall.writeContract(data.request))
       .catch((e) => {
         console.error(
-          "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
+          "useDeployAndRegisterRemoteCanonicalTokenMutation: failed during record or write",
           e
         );
         onStatusUpdate({
@@ -355,5 +369,10 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       });
   }, [data, multicall, onStatusUpdate, recordDeploymentDraft]);
 
-  return { ...multicall, writeAsync, write };
+  return {
+    ...multicall,
+    writeAsync,
+    write,
+    simulationError,
+  } as any;
 }
