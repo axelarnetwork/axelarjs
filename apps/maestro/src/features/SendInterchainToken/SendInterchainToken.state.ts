@@ -63,6 +63,8 @@ export function useSendInterchainTokenState(props: {
     ]
   );
 
+  console.log("isApprovalRequired", isApprovalRequired);
+
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
 

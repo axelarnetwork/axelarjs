@@ -192,6 +192,13 @@ export function useRpcHealthStatusQuery() {
 }
 
 export function useSingleRpcHealthStatus(chainName: string | undefined) {
+  return {
+    status: "up",
+    isLoading: false,
+    refetch: () => {},
+  };
+
+
   const [status, setStatus] = useState<"up" | "down" | "timeout" | "unknown">(
     "unknown"
   );
