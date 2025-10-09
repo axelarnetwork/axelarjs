@@ -65,7 +65,7 @@ export function parseTokenAmount(token: string, amount: string) {
     let parsedAmount;
 
     if (token === 'XRP') {
-        parsedAmount = xrpl.xrpToDrops(amount);
+        parsedAmount = amount; //xrpl.xrpToDrops(amount); // already in drops
     } else {
         const [currency, issuer] = token.split('.');
         parsedAmount = {

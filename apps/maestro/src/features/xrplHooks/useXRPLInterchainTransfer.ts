@@ -20,7 +20,10 @@ export interface XRPLInterchainTransferParams {
 }
 
 export function useXRPLInterchainTransfer() {
-    const { wallet, status } = useWallet();
+    console.log("useXRPLInterchainTransfer called");
+    const { wallet, status } = useWallet(); // this doesn't work -> hook rule violation
+    console.log("Using wallet: ", wallet, status);
+
     const signAndSubmit = useSignAndSubmitTransaction();
     
 

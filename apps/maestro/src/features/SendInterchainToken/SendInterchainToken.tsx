@@ -26,6 +26,7 @@ import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,
+  isValidXRPLWalletAddress,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
@@ -113,6 +114,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   );
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
+    console.log("Submitting form", data, state);
     e?.preventDefault();
 
     invariant(state.selectedToChain, "selectedToChain is undefined");
@@ -142,11 +144,14 @@ export const SendInterchainToken: FC<Props> = (props) => {
           }
         },
         onSuccess() {
+          console.log("On the success path", state);
           void actions.refetchBalances();
         },
       }
     );
   };
+  console.log("After sendTokenAsync", state);
+
 
   const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
     const pluralized = `token${Number(amountToTransfer) > 1 ? "s" : ""}`;
@@ -289,6 +294,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   ]);
 
   const handleAllChainsExecuted = useCallback(async () => {
+    alert("All chains executed");
     await actions.refetchBalances();
     resetForm();
     actions.resetTxState();
@@ -425,6 +431,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
               {...register("amountToTransfer", {
                 disabled: isFormDisabled,
                 validate(value) {
+                  console.log(value, props.balance);
                   if (!value || value === "0") {
                     return "Amount must be greater than 0";
                   }
@@ -433,11 +440,14 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     value as `${number}`,
                     Number(props.balance.decimals) * 2
                   );
+                  console.log("Bnvalue:", bnValue);
 
                   const bnBalance = parseUnits(
                     props.balance.tokenBalance,
                     Number(props.balance.decimals)
                   );
+
+                  console.log(bnValue, bnBalance);
 
                   if (bnValue > bnBalance) {
                     return "Insufficient balance";
@@ -495,6 +505,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     !isValidEVMAddress(value)
                   ) {
                     return "Invalid EVM address";
+                  }
+                  if (
+                    (state.selectedToChain.id.includes("xrpl") && !state.selectedToChain.id.includes("evm")) &&
+                    !isValidXRPLWalletAddress(value)
+                  ) {
+                      return "Invalid XRPL address";
                   }
 
                   if (state.selectedToChain.chain_id === HEDERA_CHAIN_ID) {

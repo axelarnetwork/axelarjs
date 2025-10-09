@@ -1,5 +1,6 @@
 import type { Context } from "~/server/context";
 import { getXRPLChainConfig, hex, parseTokenAmount } from "./utils";
+import { xrplChainConfig as xrplChainConfigDefault } from "~/config/chains";
 
 import {
   type InterchainTransferInput,
@@ -11,17 +12,17 @@ export async function buildInterchainTransferTxBytes(
   ctx: Context,
   input: InterchainTransferInput
 ): Promise<{ txBase64: string }> {
-    console.log(ctx);
-
     const xrplChainConfig = await getXRPLChainConfig(ctx);
 
-    const client = new xrpl.Client(xrplChainConfig.config.rpc[0]);
+    console.log("Called buildInterchainTransferTxBytes with input:", input, "attempt to open client to", xrplChainConfigDefault);
+
+    const client = new xrpl.Client(xrplChainConfigDefault.rpcUrls.default.http[0]); // this must be a wss one! 
     await client.connect();
 
     const tx: xrpl.Payment = {
         TransactionType: "Payment",
         Account: input.caller,
-        Destination: xrplChainConfig.config.contracts.InterchainTokenService as any, // TODO: fix
+        Destination: xrplChainConfig.config.contracts.InterchainTokenService.address,
         Amount: parseTokenAmount(input.tokenAddress, input.amount),
         Memos: [
             { Memo: { MemoType: hex("type"), MemoData: hex("interchain_transfer") } },
