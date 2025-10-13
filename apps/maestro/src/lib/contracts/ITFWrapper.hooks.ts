@@ -3,7 +3,7 @@ import {
   INTERCHAIN_TOKEN_FACTORY_ENCODERS,
 } from "@axelarjs/evm";
 
-import { useReadContract, useSimulateContract } from "wagmi";
+import { useReadContract, useSimulateContract, useWriteContract } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS } from "~/config/env";
 
@@ -81,4 +81,43 @@ export const useSimulateITFContract = <
   } as any);
 
   return { data, error };
+};
+
+export const useWriteITFContract = <
+  FunctionName extends keyof typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS &
+    Extract<
+      (typeof INTERCHAIN_TOKEN_FACTORY_ABI)[number],
+      { type: "function"; stateMutability: "nonpayable" | "payable" }
+    >["name"],
+>({
+  chainId,
+  functionName,
+}: {
+  chainId: number;
+  functionName: FunctionName;
+}) => {
+  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS;
+
+  const result = useWriteContract();
+
+  const writeContractAsync = async ({
+    args,
+    value,
+  }: {
+    args: Parameters<
+      (typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS)[FunctionName]["args"]
+    >[0];
+    value?: bigint;
+  }) => {
+    return result.writeContractAsync({
+      address,
+      abi: INTERCHAIN_TOKEN_FACTORY_ABI,
+      functionName: functionName as any,
+      args: args as any,
+      value,
+      chainId,
+    } as any);
+  };
+
+  return { ...result, writeContractAsync };
 };

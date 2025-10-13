@@ -14,10 +14,10 @@ import {
 import { useHederaDeployment } from "~/features/hederaHooks";
 import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
-import { useWriteInterchainTokenFactoryMulticall } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import {
   useReadITFContract,
   useSimulateITFContract,
+  useWriteITFContract,
 } from "~/lib/contracts/ITFWrapper.hooks";
 import { useReadITSContract } from "~/lib/contracts/ITSWrapper.hooks";
 import {
@@ -120,7 +120,7 @@ const isChainSkipDeploymentDraftRecording = (
  * - Related files: ~/features/suiHooks/
  */
 
-type Multicall = ReturnType<typeof useWriteInterchainTokenFactoryMulticall>;
+type Multicall = ReturnType<typeof useWriteITFContract>;
 type PrepareMulticallRequest = Parameters<Multicall["writeContractAsync"]>[0];
 
 // Sui event data type
@@ -594,7 +594,10 @@ const useRequestDeployToken = ({
       "useDeployAndRegisterRemoteInterchainTokenMutation: prepareMulticall?.request is not defined"
     );
 
-    return multicall.writeContractAsync(prepareMulticallRequest);
+    return multicall.writeContractAsync({
+      args: prepareMulticallRequest.args,
+      value: prepareMulticallRequest.value,
+    });
   }, [prepareMulticallRequest, multicall]);
 
   const { deployHedera } = useHederaDeployment({
@@ -780,7 +783,10 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
     }
   );
 
-  const multicall = useWriteInterchainTokenFactoryMulticall();
+  const multicall = useWriteITFContract({
+    chainId,
+    functionName: "multicall",
+  });
 
   const tokenAddress = useTokenAddress({
     tokenId,
