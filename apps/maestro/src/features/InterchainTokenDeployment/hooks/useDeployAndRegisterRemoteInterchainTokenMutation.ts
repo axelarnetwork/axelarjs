@@ -8,7 +8,7 @@ import { invariant, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { zeroAddress } from "viem";
-import { useReadContract, useWaitForTransactionReceipt } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 import {
   EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
@@ -16,16 +16,16 @@ import {
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
 } from "~/config/chains";
+import { NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS } from "~/config/env";
 import { useHederaDeployment } from "~/features/hederaHooks";
 import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
-import { useReadInterchainTokenServiceRegisteredTokenAddress } from "~/lib/contracts/hedera/HederaInterchainTokenService.hooks";
 import {
-  useReadInterchainTokenFactoryInterchainTokenId,
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { useReadInterchainTokenServiceInterchainTokenAddress } from "~/lib/contracts/InterchainTokenService.hooks";
+import { useReadITFContract } from "~/lib/contracts/ITFWrapper.hooks";
+import { useReadITSContract } from "~/lib/contracts/ITSWrapper.hooks";
 import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
@@ -247,80 +247,6 @@ const usePrepareMulticall = ({
   };
 };
 
-const useReadITSContract = <
-  FunctionName extends keyof typeof INTERCHAIN_TOKEN_SERVICE_ENCODERS &
-    Extract<
-      (typeof INTERCHAIN_TOKEN_SERVICE_ABI)[number],
-      { type: "function"; stateMutability: "view" }
-    >["name"],
->({
-  chainId,
-  functionName,
-  args,
-  enabled = true,
-}: {
-  chainId: number;
-  functionName: FunctionName;
-  args: Parameters<
-    (typeof INTERCHAIN_TOKEN_SERVICE_ENCODERS)[FunctionName]["args"]
-  >[0];
-  enabled?: boolean;
-}) => {
-  // const address = chainId === 0 ? "0x1" : "0x2";
-  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
-
-  const result = useReadContract({
-    address,
-    abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-    functionName: functionName as any,
-    args: INTERCHAIN_TOKEN_SERVICE_ENCODERS[functionName].args(
-      args as any
-    ) as any,
-    query: {
-      enabled,
-    },
-  } as any);
-
-  return result;
-};
-
-const useReadITFContract = <
-  FunctionName extends keyof typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS &
-    Extract<
-      (typeof INTERCHAIN_TOKEN_FACTORY_ABI)[number],
-      { type: "function"; stateMutability: "view" }
-    >["name"],
->({
-  chainId,
-  functionName,
-  args,
-  enabled = true,
-}: {
-  chainId: number;
-  functionName: FunctionName;
-  args: Parameters<
-    (typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS)[FunctionName]["args"]
-  >[0];
-  enabled?: boolean;
-}) => {
-  // const address = chainId === 0 ? "0x1" : "0x2";
-  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS;
-
-  const result = useReadContract({
-    address,
-    abi: INTERCHAIN_TOKEN_SERVICE_ABI,
-    functionName: functionName as any,
-    args: INTERCHAIN_TOKEN_FACTORY_ENCODERS[functionName].args(
-      args as any
-    ) as any,
-    query: {
-      enabled,
-    },
-  } as any);
-
-  return result;
-};
-
 const useTokenId = (
   input: UseDeployAndRegisterInterchainTokenInput | undefined,
   deployerAddress: `0x${string}`,
@@ -337,7 +263,7 @@ const useTokenId = (
       input?.salt && deployerAddress && isValidEVMAddress(deployerAddress),
   });
 
-  return tokenId;
+  return tokenId as `0x${string}` | undefined;
 };
 
 interface UseTokenAddressParams {
@@ -384,7 +310,7 @@ const useTokenAddress = ({
       Boolean(tokenId) && isWithNonDeterministicTokenAddress && !!receipt,
   });
 
-  return tokenAddress ?? registeredTokenAddress;
+  return (tokenAddress ?? registeredTokenAddress) as `0x${string}` | undefined;
 };
 
 interface UseDestinationChainIdsParams {
