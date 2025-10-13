@@ -11,7 +11,6 @@ import { parseUnits, TransactionExecutionError } from "viem";
 import { useBlockNumber, useWaitForTransactionReceipt } from "wagmi";
 
 import { HEDERA_CHAIN_ID } from "~/config/chains";
-import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
   useReadInterchainTokenAllowance,
   useReadInterchainTokenDecimals,
@@ -32,6 +31,7 @@ export type UseSendInterchainTokenConfig = {
   destinationChainName: string;
   destinationAddress?: string;
   gas?: bigint;
+  spenderAddress?: `0x${string}`;
 };
 
 export type UseSendInterchainTokenInput = {
@@ -54,11 +54,9 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { address } = useAccount();
 
-  const approvalSpender = NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
-
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
     config.tokenAddress as `0x${string}`,
-    approvalSpender
+    config.spenderAddress ?? "0x"
   );
 
   const {
@@ -177,7 +175,7 @@ export function useInterchainTokenServiceTransferMutation(
         decimals === undefined ||
         !address ||
         config.gas === undefined ||
-        !approvalSpender
+        !config.spenderAddress
       ) {
         toast.error("Transfer not ready: missing information");
         setTxState({ status: "idle" });
@@ -197,7 +195,7 @@ export function useInterchainTokenServiceTransferMutation(
           await approveInterchainTokenAsync({
             address: config.tokenAddress as `0x${string}`,
             args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
-              spender: approvalSpender,
+              spender: config.spenderAddress,
               amount: approvedAmountRef.current,
             }),
           });
