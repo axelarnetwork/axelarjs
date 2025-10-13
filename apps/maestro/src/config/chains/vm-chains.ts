@@ -188,6 +188,6 @@ export const stellarChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
   chain.axelarChainId.includes("stellar")
 ) as ExtendedWagmiChainConfig;
 
-export const xrplChainConfig = VM_CHAIN_CONFIGS.find((chain) => {
-  chain.axelarChainId.includes("xrpl");
-}) as ExtendedWagmiChainConfig;
+export const xrplChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
+  chain.axelarChainId.includes("xrpl")
+) as ExtendedWagmiChainConfig;

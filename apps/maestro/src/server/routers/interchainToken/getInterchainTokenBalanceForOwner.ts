@@ -2,9 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { Account, Address, scValToNative } from "stellar-sdk";
 import * as xrpl from "xrpl";
+import * as xrpl from "xrpl";
 import { z } from "zod";
 
-import { xrplChainConfig } from "~/config/chains";
+import { xrplChainConfig, xrplChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import {
   isTokenAddressIncompatibleWithOwner,

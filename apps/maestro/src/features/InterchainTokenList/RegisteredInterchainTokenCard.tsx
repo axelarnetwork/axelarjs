@@ -27,7 +27,7 @@ import {
   isTokenAddressIncompatibleWithOwner,
   normalizeTokenAddressForCompatibility,
 } from "~/lib/utils/addressCompatibility";
-import { isValidXRPLTokenAddress } from "~/lib/utils/validation";
+import { isValidXRPLWalletAddress } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
