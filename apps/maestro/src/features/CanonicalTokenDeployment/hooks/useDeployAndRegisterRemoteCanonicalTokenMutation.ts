@@ -10,10 +10,10 @@ import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import { useRegisterStellarTokenWithContractDeployment } from "~/features/stellarHooks";
 import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
 import {
-  useReadInterchainTokenFactoryCanonicalInterchainTokenId,
-  useSimulateInterchainTokenFactoryMulticall,
-  useWriteInterchainTokenFactoryMulticall,
-} from "~/lib/contracts/InterchainTokenFactory.hooks";
+  useReadITFContract,
+  useSimulateITFContract,
+  useWriteITFContract,
+} from "~/lib/contracts/ITFWrapper.hooks";
 import {
   decodeDeploymentMessageId,
   type DeploymentMessageId,
@@ -62,15 +62,14 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<RecordInterchainTokenDeploymentInput>();
 
-  const { data: tokenId } =
-    useReadInterchainTokenFactoryCanonicalInterchainTokenId({
-      args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.canonicalInterchainTokenId.args({
-        tokenAddress: input?.tokenAddress as `0x${string}`,
-      }),
-      query: {
-        enabled: Maybe.of(input?.tokenAddress).mapOr(false, isValidEVMAddress),
-      },
-    });
+  const { data: tokenId } = useReadITFContract({
+    chainId,
+    functionName: "canonicalInterchainTokenId",
+    args: {
+      tokenAddress: input?.tokenAddress as `0x${string}`,
+    },
+    enabled: Maybe.of(input?.tokenAddress).mapOr(false, isValidEVMAddress),
+  });
 
   const { destinationChainNames } = useMemo(() => {
     const index = combinedComputed.indexedById;
@@ -129,15 +128,13 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     // enable if there are no remote chains or if there are remote chains and the total gas fee is greater than 0
     (!destinationChainNames.length || totalGasFee > 0n);
 
-  const { data, error: simulationError } =
-    useSimulateInterchainTokenFactoryMulticall({
-      chainId,
-      value: totalGasFee,
-      args: [multicallArgs],
-      query: {
-        enabled: isMutationReady,
-      },
-    });
+  const { data, error: simulationError } = useSimulateITFContract({
+    chainId,
+    functionName: "multicall",
+    value: totalGasFee,
+    args: { data: multicallArgs },
+    enabled: isMutationReady,
+  });
 
   if (simulationError) {
     console.log(
@@ -154,7 +151,10 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     );
   }
 
-  const multicall = useWriteInterchainTokenFactoryMulticall();
+  const multicall = useWriteITFContract({
+    chainId,
+    functionName: "multicall",
+  });
 
   const { data: receipt } = useWaitForTransactionReceipt({
     hash: multicall?.data,
@@ -316,11 +316,15 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         return result.tokenRegistration;
       }
     } else {
+      const prepareMulticallRequest = data?.request;
       invariant(
-        data?.request !== undefined,
+        prepareMulticallRequest !== undefined,
         `useDeployAndRegisterRemoteCanonicalTokenMutation: prepareMulticall?.request is not defined, chainId: ${chainId}, input: ${JSON.stringify(input)}`
       );
-      return await multicall.writeContractAsync(data.request);
+      return await multicall.writeContractAsync({
+        args: prepareMulticallRequest.args,
+        value: prepareMulticallRequest.value,
+      });
     }
   }, [
     data,
@@ -342,8 +346,19 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       );
     }
 
+    const prepareMulticallRequest = data?.request;
     recordDeploymentDraft()
-      .then(() => data && multicall.writeContract(data.request))
+      .then(
+        () =>
+          prepareMulticallRequest &&
+          multicall.writeContract({
+            address: multicall.address,
+            abi: multicall.abi,
+            functionName: "multicall",
+            args: prepareMulticallRequest.args,
+            value: prepareMulticallRequest.value,
+          })
+      )
       .catch((e) => {
         console.error(
           "useDeployAndRegisterRemoteCanonicalTokenMutation: unable to record tx",
