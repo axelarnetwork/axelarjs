@@ -1,12 +1,14 @@
 import {
+  INTERCHAIN_TOKEN_FACTORY_ABI,
   INTERCHAIN_TOKEN_FACTORY_ENCODERS,
+  INTERCHAIN_TOKEN_SERVICE_ABI,
   INTERCHAIN_TOKEN_SERVICE_ENCODERS,
 } from "@axelarjs/evm";
 import { invariant, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { zeroAddress } from "viem";
-import { useWaitForTransactionReceipt } from "wagmi";
+import { useReadContract, useWaitForTransactionReceipt } from "wagmi";
 
 import {
   EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
@@ -245,20 +247,96 @@ const usePrepareMulticall = ({
   };
 };
 
+const useReadITSContract = <
+  FunctionName extends keyof typeof INTERCHAIN_TOKEN_SERVICE_ENCODERS &
+    Extract<
+      (typeof INTERCHAIN_TOKEN_SERVICE_ABI)[number],
+      { type: "function"; stateMutability: "view" }
+    >["name"],
+>({
+  chainId,
+  functionName,
+  args,
+  enabled = true,
+}: {
+  chainId: number;
+  functionName: FunctionName;
+  args: Parameters<
+    (typeof INTERCHAIN_TOKEN_SERVICE_ENCODERS)[FunctionName]["args"]
+  >[0];
+  enabled?: boolean;
+}) => {
+  // const address = chainId === 0 ? "0x1" : "0x2";
+  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
+
+  const result = useReadContract({
+    address,
+    abi: INTERCHAIN_TOKEN_SERVICE_ABI,
+    functionName: functionName as any,
+    args: INTERCHAIN_TOKEN_SERVICE_ENCODERS[functionName].args(
+      args as any
+    ) as any,
+    query: {
+      enabled,
+    },
+  } as any);
+
+  return result;
+};
+
+const useReadITFContract = <
+  FunctionName extends keyof typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS &
+    Extract<
+      (typeof INTERCHAIN_TOKEN_FACTORY_ABI)[number],
+      { type: "function"; stateMutability: "view" }
+    >["name"],
+>({
+  chainId,
+  functionName,
+  args,
+  enabled = true,
+}: {
+  chainId: number;
+  functionName: FunctionName;
+  args: Parameters<
+    (typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS)[FunctionName]["args"]
+  >[0];
+  enabled?: boolean;
+}) => {
+  // const address = chainId === 0 ? "0x1" : "0x2";
+  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS;
+
+  const result = useReadContract({
+    address,
+    abi: INTERCHAIN_TOKEN_SERVICE_ABI,
+    functionName: functionName as any,
+    args: INTERCHAIN_TOKEN_FACTORY_ENCODERS[functionName].args(
+      args as any
+    ) as any,
+    query: {
+      enabled,
+    },
+  } as any);
+
+  return result;
+};
+
 const useTokenId = (
   input: UseDeployAndRegisterInterchainTokenInput | undefined,
-  deployerAddress: `0x${string}`
+  deployerAddress: `0x${string}`,
+  chainId: number
 ) => {
-  const { data: tokenId } = useReadInterchainTokenFactoryInterchainTokenId({
-    args: INTERCHAIN_TOKEN_FACTORY_ENCODERS.interchainTokenId.args({
+  const { data: tokenId } = useReadITFContract({
+    chainId,
+    functionName: "interchainTokenId",
+    args: {
       salt: input?.salt as `0x${string}`,
       deployer: deployerAddress,
-    }),
-    query: {
-      enabled:
-        input?.salt && deployerAddress && isValidEVMAddress(deployerAddress),
     },
+    enabled:
+      input?.salt && deployerAddress && isValidEVMAddress(deployerAddress),
   });
+
   return tokenId;
 };
 
@@ -284,29 +362,27 @@ const useTokenAddress = ({
     enabled: Boolean(tokenId) && isWithNonDeterministicTokenAddress,
   });
 
-  const { data: tokenAddress } =
-    useReadInterchainTokenServiceInterchainTokenAddress({
-      args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTokenAddress.args({
-        tokenId: tokenId as `0x${string}`,
-      }),
-      query: {
-        enabled:
-          Boolean(tokenId) &&
-          isWithTokenAddress &&
-          !isWithNonDeterministicTokenAddress,
-      },
-    });
+  const { data: tokenAddress } = useReadITSContract({
+    chainId,
+    functionName: "interchainTokenAddress",
+    args: {
+      tokenId: tokenId as `0x${string}`,
+    },
+    enabled:
+      Boolean(tokenId) &&
+      isWithTokenAddress &&
+      !isWithNonDeterministicTokenAddress,
+  });
 
-  const { data: registeredTokenAddress } =
-    useReadInterchainTokenServiceRegisteredTokenAddress({
-      args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.registeredTokenAddress.args({
-        tokenId: tokenId as `0x${string}`,
-      }),
-      query: {
-        enabled:
-          Boolean(tokenId) && isWithNonDeterministicTokenAddress && !!receipt,
-      },
-    });
+  const { data: registeredTokenAddress } = useReadITSContract({
+    chainId,
+    functionName: "registeredTokenAddress",
+    args: {
+      tokenId: tokenId as `0x${string}`,
+    },
+    enabled:
+      Boolean(tokenId) && isWithNonDeterministicTokenAddress && !!receipt,
+  });
 
   return tokenAddress ?? registeredTokenAddress;
 };
@@ -768,7 +844,7 @@ export function useDeployAndRegisterRemoteInterchainTokenMutation(
   const [recordDeploymentArgs, setRecordDeploymentArgs] =
     useState<RecordInterchainTokenDeploymentInput>();
 
-  const tokenId = useTokenId(input, deployerAddress);
+  const tokenId = useTokenId(input, deployerAddress, chainId);
 
   const { destinationChainIds } = useDestinationChainIds({
     input,
