@@ -20,8 +20,9 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
-import { HEDERA_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import { HEDERA_CHAIN_ID, SUI_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
 import { useHederaTokenAssociation } from "~/features/hederaHooks";
+import { useXRPLTrustLine } from "~/features/xrplHooks";
 import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
@@ -86,6 +87,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     originTokenChainId: props.originTokenChainId,
   });
 
+  // Hedera association check
   const isDestinationHedera =
     state.selectedToChain?.chain_id === HEDERA_CHAIN_ID;
   const {
@@ -97,8 +99,17 @@ export const SendInterchainToken: FC<Props> = (props) => {
     enabled: isDestinationHedera && Boolean(destinationAddress),
   });
 
-  const amountToTransfer = watch("amountToTransfer");
-  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+  // XRPL trust line check
+  const isDestinationXRPL = state.selectedToChain?.chain_id === XRPL_CHAIN_ID;
+  const {
+    hasXRPLTrustLine: hasDestinationXRPLTrustLine,
+    isCheckingXRPLTrustLine: isCheckingDestinationXRPLTrustLine,
+    hasTrustLineError: hasDestinationXRPLTrustLineError,
+  } = useXRPLTrustLine(state.destinationTokenAddress, {
+    accountAddress: destinationAddress,
+    enabled: isDestinationXRPL && Boolean(destinationAddress),
+  });
+
   const mustBlockForHederaAssociation = useMemo(
     () =>
       isDestinationHedera &&
@@ -130,6 +141,25 @@ export const SendInterchainToken: FC<Props> = (props) => {
     trigger,
   ]);
 
+  const mustBlockForXRPLTrustLine = useMemo(
+    () =>
+      isDestinationXRPL &&
+      Boolean(destinationAddress) &&
+      (isCheckingDestinationXRPLTrustLine ||
+        hasDestinationXRPLTrustLine !== true ||
+        hasDestinationXRPLTrustLineError),
+    [
+      destinationAddress,
+      hasDestinationXRPLTrustLine,
+      hasDestinationXRPLTrustLineError,
+      isCheckingDestinationXRPLTrustLine,
+      isDestinationXRPL,
+    ]
+  );
+
+  const amountToTransfer = watch("amountToTransfer");
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
 
@@ -139,6 +169,15 @@ export const SendInterchainToken: FC<Props> = (props) => {
       if (isDestinationAssociated === false) {
         toast.error(
           "The destination Hedera account is not associated with this token. Please associate it before sending."
+        );
+        return;
+      }
+    }
+
+    if (state.selectedToChain.chain_id === XRPL_CHAIN_ID) {
+      if (hasDestinationXRPLTrustLine === false) {
+        toast.error(
+          "The destination XRPL account is missing the trust line for this token. Please add it before sending."
         );
         return;
       }
@@ -544,6 +583,14 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     // We block submission and show a warning elsewhere.
                   }
 
+                  if (state.selectedToChain.chain_id === XRPL_CHAIN_ID) {
+                    if (hasDestinationXRPLTrustLineError) {
+                      return "Error checking XRPL trust line";
+                    }
+                    // Do not fail field validation solely due to trust line status.
+                    // We block submission and show a warning elsewhere.
+                  }
+
                   return true;
                 },
               })}
@@ -572,6 +619,44 @@ export const SendInterchainToken: FC<Props> = (props) => {
                         <div className="flex items-center gap-2">
                           <span className="text-xs">
                             The recipient can associate by opening this page:
+                          </span>
+                          <CopyToClipboardButton
+                            $size="sm"
+                            $variant="ghost"
+                            copyText={currentUrl}
+                          >
+                            Copy link
+                          </CopyToClipboardButton>
+                        </div>
+                      </div>
+                    </Alert>
+                  )}
+              </div>
+            )}
+
+            {isDestinationXRPL && destinationAddress && (
+              <div className="mt-2">
+                {isCheckingDestinationXRPLTrustLine && (
+                  <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 text-xs dark:bg-base-100">
+                    <span className="mx-auto">Checking XRPL trust line...</span>
+                  </div>
+                )}
+                {!isCheckingDestinationXRPLTrustLine &&
+                  hasDestinationXRPLTrustLine !== true && (
+                    <Alert
+                      icon={<InfoIcon />}
+                      $status="warning"
+                      className="my-2 rounded-xl p-3"
+                    >
+                      <div className="flex flex-col gap-2">
+                        <span>
+                          The destination XRPL account is missing the trust line
+                          for this token.
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs">
+                            The recipient can add the trust line by opening this
+                            page:
                           </span>
                           <CopyToClipboardButton
                             $size="sm"
@@ -627,7 +712,9 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 </Label.AltText>
               )}
             </Label>
-            {buttonStatus === "error" && !mustBlockForHederaAssociation ? (
+            {buttonStatus === "error" &&
+            !mustBlockForHederaAssociation &&
+            !mustBlockForXRPLTrustLine ? (
               <Alert role="alert" $status="error">
                 {buttonChildren}
               </Alert>
@@ -640,7 +727,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   isFormDisabled ||
                   state.isEstimatingGas ||
                   state.hasInsufficientGasBalance ||
-                  mustBlockForHederaAssociation
+                  mustBlockForHederaAssociation ||
+                  mustBlockForXRPLTrustLine
                 }
                 $loading={state.isSending || state.isEstimatingGas}
               >

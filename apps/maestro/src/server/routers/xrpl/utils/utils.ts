@@ -1,6 +1,6 @@
 import type { XRPLChainConfig } from "@axelarjs/api/axelar-config";
 
-import Decimal from "decimal.js";
+import * as xrpl from "xrpl";
 
 import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
@@ -97,4 +97,20 @@ export function parseTokenGasValue(token: string, amount: string) {
       .replace(/0+$/, "")
       .replace(/\.$/, ""); // TODO: cannot cast to float, but if resulting number has too many digits, remove them from the right
   }
+}
+
+
+export function parseXRPLTokenAddress(
+  token: string
+): { currency: string; issuer: string } | null {
+  if (token === "XRP") {
+    return null;
+  }
+  const [currency, issuer] = token.split(".");
+  if (!currency || !issuer) {
+    throw new Error(
+      "Invalid XRPL token address format. Expected CURRENCY.ISSUER or XRP"
+    );
+  }
+  return { currency, issuer };
 }
