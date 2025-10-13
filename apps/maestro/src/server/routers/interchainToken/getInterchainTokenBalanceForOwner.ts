@@ -2,15 +2,11 @@ import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { Account, Address, scValToNative } from "stellar-sdk";
 import * as xrpl from "xrpl";
-import * as xrpl from "xrpl";
 import { z } from "zod";
 
-import { xrplChainConfig, xrplChainConfig } from "~/config/chains";
+import { xrplChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
-import {
-  isTokenAddressIncompatibleWithOwner,
-  normalizeTokenAddressForCompatibility,
-} from "~/lib/utils/addressCompatibility";
+import { isTokenAddressIncompatibleWithOwner } from "~/lib/utils/addressCompatibility";
 import {
   isValidStellarTokenAddress,
   isValidXRPLTokenAddress,
@@ -73,13 +69,12 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    const normalizedTokenAddress = normalizeTokenAddressForCompatibility(
-      input.tokenAddress
-    );
     // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
     // To check sui for example, they need to connect with a sui wallet
-    let isIncompatibleChain =
-      normalizedTokenAddress?.length !== input.owner?.length;
+    let isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
+      input.tokenAddress,
+      input.owner
+    );
     if (input.owner[0] === "r") {
       // xrpl address
       isIncompatibleChain = !input.tokenAddress?.includes(".");
