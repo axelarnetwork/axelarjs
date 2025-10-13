@@ -8,9 +8,9 @@ import {
 } from "~/config/env";
 import type { DeployAndRegisterTransactionState as InterchainDeployAndRegisterTransactionState } from "~/features/InterchainTokenDeployment";
 import {
-  useSimulateInterchainTokenFactoryMulticall,
-  useWriteInterchainTokenFactoryMulticall,
-} from "~/lib/contracts/InterchainTokenFactory.hooks";
+  useSimulateITFContract,
+  useWriteITFContract,
+} from "~/lib/contracts/ITFWrapper.hooks";
 import { useChainId } from "~/lib/hooks";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -89,15 +89,18 @@ export default function useRegisterRemoteCanonicalTokens(
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
-  const { data: config } = useSimulateInterchainTokenFactoryMulticall({
+  const { data: config } = useSimulateITFContract({
+    chainId,
+    functionName: "multicall",
     value: totalGasFee,
-    args: [multicallArgs],
-    query: {
-      enabled: multicallArgs.length > 0 && totalGasFee > 0n,
-    },
+    args: { data: multicallArgs },
+    enabled: multicallArgs.length > 0 && totalGasFee > 0n,
   });
 
-  const mutation = useWriteInterchainTokenFactoryMulticall();
+  const mutation = useWriteITFContract({
+    chainId,
+    functionName: "multicall",
+  });
 
   const { registerRemoteInterchainToken: registerRemoteInterchainTokenOnSui } =
     useRegisterRemoteInterchainTokenOnSui();
@@ -145,7 +148,10 @@ export default function useRegisterRemoteCanonicalTokens(
         return registerRemoteInterchainTokenOnStellar(stellarInput);
       }
       if (!config) return;
-      return mutation.writeContract(config.request);
+      return mutation.writeContract({
+        args: config.request.args,
+        value: config.request.value,
+      });
     },
     writeContractAsync: async () => {
       if (chainId === SUI_CHAIN_ID) {
@@ -155,7 +161,10 @@ export default function useRegisterRemoteCanonicalTokens(
         return registerRemoteInterchainTokenOnStellar(stellarInput);
       }
       if (!config) return;
-      return await mutation.writeContractAsync(config.request);
+      return await mutation.writeContractAsync({
+        args: config.request.args,
+        value: config.request.value,
+      });
     },
   };
 }

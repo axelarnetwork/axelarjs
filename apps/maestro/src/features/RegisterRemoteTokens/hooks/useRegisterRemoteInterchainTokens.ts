@@ -7,9 +7,9 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
 import {
-  useSimulateInterchainTokenFactoryMulticall,
-  useWriteInterchainTokenFactoryMulticall,
-} from "~/lib/contracts/InterchainTokenFactory.hooks";
+  useSimulateITFContract,
+  useWriteITFContract,
+} from "~/lib/contracts/ITFWrapper.hooks";
 import { useChainId } from "~/lib/hooks";
 import { scaleGasValue } from "~/lib/utils/gas";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -79,15 +79,18 @@ export default function useRegisterRemoteInterchainTokens(
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
-  const { data: config } = useSimulateInterchainTokenFactoryMulticall({
+  const { data: config } = useSimulateITFContract({
+    chainId,
+    functionName: "multicall",
     value: totalGasFee,
-    args: [multicallArgs],
-    query: {
-      enabled: chainId !== SUI_CHAIN_ID && multicallArgs.length > 0,
-    },
+    args: { data: multicallArgs },
+    enabled: chainId !== SUI_CHAIN_ID && multicallArgs.length > 0,
   });
 
-  const mutation = useWriteInterchainTokenFactoryMulticall();
+  const mutation = useWriteITFContract({
+    chainId,
+    functionName: "multicall",
+  });
 
   const { registerRemoteInterchainToken: registerRemoteInterchainTokenOnSui } =
     useRegisterRemoteInterchainTokenOnSui();
@@ -128,7 +131,10 @@ export default function useRegisterRemoteInterchainTokens(
 
       if (!config) return;
 
-      return mutation.writeContract(config.request);
+      return mutation.writeContract({
+        args: config.request.args,
+        value: config.request.value,
+      });
     },
     writeContractAsync: async () => {
       if (chainId === SUI_CHAIN_ID) {
@@ -141,7 +147,10 @@ export default function useRegisterRemoteInterchainTokens(
 
       if (!config) return;
 
-      return await mutation.writeContractAsync(config.request);
+      return await mutation.writeContractAsync({
+        args: config.request.args,
+        value: config.request.value,
+      });
     },
   };
 }
