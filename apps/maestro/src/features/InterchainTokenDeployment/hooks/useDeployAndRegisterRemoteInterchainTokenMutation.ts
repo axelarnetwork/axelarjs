@@ -71,7 +71,7 @@ const isChainSkipDeploymentDraftRecording = (
  *
  * 2. MULTICALL PREPARATION
  *    └── usePrepareMulticall() ──────► Build encoded function calls and prepare simulation
- *    └── useSimulateInterchainTokenFactoryMulticall() ──► Prepare transaction simulation
+ *    └── useSimulateITFContract() ──► Prepare multicall transaction simulation
  *
  * 3. READINESS CHECK
  *    └── useReady() ─────────────────► Check if deployment is ready (excludes Hedera manual multicall)
