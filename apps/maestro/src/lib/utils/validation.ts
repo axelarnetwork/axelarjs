@@ -164,7 +164,7 @@ export function isValidStellarWalletAddress(address: string): boolean {
 }
 
 const XRPL_ADDRESS_REGEX = /^r[a-km-zA-HJ-NP-Z1-9]{25,34}$/;
-const XRPL_TOKEN_REGEX = /^[A-Za-z0-9]\.r[a-km-zA-HJ-NP-Z1-9]{25,34}$/;
+const XRPL_TOKEN_REGEX = /^[A-Za-z0-9]*\.r[a-km-zA-HJ-NP-Z1-9]{25,34}$/;
 
 export const xrplTokenAddress = () =>
   z
