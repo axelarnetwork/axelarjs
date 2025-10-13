@@ -12,8 +12,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 import { useSignTransaction as useXRPLSignTransaction, useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
-
-import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { wagmiConfig } from "~/config/wagmi";
 import { useDisconnect } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
@@ -21,6 +19,7 @@ import { trpc } from "../trpc";
 import { setStellarConnectionState } from "../utils/stellar";
 
 import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
+import { xrplChainConfig } from "~/config/chains";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;

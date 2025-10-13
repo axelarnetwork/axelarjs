@@ -5,6 +5,7 @@ import * as xrpl from "xrpl";
 import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import type { Context } from "~/server/context";
+import Decimal from "decimal.js";
 
 const isXRPLChainConfig = (c: unknown): c is XRPLChainConfig => {
   return (c as { chainType?: string })?.chainType === "xrpl";

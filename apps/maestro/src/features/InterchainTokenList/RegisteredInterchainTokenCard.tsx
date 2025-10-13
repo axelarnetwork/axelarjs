@@ -202,7 +202,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               isTokenMinter={Boolean(balance?.isTokenMinter)}
               hasPendingOwner={Boolean(balance?.hasPendingOwner)}
               tokenId={props.tokenId}
-              canMint={canMint}
+              canMint={
+                (!isHederaChain || Boolean(isHederaAssociated)) &&
+                (!isXRPLChain || Boolean(hasXRPLTrustLine))
+              }
             />
           ) : (
             <StatusIndicator
