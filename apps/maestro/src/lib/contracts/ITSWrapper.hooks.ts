@@ -7,6 +7,11 @@ import { useReadContract } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 
+const getITSAddress = (chainId: number): `0x${string}` => {
+  // Address can be provided dynamically based on the chainId
+  return NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
+};
+
 export const useReadITSContract = <
   FunctionName extends keyof typeof INTERCHAIN_TOKEN_SERVICE_ENCODERS &
     Extract<
@@ -14,6 +19,7 @@ export const useReadITSContract = <
       { type: "function"; stateMutability: "view" }
     >["name"],
 >({
+  chainId,
   functionName,
   args,
   enabled = true,
@@ -25,9 +31,7 @@ export const useReadITSContract = <
   >[0];
   enabled?: boolean;
 }) => {
-  // const address = chainId === 0 ? "0x1" : "0x2";
-  // TODO: Add chain-specific address logic here
-  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
+  const address = getITSAddress(chainId);
 
   const result = useReadContract({
     address,

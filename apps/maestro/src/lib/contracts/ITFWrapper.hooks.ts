@@ -7,6 +7,11 @@ import { useReadContract, useSimulateContract, useWriteContract } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS } from "~/config/env";
 
+const getITFAddress = (chainId: number): `0x${string}` => {
+  // Address can be provided dynamically based on the chainId
+  return NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS;
+};
+
 export const useReadITFContract = <
   FunctionName extends keyof typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS &
     Extract<
@@ -14,6 +19,7 @@ export const useReadITFContract = <
       { type: "function"; stateMutability: "view" }
     >["name"],
 >({
+  chainId,
   functionName,
   args,
   enabled = true,
@@ -25,8 +31,7 @@ export const useReadITFContract = <
   >[0];
   enabled?: boolean;
 }) => {
-  // const address = chainId === 0 ? "0x1" : "0x2";
-  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS;
+  const address = getITFAddress(chainId);
 
   const result = useReadContract({
     address,
@@ -64,7 +69,7 @@ export const useSimulateITFContract = <
   value?: bigint;
   enabled?: boolean;
 }) => {
-  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS;
+  const address = getITFAddress(chainId);
 
   const { data, error } = useSimulateContract({
     address,
@@ -96,7 +101,7 @@ export const useWriteITFContract = <
   chainId: number;
   functionName: FunctionName;
 }) => {
-  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS;
+  const address = getITFAddress(chainId);
 
   const result = useWriteContract();
 
