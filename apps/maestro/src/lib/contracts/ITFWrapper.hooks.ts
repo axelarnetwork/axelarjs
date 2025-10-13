@@ -3,7 +3,7 @@ import {
   INTERCHAIN_TOKEN_FACTORY_ENCODERS,
 } from "@axelarjs/evm";
 
-import { useReadContract } from "wagmi";
+import { useReadContract, useSimulateContract } from "wagmi";
 
 import { NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS } from "~/config/env";
 
@@ -41,4 +41,44 @@ export const useReadITFContract = <
   } as any);
 
   return result;
+};
+
+export const useSimulateITFContract = <
+  FunctionName extends keyof typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS &
+    Extract<
+      (typeof INTERCHAIN_TOKEN_FACTORY_ABI)[number],
+      { type: "function"; stateMutability: "nonpayable" | "payable" }
+    >["name"],
+>({
+  chainId,
+  functionName,
+  args,
+  value,
+  enabled = true,
+}: {
+  chainId: number;
+  functionName: FunctionName;
+  args: Parameters<
+    (typeof INTERCHAIN_TOKEN_FACTORY_ENCODERS)[FunctionName]["args"]
+  >[0];
+  value?: bigint;
+  enabled?: boolean;
+}) => {
+  const address = NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS;
+
+  const { data, error } = useSimulateContract({
+    address,
+    chainId,
+    value,
+    abi: INTERCHAIN_TOKEN_FACTORY_ABI,
+    functionName: functionName as any,
+    args: INTERCHAIN_TOKEN_FACTORY_ENCODERS[functionName].args(
+      args as any
+    ) as any,
+    query: {
+      enabled,
+    },
+  } as any);
+
+  return { data, error };
 };

@@ -1,14 +1,9 @@
-import {
-  INTERCHAIN_TOKEN_FACTORY_ABI,
-  INTERCHAIN_TOKEN_FACTORY_ENCODERS,
-  INTERCHAIN_TOKEN_SERVICE_ABI,
-  INTERCHAIN_TOKEN_SERVICE_ENCODERS,
-} from "@axelarjs/evm";
+import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { invariant, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { zeroAddress } from "viem";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 import {
   EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
@@ -16,15 +11,14 @@ import {
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
 } from "~/config/chains";
-import { NEXT_PUBLIC_INTERCHAIN_TOKEN_FACTORY_ADDRESS } from "~/config/env";
 import { useHederaDeployment } from "~/features/hederaHooks";
 import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
+import { useWriteInterchainTokenFactoryMulticall } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import {
-  useSimulateInterchainTokenFactoryMulticall,
-  useWriteInterchainTokenFactoryMulticall,
-} from "~/lib/contracts/InterchainTokenFactory.hooks";
-import { useReadITFContract } from "~/lib/contracts/ITFWrapper.hooks";
+  useReadITFContract,
+  useSimulateITFContract,
+} from "~/lib/contracts/ITFWrapper.hooks";
 import { useReadITSContract } from "~/lib/contracts/ITSWrapper.hooks";
 import {
   decodeDeploymentMessageId,
@@ -225,13 +219,12 @@ const usePrepareMulticall = ({
     multicallArgs.length > 0 && isDestinationFeeSet && isTokenReadyForMulticall;
 
   const { data: prepareMulticall, error: simulationError } =
-    useSimulateInterchainTokenFactoryMulticall({
+    useSimulateITFContract({
       chainId,
+      functionName: "multicall",
       value: totalGasFee,
-      args: [multicallArgs],
-      query: {
-        enabled: isMutationReady,
-      },
+      args: { data: multicallArgs },
+      enabled: isMutationReady,
     });
 
   if (simulationError) {
