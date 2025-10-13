@@ -30,6 +30,7 @@ import {
   HEDERA_CHAIN_ID,
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
+  XRPL_CHAIN_ID,
 } from "~/config/chains";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
@@ -71,6 +72,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
   const isStellarChain = props.chain.chain_id === STELLAR_CHAIN_ID;
   const isHederaChain = props.chain.chain_id === HEDERA_CHAIN_ID;
+  const isXRPLChain = props.chain.chain_id === XRPL_CHAIN_ID;
   const tokenAddress = props.tokenAddress;
 
   const tokenDetails: Array<[string, ReactNode]> = [
@@ -90,7 +92,13 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     ],
   ];
 
-  if (wallet && !isSuiChain && !isStellarChain && !isHederaChain) {
+  if (
+    wallet &&
+    !isSuiChain &&
+    !isStellarChain &&
+    !isHederaChain &&
+    !isXRPLChain
+  ) {
     tokenDetails.push([
       "Add Token to Wallet",
       <LinkButton

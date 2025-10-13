@@ -1,10 +1,10 @@
 import { XRPLChainConfig } from "@axelarjs/api";
 
+import * as xrpl from "xrpl";
+
 import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import type { Context } from "~/server/context";
-
-import * as xrpl from "xrpl";
 
 export const getXRPLChainConfig = async (
   ctx: Context
@@ -12,7 +12,9 @@ export const getXRPLChainConfig = async (
   const chainConfigs = await ctx.configs.axelarConfigs();
   // Determine the best key based on environment and available S3 keys
   const s3Keys = Object.keys(chainConfigs.chains);
-  const xrplKeys = s3Keys.filter((k) => k.toLowerCase().includes("xrpl")).filter((k) => !k.toLowerCase().includes("evm"));
+  const xrplKeys = s3Keys
+    .filter((k) => k.toLowerCase().includes("xrpl"))
+    .filter((k) => !k.toLowerCase().includes("evm"));
   const preferredKey = xrplChainConfig?.axelarChainId || "xrpl";
 
   // Helper to pick best candidate per env
@@ -26,14 +28,10 @@ export const getXRPLChainConfig = async (
       );
     }
     if (env === "testnet") {
-      return (
-        xrplKeys.find((k) => lower(k).includes("testnet")) || xrplKeys[0]
-      );
+      return xrplKeys.find((k) => lower(k).includes("testnet")) || xrplKeys[0];
     }
     // mainnet default
-    return (
-      xrplKeys.find((k) => lower(k).includes("mainnet")) || xrplKeys[0]
-    );
+    return xrplKeys.find((k) => lower(k).includes("mainnet")) || xrplKeys[0];
   };
 
   const chainConfig = (chainConfigs.chains[preferredKey] ||
@@ -58,22 +56,37 @@ export const getXRPLChainConfig = async (
 };
 
 export function hex(str: string) {
-    return Buffer.from(str).toString('hex');
+  return Buffer.from(str).toString("hex");
 }
 
 export function parseTokenAmount(token: string, amount: string) {
-    let parsedAmount;
+  let parsedAmount;
 
-    if (token === 'XRP') {
-        parsedAmount = xrpl.xrpToDrops(amount);
-    } else {
-        const [currency, issuer] = token.split('.');
-        parsedAmount = {
-            currency,
-            issuer,
-            value: amount,
-        };
-    }
+  if (token === "XRP") {
+    parsedAmount = xrpl.xrpToDrops(amount);
+  } else {
+    const [currency, issuer] = token.split(".");
+    parsedAmount = {
+      currency,
+      issuer,
+      value: amount,
+    };
+  }
 
-    return parsedAmount;
+  return parsedAmount;
+}
+
+export function parseXRPLTokenAddress(
+  token: string
+): { currency: string; issuer: string } | null {
+  if (token === "XRP") {
+    return null;
+  }
+  const [currency, issuer] = token.split(".");
+  if (!currency || !issuer) {
+    throw new Error(
+      "Invalid XRPL token address format. Expected CURRENCY.ISSUER or XRP"
+    );
+  }
+  return { currency, issuer };
 }
