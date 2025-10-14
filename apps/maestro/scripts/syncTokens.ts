@@ -2,12 +2,16 @@ import { config } from "dotenv";
 config({ path: ".env.local" }); // Load variables from .env.local
 import { Client } from "pg";
 import https from "https";
+import http from "http";
 
 //import { CHAIN_CONFIGS } from "~/config/chains"; // Import doesn't work
 
 function fetchJson(url: string): Promise<any> {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
+    let protocol: any = http;
+    if(url.startsWith("https"))
+      protocol = https;
+    protocol.get(url, (res) => {
       let data = "";
       res.on("data", (chunk) => (data += chunk));
       res.on("end", () => {
@@ -148,13 +152,13 @@ async function main() {
           tokenInfo.name,
           tokenInfo.prettySymbol,
           tokenInfo.decimals, // decimals from the original chain object
-          tokenInfo.details?.deploymentMessageId ?? null,
+          tokenInfo.details?.deploymentMessageId ?? "0x",
           tokenInfo.details?.deployer ?? null,
           originalChain.tokenManager ?? null,
           originalChain.tokenManagerType.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase() ?? null,
           tokenInfo.details?.originalMinter ?? null,
           tokenInfo.type,
-          tokenInfo.details?.deploySalt ?? null,
+          tokenInfo.details?.deploySalt ?? "0x",
         ]
       );
     }
