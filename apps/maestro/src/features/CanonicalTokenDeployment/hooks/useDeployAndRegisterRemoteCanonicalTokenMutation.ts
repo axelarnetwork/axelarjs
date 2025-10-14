@@ -2,7 +2,6 @@ import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { invariant, Maybe, throttle } from "@axelarjs/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { reduce } from "rambda";
 import type { TransactionReceipt } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 
@@ -25,6 +24,7 @@ import {
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -108,7 +108,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     }
 
     const registerTxData = destinationChainNames.map((destinationChain, i) => {
-      const gasValue = input.remoteDeploymentGasFees[i];
+      const gasValue = scaleGasValue(chainId, input.remoteDeploymentGasFees[i]);
 
       const args = {
         originalTokenAddress: input.tokenAddress as `0x${string}`,
@@ -122,11 +122,11 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
 
     return [deployTxData, ...registerTxData];
-  }, [input, destinationChainNames]);
+  }, [input, destinationChainNames, chainId]);
 
   const totalGasFee = Maybe.of(input?.remoteDeploymentGasFees).mapOr(
     0n,
-    reduce((a, b) => a + b, 0n)
+    (fees) => fees.reduce((acc, fee) => acc + scaleGasValue(chainId, fee), 0n)
   );
 
   const { data, error: simulationError } =
@@ -145,8 +145,10 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const multicall = useWriteInterchainTokenFactoryMulticall();
 
+  const [pendingHash, setPendingHash] = useState<`0x${string}` | undefined>();
+
   const { data: receipt } = useWaitForTransactionReceipt({
-    hash: multicall?.data,
+    hash: pendingHash ?? multicall?.data,
   });
 
   const onReceipt = useCallback(
@@ -321,17 +323,21 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
             "No calls prepared for multicall; cannot submit transaction on Hedera"
           );
         }
-        return await multicall.writeContractAsync({
+        const result = await multicall.writeContractAsync({
           args: [multicallArgs],
-          value: totalGasFee,
+          value: scaleGasValue(chainId, totalGasFee),
         } as any);
+        setPendingHash(result);
+        return result;
       }
       default: {
         invariant(
           data?.request !== undefined,
           `useDeployAndRegisterRemoteCanonicalTokenMutation: prepared request is undefined (chainId: ${chainId})`
         );
-        return await multicall.writeContractAsync(data.request);
+        const txHash = await multicall.writeContractAsync(data.request);
+        setPendingHash(txHash);
+        return txHash;
       }
     }
   }, [
