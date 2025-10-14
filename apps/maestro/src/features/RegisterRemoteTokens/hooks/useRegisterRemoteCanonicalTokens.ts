@@ -76,7 +76,7 @@ export default function useRegisterRemoteCanonicalTokens(
     if (chainId === SUI_CHAIN_ID) return [] as `0x${string}`[];
 
     const hasLengthMatch =
-      gasFeesData.gasFees.length === destinationChainIds.length;
+      gasFeesData.gasFees.length === destinationChainNames.length;
     if (!hasLengthMatch) {
       throw new Error("Gas fees length does not match destination chains");
     }
@@ -90,7 +90,7 @@ export default function useRegisterRemoteCanonicalTokens(
         }
       )
     );
-  }, [tokenDetails, gasFeesData, chainId, input, destinationChainIds]);
+  }, [tokenDetails, gasFeesData, chainId, input, destinationChainNames]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
