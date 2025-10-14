@@ -118,7 +118,11 @@ export function useSendInterchainTokenState(props: {
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
 
-  const { data: gas } = useEstimateGasFeeQuery({
+  const {
+    data: gas,
+    isLoading: isGasLoading,
+    isFetching: isGasFetching,
+  } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
     destinationChainId: selectedToChain?.id,
     sourceChainTokenSymbol: nativeTokenSymbol,
@@ -221,6 +225,7 @@ export function useSendInterchainTokenState(props: {
       isModalOpen,
       txState,
       isSending,
+      isEstimatingGas: isGasLoading || isGasFetching,
       selectedToChain,
       eligibleTargetChains,
       tokenSymbol,
