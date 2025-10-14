@@ -61,13 +61,32 @@ export function hex(str: string) {
     return Buffer.from(str).toString('hex');
 }
 
+function divideNumericString(amount: string, decimals: number) {
+  console.log("Before:", amount);
+  
+  amount = "0".repeat(decimals) + amount;
+  amount = amount.slice(0, -decimals) + '.' + amount.slice(-decimals);
+  amount = amount
+    .replace(/^0+/, '') // remove leading zeroes
+    .replace(/0+$/, '') // remove trailing zeroes
+    .replace(/^\./, '0.') // add single zero if non-decimal part is zero
+    .replace(/\.$/, ''); // remove trailing decimal point
+  console.log("After:", amount);
+
+  return amount;
+}
+
 export function parseTokenAmount(token: string, amount: string) {
     let parsedAmount;
 
     if (token === 'XRP') {
         parsedAmount = amount; //xrpl.xrpToDrops(amount); // already in drops
     } else {
-        const [currency, issuer] = token.split('.');
+      const [currency, issuer] = token.split('.');
+        // assert: amount != "0"
+        // the token has 15 decimals -> add a decimal point between the 14th and the 15th from the right
+        amount = divideNumericString(amount, 15);
+
         parsedAmount = {
             currency,
             issuer,
@@ -76,4 +95,12 @@ export function parseTokenAmount(token: string, amount: string) {
     }
 
     return parsedAmount;
+}
+
+export function parseTokenGasValue(token: string, amount: string) {
+  if (token === 'XRP') {
+      return amount;
+    } else {
+      return divideNumericString(amount, 15);
+    }
 }

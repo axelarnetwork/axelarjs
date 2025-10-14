@@ -76,10 +76,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       input.tokenAddress,
       input.owner
     );
-    console.log("getInterchainTokenBalanceForOwner");
     if (isValidXRPLWalletAddress(input.owner)) { // xrpl address
       isIncompatibleChain = !isValidXRPLTokenAddress(input.tokenAddress);
-      console.log("isIncompatibleChain for xrpl", isIncompatibleChain, input.owner);
     }
     if (isIncompatibleChain) {
       return {
@@ -257,32 +255,27 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
               message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
             });
           }
-          console.log("Connecting now", input);
-
-          console.log("Requesting now", input);
 
           const response = await client.request({
             command: "account_lines",
             account: input.owner,
           });
 
-          console.log("Response is", response);
-
           await client.disconnect();
-          console.log("Result is:", response.result);
 
           // Find the line that matches the token
           const line = response.result.lines.find(
             (l) => l.currency === currency && l.account === issuer
           );
 
-          console.log("Line is", line);
+          const XRPL_TOKEN_DECIMALS = 15;
+          const actualBalance = line ? BigInt(line.balance) * BigInt(10**XRPL_TOKEN_DECIMALS) : BigInt(0);
 
           return {
             isTokenOwner: false,
             isTokenMinter: false,
-            tokenBalance: line ? line.balance : "0",
-            decimals: 15, // TODO: fetch actual decimals
+            tokenBalance: line ? actualBalance.toString() : "0",
+            decimals: XRPL_TOKEN_DECIMALS,
             isTokenPendingOwner: false,
             hasPendingOwner: false,
             hasMinterRole: false,
