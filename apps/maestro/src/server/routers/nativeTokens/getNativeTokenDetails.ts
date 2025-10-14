@@ -104,7 +104,7 @@ async function getXRPLTokenDetails(tokenAddress: string, ctx: Context) {
 
   return {
     name: name,
-    decimals: 15,
+    decimals: tokenAddress === "XRP" ? 6 : 15,
     symbol: symbol,
     chainId: xrplChainConfig.id,
     chainName,

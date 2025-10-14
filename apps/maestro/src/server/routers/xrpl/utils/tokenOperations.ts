@@ -1,5 +1,5 @@
 import type { Context } from "~/server/context";
-import { getXRPLChainConfig, hex, parseTokenAmount } from "./utils";
+import { getXRPLChainConfig, hex, parseTokenAmount, parseTokenGasValue } from "./utils";
 import { xrplChainConfig as xrplChainConfigDefault } from "~/config/chains";
 
 import {
@@ -28,7 +28,7 @@ export async function buildInterchainTransferTxBytes(
             { Memo: { MemoType: hex("type"), MemoData: hex("interchain_transfer") } },
             { Memo: { MemoType: hex("destination_address"), MemoData: hex(input.destinationAddress.replace(/^0x/, "")) } },
             { Memo: { MemoType: hex("destination_chain"), MemoData: hex(input.destinationChain) } },
-            { Memo: { MemoType: hex("gas_fee_amount"), MemoData: hex(input.gasValue) } },
+            { Memo: { MemoType: hex("gas_fee_amount"), MemoData: hex(parseTokenGasValue(input.tokenAddress, input.gasValue)) } },
         ]
     };
 
