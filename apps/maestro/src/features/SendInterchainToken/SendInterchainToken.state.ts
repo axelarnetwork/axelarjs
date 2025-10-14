@@ -140,10 +140,10 @@ export function useSendInterchainTokenState(props: {
 
   const spenderAddress = useMemo<`0x${string}` | undefined>(() => {
     const isHedera = props.sourceChain.chain_id === HEDERA_CHAIN_ID;
-    if (isHedera && props.kind === "canonical") {
-      return NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
+    if (isHedera && props.kind === "interchain") {
+      return tokenManagerAddress;
     }
-    return tokenManagerAddress;
+    return NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
   }, [props.sourceChain.chain_id, props.kind, tokenManagerAddress]);
 
   const hasInsufficientGasBalance = useMemo(() => {
