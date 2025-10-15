@@ -3,6 +3,7 @@ import { always } from "rambda";
 import { Account, Address, scValToNative } from "stellar-sdk";
 import * as xrpl from "xrpl";
 import { z } from "zod";
+import Decimal from "decimal.js";
 
 import { xrplChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
@@ -220,10 +221,10 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         };
       }
     }
-    //console.log("Fetching token balance for", input);
+    console.log("Fetching token balance for", input);
 
     if (isValidXRPLTokenAddress(input.tokenAddress)) {
-      //console.log("Fetching XRPL token balance for", input);
+      console.log("Fetching XRPL token balance for", input);
       try {
           const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
           await client.connect();
@@ -231,13 +232,12 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
             // fetch XRP balance
             const balance = await client.getXrpBalance(input.owner);
             //console.log(balance);
-
-            const balanceInDrops = balance * (10**xrplChainConfig.nativeCurrency.decimals);
+            const balanceInDrops = xrpl.xrpToDrops(balance);
 
             return {
               isTokenOwner: false,
               isTokenMinter: false,
-              tokenBalance: `${balanceInDrops}`,
+              tokenBalance: balanceInDrops,
               decimals: 6,
               isTokenPendingOwner: false,
               hasPendingOwner: false,
@@ -262,14 +262,15 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           });
 
           await client.disconnect();
-
+          console.log(response.result.lines);
           // Find the line that matches the token
           const line = response.result.lines.find(
             (l) => l.currency === currency && l.account === issuer
           );
 
           const XRPL_TOKEN_DECIMALS = 15;
-          const actualBalance = line ? BigInt(line.balance) * BigInt(10**XRPL_TOKEN_DECIMALS) : BigInt(0);
+          const actualBalance = line ? Decimal(line.balance).times(10**XRPL_TOKEN_DECIMALS).toFixed(0) : "0";
+          console.log("Line.balance is", line?.balance, " and reporting actual balance as", actualBalance);
 
           return {
             isTokenOwner: false,
@@ -282,7 +283,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
             hasOperatorRole: false,
             hasFlowLimiterRole: false,
           }
-      } catch (_) {
+      } catch (error) {
+        console.log("An error occurred:", error);
         return {
           isTokenOwner: false,
           isTokenMinter: false,

@@ -68,6 +68,7 @@
     "@xrpl-wallet-standard/app": "0.1.4",
     "@xrpl-wallet-standard/core": "0.1.4",
     "@xrpl-wallet-standard/react": "^0.2.4",
+    "decimal.js": "^10.6.0",
     "drizzle-orm": "^0.29.5",
     "ethers": "^5.7.2",
     "hardhat": "^2.22.13",
