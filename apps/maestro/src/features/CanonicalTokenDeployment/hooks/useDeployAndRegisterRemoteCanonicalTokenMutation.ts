@@ -30,6 +30,12 @@ import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchai
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import type { DeployAndRegisterTransactionState } from "../CanonicalTokenDeployment.state";
 
+const SIMULATION_DISABLED_CHAIN_IDS = [
+  SUI_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  HEDERA_CHAIN_ID,
+];
+
 export interface UseDeployAndRegisterCanonicalTokenInput {
   sourceChainId: string;
   tokenName: string;
@@ -137,9 +143,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
       query: {
         enabled:
           multicallArgs.length > 0 &&
-          chainId !== SUI_CHAIN_ID &&
-          chainId !== STELLAR_CHAIN_ID &&
-          chainId !== HEDERA_CHAIN_ID,
+          !SIMULATION_DISABLED_CHAIN_IDS.includes(chainId),
       },
     });
 
@@ -240,6 +244,103 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     });
   }, [deployerAddress, input, recordDeploymentAsync, tokenId]);
 
+  const writeOnSui = useCallback(async () => {
+    if (!input) return;
+    const gasValues = input.remoteDeploymentGasFees;
+    const result = await registerCanonicalToken({
+      destinationChains: input.destinationChainIds,
+      coinType: input.tokenAddress,
+      gasValues,
+    });
+    if (result?.digest && result.deploymentMessageId) {
+      const token: any = result?.events?.[0]?.parsedJson;
+      setRecordDeploymentArgs({
+        kind: "canonical",
+        deploymentMessageId: result.deploymentMessageId,
+        tokenId: token.token_id?.id,
+        deployerAddress,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        tokenManagerType: result.tokenManagerType,
+        axelarChainId: input.sourceChainId,
+        destinationAxelarChainIds: input.destinationChainIds,
+        tokenManagerAddress: result.tokenManagerAddress,
+        tokenAddress: input.tokenAddress,
+      });
+      return result;
+    }
+  }, [input, registerCanonicalToken, deployerAddress]);
+
+  const writeOnStellar = useCallback(async () => {
+    if (!input) return;
+    if (!kit) {
+      throw new Error("Stellar wallet not connected");
+    }
+    const result = await registerTokenWithContractDeployment({
+      kit,
+      tokenAddress: input.tokenAddress,
+      destinationChains: input.destinationChainIds,
+      gasValues: input.remoteDeploymentGasFees,
+      onStatusUpdate: (status) => {
+        if (config.onStatusUpdate) {
+          config.onStatusUpdate(status);
+        }
+      },
+    });
+
+    if (result?.tokenRegistration?.hash) {
+      setRecordDeploymentArgs({
+        kind: "canonical",
+        deploymentMessageId:
+          result?.tokenRegistration?.deploymentMessageId ||
+          result?.tokenRegistration?.hash,
+        tokenId: result.tokenRegistration.tokenId,
+        deployerAddress,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        tokenManagerType: result.tokenRegistration.tokenManagerType,
+        axelarChainId: input.sourceChainId,
+        destinationAxelarChainIds: input.destinationChainIds,
+        tokenAddress: result.tokenRegistration.tokenAddress,
+        tokenManagerAddress: result.tokenRegistration.tokenManagerAddress,
+      });
+      return result.tokenRegistration;
+    }
+  }, [
+    input,
+    kit,
+    registerTokenWithContractDeployment,
+    config,
+    deployerAddress,
+  ]);
+
+  const writeOnHedera = useCallback(async () => {
+    // Hedera: skip prepare/simulation but still submit the transaction
+    if (!multicallArgs.length) {
+      throw new Error(
+        "No calls prepared for multicall; cannot submit transaction on Hedera"
+      );
+    }
+    const result = await multicall.writeContractAsync({
+      args: [multicallArgs],
+      value: scaleGasValue(chainId, totalGasFee),
+    });
+    setPendingHash(result);
+    return result;
+  }, [multicallArgs, multicall, chainId, totalGasFee]);
+
+  const writeOnEvm = useCallback(async () => {
+    invariant(
+      data?.request !== undefined,
+      `useDeployAndRegisterRemoteCanonicalTokenMutation: prepared request is undefined (chainId: ${chainId})`
+    );
+    const txHash = await multicall.writeContractAsync(data.request);
+    setPendingHash(txHash);
+    return txHash;
+  }, [data, multicall, chainId]);
+
   const writeAsync = useCallback(async () => {
     await recordDeploymentDraft();
     // If input is missing, fall back to default EVM flow with prepared request
@@ -252,107 +353,25 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     }
 
     switch (chainId) {
-      case SUI_CHAIN_ID: {
-        const gasValues = input.remoteDeploymentGasFees;
-        const result = await registerCanonicalToken({
-          destinationChains: input.destinationChainIds,
-          coinType: input.tokenAddress,
-          gasValues,
-        });
-        if (result?.digest && result.deploymentMessageId) {
-          const token: any = result?.events?.[0]?.parsedJson;
-          setRecordDeploymentArgs({
-            kind: "canonical",
-            deploymentMessageId: result.deploymentMessageId,
-            tokenId: token.token_id?.id,
-            deployerAddress,
-            tokenName: input.tokenName,
-            tokenSymbol: input.tokenSymbol,
-            tokenDecimals: input.decimals,
-            tokenManagerType: result.tokenManagerType,
-            axelarChainId: input.sourceChainId,
-            destinationAxelarChainIds: input.destinationChainIds,
-            tokenManagerAddress: result.tokenManagerAddress,
-            tokenAddress: input.tokenAddress,
-          });
-          return result;
-        }
-        break;
-      }
-      case STELLAR_CHAIN_ID: {
-        if (!kit) {
-          throw new Error("Stellar wallet not connected");
-        }
-        const result = await registerTokenWithContractDeployment({
-          kit,
-          tokenAddress: input.tokenAddress,
-          destinationChains: input.destinationChainIds,
-          gasValues: input.remoteDeploymentGasFees,
-          onStatusUpdate: (status) => {
-            if (config.onStatusUpdate) {
-              config.onStatusUpdate(status);
-            }
-          },
-        });
-
-        if (result?.tokenRegistration?.hash) {
-          setRecordDeploymentArgs({
-            kind: "canonical",
-            deploymentMessageId:
-              result?.tokenRegistration?.deploymentMessageId ||
-              result?.tokenRegistration?.hash,
-            tokenId: result.tokenRegistration.tokenId,
-            deployerAddress,
-            tokenName: input.tokenName,
-            tokenSymbol: input.tokenSymbol,
-            tokenDecimals: input.decimals,
-            tokenManagerType: result.tokenRegistration.tokenManagerType,
-            axelarChainId: input.sourceChainId,
-            destinationAxelarChainIds: input.destinationChainIds,
-            tokenAddress: result.tokenRegistration.tokenAddress,
-            tokenManagerAddress: result.tokenRegistration.tokenManagerAddress,
-          });
-          return result.tokenRegistration;
-        }
-        break;
-      }
-      case HEDERA_CHAIN_ID: {
-        // Hedera: skip prepare/simulation but still submit the transaction
-        if (!multicallArgs.length) {
-          throw new Error(
-            "No calls prepared for multicall; cannot submit transaction on Hedera"
-          );
-        }
-        const result = await multicall.writeContractAsync({
-          args: [multicallArgs],
-          value: scaleGasValue(chainId, totalGasFee),
-        } as any);
-        setPendingHash(result);
-        return result;
-      }
-      default: {
-        invariant(
-          data?.request !== undefined,
-          `useDeployAndRegisterRemoteCanonicalTokenMutation: prepared request is undefined (chainId: ${chainId})`
-        );
-        const txHash = await multicall.writeContractAsync(data.request);
-        setPendingHash(txHash);
-        return txHash;
-      }
+      case SUI_CHAIN_ID:
+        return await writeOnSui();
+      case STELLAR_CHAIN_ID:
+        return await writeOnStellar();
+      case HEDERA_CHAIN_ID:
+        return await writeOnHedera();
+      default:
+        return await writeOnEvm();
     }
   }, [
-    data,
-    multicall,
     recordDeploymentDraft,
-    chainId,
-    deployerAddress,
     input,
-    registerCanonicalToken,
-    registerTokenWithContractDeployment,
-    kit,
-    config,
-    multicallArgs,
-    totalGasFee,
+    data,
+    chainId,
+    multicall,
+    writeOnSui,
+    writeOnStellar,
+    writeOnHedera,
+    writeOnEvm,
   ]);
 
   const write = useCallback(() => {

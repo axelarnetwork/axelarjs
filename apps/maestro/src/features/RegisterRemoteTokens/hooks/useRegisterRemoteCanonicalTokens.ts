@@ -1,7 +1,11 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import {
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -22,6 +26,12 @@ import {
   type RegisterRemoteInterchainTokenOnStellarInput,
 } from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
+
+const SIMULATION_DISABLED_CHAIN_IDS = [
+  SUI_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  HEDERA_CHAIN_ID,
+];
 
 export type RegisterRemoteCanonicalTokensInput = {
   chainIds: number[];
@@ -78,7 +88,15 @@ export default function useRegisterRemoteCanonicalTokens(
     const hasLengthMatch =
       gasFeesData.gasFees.length === destinationChainNames.length;
     if (!hasLengthMatch) {
-      throw new Error("Gas fees length does not match destination chains");
+      console.error(
+        "gas fees data length does not match destination chain names length",
+        {
+          gasFeesData,
+          destinationChainNames,
+        }
+      );
+      // return empty args to disable simulation/write until fees align
+      return [] as `0x${string}`[];
     }
 
     return destinationChainNames.map((destinationChain, i) =>
@@ -99,7 +117,9 @@ export default function useRegisterRemoteCanonicalTokens(
       value: totalGasFee,
       args: [multicallArgs],
       query: {
-        enabled: chainId !== SUI_CHAIN_ID && multicallArgs.length > 0,
+        enabled:
+          !SIMULATION_DISABLED_CHAIN_IDS.includes(chainId) &&
+          multicallArgs.length > 0,
       },
     });
 

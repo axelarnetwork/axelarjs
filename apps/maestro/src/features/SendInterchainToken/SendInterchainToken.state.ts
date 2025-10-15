@@ -27,6 +27,7 @@ import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMuta
 
 // Chains that should force using Interchain Token Service path
 const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
+const TOKEN_MANAGER_SPENDER_CHAINS = [HEDERA_CHAIN_ID];
 const CHAINS_GAS_FEE_DECIMALS = {
   [HEDERA_CHAIN_ID]: 18,
 };
@@ -138,13 +139,17 @@ export function useSendInterchainTokenState(props: {
         tokenId: props.tokenId,
       }),
       query: {
-        enabled: props.sourceChain.chain_id === HEDERA_CHAIN_ID,
+        enabled: TOKEN_MANAGER_SPENDER_CHAINS.includes(
+          props.sourceChain.chain_id
+        ),
       },
     });
 
   const spenderAddress = useMemo<`0x${string}` | undefined>(() => {
-    const isHedera = props.sourceChain.chain_id === HEDERA_CHAIN_ID;
-    if (isHedera && props.kind === "interchain") {
+    const useTokenManagerAsSpender =
+      TOKEN_MANAGER_SPENDER_CHAINS.includes(props.sourceChain.chain_id) &&
+      props.kind === "interchain";
+    if (useTokenManagerAsSpender) {
       return tokenManagerAddress;
     }
     return NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;

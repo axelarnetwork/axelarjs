@@ -31,6 +31,12 @@ import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
 
+const SIMULATION_DISABLED_CHAIN_IDS = [
+  SUI_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  HEDERA_CHAIN_ID,
+];
+
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
     useCanonicalTokenDeploymentStateContainer();
@@ -88,7 +94,7 @@ export const Step3: FC = () => {
       shortMessage?: string;
       message?: string;
     };
-    const msg = `${err?.shortMessage ?? err?.message ?? "Failed to prepare transaction"}`;
+    const msg = `${err.shortMessage ?? err.message ?? "Failed to prepare transaction"}`;
     toast.error(msg);
   }, [simulationError]);
 
@@ -249,23 +255,15 @@ export const Step3: FC = () => {
     return gasFeeBn > balance.value;
   }, [balance, state.remoteDeploymentGasFees, state.totalGasFee]);
 
-  let isBlockingSimError = false;
-  switch (chainId) {
-    case SUI_CHAIN_ID:
-      isBlockingSimError = false;
-      break;
-    case STELLAR_CHAIN_ID:
-      isBlockingSimError = false;
-      break;
-    case HEDERA_CHAIN_ID:
-      isBlockingSimError = false;
-      break;
-    default:
-      isBlockingSimError = Boolean(simulationError);
+  let isSimErrorBlocking: boolean;
+  if (SIMULATION_DISABLED_CHAIN_IDS.includes(chainId)) {
+    isSimErrorBlocking = false;
+  } else {
+    isSimErrorBlocking = Boolean(simulationError);
   }
 
   const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
-    if (isBlockingSimError) {
+    if (isSimErrorBlocking) {
       return {
         children: "Preparing transaction failed",
         status: "error" as const,
@@ -320,7 +318,7 @@ export const Step3: FC = () => {
     hasInsufficientGasBalance,
     validDestinationChainIds.length,
     nativeTokenSymbol,
-    isBlockingSimError,
+    isSimErrorBlocking,
   ]);
 
   return (

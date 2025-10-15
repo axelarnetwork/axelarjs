@@ -181,7 +181,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     writeContractAsync: registerCanonicalTokensAsync,
     reset: resetCanonical,
     simulationError: canonicalSimulationError,
-  }: any = useRegisterRemoteCanonicalTokens({
+  } = useRegisterRemoteCanonicalTokens({
     chainIds: props.chainIds,
     deployerAddress: deployerAddress,
     tokenAddress: props.tokenAddress,
@@ -192,11 +192,15 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     writeContractAsync: registerInterchainTokensAsync,
     reset: resetInterchain,
     simulationError: interchainSimulationError,
-  }: any = useRegisterRemoteInterchainTokens({
+  } = useRegisterRemoteInterchainTokens({
     chainIds: props.chainIds,
     tokenAddress: props.tokenAddress,
     originChainId: props.originChainId ?? -1,
-  }) ?? { writeContractAsync: undefined, reset: () => {} };
+  }) ?? {
+    writeContractAsync: undefined,
+    reset: () => {},
+    simulationError: undefined,
+  };
 
   useEffect(
     () => {

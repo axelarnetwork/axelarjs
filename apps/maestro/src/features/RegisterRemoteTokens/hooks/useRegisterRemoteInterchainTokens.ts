@@ -1,7 +1,11 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import {
+  HEDERA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -17,6 +21,12 @@ import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hoo
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 import { useRegisterRemoteInterchainTokenOnStellar } from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
+
+const SIMULATION_DISABLED_CHAIN_IDS = [
+  SUI_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  HEDERA_CHAIN_ID,
+];
 
 export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
@@ -84,7 +94,9 @@ export default function useRegisterRemoteInterchainTokens(
       value: totalGasFee,
       args: [multicallArgs],
       query: {
-        enabled: chainId !== SUI_CHAIN_ID && multicallArgs.length > 0,
+        enabled:
+          !SIMULATION_DISABLED_CHAIN_IDS.includes(chainId) &&
+          multicallArgs.length > 0,
       },
     });
 
@@ -102,6 +114,7 @@ export default function useRegisterRemoteInterchainTokens(
       ...mutation,
       writeContract: undefined,
       writeContractAsync: undefined,
+      simulationError: undefined,
     };
 
   const suiInput = {
