@@ -104,25 +104,21 @@ export const suiRouter = router({
 
         const coinMetadata = await queryCoinMetadata(coinType);
 
-        const coinInfo = await txBuilder.moveCall({
-          target: `${ITS.address}::coin_info::from_info`,
-          typeArguments: [coinType],
-          arguments: [
-            coinMetadata.name,
-            coinMetadata.symbol,
-            coinMetadata.decimals.toString(),
-          ],
-        });
-
         const coinManagement = await txBuilder.moveCall({
           target: `${ITS.address}::coin_management::new_locked`,
           typeArguments: [coinType],
         });
 
         const tokenId = await txBuilder.moveCall({
-          target: `${ITS.address}::interchain_token_service::register_coin`,
+          target: `${ITS.address}::interchain_token_service::register_coin_from_info`,
           typeArguments: [coinType],
-          arguments: [itsObjectId, coinInfo, coinManagement],
+          arguments: [
+            itsObjectId,
+            coinMetadata.name,
+            coinMetadata.symbol,
+            coinMetadata.decimals,
+            coinManagement
+          ],
         });
 
         for (let i = 0; i < destinationChains.length; i++) {
@@ -186,16 +182,6 @@ export const suiRouter = router({
           throw new Error("Treasury cap not found");
         }
 
-        const coinInfo = await txBuilder.moveCall({
-          target: `${ITS.address}::coin_info::from_info`,
-          typeArguments: [coinType],
-          arguments: [
-            coinMetadata.name,
-            coinMetadata.symbol,
-            coinMetadata.decimals.toString(),
-          ],
-        });
-
         // Mint initial coins supply
         await mintToken(txBuilder, coinType, treasuryCap, amount, sender);
 
@@ -230,9 +216,15 @@ export const suiRouter = router({
         }
 
         const tokenId = await txBuilder.moveCall({
-          target: `${ITS.address}::interchain_token_service::register_coin`,
+          target: `${ITS.address}::interchain_token_service::register_coin_from_info`,
           typeArguments: [coinType],
-          arguments: [itsObjectId, coinInfo, coinManagement],
+          arguments: [
+            itsObjectId,
+            coinMetadata.name,
+            coinMetadata.symbol,
+            coinMetadata.decimals,
+            coinManagement
+          ],
         });
 
         for (let i = 0; i < destinationChains.length; i++) {
