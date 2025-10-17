@@ -54,8 +54,8 @@ async function main() {
   if (deleteImported) {
     console.log("Deleting all imported tokens before syncing");
     try {
-      client.query("DELETE FROM remote_interchain_tokens WHERE imported = true");
-      client.query("DELETE FROM interchain_tokens WHERE imported = true");
+      await client.query("DELETE FROM remote_interchain_tokens WHERE imported = true");
+      await client.query("DELETE FROM interchain_tokens WHERE imported = true");
     }
     catch (err) {
       console.error("Failed to delete tokens:", err);
@@ -81,6 +81,7 @@ async function main() {
   let tokensAdded = [];
   let tokensIgnored = [];
   let tokensAlreadyPresent = [];
+  let tokensErrored = [];
 
   for (const [tokenId, tokenInfo] of Object.entries(assets)) {
     // check if this token is unsupported
@@ -145,40 +146,25 @@ async function main() {
         }
       }
   */
-    /*
-    // attempt to get original chain by accessing tokenInfo.chains[tokenInfo.originAxelarChainId]
-    let originalChain = tokenInfo.chains[tokenInfo.originAxelarChainId];
-    if (!originalChain) {
-      console.warn(`Original chain ${tokenInfo.originalAxelarChainId} not found in tokenInfo.chains for token ${tokenId}, attempting to infer from known chains`);
-      let originalChainConfig = CHAIN_CONFIGS.find(c => c.axelarChainName === tokenInfo.originalAxelarChainId);
-      if (!originalChainConfig) {
-        console.error(`Could not find chain config for originalAxelarChainId ${tokenInfo.originalAxelarChainId}, skipping token ${tokenId}`);
-        continue;
-      }
-      originalChain = tokenInfo.chains[originalChainConfig.axelarChainId];
-      if (!originalChain) {
-        console.error(`Could not find chain info for original chain ${originalChainConfig.axelarChainId} in tokenInfo.chains, skipping token ${tokenId}`);
-        continue;
-      }
-    }*/
     
     // attempt to get original chain by accessing tokenInfo.chains[tokenInfo.originAxelarChainId]
     let originalChain =
       tokenInfo.chains?.[tokenInfo.originAxelarChainId] ||
       tokenInfo.chains?.[tokenInfo.originAxelarChainId?.toLowerCase()];
     if (!originalChain) {
-      console.error(
-        `Original chain ${tokenInfo.originAxelarChainId} not found in tokenInfo.chains for token ${tokenId}, consider adding an extra rule`
-      );
-      throw new Error();
+      tokensErrored.push(tokenId);
+      console.error(`Original chain ${tokenInfo.originAxelarChainId} not found in tokenInfo.chains for token ${tokenId}, consider adding an extra rule`);
+      continue;
     }
 
     // Use the correct fields from the example token structure
     try {
+      await client.query('BEGIN'); // begin a transaction
+
       await client.query(
         `INSERT INTO interchain_tokens
-          (token_id, token_address, axelar_chain_id, token_name, token_symbol, token_decimals, deployment_message_id, deployer_address, token_manager_address, token_manager_type, original_minter_address, kind, salt, updated_at, created_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+          (token_id, token_address, axelar_chain_id, token_name, token_symbol, token_decimals, deployment_message_id, deployer_address, token_manager_address, token_manager_type, original_minter_address, kind, salt, imported, updated_at, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, true, NOW(), NOW())
           RETURNING *`,
         [
           tokenId, // token_id
@@ -186,14 +172,15 @@ async function main() {
           tokenInfo.originAxelarChainId, // axelar_chain_id
           tokenInfo.name, // token_name
           tokenInfo.prettySymbol, // token_symbol
-          tokenInfo.decimals, // token_decimals // decimals from the original chain object
+          tokenInfo.decimals, // token_decimals // decimals as defined on the token itself
           tokenInfo.details?.deploymentMessageId ?? "0x", // deployment_message_id // if this doesn't exist, we still have to set it to 0x - otherwise the token will not show up as deployed
           tokenInfo.details?.deployer ?? null, // deployer_address
           originalChain.tokenManager ?? null, // token_manager_address
           originalChain.tokenManagerType?.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase() ?? null, // token_manager_type
           tokenInfo.details?.originalMinter ?? null, // original_minter_address
           tokenInfo.type, // kind
-          tokenInfo.details?.deploySalt ?? "0x", // salt
+          tokenInfo.details?.deploySalt ?? "0x", // salt // Cannot be null because of a check later, and might not always exist.
+          // true (mark this token as imported)
           // NOW() as created_at (there are no timestamps in the config)
           // NOW() as updated_at (there are no timestamps in the config)
         ]
@@ -201,11 +188,12 @@ async function main() {
     }
     catch (err) {
       console.error(`Error inserting token ${tokenId}:`, err);
-      throw err;
+      await client.query('ROLLBACK');
+      tokensErrored.push(tokenId);
+      continue;
     }
 
-    tokensAdded.push(tokenId);
-
+    let storingRemoteTokenFailed = false;
     // also add remote_interchain_tokens entries for each chain
     for (const [chainId, chainInfo] of Object.entries(tokenInfo.chains || {})) {
       if (chainId === tokenInfo.originAxelarChainId) continue; // skip original chain
@@ -213,8 +201,8 @@ async function main() {
       try { 
         await client.query(
           `INSERT INTO remote_interchain_tokens
-            (id, token_id, axelar_chain_id, token_address, token_manager_address, token_manager_type, deployment_message_id, deployment_status, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+            (id, token_id, axelar_chain_id, token_address, token_manager_address, token_manager_type, deployment_message_id, deployment_status, imported, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, NOW(), NOW())
             RETURNING *`,
           [
             `${chainId}:${chainInfo.tokenAddress}`, // id // composite key
@@ -225,14 +213,23 @@ async function main() {
             chainInfo.tokenManagerType?.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase() ?? null, // token_manager_type
             tokenInfo.details?.deploymentMessageId ?? null, // deployment_message_id
             'confirmed', // deployment_status // assume deployment confirmed if present in config
+            // true (mark this token as imported)
             // NOW() as created_at (there are no timestamps in the config)
             // NOW() as updated_at (there are no timestamps in the config)
           ]
         );
       } catch (err) {
         console.error(`Error inserting remote token ${tokenId} for chain ${chainId}:`, err);
-        throw err;
+        storingRemoteTokenFailed = true;
+        break;
       }
+    }
+    if (!storingRemoteTokenFailed) {
+      await client.query('COMMIT');
+      tokensAdded.push(tokenId);
+    } else {
+      await client.query('ROLLBACK');
+      tokensErrored.push(tokenId);
     }
   }
   await client.end();
@@ -259,6 +256,14 @@ async function main() {
   } else {
     console.log("-- None --");
   }
+
+  console.log("\n🔴 Tokens Errored:");
+  if (tokensErrored.length) {
+    tokensErrored.forEach(token => console.log(`- ${token}`));
+  } else {
+    console.log("-- None --");
+  }
+
 
   return;
 }
