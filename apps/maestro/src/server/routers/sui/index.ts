@@ -447,7 +447,7 @@ export const suiRouter = router({
           arguments: [recipientChannelId]
         });
 
-        const optionAddress = txBuilder.moveCall({
+        const optionAddress = await txBuilder.moveCall({
           target: `${STD_PACKAGE_ID}::option::some`,
           typeArguments: ["address"],
           arguments: [recipientChannelAddress],
