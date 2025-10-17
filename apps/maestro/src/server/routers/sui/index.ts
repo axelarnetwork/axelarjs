@@ -439,7 +439,7 @@ export const suiRouter = router({
 
         const channelId = (await getChannelId(sender, chainConfig)) as string;
 
-        // Recipient of operatorship must have a Channel
+        // Recipient of operatorship must have an existing Channel
         const recipientChannelId = (await getChannelId(recipientAddress, chainConfig)) as string;
 
         const recipientChannelAddress = await txBuilder.moveCall({
