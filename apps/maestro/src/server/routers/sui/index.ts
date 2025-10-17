@@ -431,7 +431,7 @@ export const suiRouter = router({
         const { sender, tokenAddress, recipientAddress, tokenId, symbol } =
           input;
         const chainConfig = await getSuiChainConfig(ctx);
-        const { InterchainTokenService: ITS } = chainConfig.config.contracts;
+        const { AxelarGateway, InterchainTokenService: ITS } = chainConfig.config.contracts;
         const txBuilder = new TxBuilder(suiClient);
         const TokenId = await getTokenId(txBuilder, tokenId, ITS);
 
@@ -439,11 +439,18 @@ export const suiRouter = router({
 
         const channelId = (await getChannelId(sender, chainConfig)) as string;
 
-        // TODO: just transfer the channel id
-        const optionAddress = txBuilder.tx.moveCall({
+        // Recipient of operatorship must have a Channel
+        const recipientChannelId = (await getChannelId(recipientAddress, chainConfig)) as string;
+
+        const recipientChannelAddress = await txBuilder.moveCall({
+          target: `${AxelarGateway.address}::channel::to_address`,
+          arguments: [recipientChannelId]
+        });
+
+        const optionAddress = txBuilder.moveCall({
           target: `${STD_PACKAGE_ID}::option::some`,
           typeArguments: ["address"],
-          arguments: [txBuilder.tx.pure.address(recipientAddress)],
+          arguments: [recipientChannelAddress],
         });
 
         await txBuilder.moveCall({
