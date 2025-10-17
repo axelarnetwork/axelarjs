@@ -7,7 +7,7 @@ import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
 } from "~/config/env";
-import { useBalance } from "~/lib/hooks";
+import { useBalance, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -115,7 +115,8 @@ export function useSendInterchainTokenState(props: {
   const balance = useBalance();
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
-  const isXRPLChain = props.originTokenChainId == XRPL_CHAIN_ID;
+  const isXRPLChain = useChainId() == XRPL_CHAIN_ID;
+  console.log("chain id is", useChainId(), isXRPLChain);
   const payWithToken = isXRPLChain; // XRPL is the only chain that pays with ITS token instead of native token 
   let sourceChainTokenSymbol;
   if(isXRPLChain) {
@@ -136,7 +137,7 @@ export function useSendInterchainTokenState(props: {
     gasMultiplier: "auto",
   });
   // TODO: remove custom overrides
-  if (tokenDetails?.symbol === "FOO") {
+  if (tokenDetails?.symbol === "FOO" && isXRPLChain) {
     gas = 1_000_000_000_000_000_000n;
   }
 
