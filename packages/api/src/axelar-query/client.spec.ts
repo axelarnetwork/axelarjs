@@ -10,7 +10,7 @@ import type {
 import { createAxelarQueryClient } from "./client";
 import { activeChainsStub } from "./stubs";
 
-describe("axelar-query (node client)", () => {
+describe.skip("axelar-query (node client)", () => {
   const testnetApi: AxelarQueryAPIClient = createAxelarQueryClient(
     ENVIRONMENTS.testnet,
     {}

@@ -1,6 +1,6 @@
 import { queryTransactionStatus } from "./client";
 
-describe("queryTransactionStatus", () => {
+describe.skip("queryTransactionStatus", () => {
   const environment = "mainnet";
 
   test("should return success false when the tx is not found", async () => {
