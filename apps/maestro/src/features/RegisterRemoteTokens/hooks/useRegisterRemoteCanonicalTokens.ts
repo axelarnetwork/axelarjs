@@ -1,11 +1,7 @@
 import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
-import {
-  HEDERA_CHAIN_ID,
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-} from "~/config/chains";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -27,11 +23,7 @@ import {
 } from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
 
-const SIMULATION_DISABLED_CHAIN_IDS = [
-  SUI_CHAIN_ID,
-  STELLAR_CHAIN_ID,
-  HEDERA_CHAIN_ID,
-];
+const SIMULATION_DISABLED_CHAIN_IDS = [SUI_CHAIN_ID, STELLAR_CHAIN_ID];
 
 export type RegisterRemoteCanonicalTokensInput = {
   chainIds: number[];
