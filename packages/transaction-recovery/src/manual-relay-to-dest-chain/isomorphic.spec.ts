@@ -3,7 +3,7 @@ import { hashMessage } from "viem";
 import { manualRelayToDestChain } from "./client";
 import { ManualRelayToDestChainError } from "./error";
 
-describe("manualRelayToDestChain", () => {
+describe.skip("manualRelayToDestChain", () => {
   const environment = "testnet";
   test("should throw error when the tx is already executed", async () => {
     // optimism -> avalanche

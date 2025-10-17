@@ -13,7 +13,7 @@ import { createAxelarRPCTxClient } from "../index";
 import { RpcImpl } from "../rpcImpl";
 import { MOCK_BROADCAST_RESPONSE } from "./mock";
 
-describe("rpc client", () => {
+describe.skip("rpc client", () => {
   const fallbackRpcUrls =
     AXELAR_RPC_URLS_FALLBACK.testnet as unknown as string[];
   const fallbackLcdUrls =

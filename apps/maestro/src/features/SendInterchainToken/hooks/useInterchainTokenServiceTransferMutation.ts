@@ -10,7 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 import { useBlockNumber, useWaitForTransactionReceipt } from "wagmi";
 
-import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
+import { HEDERA_CHAIN_ID } from "~/config/chains";
 import {
   useReadInterchainTokenAllowance,
   useReadInterchainTokenDecimals,
@@ -19,7 +19,10 @@ import {
 import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
+
+const CHAINS_SCALED_GAS = [HEDERA_CHAIN_ID];
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -28,6 +31,7 @@ export type UseSendInterchainTokenConfig = {
   destinationChainName: string;
   destinationAddress?: string;
   gas?: bigint;
+  spenderAddress?: `0x${string}`;
 };
 
 export type UseSendInterchainTokenInput = {
@@ -42,6 +46,8 @@ export function useInterchainTokenServiceTransferMutation(
   const chainId = useChainId();
   const [txState, setTxState] = useTransactionState();
 
+  const shouldScaleGas = CHAINS_SCALED_GAS.includes(chainId);
+
   const { data: decimals } = useReadInterchainTokenDecimals({
     address: config.tokenAddress as `0x${string}`,
   });
@@ -50,7 +56,7 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
     config.tokenAddress as `0x${string}`,
-    NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS
+    config.spenderAddress ?? "0x"
   );
 
   const {
@@ -91,9 +97,11 @@ export function useInterchainTokenServiceTransferMutation(
               : ((destinationAddress as `0x${string}`) ?? address),
             amount: approvedAmountRef.current,
             metadata: "0x",
-            gasValue: config.gas ?? 0n,
+            gasValue: shouldScaleGas
+              ? scaleGasValue(chainId, config.gas)
+              : (config.gas ?? 0n),
           }),
-          value: config.gas,
+          value: config.gas ?? 0n,
         });
 
         if (txHash) {
@@ -138,6 +146,7 @@ export function useInterchainTokenServiceTransferMutation(
       config.tokenId,
       interchainTransferAsync,
       setTxState,
+      shouldScaleGas,
     ]
   );
 
@@ -162,7 +171,14 @@ export function useInterchainTokenServiceTransferMutation(
   const mutation = useMutation<void, unknown, UseSendInterchainTokenInput>({
     mutationFn: async ({ amount, destinationAddress }) => {
       // allow token transfers with decimals === 0 but not undefined
-      if (!(decimals !== undefined && address && config.gas)) {
+      if (
+        decimals === undefined ||
+        !address ||
+        config.gas === undefined ||
+        !config.spenderAddress
+      ) {
+        toast.error("Transfer not ready: missing information");
+        setTxState({ status: "idle" });
         return;
       }
 
@@ -179,7 +195,7 @@ export function useInterchainTokenServiceTransferMutation(
           await approveInterchainTokenAsync({
             address: config.tokenAddress as `0x${string}`,
             args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
-              spender: NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
+              spender: config.spenderAddress,
               amount: approvedAmountRef.current,
             }),
           });
@@ -244,7 +260,6 @@ function useWatchInterchainTokenAllowance(
         queryClient.invalidateQueries({ queryKey }).catch((error) => {
           logger.error("Failed to invalidate token allowance query:", error);
         });
-        logger.info("Invalidating token allowance query");
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

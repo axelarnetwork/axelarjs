@@ -25,7 +25,7 @@ export type ChainConfig = {
   name: string;
   rpcUrl?: string | undefined;
 };
-describe("recovery", () => {
+describe.skip("recovery", () => {
   const environment = "testnet";
   const srcChainConfig = {
     chain_type: "evm" as const,

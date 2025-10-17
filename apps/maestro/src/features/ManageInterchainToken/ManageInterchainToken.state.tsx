@@ -16,6 +16,7 @@ export const INITIAL_STATE = {
   } as TransactionState,
   tokenAddress: `0x` as `0x${string}`,
   tokenId: `0x` as `0x${string}`,
+  tokenManagerAddress: `0x` as `0x${string}`,
 };
 
 function useManageInterchainTokenState(initialState = INITIAL_STATE) {
@@ -29,13 +30,14 @@ function useManageInterchainTokenState(initialState = INITIAL_STATE) {
     () => {
       if (
         state.tokenAddress !== initialState.tokenAddress ||
-        state.tokenId !== initialState.tokenId
+        state.tokenId !== initialState.tokenId ||
+        state.tokenManagerAddress !== initialState.tokenManagerAddress
       ) {
         setState(initialState);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [initialState, state.tokenAddress, state.tokenId]
+    [initialState, state.tokenAddress, state.tokenId, state.tokenManagerAddress]
   );
 
   const actions = {

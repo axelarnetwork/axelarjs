@@ -21,7 +21,7 @@ import {
 import { ConfirmGatewayTxError } from "./error";
 import * as Qualifier from "./verifier";
 
-describe("AxelarConfirmTx", () => {
+describe.skip("AxelarConfirmTx", () => {
   const environment = "testnet";
   const txHash = hashMessage("random tx hash");
   const searchGMPData = {

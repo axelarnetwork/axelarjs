@@ -7,6 +7,7 @@ import Link from "next/link";
 import { groupBy } from "rambda";
 
 import { useChainId, type TxType } from "~/lib/hooks";
+import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
@@ -16,7 +17,6 @@ import {
   useGMPTxProgress,
 } from "~/ui/compounds/GMPTxStatusMonitor";
 import { useTransactionsContainer } from "./Transactions.state";
-import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
 
 const TX_LABEL_MAP: Record<TxType, string> = {
   INTERCHAIN_DEPLOYMENT: "Interchain Deployment",
@@ -44,7 +44,7 @@ function useGroupedStatuses(txHash: string) {
     );
 
     const groupedStatusesProps = Object.entries(
-      groupBy((x) => x.status, statusValues)
+      groupBy((x) => x.status ?? "pending", statusValues)
     ).map(([status, entries]) => ({
       status: status as ExtendedGMPTxStatus,
       chains: entries.map((entry) => entry.chain),

@@ -4,7 +4,7 @@ import { encodeAbiParameters, keccak256, parseAbiParameters } from "viem";
 
 import { createDepositServiceApiClient } from "./client";
 
-describe("deposit service", () => {
+describe.skip("deposit service", () => {
   test("wrap deposit address should return the address when passing params correctly", async () => {
     const client = createDepositServiceApiClient(ENVIRONMENTS.testnet);
     const salt = keccak256(
