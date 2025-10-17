@@ -116,7 +116,7 @@ export const suiRouter = router({
             itsObjectId,
             coinMetadata.name,
             coinMetadata.symbol,
-            coinMetadata.decimals,
+            coinMetadata.decimals.toString(),
             coinManagement
           ],
         });
@@ -222,7 +222,7 @@ export const suiRouter = router({
             itsObjectId,
             coinMetadata.name,
             coinMetadata.symbol,
-            coinMetadata.decimals,
+            coinMetadata.decimals.toString(),
             coinManagement
           ],
         });
