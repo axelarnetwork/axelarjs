@@ -4,7 +4,6 @@ import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import type { Context } from "~/server/context";
 
-import * as xrpl from "xrpl";
 import Decimal from "decimal.js";
 
 export const getXRPLChainConfig = async (
@@ -76,7 +75,7 @@ export function parseTokenAmount(token: string, amountInDrops: string) {
         parsedAmount = {
             currency,
             issuer,
-            value: amount.toFixed(15),
+            value: amount.toFixed(15).replace(/0+$/, "").replace(/\.$/, ""),
         };
     }
 
@@ -87,6 +86,6 @@ export function parseTokenGasValue(token: string, amount: string) {
   if (token === 'XRP') {
       return amount;
     } else {
-      return Decimal(amount).times(1e-15).toFixed(15);
+      return Decimal(amount).times(1e-15).toFixed(15).replace(/0+$/, "").replace(/\.$/, "");
     }
 }

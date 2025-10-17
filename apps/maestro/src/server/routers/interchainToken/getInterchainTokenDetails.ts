@@ -90,13 +90,11 @@ export const getInterchainTokenDetails = publicProcedure
 
     // For Stellar tokens, we need to handle both symbol-issuer and contract address formats
     let tokenRecord = null;
-    console.log("axelarChainId is ", axelarChainId, "and input.tokenAddress is ", input.tokenAddress);
     tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         axelarChainId,
         input.tokenAddress
       );
-    console.log("Found token record?", tokenRecord);
 
     // If not found and this is a Stellar chain, try the alternative Contract format
     if (!tokenRecord && input.chainId === STELLAR_CHAIN_ID) {
@@ -146,23 +144,6 @@ export const getInterchainTokenDetails = publicProcedure
           `[getInterchainTokenDetails] Error converting address format:`,
           error
         );
-      }
-    }
-
-    if (!tokenRecord && input.chainId === xrplChainConfig.id) {
-      console.log(
-        `[getInterchainTokenDetails] Token not found with original address on XRPL, trying alternative format`
-      );
-      if (input.tokenAddress === "xrp") {
-        // in that case, this is the native XRP token
-        console.log("Attempting to find the native XRP token record");
-        tokenRecord =
-          await ctx.persistence.postgres.getInterchainTokenByTokenId(
-            "0xba5a21ca88ef6bba2bfff5088994f90e1077e2a1cc3dcc38bd261f00fce2824f"
-          ); // TODO: derive?
-        console.log("Found:", tokenRecord);
-      } else {
-        console.error("Failed to find this XRPL token:", input.tokenAddress);
       }
     }
 

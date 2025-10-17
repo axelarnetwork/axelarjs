@@ -13,7 +13,7 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
-import { useConnect as useXRPLConnect, useWallet as useXRPLWallet, useSignAndSubmitTransaction as useXRPLSignAndSubmitTransaction } from "@xrpl-wallet-standard/react";
+import { useSignAndSubmitTransaction as useXRPLSignAndSubmitTransaction } from "@xrpl-wallet-standard/react";
 import * as xrpl from "xrpl";
 import { xrplChainConfig } from "~/config/chains";
 
@@ -40,8 +40,6 @@ export function useInterchainTransferMutation(
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
   const { address } = useAccount();
-  const { connect: xrplConnection } = useXRPLConnect();
-  const { wallet: xrplWallet } = useXRPLWallet();
   const xrplSignAndSubmit = useXRPLSignAndSubmitTransaction();
   
 
@@ -114,36 +112,18 @@ export function useInterchainTransferMutation(
           });
           txHash = receipt.digest;
         } else if (config.sourceChainName.toLowerCase().includes("xrpl") && !config.sourceChainName.toLowerCase().includes("evm")) {
-          console.log("In mutation: XRPL path");
-
-          /*const xrplInterchainTransfer = useXRPLInterchainTransfer();
-          console.log("Got xrplInterchainTransfer function", xrplInterchainTransfer);
-
-          xrplInterchainTransfer({
-            caller: address,
-            tokenId: tokenId,
-            tokenAddress: config.tokenAddress,
-            destinationChain: config.destinationChainName,
-            destinationAddress: encodedRecipient,
-            amount: bnAmount.toString(),
-            gasValue: config.gas.toString() ?? "0",
-          });*/
-
           const gasToAdd = config.gas ?? 0;
-          const totalTransferAmount = bnAmount + gasToAdd;
           const { txBase64 } = await getXRPLSendTokenTx({
             caller: address,
             tokenId: tokenId,
             tokenAddress: config.tokenAddress,
             destinationChain: config.destinationChainName,
             destinationAddress: encodedRecipient,
-            amount: totalTransferAmount.toString(),
+            amount: bnAmount.toString(),
             gasValue: gasToAdd.toString(),
           });
 
-          const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type
-
-          console.log("Decoded tx:", tx);
+          const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type?
 
           const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
           await client.connect();

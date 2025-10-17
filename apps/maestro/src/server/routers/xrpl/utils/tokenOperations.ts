@@ -13,8 +13,9 @@ export async function buildInterchainTransferTxBytes(
   input: InterchainTransferInput
 ): Promise<{ txBase64: string }> {
     const xrplChainConfig = await getXRPLChainConfig(ctx);
-
-    console.log("Called buildInterchainTransferTxBytes with input:", input, "attempt to open client to", xrplChainConfigDefault);
+    let amountToTransfer = BigInt(input.amount) + BigInt(input.gasValue);
+    let gasFeeAmount = parseTokenGasValue(input.tokenAddress, input.gasValue);
+    let amount = parseTokenAmount(input.tokenAddress, amountToTransfer.toString());
 
     const client = new xrpl.Client(xrplChainConfigDefault.rpcUrls.default.http[0]); // this must be a wss one! 
     await client.connect();
@@ -23,12 +24,12 @@ export async function buildInterchainTransferTxBytes(
         TransactionType: "Payment",
         Account: input.caller,
         Destination: xrplChainConfig.config.contracts.InterchainTokenService.address,
-        Amount: parseTokenAmount(input.tokenAddress, input.amount),
+        Amount: amount,
         Memos: [
             { Memo: { MemoType: hex("type"), MemoData: hex("interchain_transfer") } },
             { Memo: { MemoType: hex("destination_address"), MemoData: hex(input.destinationAddress.replace(/^0x/, "")) } },
             { Memo: { MemoType: hex("destination_chain"), MemoData: hex(input.destinationChain) } },
-            { Memo: { MemoType: hex("gas_fee_amount"), MemoData: hex(parseTokenGasValue(input.tokenAddress, input.gasValue)) } },
+            { Memo: { MemoType: hex("gas_fee_amount"), MemoData: hex(gasFeeAmount) } },
         ]
     };
 

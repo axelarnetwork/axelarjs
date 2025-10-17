@@ -1,7 +1,8 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
+import { formatUnits } from "viem";
 
-import { HEDERA_CHAIN_ID } from "~/config/chains";
+import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
@@ -114,22 +115,62 @@ export function useSendInterchainTokenState(props: {
   const balance = useBalance();
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
+  const isXRPLChain = props.originTokenChainId == XRPL_CHAIN_ID;
+  const payWithToken = isXRPLChain; // XRPL is the only chain that pays with ITS token instead of native token 
+  let sourceChainTokenSymbol;
+  if(isXRPLChain) {
+    // on xrpl, we can only pay for gas with the token that is transferred
+    // we will need the "prettySymbol" value of that token though
+    sourceChainTokenSymbol = tokenSymbol;
+  } else {
+    // in all other cases, use the native token of the chain
+    sourceChainTokenSymbol = nativeTokenSymbol;
+  }
 
-  const { data: gas } = useEstimateGasFeeQuery({
+  let { data: gas } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
     destinationChainId: selectedToChain?.id,
-    sourceChainTokenSymbol: nativeTokenSymbol,
+    sourceChainTokenSymbol,
     gasLimit: NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
     gasMultiplier: "auto",
   });
+  // TODO: remove custom overrides
+  if (tokenDetails?.symbol === "FOO") {
+    gas = 1_000_000_000_000_000_000n;
+  }
+
+  let gasFeeDecimals =
+          CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
+          props.sourceChain.native_token.decimals;
+
+  if(isXRPLChain) {
+    // when XRPL is the source chain, we have to remap the return value of the estimate gas fee query to the "actual" decimals
+    if(sourceChainTokenSymbol == nativeTokenSymbol) {
+      // when we transfer XRP, this is already correct
+    } else if (!tokenDetails?.decimals || !gas) {
+      // this must not happen, but if it does, we assume it is already correct?
+      console.error("tokenDetails.decimals:", tokenDetails, tokenDetails?.decimals, ", gas", gas);
+    } else {
+      // we need to map from tokenDetails.decimals to a rational number
+      if (15 > tokenDetails.decimals)
+        gas = gas * BigInt(10 ** (15 - tokenDetails.decimals));
+      else if (tokenDetails.decimals > 15)
+        gas = gas / BigInt(10 ** (tokenDetails.decimals - 15));
+
+      gasFeeDecimals = 15;
+    }
+  }
 
   const hasInsufficientGasBalance = useMemo(() => {
     if (!balance || !gas) {
       return false;
     }
+    if (payWithToken) {
+      return false; // don't check here
+    }
     return gas > balance.value;
-  }, [balance, gas]);
+  }, [balance, gas, payWithToken]);
 
   const {
     mutateAsync: interchainTransferAsync,
@@ -201,12 +242,11 @@ export function useSendInterchainTokenState(props: {
       selectedToChain,
       eligibleTargetChains,
       tokenSymbol,
+      payWithToken, // whether to pay with the bridged token or with the native token
+      gasRaw: gas, // the actual gas value, as a BigInt
       gasFee: Maybe.of(gas).mapOrUndefined((gasValue) => {
-        const decimals =
-          CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
-          props.sourceChain.native_token.decimals;
-        return toNumericString(gasValue, decimals);
-      }),
+        return toNumericString(gasValue, gasFeeDecimals);
+      }), // just for displaying the value
       nativeTokenSymbol,
       hasInsufficientGasBalance,
       estimatedWaitTimeInMinutes: Maybe.of(sourceChainInfo).mapOr(

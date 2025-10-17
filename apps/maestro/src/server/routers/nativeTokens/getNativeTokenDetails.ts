@@ -96,15 +96,31 @@ export const getStellarTokenDetails = async (
 async function getXRPLTokenDetails(tokenAddress: string, ctx: Context) {
   let name = tokenAddress;
   let symbol = tokenAddress;
+  const { name: chainName, axelarChainId, axelarChainName } = xrplChainConfig;
+  let decimals = 6; // XRP has 6 decimals
+
   if (tokenAddress !== "XRP") {
     symbol = tokenAddress.split(".")[0];
+    const tokenRecord =
+    await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+      axelarChainId,
+      tokenAddress
+    );
+    if (!tokenRecord) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Token metadata not found for ${tokenAddress} on chain ${axelarChainId}`,
+      });
+    }
+    symbol = tokenRecord.tokenSymbol;
+    decimals = tokenRecord.tokenDecimals;
   }
 
-  const { name: chainName, axelarChainId, axelarChainName } = xrplChainConfig;
+  // we cannot get the token data from the chain, so we need to ask the database
 
   return {
     name: name,
-    decimals: tokenAddress === "XRP" ? 6 : 15,
+    decimals: decimals,
     symbol: symbol,
     chainId: xrplChainConfig.id,
     chainName,

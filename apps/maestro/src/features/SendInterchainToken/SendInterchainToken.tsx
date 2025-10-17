@@ -150,8 +150,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
       }
     );
   };
-  console.log("After sendTokenAsync", state);
-
 
   const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
     const pluralized = `token${Number(amountToTransfer) > 1 ? "s" : ""}`;
@@ -436,18 +434,19 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     return "Amount must be greater than 0";
                   }
 
-                  const bnValue = parseUnits(
+                  let bnValue = parseUnits(
                     value as `${number}`,
                     Number(props.balance.decimals) * 2
                   );
-                  console.log("Bnvalue:", bnValue);
+
+                  if (state.gasRaw && state.payWithToken) {
+                    bnValue += state.gasRaw;
+                  }
 
                   const bnBalance = parseUnits(
                     props.balance.tokenBalance,
                     Number(props.balance.decimals)
                   );
-
-                  console.log(bnValue, bnBalance);
 
                   if (bnValue > bnBalance) {
                     return "Insufficient balance";
@@ -598,7 +597,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 <Label.AltText>
                   <Tooltip tip="Approximate gas cost">
                     <span className="ml-2 whitespace-nowrap text-xs">
-                      (≈ {state.gasFee} {state.nativeTokenSymbol} in fees)
+                      (≈ {state.gasFee} {state.payWithToken ? state.tokenSymbol : state.nativeTokenSymbol} in fees)
                     </span>
                   </Tooltip>
                 </Label.AltText>
