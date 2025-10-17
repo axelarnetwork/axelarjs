@@ -54,8 +54,8 @@ async function main() {
   if (deleteImported) {
     console.log("Deleting all imported tokens before syncing");
     try {
-      client.query("DELETE FROM remote_interchain_tokens WHERE imported = true");
-      client.query("DELETE FROM interchain_tokens WHERE imported = true");
+      await client.query("DELETE FROM remote_interchain_tokens WHERE imported = true");
+      await client.query("DELETE FROM interchain_tokens WHERE imported = true");
     }
     catch (err) {
       console.error("Failed to delete tokens:", err);
