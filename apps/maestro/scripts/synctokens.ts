@@ -177,8 +177,8 @@ async function main() {
     try {
       await client.query(
         `INSERT INTO interchain_tokens
-          (token_id, token_address, axelar_chain_id, token_name, token_symbol, token_decimals, deployment_message_id, deployer_address, token_manager_address, token_manager_type, original_minter_address, kind, salt, updated_at, created_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+          (token_id, token_address, axelar_chain_id, token_name, token_symbol, token_decimals, deployment_message_id, deployer_address, token_manager_address, token_manager_type, original_minter_address, kind, salt, imported, updated_at, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, true, NOW(), NOW())
           RETURNING *`,
         [
           tokenId, // token_id
@@ -213,8 +213,8 @@ async function main() {
       try { 
         await client.query(
           `INSERT INTO remote_interchain_tokens
-            (id, token_id, axelar_chain_id, token_address, token_manager_address, token_manager_type, deployment_message_id, deployment_status, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+            (id, token_id, axelar_chain_id, token_address, token_manager_address, token_manager_type, deployment_message_id, deployment_status, imported, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, NOW(), NOW())
             RETURNING *`,
           [
             `${chainId}:${chainInfo.tokenAddress}`, // id // composite key
