@@ -16,6 +16,7 @@ import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
 import { useSignAndSubmitTransaction as useXRPLSignAndSubmitTransaction } from "@xrpl-wallet-standard/react";
 import * as xrpl from "xrpl";
 import { xrplChainConfig } from "~/config/chains";
+import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -94,6 +95,8 @@ export function useInterchainTransferMutation(
         // Encode the recipient address for Stellar since it's a base64 string
         if (config.destinationChainName.toLowerCase().includes("stellar")) {
           encodedRecipient = stellarEncodedRecipient(destinationAddress);
+        } else if (config.destinationChainName.includes("xrpl") && !config.destinationChainName.includes("evm")) {
+          encodedRecipient = xrplEncodedRecipient(destinationAddress);
         } else {
           encodedRecipient = destinationAddress as `0x${string}`;
         }
@@ -144,8 +147,6 @@ export function useInterchainTransferMutation(
               const result = await xrplSignAndSubmit(preparedTx, `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? '0' : process.env.NEXT_PUBLIC_NETWORK_ENV === 'devnet-amplifier' ? '2' : '1'}`);
               txHash = result.tx_hash;
               console.log("Submitted transaction successfully:", txHash);
-              //params.onStatusUpdate?.({ type: "sending", txHash: txHash }); // TODO?
-
           }
           catch (error) {
               console.error("Error during XRPL transaction signing/submission:", error);
