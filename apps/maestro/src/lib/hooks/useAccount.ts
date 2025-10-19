@@ -4,7 +4,7 @@ import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";
 import { getAddress, getNetwork, isConnected } from "@stellar/freighter-api";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
-import {useConnect as useXRPLConnect, useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
+import { useAccount as useXRPLAccount } from "@xrpl-wallet-standard/react";
 
 import { 
   stellarChainConfig, 
@@ -37,11 +37,10 @@ interface CombinedAccountInfo {
 export function useAccount(): CombinedAccountInfo {
   const wagmiAccount = useWagmiAccount();
   const mystenAccount = useMystenAccount();
+  const xrplAccount = useXRPLAccount();
   const [stellarAccount, setStellarAccount] = useState<string | null>(null);
   const [stellarNetwork, setStellarNetwork] = useState<string | null>(null);
   const [isLoadingStellar, setIsLoadingStellar] = useState(true);
-  const xrplWallet = useXRPLWallet();
-  const { connect: xrplConnection } = useXRPLConnect();
 
   const { data: evmChains } = useEVMChainConfigsQuery();
   const APP_SUI_NETWORK =
@@ -98,7 +97,7 @@ export function useAccount(): CombinedAccountInfo {
   const isWagmiConnected = wagmiAccount.isConnected;
   const isMystenConnected = !!mystenAccount;
   const isStellarConnected = !!stellarAccount;
-  const isXRPLConnected = xrplWallet.status === "connected" && !!xrplWallet.wallet?.accounts.at(0);
+  const isXRPLConnected = !!xrplAccount?.address;
 
   const evmChain = useMemo(
     () => evmChains?.find?.((x) => x.chain_id === wagmiAccount?.chain?.id),
@@ -110,7 +109,7 @@ export function useAccount(): CombinedAccountInfo {
       wagmiAccount.address ||
       (mystenAccount?.address as `0x${string}`) ||
       (stellarAccount as string) || 
-      (xrplWallet.wallet?.accounts.at(0)?.address),
+      (xrplAccount?.address),
     isConnected: isWagmiConnected || isMystenConnected || isStellarConnected || isXRPLConnected,
     isDisconnected:
       !isWagmiConnected && !isMystenConnected && !isStellarConnected && !isXRPLConnected,
@@ -135,8 +134,8 @@ export function useAccount(): CombinedAccountInfo {
       APP_STELLAR_NETWORK !== stellarNetwork,
     isWrongXRPLNetwork:
       isXRPLConnected &&
-      !!xrplConnection &&
-      false, // TODO
+      //!!xrplConnection &&
+      false, // TODO - do we need that?
     isLoadingStellar,
   };
 }

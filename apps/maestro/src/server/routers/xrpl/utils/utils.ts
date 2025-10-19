@@ -61,6 +61,10 @@ export function hex(str: string) {
     return Buffer.from(str).toString('hex');
 }
 
+export const xrplEncodedRecipient = (
+  destinationAddress: string
+): `0x${string}` => `0x${hex(destinationAddress)}`;
+
 export function parseTokenAmount(token: string, amountInDrops: string) {
     let parsedAmount;
 

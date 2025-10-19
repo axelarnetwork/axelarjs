@@ -68,8 +68,6 @@ export function useBalance(): BalanceResult | undefined {
   }, [chainName, address]);
 
   useEffect(() => {
-    console.log("Running XRPL get balance effect:", chainName, xrplChainConfig.name, address, xrplWallet);
-
     if (chainName === xrplChainConfig.name && address && xrplWallet?.accounts.length) { // TODO: fix XRPL connection check
       const fetchXRPLBalance = async () => {
         const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
