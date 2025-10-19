@@ -85,7 +85,7 @@ async function main() {
 
   for (const [tokenId, tokenInfo] of Object.entries(assets)) {
     // check if this token is unsupported
-    if(tokenInfo.type != "customInterchain" && tokenInfo.type != "interchain") {
+    if(tokenInfo.type != "customInterchain" && tokenInfo.type != "interchain" && tokenInfo.type != "canonical") {
       tokensIgnored.push(tokenId);
       continue;
     }
