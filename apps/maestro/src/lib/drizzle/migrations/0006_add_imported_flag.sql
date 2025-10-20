@@ -1,2 +1,0 @@
-ALTER TABLE "remote_interchain_tokens" ADD COLUMN "imported" BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE "interchain_tokens" ADD COLUMN "imported" BOOLEAN NOT NULL DEFAULT FALSE;
