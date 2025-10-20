@@ -41,8 +41,6 @@ export async function buildInterchainTransferTxBytes(
       // Fill in missing fields (Fee, Sequence, LastLedgerSequence, etc.)
       const prepared = await client.autofill(tx);
 
-      console.log("Prepared XRPL transaction:", prepared);
-
       const txBase64 = xrpl.encode(prepared);
       return { txBase64 };
     } 

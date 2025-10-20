@@ -47,10 +47,11 @@ export function useXRPLInterchainTransfer() {
             const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type
 
             const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-            await client.connect();
             
             let preparedTx;
             try {
+                await client.connect();
+
                 preparedTx = await client.autofill(tx);
                 const sim = await client.simulate(preparedTx);
                 if (sim.result.engine_result_code !== 0) {
@@ -59,8 +60,16 @@ export function useXRPLInterchainTransfer() {
                 }
             }
             catch (error) {
-                toast.error(`Error during XRPL transaction simulation: ${error}`); // TODO: what to do in that case?
+                toast.error("Error during XRPL transaction simulation"); // TODO: what to do in that case?
+                console.error("Error during XRPL transaction simulation:", error); // TODO: what to do in that case?
                 throw error;
+            }
+            finally {
+                try {
+                    await client.disconnect();
+                } catch (_) {
+                    // ignore this
+                }
             }
 
             try {
@@ -71,7 +80,8 @@ export function useXRPLInterchainTransfer() {
                 return { txHash };
             }
             catch (error) {
-                toast.error(`Error during XRPL transaction signing/submission: ${error}`);
+                toast.error("Error during XRPL transaction signing/submission");
+                console.error("Error during XRPL transaction signing/submission", error);
                 throw error;
             }
         },

@@ -32,8 +32,7 @@ async function checkRpcNode(
           const pingResponse = await client.request({
             command: "ping",
           });
-          clearTimeout(timeout);
-          if (pingResponse.type != "response") {
+          if (pingResponse.type !== "response") {
             return "down";
           }
           return "up";
@@ -41,6 +40,7 @@ async function checkRpcNode(
           return "down";
         } finally {
           try {
+            clearTimeout(timeout);
             await client.disconnect();
           } catch (_) {
             // ignore this

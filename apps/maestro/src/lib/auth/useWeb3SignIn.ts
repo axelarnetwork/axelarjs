@@ -121,7 +121,7 @@ export function useWeb3SignIn({
             Fee: "0"
           };
 
-          const result = await xrplSignTransaction(tx, `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? '0' : process.env.NEXT_PUBLIC_NETWORK_ENV === 'devnet-amplifier' ? '2' : '1'}`);
+          const result = await xrplSignTransaction(tx, (xrplChainConfig as unknown as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
           signature = result.signed_tx_blob;
         }
         const response = await signIn("credentials", {

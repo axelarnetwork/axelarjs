@@ -154,7 +154,8 @@ export function useInterchainTransferMutation(
               txHash = result.tx_hash;
           }
           catch (error) {
-              toast.error(`Error during XRPL transaction signing/submission: ${error}`);
+              toast.error("Error during XRPL transaction signing/submission");
+              console.error("Error during XRPL transaction signing/submission", error);
               throw error;
           }
           

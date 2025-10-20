@@ -92,7 +92,7 @@ export function useBalance(): BalanceResult | undefined {
       }
       fetchXRPLBalance();
     }
-  }, [chainName, address])
+  }, [chainName, address]);
 
   const balance = useMemo(() => {
     if (wagmiBalance) {
@@ -120,11 +120,7 @@ export function useBalance(): BalanceResult | undefined {
     }
     if (XRPLDrops) {
       const value = BigInt(XRPLDrops);
-      const { decimals, symbol } = (
-        xrplChainConfig ?? {
-          nativeCurrency: { decimals: 6, symbol: "XRP" },
-        }
-      ).nativeCurrency as { decimals: number; symbol: string };
+      const { decimals, symbol } = xrplChainConfig.nativeCurrency;
       return {
         value,
         formatted: formatUnits(value, decimals),

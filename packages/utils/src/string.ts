@@ -24,6 +24,11 @@ export const maskAddress = (
   const segA = opts?.segmentA ?? 6;
   const segB = opts?.segmentB ?? -4;
 
+  if (segA <= 0 || segB >= 0) {
+    // in case invariants fail, just return the address unchanged
+    return address;
+  }
+
   // If the address is too short to reasonably mask, return it unchanged
   if (address.length <= segA + (-segB) + 3) {
     return address;
