@@ -5,7 +5,6 @@ import {
   useConnect as useXRPLConnect,
   useWallet as useXRPLWallet,
 } from "@xrpl-wallet-standard/react";
-import * as xrpl from "xrpl";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {
@@ -20,6 +19,7 @@ import {
 } from "~/config/chains/vm-chains";
 import { STELLAR_HORIZON_URL } from "~/server/routers/stellar/utils/config";
 import { useAccount } from "./useAccount";
+import { fetchXRPLBalance } from "../utils/xrpl";
 
 // Define a type for the balance result
 interface BalanceResult {
@@ -69,28 +69,10 @@ export function useBalance(): BalanceResult | undefined {
 
   useEffect(() => {
     if (chainName === xrplChainConfig.name && address && xrplWallet?.accounts.length) { // TODO: fix XRPL connection check
-      const fetchXRPLBalance = async () => {
-        const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-        await client.connect();
-
-        try {
-          const accountInfo = await client.request({
-            command: "account_info",
-            account: address,
-          });
-          // Balance is returned in drops (1 XRP = 1,000,000 drops)
-          const drops = accountInfo.result.account_data.Balance;
-          
-          setXRPLDrops(drops);
-        } finally {
-          try {
-            await client.disconnect();
-          } catch (_) {
-            // ignore this
-          }
-        }
-      }
-      fetchXRPLBalance();
+      (async () => {
+        const drops = await fetchXRPLBalance(address);
+        setXRPLDrops(drops);
+      })();
     }
   }, [chainName, address]);
 

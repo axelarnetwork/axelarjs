@@ -8,6 +8,7 @@ import {
 
 import * as xrpl from "xrpl";
 import { invariant } from "@axelarjs/utils";
+import { autofillXRPLTx } from "~/lib/utils/xrpl";
 
 export async function buildInterchainTransferTxBytes(
   ctx: Context,
@@ -21,34 +22,22 @@ export async function buildInterchainTransferTxBytes(
     let gasFeeAmount = parseTokenGasValue(input.tokenAddress, input.gasValue);
     let amount = parseTokenAmount(input.tokenAddress, amountToTransfer.toString());
 
-    const client = new xrpl.Client(xrplChainConfigDefault.rpcUrls.default.http[0]); // this must be a wss one! 
-    try {
-      await client.connect();
+    const tx: xrpl.Payment = {
+        TransactionType: "Payment",
+        Account: input.caller,
+        Destination: xrplChainConfig.config.contracts.InterchainTokenService.address,
+        Amount: amount,
+        Memos: [
+            { Memo: { MemoType: hex("type"), MemoData: hex("interchain_transfer") } },
+            { Memo: { MemoType: hex("destination_address"), MemoData: hex(input.destinationAddress.replace(/^0x/, "")) } },
+            { Memo: { MemoType: hex("destination_chain"), MemoData: hex(input.destinationChain) } },
+            { Memo: { MemoType: hex("gas_fee_amount"), MemoData: hex(gasFeeAmount) } },
+        ]
+    };
 
-      const tx: xrpl.Payment = {
-          TransactionType: "Payment",
-          Account: input.caller,
-          Destination: xrplChainConfig.config.contracts.InterchainTokenService.address,
-          Amount: amount,
-          Memos: [
-              { Memo: { MemoType: hex("type"), MemoData: hex("interchain_transfer") } },
-              { Memo: { MemoType: hex("destination_address"), MemoData: hex(input.destinationAddress.replace(/^0x/, "")) } },
-              { Memo: { MemoType: hex("destination_chain"), MemoData: hex(input.destinationChain) } },
-              { Memo: { MemoType: hex("gas_fee_amount"), MemoData: hex(gasFeeAmount) } },
-          ]
-      };
+    // Fill in missing fields (Fee, Sequence, LastLedgerSequence, etc.)
+    const prepared = await autofillXRPLTx(tx);
 
-      // Fill in missing fields (Fee, Sequence, LastLedgerSequence, etc.)
-      const prepared = await client.autofill(tx);
-
-      const txBase64 = xrpl.encode(prepared);
-      return { txBase64 };
-    } 
-    finally {
-      try {
-        await client.disconnect();
-      } catch (_) {
-        // ignore this
-      }
-    }
+    const txBase64 = xrpl.encode(prepared);
+    return { txBase64 };
 }

@@ -6,6 +6,7 @@ import { toast } from "@axelarjs/ui/toaster";
 import { trpc } from "~/lib/trpc";
 import { xrplChainConfig } from "~/config/chains";
 import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
+import { autofillAndSimulateXRPLTx } from "~/lib/utils/xrpl";
 
 export interface XRPLInterchainTransferParams {
     caller: string;
@@ -46,29 +47,14 @@ export function useXRPLInterchainTransfer() {
 
             const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type
 
-            const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-            
             let preparedTx;
             try {
-                await client.connect();
-
-                preparedTx = await client.autofill(tx);
-                const sim = await client.simulate(preparedTx);
-                if (sim.result.engine_result_code !== 0) {
-                    throw Error(`Simulation failed: ${sim.result.engine_result_message}`);
-                }
+                preparedTx = await autofillAndSimulateXRPLTx(tx);
             }
             catch (error) {
                 toast.error(`Error during XRPL transaction simulation: ${error}`);
                 console.error("Error during XRPL transaction simulation:", error);
                 throw error;
-            }
-            finally {
-                try {
-                    await client.disconnect();
-                } catch (_) {
-                    // ignore this
-                }
             }
 
             try {

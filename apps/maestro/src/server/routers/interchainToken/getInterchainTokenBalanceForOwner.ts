@@ -19,6 +19,7 @@ import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { simulateCall } from "../stellar/utils/transactions";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
+import { fetchXRPLBalance, getXRPLAccountBalance } from "~/lib/utils/xrpl";
 
 // Helper function to call Stellar contract methods and handle errors
 async function callStellarContractMethod<T>({
@@ -223,80 +224,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     }
 
     if (isValidXRPLTokenAddress(input.tokenAddress)) {
-      const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-      try {
-        await client.connect();
-        if (input.tokenAddress === "XRP") {
-          // fetch XRP balance
-          const balance = await client.getXrpBalance(input.owner);
-          const balanceInDrops = xrpl.xrpToDrops(balance);
-
-          return {
-            isTokenOwner: false,
-            isTokenMinter: false,
-            tokenBalance: balanceInDrops,
-            decimals: 6,
-            isTokenPendingOwner: false,
-            hasPendingOwner: false,
-            hasMinterRole: false,
-            hasOperatorRole: false,
-            hasFlowLimiterRole: false,
-          };
-        }
-
-        // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
-        const [currency, issuer] = input.tokenAddress.split(".");
-        if (!currency || !issuer) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
-          });
-        }
-
-        const response = await client.request({
-          command: "account_lines",
-          account: input.owner,
-        });
-
-        // Find the line that matches the token
-        const line = response.result.lines.find(
-          (l) => l.currency === currency && l.account === issuer
-        );
-
-        const XRPL_TOKEN_DECIMALS = 15;
-        const actualBalance = line ? Decimal(line.balance).times(new Decimal(10).pow(XRPL_TOKEN_DECIMALS)).toFixed(0) : "0";
-
-        return {
-          isTokenOwner: false,
-          isTokenMinter: false,
-          tokenBalance: line ? actualBalance.toString() : "0",
-          decimals: XRPL_TOKEN_DECIMALS,
-          isTokenPendingOwner: false,
-          hasPendingOwner: false,
-          hasMinterRole: false,
-          hasOperatorRole: false,
-          hasFlowLimiterRole: false,
-        }
-      } catch (error) {
-        // TODO: should this throw an TRPCError ?
-        return {
-          isTokenOwner: false,
-          isTokenMinter: false,
-          tokenBalance: "0",
-          decimals: 0,
-          isTokenPendingOwner: false,
-          hasPendingOwner: false,
-          hasMinterRole: false,
-          hasOperatorRole: false,
-          hasFlowLimiterRole: false,
-        };
-      } finally {
-        try {
-          await client.disconnect();
-        } catch (_) {
-          // ignore this
-        }
-      }
+      return getXRPLAccountBalance(input.owner, input.tokenAddress);
     }
 
     // This is for ERC20 tokens

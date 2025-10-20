@@ -3,49 +3,31 @@ import { z } from "zod";
 import { CHAIN_CONFIGS } from "~/config/chains";
 import { sendRpcNodeIssueNotificationWithRateLimit } from "~/lib/utils/slack-notifications";
 import { publicProcedure, router } from "~/server/trpc";
-import { Client as xrplClient } from "xrpl";
+import { checkXRPLNode } from "~/lib/utils/xrpl";
 
 async function checkRpcNode(
   url: string,
   chainName: string
 ): Promise<"up" | "down" | "timeout"> {
   try {
+    const chainNameLower = chainName.toLowerCase();
+
+    if(chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
+      // test via xrpl.js
+      return checkXRPLNode();
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => {
       controller.abort();
     }, 60000); // will timeout if RPC node dont respond in 60s
     try {
       let method = "net_version";
-      const chainNameLower = chainName.toLowerCase();
       
       if (chainNameLower === "sui") {
         method = "sui_getTotalTransactionBlocks";
       } else if (chainNameLower === "stellar" || chainNameLower.includes("stellar")) {
         method = "getVersionInfo";
-      }
-      if(chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
-        // test via xrpl.js
-        const client = new xrplClient(url);
-        await client.connect();
-
-        try {
-          const pingResponse = await client.request({
-            command: "ping",
-          });
-          if (pingResponse.type !== "response") {
-            return "down";
-          }
-          return "up";
-        } catch (error) {
-          return "down";
-        } finally {
-          try {
-            clearTimeout(timeout);
-            await client.disconnect();
-          } catch (_) {
-            // ignore this
-          }
-        }
       }
 
       let json;
