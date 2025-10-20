@@ -7,13 +7,13 @@ import { clamp, splitAt } from "rambda";
 import { useBlockNumber, useTransaction } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
-import { ITSChainConfig } from "~/server/chainConfig";
 import { useChainId } from "~/lib/hooks";
-import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
+import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
+import { ITSChainConfig } from "~/server/chainConfig";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
+import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
-import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 
@@ -199,13 +199,12 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <ul className="grid gap-2 rounded-box bg-base-300 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
-
             const chain = getNormalizedTwoHopChainConfig(
               axelarChainId,
               combinedComputed,
               chainId
             );
-             
+
             if (!chain) {
               console.log("chain not found", axelarChainId);
               return undefined;
@@ -215,7 +214,7 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
               <ChainStatusItem
                 key={`chain-status-${axelarChainId}`}
                 chain={chain}
-                status={status}
+                status={status ?? "pending"}
                 txHash={txHash}
                 logIndex={logIndex}
               />

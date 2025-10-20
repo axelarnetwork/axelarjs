@@ -51,11 +51,11 @@ export default function HomePage() {
           <ConditionalRenderInterchainBanner />
         </div>
         <div
-          className="flex min-h-[80dvh] w-full max-w-lg flex-col items-center justify-center"
+          className="z-0 flex min-h-[80dvh] w-full max-w-lg flex-col items-center justify-center"
           id="main-content"
         >
           {shouldRenderTestnetBanner && (
-            <Dialog open onClose={handleDismissBanner} className="bg-warning">
+            <Dialog open onClose={handleDismissBanner}>
               <Dialog.Body className="bg-warning text-warning-content">
                 <Dialog.CornerCloseAction onClick={handleDismissBanner} />
                 <Alert $status="warning">

@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { suiChainConfig } from "~/config/chains";
 
+import { suiChainConfig } from "~/config/chains";
 import { publicProcedure } from "~/server/trpc";
 
 const INPUT_SCHEMA = z.object({
@@ -52,15 +52,14 @@ export const getChainInfo = publicProcedure
 
       return output;
     } catch (error) {
-
       // Remove this once we have sui supported in the urlMap from the axelarjs-sdk
-      if(input.axelarChainId.includes("sui")){
+      if (input.axelarChainId.includes("sui")) {
         return {
           id: suiChainConfig.axelarChainId,
           chainName: "sui",
           blockConfirmations: 1,
           estimatedWaitTimeInMinutes: 1,
-        }
+        };
       }
       // If we get a TRPC error, we throw it
       if (error instanceof TRPCError) {

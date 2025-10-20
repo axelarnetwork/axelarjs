@@ -73,6 +73,7 @@ type Props = {
   compact?: boolean;
   hideLabel?: boolean;
   disabled?: boolean;
+  containerClassName?: string;
   triggerClassName?: string;
   chainIconClassName?: string;
   contentClassName?: string;
@@ -275,7 +276,7 @@ const ChainsDropdown: FC<Props> = (props) => {
   );
 
   return (
-    <Dropdown $align="end">
+    <Dropdown $align="end" className={props.containerClassName}>
       {props.renderTrigger?.() ?? (
         <Dropdown.Trigger
           $as="button"
@@ -300,9 +301,9 @@ const ChainsDropdown: FC<Props> = (props) => {
       {eligibleChains.length > 0 && !props.disabled && (
         <Dropdown.Content
           className={cn(
-            "z-10 mt-2 max-h-[75vh] w-full dark:bg-base-200 md:w-[28rem]",
+            "z-10 mt-2 grid max-h-[75vh] w-full grid-cols-2 gap-1 overflow-y-auto overflow-x-hidden p-1 dark:bg-base-200 md:w-[28rem]",
             {
-              "broder max-h-[350px] w-80 overflow-x-scroll bg-base-200 dark:bg-base-300 md:w-96":
+              "broder max-h-[350px] w-80 bg-base-200 dark:bg-base-300 md:w-96":
                 props.compact,
             },
             props.contentClassName

@@ -3,9 +3,14 @@ import { Alert, Button, cn, Tooltip } from "@axelarjs/ui";
 import { Maybe } from "@axelarjs/utils";
 import { useSessionStorageState } from "@axelarjs/utils/react";
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
+import { useSession } from "next-auth/react";
 
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 
+import {
+  EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
@@ -16,7 +21,6 @@ import type { TokenInfo } from "~/features/InterchainTokenList/types";
 import { RegisterRemoteTokens } from "~/features/RegisterRemoteTokens";
 import { useTransactionsContainer } from "~/features/Transactions";
 import {
-  SUI_CHAIN_ID,
   useAccount,
   useBalance,
   useChainId,
@@ -119,15 +123,262 @@ function getDeploymentStatus(
     : { ...deploymentStatus, status: "pending" };
 }
 
+const useIsAuthenticated = () => {
+  const { data: session, status: sessionStatus } = useSession();
+  return {
+    isAuthenticated: sessionStatus === "authenticated" && !!session?.address,
+    session,
+    sessionStatus,
+  };
+};
+
+type InterchainToken = NonNullable<
+  Awaited<ReturnType<typeof useInterchainTokensQuery>>
+>["data"];
+
+interface UseUpdateRemoteSuiProps {
+  interchainToken: InterchainToken;
+  tokenId: string | null;
+  tokenAddress: string;
+  onSuccess: VoidFunction;
+}
+
+const useUpdateRemoteSui = ({
+  interchainToken,
+  tokenId,
+  tokenAddress,
+  onSuccess,
+}: UseUpdateRemoteSuiProps) => {
+  const { isAuthenticated } = useIsAuthenticated();
+
+  const { mutateAsync: updateSuiAddresses } =
+    trpc.interchainToken.updateSuiRemoteTokenAddresses.useMutation();
+
+  const [isAlreadyUpdatingRemoteSui, setAlreadyUpdatingRemoteSui] =
+    useState(false);
+
+  // Update Sui remote token addresses
+  // the address is wrong on the Sui chain on deployment because it's the EVM address,
+  // we wait for the tx to be executed then we update the address on the Sui chain
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const suiChain = interchainToken?.matchingTokens?.find((x) =>
+      x.chain?.id.includes("sui")
+    );
+
+    if (
+      !isAlreadyUpdatingRemoteSui &&
+      suiChain &&
+      interchainToken?.matchingTokens?.some(
+        (x) =>
+          x.chain?.id === suiChain?.chain?.id &&
+          x.tokenAddress === tokenAddress &&
+          x.isRegistered
+      ) &&
+      tokenId
+    ) {
+      setAlreadyUpdatingRemoteSui(true);
+      updateSuiAddresses({
+        tokenId,
+      })
+        .then(() => {
+          setAlreadyUpdatingRemoteSui(false);
+          onSuccess();
+        })
+        .catch(() => {
+          setTimeout(() => {
+            setAlreadyUpdatingRemoteSui(false);
+          }, 5000); // space requests while waiting for the tx to be executed and data to be available on sui chain
+        });
+    }
+  }, [
+    isAuthenticated,
+    interchainToken?.matchingTokens,
+    isAlreadyUpdatingRemoteSui,
+    tokenAddress,
+    tokenId,
+    updateSuiAddresses,
+    onSuccess,
+  ]);
+};
+
+interface UseUpdateRemoteStellarProps {
+  interchainToken: InterchainToken;
+  tokenId: string | null;
+  tokenAddress: string;
+  onSuccess: VoidFunction;
+}
+
+const useUpdateRemoteStellar = ({
+  interchainToken,
+  tokenId,
+  tokenAddress,
+  onSuccess,
+}: UseUpdateRemoteStellarProps) => {
+  const { isAuthenticated } = useIsAuthenticated();
+
+  const [isAlreadyUpdatingRemoteStellar, setAlreadyUpdatingRemoteStellar] =
+    useState(false);
+
+  const { mutateAsync: updateStellarAddresses } =
+    trpc.interchainToken.updateStellarRemoteTokenAddresses.useMutation();
+
+  // Update Stellar remote token addresses
+  // the address is wrong on the Stellar chain on deployment because it's the EVM address,
+  // we wait for the tx to be executed then we update the address on the Stellar chain
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const stellarChain = interchainToken?.matchingTokens?.find((x) =>
+      x.chain?.id.includes("stellar")
+    );
+
+    if (
+      !isAlreadyUpdatingRemoteStellar &&
+      stellarChain &&
+      interchainToken?.matchingTokens?.some(
+        (x) =>
+          x.chain?.id === stellarChain?.chain?.id &&
+          x.tokenAddress === tokenAddress &&
+          x.isRegistered
+      ) &&
+      tokenId
+    ) {
+      setAlreadyUpdatingRemoteStellar(true);
+      updateStellarAddresses({
+        tokenId,
+      })
+        .then(() => {
+          setAlreadyUpdatingRemoteStellar(false);
+          onSuccess();
+        })
+        .catch(() => {
+          setTimeout(() => {
+            setAlreadyUpdatingRemoteStellar(false);
+          }, 5000); // space requests while waiting for the tx to be executed and data to be available on stellar chain
+        });
+    }
+  }, [
+    isAuthenticated,
+    interchainToken?.matchingTokens,
+    isAlreadyUpdatingRemoteStellar,
+    tokenAddress,
+    tokenId,
+    onSuccess,
+    updateStellarAddresses,
+  ]);
+};
+
+interface UseUpdateRemoteRegisteredEVMProps {
+  chainId: number;
+  interchainToken: InterchainToken;
+  tokenId: string | null;
+  tokenAddress: string;
+  onSuccess: VoidFunction;
+}
+
+const useUpdateRemoteEVM = ({
+  chainId,
+  interchainToken,
+  tokenId,
+  tokenAddress,
+  onSuccess,
+}: UseUpdateRemoteRegisteredEVMProps) => {
+  const { isAuthenticated } = useIsAuthenticated();
+
+  const { mutateAsync: updateEVMRemoteTokenAddress } =
+    trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
+
+  const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
+
+  const setChainUpdateStatus = useCallback(
+    (chainId: string | undefined, status: boolean) => {
+      setIsUpdating((prev) => ({ ...prev, [chainId ?? ""]: status }));
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    // also, update the address for the EVM chains that have a non-deterministic token address
+    interchainToken?.matchingTokens?.forEach((x) => {
+      const updateToken = () => {
+        if (isUpdating[x.chain?.id ?? ""] || !tokenId) {
+          return;
+        }
+
+        setChainUpdateStatus(x.chain?.id, true);
+        updateEVMRemoteTokenAddress({
+          tokenId,
+          axelarChainId: x.chain?.id,
+        })
+          .then(() => {
+            setChainUpdateStatus(x.chain?.id, false);
+            onSuccess();
+          })
+          .catch(() => {
+            setTimeout(() => {
+              setChainUpdateStatus(x.chain?.id, false);
+            }, 5000);
+          });
+      };
+
+      // check if the EVM token address is the same as sui, which is wrong
+      // NOTE: maybe also check that the destination chain is actually an EVM chain
+      const shouldUpdateSui =
+        chainId === SUI_CHAIN_ID &&
+        !x.chain?.id.includes("sui") &&
+        x.tokenAddress === tokenAddress;
+
+      if (shouldUpdateSui) {
+        updateToken();
+        return;
+      }
+
+      // only handle registered tokens
+      if (!x.isRegistered) {
+        return;
+      }
+
+      const isSourceEVMNonDeterministic =
+        EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(chainId);
+      const isDestinationEVMNonDeterministic =
+        EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS.includes(
+          x.chain?.chain_id
+        );
+
+      // 1. If source chain is non-deterministic, update matchingTokens where the addresses match
+      // 2. If source chain is deterministic, update matchingTokens where the addresses match AND the destination chain is non-deterministic
+      const shouldUpdateToken = isSourceEVMNonDeterministic
+        ? x.tokenAddress === tokenAddress && x.chain?.chain_id !== chainId
+        : x.tokenAddress === tokenAddress && isDestinationEVMNonDeterministic;
+
+      if (shouldUpdateToken) {
+        updateToken();
+        return;
+      }
+    });
+  }, [
+    isAuthenticated,
+    interchainToken?.matchingTokens,
+    chainId,
+    tokenAddress,
+    tokenId,
+    updateEVMRemoteTokenAddress,
+    isUpdating,
+    onSuccess,
+    setChainUpdateStatus,
+  ]);
+};
+
 const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
   props
 ) => {
-  const [isAlreadyUpdatingRemoteSui, setAlreadyUpdatingRemoteSui] =
-    useState(false);
-  const [isAlreadyUpdatingRemoteStellar, setAlreadyUpdatingRemoteStellar] =
-    useState(false);
   const { address } = useAccount();
   const chainId = useChainId();
+  const { isAuthenticated } = useIsAuthenticated();
   const {
     data: interchainToken,
     refetch: refetchInterchainToken,
@@ -269,146 +520,32 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   // Try to recover deployment message id if it's missing
   useEffect(() => {
-    recoverMessageId();
-  }, [recoverMessageId]);
-
-  const { mutateAsync: updateSuiAddresses } =
-    trpc.interchainToken.updateSuiRemoteTokenAddresses.useMutation();
-
-  const { mutateAsync: updateStellarAddresses } =
-    trpc.interchainToken.updateStellarRemoteTokenAddresses.useMutation();
-
-  const { mutateAsync: updateEVMAddresses } =
-    trpc.interchainToken.updateEVMRemoteTokenAddress.useMutation();
-
-  // Update Sui remote token addresses
-  // the address is wrong on the Sui chain on deployment because it's the EVM address,
-  // we wait for the tx to be executed then we update the address on the Sui chain
-  useEffect(() => {
-    const suiChain = interchainToken?.matchingTokens?.find((x) =>
-      x.chain?.id.includes("sui")
-    );
-
-    if (
-      !isAlreadyUpdatingRemoteSui &&
-      suiChain &&
-      interchainToken?.matchingTokens?.some(
-        (x) =>
-          x.chain?.id === suiChain?.chain?.id &&
-          x.tokenAddress === props.tokenAddress &&
-          x.isRegistered
-      ) &&
-      props.tokenId
-    ) {
-      setAlreadyUpdatingRemoteSui(true);
-      updateSuiAddresses({
-        tokenId: props.tokenId,
-      })
-        .then(() => {
-          setAlreadyUpdatingRemoteSui(false);
-          refetchPageData();
-        })
-        .catch(() => {
-          setTimeout(() => {
-            setAlreadyUpdatingRemoteSui(false);
-          }, 5000); // space requests while waiting for the tx to be executed and data to be available on sui chain
-        });
+    if (isAuthenticated) {
+      recoverMessageId();
     }
-  }, [
-    interchainToken?.matchingTokens,
-    isAlreadyUpdatingRemoteSui,
-    props.tokenAddress,
-    props.tokenId,
-    updateSuiAddresses,
-    refetchPageData,
-  ]);
+  }, [recoverMessageId, isAuthenticated]);
 
-  // Update Stellar remote token addresses
-  // the address is wrong on the Stellar chain on deployment because it's the EVM address,
-  // we wait for the tx to be executed then we update the address on the Stellar chain
-  useEffect(() => {
-    const stellarChain = interchainToken?.matchingTokens?.find((x) =>
-      x.chain?.id.includes("stellar")
-    );
+  useUpdateRemoteSui({
+    interchainToken,
+    tokenId: props.tokenId ?? null,
+    tokenAddress: props.tokenAddress,
+    onSuccess: refetchPageData,
+  });
 
-    if (
-      !isAlreadyUpdatingRemoteStellar &&
-      stellarChain &&
-      interchainToken?.matchingTokens?.some(
-        (x) =>
-          x.chain?.id === stellarChain?.chain?.id &&
-          x.tokenAddress === props.tokenAddress &&
-          x.isRegistered
-      ) &&
-      props.tokenId
-    ) {
-      setAlreadyUpdatingRemoteStellar(true);
-      updateStellarAddresses({
-        tokenId: props.tokenId,
-      })
-        .then(() => {
-          setAlreadyUpdatingRemoteStellar(false);
-          refetchPageData();
-        })
-        .catch(() => {
-          setTimeout(() => {
-            setAlreadyUpdatingRemoteStellar(false);
-          }, 5000); // space requests while waiting for the tx to be executed and data to be available on stellar chain
-        });
-    }
-  }, [
-    interchainToken?.matchingTokens,
-    isAlreadyUpdatingRemoteStellar,
-    props.tokenAddress,
-    props.tokenId,
-    refetchPageData,
-    updateStellarAddresses,
-  ]);
+  useUpdateRemoteStellar({
+    interchainToken,
+    tokenId: props.tokenId ?? null,
+    tokenAddress: props.tokenAddress,
+    onSuccess: refetchPageData,
+  });
 
-  const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
-
-  const setChainUpdateStatus = useCallback(
-    (chainId: string | undefined, status: boolean) => {
-      setIsUpdating((prev) => ({ ...prev, [chainId ?? ""]: status }));
-    },
-    []
-  );
-
-  useEffect(() => {
-    interchainToken?.matchingTokens?.forEach((x) => {
-      // check if the EVM token address is the same as sui, which is wrong
-      if (
-        props.chainId === SUI_CHAIN_ID &&
-        !x.chain?.id.includes("sui") &&
-        x.tokenAddress === props.tokenAddress &&
-        !isUpdating[x.chain?.id ?? ""]
-      ) {
-        setChainUpdateStatus(x.chain?.id, true);
-        updateEVMAddresses({
-          tokenId: props?.tokenId as `0x${string}`,
-          axelarChainId: x.chain?.id,
-        })
-          .then(() => {
-            setChainUpdateStatus(x.chain?.id, false);
-            refetchPageData();
-          })
-          .catch(() => {
-            setTimeout(() => {
-              setChainUpdateStatus(x.chain?.id, false);
-            }, 5000);
-          });
-      }
-    });
-  }, [
-    interchainToken?.matchingTokens,
-    props.chainId,
-    props.tokenAddress,
-    props?.tokenId,
-    updateEVMAddresses,
-    isUpdating,
-    refetchPageData,
-    setChainUpdateStatus,
-  ]);
+  useUpdateRemoteEVM({
+    chainId: props.chainId,
+    interchainToken,
+    tokenId: props.tokenId ?? null,
+    tokenAddress: props.tokenAddress,
+    onSuccess: refetchPageData,
+  });
 
   const remoteChainsExecuted = useMemo(
     () =>
