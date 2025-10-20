@@ -111,7 +111,7 @@ async function getXRPLTokenDetails(tokenAddress: string, ctx: Context) {
         message: `Token metadata not found for ${tokenAddress} on chain ${axelarChainId}`,
       });
     }
-    // name = tokenRecord.tokenName; // TODO: not sure if token address or token name should be displayed here - showing the address makes token fraud harder?
+    name = tokenRecord.tokenName;
     symbol = tokenRecord.tokenSymbol;
     decimals = tokenRecord.tokenDecimals;
   }

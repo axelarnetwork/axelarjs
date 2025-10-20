@@ -18,6 +18,7 @@ import * as xrpl from "xrpl";
 import { xrplChainConfig } from "~/config/chains";
 import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
 import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
+import { useXRPLInterchainTransfer } from "~/features/xrplHooks";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -42,7 +43,7 @@ export function useInterchainTransferMutation(
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
   const { address } = useAccount();
-  const xrplSignAndSubmit = useXRPLSignAndSubmitTransaction();
+  const xrplInterchainTransfer = useXRPLInterchainTransfer();
   
 
   const { sendToken: sendStellarToken } = useSendStellarToken();
@@ -51,12 +52,6 @@ export function useInterchainTransferMutation(
     useWriteInterchainTokenInterchainTransfer();
 
   const { mutateAsync: getSendTokenTx } = trpc.sui.getSendTokenTx.useMutation({
-    onError(error) {
-      console.log("error in getSendTokenTx", error.message);
-    },
-  });
-
-  const { mutateAsync: getXRPLSendTokenTx } = trpc.xrpl.getInterchainTransferTxBytes.useMutation({
     onError(error) {
       console.log("error in getSendTokenTx", error.message);
     },
@@ -115,50 +110,17 @@ export function useInterchainTransferMutation(
           });
           txHash = receipt.digest;
         } else if (config.sourceChainName.toLowerCase().includes("xrpl") && !config.sourceChainName.toLowerCase().includes("evm")) {
-          const gasToAdd = config.gas ?? 0;
-          const { txBase64 } = await getXRPLSendTokenTx({
+          const result = await xrplInterchainTransfer({
             caller: address,
             tokenId: tokenId,
             tokenAddress: config.tokenAddress,
             destinationChain: config.destinationChainName,
             destinationAddress: encodedRecipient,
             amount: bnAmount.toString(),
-            gasValue: gasToAdd.toString(),
+            gasValue: config.gas.toString() ?? "0",
           });
 
-          const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type?
-
-          const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-          let preparedTx;
-
-          try {
-            await client.connect();
-            preparedTx = await client.autofill(tx);
-            const sim = await client.simulate(preparedTx);
-
-            if (sim.result.engine_result_code !== 0) {
-              toast.error(`Simulation failed: ${sim.result.engine_result_message}`);
-              throw Error("Simulation failed");
-            }
-          }
-          finally {
-            try {
-              await client.disconnect();
-            } catch (_) {
-              // ignore this
-            }
-          }
-
-          try {
-              const result = await xrplSignAndSubmit(preparedTx, (xrplChainConfig as unknown as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
-              txHash = result.tx_hash;
-          }
-          catch (error) {
-              toast.error("Error during XRPL transaction signing/submission");
-              console.error("Error during XRPL transaction signing/submission", error);
-              throw error;
-          }
-          
+          txHash = result.txHash;
         }
         else if (config.sourceChainName.toLowerCase().includes("stellar")) {
           const result = await sendStellarToken.mutateAsync({

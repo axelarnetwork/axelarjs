@@ -55,13 +55,12 @@ export function useXRPLInterchainTransfer() {
                 preparedTx = await client.autofill(tx);
                 const sim = await client.simulate(preparedTx);
                 if (sim.result.engine_result_code !== 0) {
-                    toast.error(`Simulation failed: ${sim.result.engine_result_message}`);
-                    throw Error("Simulation failed");
+                    throw Error(`Simulation failed: ${sim.result.engine_result_message}`);
                 }
             }
             catch (error) {
-                toast.error("Error during XRPL transaction simulation"); // TODO: what to do in that case?
-                console.error("Error during XRPL transaction simulation:", error); // TODO: what to do in that case?
+                toast.error(`Error during XRPL transaction simulation: ${error}`);
+                console.error("Error during XRPL transaction simulation:", error);
                 throw error;
             }
             finally {
@@ -80,7 +79,7 @@ export function useXRPLInterchainTransfer() {
                 return { txHash };
             }
             catch (error) {
-                toast.error("Error during XRPL transaction signing/submission");
+                toast.error(`Error during XRPL transaction signing/submission: ${error}`);
                 console.error("Error during XRPL transaction signing/submission", error);
                 throw error;
             }

@@ -30,7 +30,6 @@ interface CombinedAccountInfo {
   chainName?: string;
   isWrongSuiNetwork?: boolean;
   isWrongStellarNetwork?: boolean;
-  isWrongXRPLNetwork?: boolean;
   isLoadingStellar?: boolean;
 }
 
@@ -47,8 +46,6 @@ export function useAccount(): CombinedAccountInfo {
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "sui:mainnet" : "sui:testnet";
   const APP_STELLAR_NETWORK =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "PUBLIC" : "TESTNET";
-  const APP_XRPL_NETWORK =
-    NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "mainnet" : NEXT_PUBLIC_NETWORK_ENV === "testnet" ? "testnet" : "devnet";
   const checkFreighterStatus = useCallback(async () => {
     const isStellarConnected = getStellarConnectionState() ?? false;
     if (stellarAccount && isStellarConnected) {
@@ -132,10 +129,6 @@ export function useAccount(): CombinedAccountInfo {
       isStellarConnected &&
       !!stellarNetwork &&
       APP_STELLAR_NETWORK !== stellarNetwork,
-    isWrongXRPLNetwork:
-      isXRPLConnected &&
-      //!!xrplConnection &&
-      false, // TODO - do we need that?
     isLoadingStellar,
   };
 }

@@ -21,6 +21,7 @@ import { trpc } from "../trpc";
 import { setStellarConnectionState } from "../utils/stellar";
 
 import { Client, Wallet, multisign } from "xrpl";
+import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
