@@ -5,6 +5,7 @@ import { toast } from "@axelarjs/ui/toaster";
 
 import { trpc } from "~/lib/trpc";
 import { xrplChainConfig } from "~/config/chains";
+import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
 
 export interface XRPLInterchainTransferParams {
     caller: string;
@@ -62,15 +63,14 @@ export function useXRPLInterchainTransfer() {
             }
 
             try {
-                const result = await signAndSubmit(preparedTx, `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? '0' : process.env.NEXT_PUBLIC_NETWORK_ENV === 'devnet-amplifier' ? '2' : '1'}`);
+                const result = await signAndSubmit(preparedTx, (xrplChainConfig as unknown as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
                 const txHash = result.tx_hash;
-                console.log("Submitted transaction successfully:", txHash);
                 params.onStatusUpdate?.({ type: "sending", txHash: txHash });
 
                 return { txHash };
             }
             catch (error) {
-                console.error("Error during XRPL transaction signing/submission:", error);
+                toast.error(`Error during XRPL transaction signing/submission: ${error}`);
                 throw error;
             }
         },

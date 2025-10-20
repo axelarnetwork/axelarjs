@@ -135,6 +135,10 @@ export function useInterchainTransferMutation(
 
             preparedTx = await client.autofill(tx);
             const sim = await client.simulate(preparedTx);
+
+            if (sim.status !== "success") {
+              throw Error("Simulation failed");
+            }
           }
           finally {
             try {
@@ -147,10 +151,9 @@ export function useInterchainTransferMutation(
           try {
               const result = await xrplSignAndSubmit(preparedTx, (xrplChainConfig as unknown as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
               txHash = result.tx_hash;
-              console.log("Submitted transaction successfully:", txHash);
           }
           catch (error) {
-              console.error("Error during XRPL transaction signing/submission:", error);
+              toast.error(`Error during XRPL transaction signing/submission: ${error}`);
               throw error;
           }
           
