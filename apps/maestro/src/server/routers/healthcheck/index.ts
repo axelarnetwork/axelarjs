@@ -3,6 +3,7 @@ import { z } from "zod";
 import { CHAIN_CONFIGS } from "~/config/chains";
 import { sendRpcNodeIssueNotificationWithRateLimit } from "~/lib/utils/slack-notifications";
 import { publicProcedure, router } from "~/server/trpc";
+import { Client as xrplClient } from "xrpl";
 
 async function checkRpcNode(
   url: string,
@@ -24,28 +25,53 @@ async function checkRpcNode(
       } else if (chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
         method = "server_info";
       }
+      if(chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
+        // test via xrpl.js
+        const client = new xrplClient(url);
+        await client.connect();
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: 1,
-          method,
-        }),
-        signal: controller.signal,
-      });
+        try {
+          const pingResponse = await client.request({
+            command: "ping",
+          });
+          if (pingResponse.type != "response") {
+            return "down";
+          }
+          return "up";
+        } catch (error) {
+          return "down";
+        } finally {
+          client.disconnect();
+        }
+      }
 
-      clearTimeout(timeout);
       let json;
       try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeout);
+        if (!response.ok) return "down";
+
+        if(chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
+          console.log("Could parse JSON from RPC response:", response);
+        }
+
         json = await response.json();
       } catch (error) {
+        console.error("Error parsing JSON from RPC response:", error);
         return "down";
       }
 
       // Verify if the response is valid
-      if (!response.ok) return "down";
       if (!json || json.error) {
         return "down";
       }
