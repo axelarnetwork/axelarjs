@@ -149,8 +149,10 @@ const TxFinalityProgress: FC<{ txHash: string; chainId: number }> = ({
 };
 
 const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
+  const CHAINS_WITHOUT_LOG_INDEX = [XRPL_CHAIN_ID];
+
   const chainId = useChainId();
-  const hideLogIndex = chainId === XRPL_CHAIN_ID; // TODO: only because the currently open chain is xrpl, this does not mean that we are looking at a xrpl tx -> determine from actual source chain
+  const hideLogIndex = CHAINS_WITHOUT_LOG_INDEX.includes(chainId); // TODO: only because the currently open chain is xrpl, this does not mean that we are looking at a xrpl tx -> determine from actual source chain
   const { combinedComputed } = useAllChainConfigsQuery();
   const {
     data: statuses,
