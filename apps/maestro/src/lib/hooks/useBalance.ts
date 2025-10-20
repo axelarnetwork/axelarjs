@@ -82,7 +82,6 @@ export function useBalance(): BalanceResult | undefined {
           const drops = accountInfo.result.account_data.Balance;
           
           setXRPLDrops(drops);
-          console.log("Fetched XRPL balance in drops:", drops);
         } finally {
           try {
             await client.disconnect();

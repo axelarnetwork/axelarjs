@@ -75,29 +75,13 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   );
   if (props.chainId === xrplChainConfig.id) {
     isIncompatibleChain = !isValidXRPLWalletAddress(address);
-    console.log(
-      "isIncompatibleChain for xrpl",
-      isIncompatibleChain,
-      address,
-      normalizedTokenAddress
-    );
   }
-  console.log(
-    "isIncompatibleChain",
-    isIncompatibleChain,
-    chainId,
-    props.chainId,
-    normalizedTokenAddress,
-    address
-  );
-  console.log("disabled:", !props.isRegistered || isIncompatibleChain);
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
     owner: address,
     disabled: !props.isRegistered || isIncompatibleChain,
   });
-  console.log("balance result", result);
   const balance = result?.data;
 
   const { explorerUrl, explorerName } = useMemo(() => {

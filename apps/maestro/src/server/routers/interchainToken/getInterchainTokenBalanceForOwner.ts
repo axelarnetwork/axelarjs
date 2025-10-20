@@ -221,10 +221,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         };
       }
     }
-    console.log("Fetching token balance for", input);
 
     if (isValidXRPLTokenAddress(input.tokenAddress)) {
-      console.log("Fetching XRPL token balance for", input);
       const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
       try {
         await client.connect();

@@ -127,16 +127,17 @@ export function useInterchainTransferMutation(
           });
 
           const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type?
+
           const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
           let preparedTx;
 
           try {
             await client.connect();
-
             preparedTx = await client.autofill(tx);
             const sim = await client.simulate(preparedTx);
 
-            if (sim.status !== "success") {
+            if (sim.result.engine_result_code !== 0) {
+              toast.error(`Simulation failed: ${sim.result.engine_result_message}`);
               throw Error("Simulation failed");
             }
           }

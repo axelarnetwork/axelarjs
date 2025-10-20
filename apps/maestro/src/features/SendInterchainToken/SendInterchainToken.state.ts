@@ -116,7 +116,6 @@ export function useSendInterchainTokenState(props: {
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
   const isXRPLChain = useChainId() == XRPL_CHAIN_ID;
-  console.log("chain id is", useChainId(), isXRPLChain);
   const payWithToken = isXRPLChain; // XRPL is the only chain that pays with ITS token instead of native token 
   let sourceChainTokenSymbol;
   if(isXRPLChain) {

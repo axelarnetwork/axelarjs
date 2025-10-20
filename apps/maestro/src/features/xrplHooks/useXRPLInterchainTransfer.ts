@@ -53,8 +53,9 @@ export function useXRPLInterchainTransfer() {
             try {
                 preparedTx = await client.autofill(tx);
                 const sim = await client.simulate(preparedTx);
-                if (sim.status !== 'success') {
-                    throw Error(`Simulation failed: ${sim.status}`);
+                if (sim.result.engine_result_code !== 0) {
+                    toast.error(`Simulation failed: ${sim.result.engine_result_message}`);
+                    throw Error("Simulation failed");
                 }
             }
             catch (error) {
