@@ -1,6 +1,6 @@
 import type { XRPLWallet } from '@xrpl-wallet-standard/app'
 import styled from 'styled-components'
-import { useConnect, useWallets } from '@xrpl-wallet-standard/react'
+import { useConnect } from '@xrpl-wallet-standard/react'
 import { getRegisterdXRPLWallets } from "@xrpl-wallet-standard/app";
 
 const WalletListContainer = styled.ul`

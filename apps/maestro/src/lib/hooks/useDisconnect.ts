@@ -32,7 +32,7 @@ export function useDisconnect(): DisconnectResult {
 
       // Attempt to disconnect from xrpl wallet
       if (xrpl.status === "connected") {
-        xrplDisconnect();
+        await xrplDisconnect();
       }
     } catch (e) {
       error = e as Error;

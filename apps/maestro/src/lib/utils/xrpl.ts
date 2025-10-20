@@ -24,7 +24,7 @@ export const xrplScaleGas = (
     return {gas, gasFeeDecimals}
 };
 
-export const useXRPLClient = async (callback: (client: xrpl.Client) => Promise<any>) => {
+export const withXRPLClient = async (callback: (client: xrpl.Client) => Promise<any>) => {
     let client;
     try {
         client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
@@ -45,7 +45,7 @@ export const useXRPLClient = async (callback: (client: xrpl.Client) => Promise<a
 }
 
 export const fetchXRPLBalance = async (address: string) => {
-    return await useXRPLClient(async (client) => {
+    return await withXRPLClient(async (client) => {
         const accountInfo = await client.request({
             command: "account_info",
             account: address,
@@ -58,7 +58,7 @@ export const fetchXRPLBalance = async (address: string) => {
 };
 
 export const autofillXRPLTx = async (tx: xrpl.SubmittableTransaction) => {
-    return await useXRPLClient(async (client) => {
+    return await withXRPLClient(async (client) => {
         const preparedTx = await client.autofill(tx);
        
         return preparedTx;
@@ -66,7 +66,7 @@ export const autofillXRPLTx = async (tx: xrpl.SubmittableTransaction) => {
 };
 
 export const autofillAndSimulateXRPLTx = async (tx: xrpl.SubmittableTransaction) => {
-    return await useXRPLClient(async (client) => {
+    return await withXRPLClient(async (client) => {
         const preparedTx = await client.autofill(tx);
         const sim = await client.simulate(preparedTx);
         if (sim.result.engine_result_code !== 0) {
@@ -78,7 +78,7 @@ export const autofillAndSimulateXRPLTx = async (tx: xrpl.SubmittableTransaction)
 
 export const checkXRPLNode = async () => {
     try {
-        return await useXRPLClient(async (client) => {
+        return await withXRPLClient(async (client) => {
             const pingResponse = await client.request({
                 command: "ping",
             });
@@ -119,7 +119,7 @@ export const getXRPLAccountBalance = async (accountAddress: string, tokenAddress
             });
         }
 
-        const response = await useXRPLClient(async (client) => {
+        const response = await withXRPLClient(async (client) => {
             // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"    
             return await client.request({
               command: "account_lines",

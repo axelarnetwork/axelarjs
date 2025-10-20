@@ -1,13 +1,12 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
-import { formatUnits } from "viem";
 
 import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
 } from "~/config/env";
-import { useBalance, useChainId } from "~/lib/hooks";
+import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";

@@ -20,7 +20,6 @@ import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "../trpc";
 import { setStellarConnectionState } from "../utils/stellar";
 
-import { Client, Wallet, multisign } from "xrpl";
 import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
 
 export type UseWeb3SignInOptions = {
@@ -122,7 +121,7 @@ export function useWeb3SignIn({
             Fee: "0"
           };
 
-          const result = await xrplSignTransaction(tx, (xrplChainConfig as unknown as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
+          const result = await xrplSignTransaction(tx, (xrplChainConfig as any as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
           signature = result.signed_tx_blob;
         }
         const response = await signIn("credentials", {
@@ -229,6 +228,7 @@ export function useWeb3SignIn({
     void signInWithWeb3Async(address);
   }, [
     xrplWallet?.accounts?.length,
+    xrplWallet.accounts,
     xrplConnectionStatus,
     sessionStatus,
     session?.address,

@@ -130,7 +130,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           const encodedTx = signature; // this is the signed transaction blob that we received from the client
           const tx = binary.decode(encodedTx); // decode it to get the transaction object
 
-          if (!tx.Memos || tx.Memos.length === 0) {
+          if (!tx.Memos || !Array.isArray(tx.Memos) || tx.Memos.length === 0) {
             console.warn("No memos found in the transaction");
             return null;
           }

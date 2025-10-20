@@ -23,7 +23,7 @@ export interface XRPLInterchainTransferParams {
 }
 
 export function useXRPLInterchainTransfer() {
-    const { wallet, status } = useWallet();
+    const { wallet } = useWallet();
     const signAndSubmit = useSignAndSubmitTransaction();
 
     const buildTx = trpc.xrpl.getInterchainTransferTxBytes.useMutation();
@@ -52,20 +52,24 @@ export function useXRPLInterchainTransfer() {
                 preparedTx = await autofillAndSimulateXRPLTx(tx);
             }
             catch (error) {
-                toast.error(`Error during XRPL transaction simulation: ${error}`);
+                const message = error instanceof Error ? error.message : String(error);
+                
+                toast.error(`Error during XRPL transaction simulation: ${message}`);
                 console.error("Error during XRPL transaction simulation:", error);
                 throw error;
             }
 
             try {
-                const result = await signAndSubmit(preparedTx, (xrplChainConfig as unknown as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
+                const result = await signAndSubmit(preparedTx, (xrplChainConfig as any as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
                 const txHash = result.tx_hash;
                 params.onStatusUpdate?.({ type: "sending", txHash: txHash });
 
                 return { txHash };
             }
             catch (error) {
-                toast.error(`Error during XRPL transaction signing/submission: ${error}`);
+                const message = error instanceof Error ? error.message : String(error);
+
+                toast.error(`Error during XRPL transaction signing/submission: ${message}`);
                 console.error("Error during XRPL transaction signing/submission", error);
                 throw error;
             }

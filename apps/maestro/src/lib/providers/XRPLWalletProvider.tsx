@@ -13,7 +13,7 @@ export default function WalletProvider({
   children: React.ReactNode
 }>) {
   const xrplWallets = useMemo(() => {
-    let availableWallets: Array<XRPLBaseWallet> = [new CrossmarkWallet()];
+    const availableWallets: Array<XRPLBaseWallet> = [new CrossmarkWallet()];
     
     const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
     if (walletConnectProjectId && walletConnectProjectId.length > 0) {

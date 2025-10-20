@@ -7,7 +7,6 @@ import {
   stellarChainConfig,
   SUI_CHAIN_ID,
   suiChainConfig,
-  xrplChainConfig,
 } from "~/config/chains";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";

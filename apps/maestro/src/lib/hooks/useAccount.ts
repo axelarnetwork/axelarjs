@@ -22,7 +22,7 @@ import { useEVMChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 export { STELLAR_CONNECTION_CHANGE };
 
 interface CombinedAccountInfo {
-  address: `0x${string}` | string; // addresses on XRPL are not in the form `0x...`
+  address: string;
   isConnected: boolean;
   isDisconnected: boolean;
   chain?: Chain;

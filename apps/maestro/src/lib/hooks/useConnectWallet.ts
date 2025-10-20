@@ -80,7 +80,7 @@ export function useConnectWallet() {
   };
 
   const tryConnectXRPLWallet = async () => {
-    for (let xrplWallet of xrplWallets) {
+    for (const xrplWallet of xrplWallets) {
       try {
         await xrplConnect(xrplWallet, { silent: true });
         return true;

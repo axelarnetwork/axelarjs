@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
-import {
-  useConnect as useXRPLConnect,
-  useWallet as useXRPLWallet,
-} from "@xrpl-wallet-standard/react";
+import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {
@@ -69,12 +66,12 @@ export function useBalance(): BalanceResult | undefined {
 
   useEffect(() => {
     if (chainName === xrplChainConfig.name && address && xrplWallet?.accounts.length) { // TODO: fix XRPL connection check
-      (async () => {
+      void (async () => {
         const drops = await fetchXRPLBalance(address);
         setXRPLDrops(drops);
       })();
     }
-  }, [chainName, address]);
+  }, [chainName, address, xrplWallet?.accounts.length]);
 
   const balance = useMemo(() => {
     if (wagmiBalance) {

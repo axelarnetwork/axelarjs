@@ -1,11 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { Account, Address, scValToNative } from "stellar-sdk";
-import * as xrpl from "xrpl";
 import { z } from "zod";
-import Decimal from "decimal.js";
 
-import { xrplChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { isTokenAddressIncompatibleWithOwner } from "~/lib/utils/addressCompatibility";
 import {
@@ -19,7 +16,7 @@ import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { simulateCall } from "../stellar/utils/transactions";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
-import { fetchXRPLBalance, getXRPLAccountBalance } from "~/lib/utils/xrpl";
+import { getXRPLAccountBalance } from "~/lib/utils/xrpl";
 
 // Helper function to call Stellar contract methods and handle errors
 async function callStellarContractMethod<T>({

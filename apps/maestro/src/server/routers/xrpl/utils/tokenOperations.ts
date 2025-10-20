@@ -1,6 +1,5 @@
 import type { Context } from "~/server/context";
 import { getXRPLChainConfig, hex, parseTokenAmount, parseTokenGasValue } from "./utils";
-import { xrplChainConfig as xrplChainConfigDefault } from "~/config/chains";
 
 import {
   type InterchainTransferInput,
@@ -18,9 +17,9 @@ export async function buildInterchainTransferTxBytes(
     invariant(parseInt(input.gasValue) >= 0);
 
     const xrplChainConfig = await getXRPLChainConfig(ctx);
-    let amountToTransfer = BigInt(input.amount) + BigInt(input.gasValue);
-    let gasFeeAmount = parseTokenGasValue(input.tokenAddress, input.gasValue);
-    let amount = parseTokenAmount(input.tokenAddress, amountToTransfer.toString());
+    const amountToTransfer = BigInt(input.amount) + BigInt(input.gasValue);
+    const gasFeeAmount = parseTokenGasValue(input.tokenAddress, input.gasValue);
+    const amount = parseTokenAmount(input.tokenAddress, amountToTransfer.toString());
 
     const tx: xrpl.Payment = {
         TransactionType: "Payment",

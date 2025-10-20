@@ -13,11 +13,7 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
-import { useSignAndSubmitTransaction as useXRPLSignAndSubmitTransaction } from "@xrpl-wallet-standard/react";
-import * as xrpl from "xrpl";
-import { xrplChainConfig } from "~/config/chains";
 import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
-import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
 import { useXRPLInterchainTransfer } from "~/features/xrplHooks";
 
 export type UseSendInterchainTokenConfig = {
