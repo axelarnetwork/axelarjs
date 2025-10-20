@@ -101,8 +101,7 @@ async function getXRPLTokenDetails(tokenAddress: string, ctx: Context) {
 
   if (tokenAddress !== "XRP") {
     symbol = tokenAddress.split(".")[0];
-    const tokenRecord =
-    await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+    const tokenRecord = await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
       axelarChainId,
       tokenAddress
     );
@@ -112,6 +111,7 @@ async function getXRPLTokenDetails(tokenAddress: string, ctx: Context) {
         message: `Token metadata not found for ${tokenAddress} on chain ${axelarChainId}`,
       });
     }
+    // name = tokenRecord.tokenName; // TODO: not sure if token address or token name should be displayed here - showing the address makes token fraud harder?
     symbol = tokenRecord.tokenSymbol;
     decimals = tokenRecord.tokenDecimals;
   }

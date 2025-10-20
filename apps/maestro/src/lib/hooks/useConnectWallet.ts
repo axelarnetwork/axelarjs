@@ -82,10 +82,10 @@ export function useConnectWallet() {
   const tryConnectXRPLWallet = async () => {
     for (let xrplWallet of xrplWallets) {
       try {
-        xrplConnect(xrplWallet, { silent: true });
+        await xrplConnect(xrplWallet, { silent: true });
         return true;
       } catch (error) {
-        console.warn("Failed to silently connect to", xrplWallet);
+        // ignore
       }
     }
     

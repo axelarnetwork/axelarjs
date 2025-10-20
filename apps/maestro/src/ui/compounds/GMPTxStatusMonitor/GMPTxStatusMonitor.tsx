@@ -150,7 +150,7 @@ const TxFinalityProgress: FC<{ txHash: string; chainId: number }> = ({
 
 const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
   const chainId = useChainId();
-  const hideLogIndex = chainId === XRPL_CHAIN_ID;
+  const hideLogIndex = chainId === XRPL_CHAIN_ID; // TODO: only because the currently open chain is xrpl, this does not mean that we are looking at a xrpl tx -> determine from actual source chain
   const { combinedComputed } = useAllChainConfigsQuery();
   const {
     data: statuses,
@@ -240,7 +240,7 @@ export type ChainStatusItemProps = {
   className?: string;
   compact?: boolean;
   offset?: number;
-  hideLogIndex?: boolean, // some chains use only the format `0x${tx_hash}` for GMP calls
+  hideLogIndex?: boolean; // some chains use only the format `0x${tx_hash}` for GMP calls
 };
 
 export type ChainStatusItemsProps = Omit<

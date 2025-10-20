@@ -22,7 +22,7 @@ import { useEVMChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 export { STELLAR_CONNECTION_CHANGE };
 
 interface CombinedAccountInfo {
-  address: `0x${string}`;
+  address: `0x${string}` | string; // addresses on XRPL are not in the form `0x...`
   isConnected: boolean;
   isDisconnected: boolean;
   chain?: Chain;
@@ -109,7 +109,7 @@ export function useAccount(): CombinedAccountInfo {
       wagmiAccount.address ||
       (mystenAccount?.address as `0x${string}`) ||
       (stellarAccount as string) || 
-      (xrplAccount?.address),
+      (xrplAccount?.address as string),
     isConnected: isWagmiConnected || isMystenConnected || isStellarConnected || isXRPLConnected,
     isDisconnected:
       !isWagmiConnected && !isMystenConnected && !isStellarConnected && !isXRPLConnected,

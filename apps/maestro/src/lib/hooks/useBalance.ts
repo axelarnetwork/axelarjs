@@ -79,9 +79,9 @@ export function useBalance(): BalanceResult | undefined {
             account: address,
           });
           // Balance is returned in drops (1 XRP = 1,000,000 drops)
-          const drops = parseInt(accountInfo.result.account_data.Balance) * (10**xrplChainConfig.nativeCurrency.decimals);
+          const drops = accountInfo.result.account_data.Balance;
           
-          setXRPLDrops(`${drops}`);
+          setXRPLDrops(drops);
           console.log("Fetched XRPL balance in drops:", drops);
         } finally {
           client.disconnect();

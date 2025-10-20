@@ -69,7 +69,7 @@ export function parseTokenAmount(token: string, amountInDrops: string) {
     let parsedAmount;
 
     if (token === 'XRP') {
-        parsedAmount = amountInDrops; //xrpl.xrpToDrops(amount); // already in drops
+        parsedAmount = amountInDrops;
     } else {
       const [currency, issuer] = token.split('.');
         // assert: amount != "0"
@@ -79,7 +79,7 @@ export function parseTokenAmount(token: string, amountInDrops: string) {
         parsedAmount = {
             currency,
             issuer,
-            value: amount.toFixed(15).replace(/0+$/, "").replace(/\.$/, ""),
+            value: amount.toFixed(15).replace(/0+$/, "").replace(/\.$/, ""), // TODO: just cast to float, and loose precision which is acceptable and required
         };
     }
 
@@ -90,6 +90,6 @@ export function parseTokenGasValue(token: string, amount: string) {
   if (token === 'XRP') {
       return amount;
     } else {
-      return Decimal(amount).times(1e-15).toFixed(15).replace(/0+$/, "").replace(/\.$/, "");
+      return Decimal(amount).times(1e-15).toFixed(15).replace(/0+$/, "").replace(/\.$/, ""); // TODO: cannot cast to float, but if resulting number has too many digits, remove them from the right
     }
 }

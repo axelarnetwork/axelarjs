@@ -17,12 +17,12 @@ export const unSluggify = (value: string) =>
 export const maskAddress = (
   address: string,
   opts?: {
-    segmentA?: number;
-    segmentB?: number;
+    segmentA?: number; // must be positive
+    segmentB?: number; // must be negative
   }
 ) => {
-  const segA = Math.max(0, opts?.segmentA ?? 6);
-  const segB = Math.min(0, opts?.segmentB ?? -4);
+  const segA = opts?.segmentA ?? 6;
+  const segB = opts?.segmentB ?? -4;
 
   // If the address is too short to reasonably mask, return it unchanged
   if (address.length <= segA + (-segB) + 3) {

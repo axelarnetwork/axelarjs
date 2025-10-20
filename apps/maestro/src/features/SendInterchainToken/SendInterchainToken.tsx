@@ -114,7 +114,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   );
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
-    console.log("Submitting form", data, state);
     e?.preventDefault();
 
     invariant(state.selectedToChain, "selectedToChain is undefined");
@@ -144,7 +143,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
           }
         },
         onSuccess() {
-          console.log("On the success path", state);
           void actions.refetchBalances();
         },
       }
@@ -292,7 +290,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
   ]);
 
   const handleAllChainsExecuted = useCallback(async () => {
-    alert("All chains executed");
     await actions.refetchBalances();
     resetForm();
     actions.resetTxState();
@@ -429,7 +426,6 @@ export const SendInterchainToken: FC<Props> = (props) => {
               {...register("amountToTransfer", {
                 disabled: isFormDisabled,
                 validate(value) {
-                  console.log(value, props.balance);
                   if (!value || value === "0") {
                     return "Amount must be greater than 0";
                   }

@@ -170,6 +170,5 @@ export const getInterchainTokenDetails = publicProcedure
         message: `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`,
       });
     }
-    console.log("Returning token record now:", tokenRecord);
     return tokenRecord;
   });

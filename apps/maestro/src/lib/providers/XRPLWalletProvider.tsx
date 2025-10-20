@@ -1,3 +1,4 @@
+import { invariant } from '@axelarjs/utils'
 import { CrossmarkWallet } from '@xrpl-wallet-adapter/crossmark'
 import { WalletConnectWallet } from '@xrpl-wallet-adapter/walletconnect'
 import { XamanWallet } from '@xrpl-wallet-adapter/xaman'
@@ -10,18 +11,34 @@ export default function WalletProvider({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const xrplWallets = useMemo(() => [
-      new CrossmarkWallet(),
-      new WalletConnectWallet({
-        projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? '',
+  const xrplWallets = useMemo(() => {
+    let availableWallets: any[] = [new CrossmarkWallet()];
+    
+    const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
+    if (walletConnectProjectId && walletConnectProjectId.length > 0) {
+      const walletConnectWallet = new WalletConnectWallet({
+        projectId: walletConnectProjectId,
         networks: [(xrplChainConfig as any).xrplNetwork],
         desktopWallets: [],
         mobileWallets: [],
-      }),
-      new XamanWallet('a9bf63cf-6798-4eef-bc6f-50ea5d2818b2'),
-    ], []);
+      });
 
-  if (xrplWallets.length === 0) return null
+      availableWallets.push(walletConnectWallet);
+    }
+
+    const xamanApiKey = process.env.NEXT_PUBLIC_XAMAN_API_KEY; 
+    if (xamanApiKey && xamanApiKey.length > 0) {
+      const xamanWallet = new XamanWallet(xamanApiKey);
+
+      availableWallets.push(xamanWallet);
+    }
+
+    invariant(availableWallets.length > 0);
+
+    return availableWallets;
+  }, []);
+
+  if (xrplWallets.length === 0) return null;
 
   return <StandardWalletProvider registerWallets={xrplWallets} autoConnect={true}>{children}</StandardWalletProvider>
 }
