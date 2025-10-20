@@ -28,6 +28,7 @@ const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
 const CHAINS_GAS_FEE_DECIMALS = {
   [HEDERA_CHAIN_ID]: 18,
 };
+const CHAINS_PAYING_GAS_WITH_BRIDGED_TOKEN = [XRPL_CHAIN_ID];
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: string;
@@ -73,7 +74,7 @@ export function useSendInterchainTokenState(props: {
 
   const shouldUseTokenService =
     CHAINS_REQUIRING_TOKEN_SERVICE.includes(props.sourceChain.chain_id) ||
-    isApprovalRequired;
+    isApprovalRequired; 
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
@@ -115,8 +116,10 @@ export function useSendInterchainTokenState(props: {
   const balance = useBalance();
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
-  const isXRPLChain = useChainId() == XRPL_CHAIN_ID;
-  const payWithToken = isXRPLChain; // XRPL is the only chain that pays with ITS token instead of native token 
+  const isXRPLChain = props.sourceChain.chain_id == XRPL_CHAIN_ID;
+
+  const payWithToken = CHAINS_PAYING_GAS_WITH_BRIDGED_TOKEN.includes(props.sourceChain.chain_id);
+  
   let sourceChainTokenSymbol;
   if(isXRPLChain) {
     // on xrpl, we can only pay for gas with the token that is transferred
