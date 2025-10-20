@@ -1,6 +1,7 @@
 import { useWallet, useSignAndSubmitTransaction } from "@xrpl-wallet-standard/react";
 import { useMutation } from "@tanstack/react-query";
 import * as xrpl from "xrpl";
+import { toast } from "@axelarjs/ui/toaster";
 
 import { trpc } from "~/lib/trpc";
 import { xrplChainConfig } from "~/config/chains";
@@ -20,15 +21,8 @@ export interface XRPLInterchainTransferParams {
 }
 
 export function useXRPLInterchainTransfer() {
-    console.log("useXRPLInterchainTransfer called");
-    const { wallet, status } = useWallet(); // this doesn't work -> hook rule violation
-    console.log("Using wallet: ", wallet, status);
-
+    const { wallet, status } = useWallet();
     const signAndSubmit = useSignAndSubmitTransaction();
-    
-
-    // TODO: check status?
-    console.log("wallet:", wallet, "status:", status);
 
     const buildTx = trpc.xrpl.getInterchainTransferTxBytes.useMutation();
 
@@ -51,8 +45,6 @@ export function useXRPLInterchainTransfer() {
 
             const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type
 
-            console.log("Decoded tx:", tx);
-
             const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
             await client.connect();
             
@@ -60,11 +52,12 @@ export function useXRPLInterchainTransfer() {
             try {
                 preparedTx = await client.autofill(tx);
                 const sim = await client.simulate(preparedTx);
-
-                console.log("Simulation result:", sim);
+                if (sim.status !== 'success') {
+                    throw Error(`Simulation failed: ${sim.status}`);
+                }
             }
             catch (error) {
-                console.error("Error during XRPL transaction simulation:", error);
+                toast.error(`Error during XRPL transaction simulation: ${error}`); // TODO: what to do in that case?
                 throw error;
             }
 

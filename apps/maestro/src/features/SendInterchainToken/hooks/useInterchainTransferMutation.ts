@@ -17,6 +17,7 @@ import { useSignAndSubmitTransaction as useXRPLSignAndSubmitTransaction } from "
 import * as xrpl from "xrpl";
 import { xrplChainConfig } from "~/config/chains";
 import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
+import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -91,7 +92,6 @@ export function useInterchainTransferMutation(
         });
         let txHash: any;
         let encodedRecipient: `0x${string}`;
-        console.log("In mutation: useInterchainTransferMutation");
         // Encode the recipient address for Stellar since it's a base64 string
         if (config.destinationChainName.toLowerCase().includes("stellar")) {
           encodedRecipient = stellarEncodedRecipient(destinationAddress);
@@ -127,24 +127,25 @@ export function useInterchainTransferMutation(
           });
 
           const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type?
-
           const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-          await client.connect();
-          
           let preparedTx;
-          try {
-              preparedTx = await client.autofill(tx);
-              const sim = await client.simulate(preparedTx);
-
-              console.log("Simulation result:", sim);
-          }
-          catch (error) {
-              console.error("Error during XRPL transaction simulation:", error);
-              throw error;
-          }
 
           try {
-              const result = await xrplSignAndSubmit(preparedTx, `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? '0' : process.env.NEXT_PUBLIC_NETWORK_ENV === 'devnet-amplifier' ? '2' : '1'}`);
+            await client.connect();
+
+            preparedTx = await client.autofill(tx);
+            const sim = await client.simulate(preparedTx);
+          }
+          finally {
+            try {
+              await client.disconnect();
+            } catch (_) {
+              // ignore this
+            }
+          }
+
+          try {
+              const result = await xrplSignAndSubmit(preparedTx, (xrplChainConfig as unknown as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
               txHash = result.tx_hash;
               console.log("Submitted transaction successfully:", txHash);
           }

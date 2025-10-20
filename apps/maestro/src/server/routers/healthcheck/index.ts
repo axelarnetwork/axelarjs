@@ -22,8 +22,6 @@ async function checkRpcNode(
         method = "sui_getTotalTransactionBlocks";
       } else if (chainNameLower === "stellar" || chainNameLower.includes("stellar")) {
         method = "getVersionInfo";
-      } else if (chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
-        method = "server_info";
       }
       if(chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
         // test via xrpl.js
@@ -34,6 +32,7 @@ async function checkRpcNode(
           const pingResponse = await client.request({
             command: "ping",
           });
+          clearTimeout(timeout);
           if (pingResponse.type != "response") {
             return "down";
           }
@@ -41,7 +40,11 @@ async function checkRpcNode(
         } catch (error) {
           return "down";
         } finally {
-          client.disconnect();
+          try {
+            await client.disconnect();
+          } catch (_) {
+            // ignore this
+          }
         }
       }
 
@@ -61,13 +64,8 @@ async function checkRpcNode(
         clearTimeout(timeout);
         if (!response.ok) return "down";
 
-        if(chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
-          console.log("Could parse JSON from RPC response:", response);
-        }
-
         json = await response.json();
       } catch (error) {
-        console.error("Error parsing JSON from RPC response:", error);
         return "down";
       }
 

@@ -225,66 +225,62 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
 
     if (isValidXRPLTokenAddress(input.tokenAddress)) {
       console.log("Fetching XRPL token balance for", input);
+      const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
       try {
-          const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-          await client.connect();
-          if (input.tokenAddress === "XRP") {
-            // fetch XRP balance
-            const balance = await client.getXrpBalance(input.owner);
-            //console.log(balance);
-            const balanceInDrops = xrpl.xrpToDrops(balance);
-
-            return {
-              isTokenOwner: false,
-              isTokenMinter: false,
-              tokenBalance: balanceInDrops,
-              decimals: 6,
-              isTokenPendingOwner: false,
-              hasPendingOwner: false,
-              hasMinterRole: false,
-              hasOperatorRole: false,
-              hasFlowLimiterRole: false,
-            };
-          }
-
-          // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
-          const [currency, issuer] = input.tokenAddress.split(".");
-          if (!currency || !issuer) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
-            });
-          }
-
-          const response = await client.request({
-            command: "account_lines",
-            account: input.owner,
-          });
-
-          await client.disconnect();
-          console.log(response.result.lines);
-          // Find the line that matches the token
-          const line = response.result.lines.find(
-            (l) => l.currency === currency && l.account === issuer
-          );
-
-          const XRPL_TOKEN_DECIMALS = 15;
-          const actualBalance = line ? Decimal(line.balance).times(10**XRPL_TOKEN_DECIMALS).toFixed(0) : "0";
-          console.log("Line.balance is", line?.balance, " and reporting actual balance as", actualBalance);
+        await client.connect();
+        if (input.tokenAddress === "XRP") {
+          // fetch XRP balance
+          const balance = await client.getXrpBalance(input.owner);
+          const balanceInDrops = xrpl.xrpToDrops(balance);
 
           return {
             isTokenOwner: false,
             isTokenMinter: false,
-            tokenBalance: line ? actualBalance.toString() : "0",
-            decimals: XRPL_TOKEN_DECIMALS,
+            tokenBalance: balanceInDrops,
+            decimals: 6,
             isTokenPendingOwner: false,
             hasPendingOwner: false,
             hasMinterRole: false,
             hasOperatorRole: false,
             hasFlowLimiterRole: false,
-          }
+          };
+        }
+
+        // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
+        const [currency, issuer] = input.tokenAddress.split(".");
+        if (!currency || !issuer) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
+          });
+        }
+
+        const response = await client.request({
+          command: "account_lines",
+          account: input.owner,
+        });
+
+        // Find the line that matches the token
+        const line = response.result.lines.find(
+          (l) => l.currency === currency && l.account === issuer
+        );
+
+        const XRPL_TOKEN_DECIMALS = 15;
+        const actualBalance = line ? Decimal(line.balance).times(new Decimal(10).pow(XRPL_TOKEN_DECIMALS)).toFixed(0) : "0";
+
+        return {
+          isTokenOwner: false,
+          isTokenMinter: false,
+          tokenBalance: line ? actualBalance.toString() : "0",
+          decimals: XRPL_TOKEN_DECIMALS,
+          isTokenPendingOwner: false,
+          hasPendingOwner: false,
+          hasMinterRole: false,
+          hasOperatorRole: false,
+          hasFlowLimiterRole: false,
+        }
       } catch (error) {
-        console.log("An error occurred:", error);
+        // TODO: should this throw an TRPCError ?
         return {
           isTokenOwner: false,
           isTokenMinter: false,
@@ -296,6 +292,12 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           hasOperatorRole: false,
           hasFlowLimiterRole: false,
         };
+      } finally {
+        try {
+          await client.disconnect();
+        } catch (_) {
+          // ignore this
+        }
       }
     }
 

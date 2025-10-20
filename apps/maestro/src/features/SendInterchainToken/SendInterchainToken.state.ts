@@ -150,8 +150,8 @@ export function useSendInterchainTokenState(props: {
     if(sourceChainTokenSymbol == nativeTokenSymbol) {
       // when we transfer XRP, this is already correct
     } else if (!tokenDetails?.decimals || !gas) {
-      // this must not happen, but if it does, we assume it is already correct?
-      console.error("tokenDetails.decimals:", tokenDetails, tokenDetails?.decimals, ", gas", gas);
+      // this should not happen, but in this case just use zero gas (and recover later)
+      gas = BigInt(0);
     } else {
       // we need to map from tokenDetails.decimals to a rational number
       if (15 > tokenDetails.decimals)

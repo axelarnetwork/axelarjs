@@ -84,7 +84,11 @@ export function useBalance(): BalanceResult | undefined {
           setXRPLDrops(drops);
           console.log("Fetched XRPL balance in drops:", drops);
         } finally {
-          client.disconnect();
+          try {
+            await client.disconnect();
+          } catch (_) {
+            // ignore this
+          }
         }
       }
       fetchXRPLBalance();

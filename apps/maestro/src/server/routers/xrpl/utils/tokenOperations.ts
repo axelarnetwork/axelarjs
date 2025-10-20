@@ -44,15 +44,13 @@ export async function buildInterchainTransferTxBytes(
       console.log("Prepared XRPL transaction:", prepared);
 
       const txBase64 = xrpl.encode(prepared);
-      await client.disconnect();
       return { txBase64 };
     } 
-    catch(error) {
+    finally {
       try {
         await client.disconnect();
       } catch (_) {
         // ignore this
       }
-      throw error;
     }
 }
