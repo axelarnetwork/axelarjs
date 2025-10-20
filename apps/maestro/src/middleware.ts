@@ -54,7 +54,7 @@ export async function middleware(req: NextRequest) {
     walletAddress = await getAuthenticatedWalletAddress(req);
 
     if (walletAddress) {
-      isWalletRestricted = await checkWalletAddresses(walletAddress);
+      isWalletRestricted = await checkWalletAddress(walletAddress);
     }
   } catch (error) {
     logger.error("Error checking wallet sanctions:", error);
@@ -85,7 +85,7 @@ export async function middleware(req: NextRequest) {
 /**
  * Check if the authenticated user's wallet address is sanctioned
  */
-async function checkWalletAddresses(address: WalletAddress): Promise<boolean> {
+async function checkWalletAddress(address: WalletAddress): Promise<boolean> {
   return await ofacSanctionsService.isWalletSanctioned(address);
 }
 

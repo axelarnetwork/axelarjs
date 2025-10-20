@@ -4,6 +4,27 @@ import { ofacSanctionsService } from "../src/services/ofacSanctions";
 
 dotenv.config();
 
+async function logSanctionsStatusFallback() {
+  try {
+    const status = await ofacSanctionsService.getSanctionsStatus();
+    if (status.hasData) {
+      console.warn("🔄 Application will continue with existing sanctions data");
+      console.warn(`📅 Existing data was updated at ${status.lastUpdate}`);
+    } else {
+      console.warn(
+        "🚨 No sanctions data available - all wallets will be allowed"
+      );
+      console.warn(
+        "🔧 Consider running initialization manually when OFAC service is available"
+      );
+    }
+  } catch {
+    console.warn(
+      "⚠️ Unable to retrieve sanctions status; proceeding without additional status details"
+    );
+  }
+}
+
 /**
  * OFAC Sanctions Initialization Script
  *
@@ -33,38 +54,13 @@ async function main() {
     } else {
       console.warn("⚠️ OFAC sanctions loading failed");
       console.warn(`📝 ${result.message || "Unknown error"}`);
-
-      const status = await ofacSanctionsService.getSanctionsStatus();
-      if (status.hasData) {
-        console.warn(
-          "🔄 Application will continue with existing sanctions data"
-        );
-        console.warn(`📅 Existing data was updated at ${status.lastUpdate}`);
-      } else {
-        console.warn(
-          "🚨 No sanctions data available - all wallets will be allowed"
-        );
-        console.warn(
-          "🔧 Consider running initialization manually when OFAC service is available"
-        );
-      }
+      await logSanctionsStatusFallback();
     }
 
     process.exit(0);
   } catch (error) {
     console.error("💥 Unexpected error loading OFAC sanctions:", error);
-    const status = await ofacSanctionsService.getSanctionsStatus();
-    if (status.hasData) {
-      console.warn("🔄 Application will continue with existing sanctions data");
-      console.warn(`📅 Existing data was updated at ${status.lastUpdate}`);
-    } else {
-      console.warn(
-        "🚨 No sanctions data available - all wallets will be allowed"
-      );
-      console.warn(
-        "🔧 Consider running initialization manually when OFAC service is available"
-      );
-    }
+    await logSanctionsStatusFallback();
     process.exit(0);
   }
 }

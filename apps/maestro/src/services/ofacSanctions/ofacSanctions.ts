@@ -1,3 +1,14 @@
+/**
+ * OFAC Sanctions Service
+ *
+ * Responsible for downloading and parsing the official OFAC SDN.XML dataset to
+ * extract digital currency addresses, and persisting them in KV for fast
+ * lookups. Also provides a lightweight status endpoint for health checks.
+ *
+ * Background: For information about OFAC sanctions and the SDN list, see
+ * https://ofac.treasury.gov/faqs/topic/1501
+ */
+
 import { kv } from "@vercel/kv";
 
 import MaestroKVClient from "~/services/db/kv/MaestroKVClient";
@@ -26,13 +37,21 @@ export class OFACSanctionsService {
     hasData: boolean;
     lastUpdate: string | null;
   }> {
-    const lastUpdate = await this.kvClient.getSanctionsLastUpdate();
-    const hasData = (await this.kvClient.getSanctionedWalletsCount()) > 0;
+    try {
+      const lastUpdate = await this.kvClient.getSanctionsLastUpdate();
+      const hasData = (await this.kvClient.getSanctionedWalletsCount()) > 0;
 
-    return {
-      hasData,
-      lastUpdate,
-    };
+      return {
+        hasData,
+        lastUpdate,
+      };
+    } catch (error) {
+      console.warn("Unable to retrieve sanctions status:", error);
+      return {
+        hasData: false,
+        lastUpdate: null,
+      };
+    }
   }
 
   /**
@@ -66,7 +85,6 @@ export class OFACSanctionsService {
         await this.kvClient.setSanctionedWallets(addresses);
       }
 
-      // Always set the last update timestamp to prevent re-downloading
       await this.kvClient.setSanctionsLastUpdate(new Date().toISOString());
 
       return {

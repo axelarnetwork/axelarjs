@@ -7,9 +7,19 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
   // Verify this is a legitimate Vercel cron job
   const authHeader = req.headers.authorization;
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    logger.error("CRON_SECRET is not configured");
+    return res.status(500).json({ error: "Server misconfiguration" });
+  }
+  if (authHeader !== `Bearer ${cronSecret}`) {
     logger.error("Unauthorized cron job attempt");
     return res.status(401).json({ error: "Unauthorized" });
   }

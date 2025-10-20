@@ -152,9 +152,27 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
 
   async setSanctionedWallets(walletAddresses: string[]): Promise<void> {
     const key = COLLECTION_KEYS.ofacSanctionsWallets;
-    // Clear existing set and add new addresses
-    await this.kv.del(key);
-    await this.addSanctionedWallets(walletAddresses);
+
+    // - Add new addresses first
+    // - Remove addresses that are no longer sanctioned
+    const normalizedAddresses = walletAddresses.map((addr) =>
+      addr.toLowerCase()
+    );
+
+    if (normalizedAddresses.length > 0) {
+      await this.kv.sadd(key, ...normalizedAddresses);
+    }
+
+    try {
+      const existing = await this.kv.smembers<string[]>(key);
+      const newSet = new Set(normalizedAddresses);
+      const toRemove = existing.filter((addr) => !newSet.has(addr));
+      if (toRemove.length > 0) {
+        await this.kv.srem(key, ...toRemove);
+      }
+    } catch {
+      // noop
+    }
   }
 
   async getSanctionsLastUpdate(): Promise<string | null> {
