@@ -22,6 +22,7 @@ import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
+import { xrplScaleGas } from "~/lib/utils/xrpl";
 
 // Chains that should force using Interchain Token Service path
 const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
@@ -119,7 +120,7 @@ export function useSendInterchainTokenState(props: {
   const isXRPLChain = props.sourceChain.chain_id == XRPL_CHAIN_ID;
 
   const payWithToken = CHAINS_PAYING_GAS_WITH_BRIDGED_TOKEN.includes(props.sourceChain.chain_id);
-  
+
   let sourceChainTokenSymbol;
   if(isXRPLChain) {
     // on xrpl, we can only pay for gas with the token that is transferred
@@ -149,20 +150,7 @@ export function useSendInterchainTokenState(props: {
 
   if(isXRPLChain) {
     // when XRPL is the source chain, we have to remap the return value of the estimate gas fee query to the "actual" decimals
-    if(sourceChainTokenSymbol == nativeTokenSymbol) {
-      // when we transfer XRP, this is already correct
-    } else if (!tokenDetails?.decimals || !gas) {
-      // this should not happen, but in this case just use zero gas (and recover later)
-      gas = BigInt(0);
-    } else {
-      // we need to map from tokenDetails.decimals to a rational number
-      if (15 > tokenDetails.decimals)
-        gas = gas * BigInt(10 ** (15 - tokenDetails.decimals));
-      else if (tokenDetails.decimals > 15)
-        gas = gas / BigInt(10 ** (tokenDetails.decimals - 15));
-
-      gasFeeDecimals = 15;
-    }
+    ({gas, gasFeeDecimals} = xrplScaleGas(sourceChainTokenSymbol === nativeTokenSymbol, tokenDetails?.decimals, gas, gasFeeDecimals));
   }
 
   const hasInsufficientGasBalance = useMemo(() => {
