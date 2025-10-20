@@ -1,6 +1,8 @@
 import type { VercelKV } from "@vercel/kv";
 import { z } from "zod";
 
+import { logger } from "~/lib/logger";
+
 export const COLLECTIONS = {
   accounts: "accounts",
   ofac: "ofac",
@@ -153,25 +155,40 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   async setSanctionedWallets(walletAddresses: string[]): Promise<void> {
     const key = COLLECTION_KEYS.ofacSanctionsWallets;
 
-    // - Add new addresses first
-    // - Remove addresses that are no longer sanctioned
     const normalizedAddresses = walletAddresses.map((addr) =>
       addr.toLowerCase()
     );
 
-    if (normalizedAddresses.length > 0) {
-      await this.kv.sadd(key, ...normalizedAddresses);
+    let existing: string[] = [];
+    try {
+      existing = await this.kv.smembers<string[]>(key);
+    } catch (error) {
+      logger.error("Failed to read existing sanctioned wallets from KV", error);
+      existing = [];
     }
 
-    try {
-      const existing = await this.kv.smembers<string[]>(key);
-      const newSet = new Set(normalizedAddresses);
-      const toRemove = existing.filter((addr) => !newSet.has(addr));
-      if (toRemove.length > 0) {
-        await this.kv.srem(key, ...toRemove);
+    const existingSet = new Set(existing);
+    const newSet = new Set(normalizedAddresses);
+
+    const toAdd = normalizedAddresses.filter((addr) => !existingSet.has(addr));
+    const toRemove = existing.filter((addr) => !newSet.has(addr));
+
+    if (toAdd.length > 0) {
+      try {
+        await this.kv.sadd(key, ...toAdd);
+      } catch (error) {
+        // Adding failed: log and rethrow since this could create false negatives
+        logger.error("Failed adding new sanctioned wallets to KV", error);
+        throw error;
       }
-    } catch {
-      // noop
+    }
+
+    if (toRemove.length > 0) {
+      try {
+        await this.kv.srem(key, ...toRemove);
+      } catch (error) {
+        logger.warn("Failed removing stale sanctioned wallets from KV", error);
+      }
     }
   }
 

@@ -16,6 +16,17 @@ import MaestroKVClient from "~/services/db/kv/MaestroKVClient";
 const OFAC_BASE_URL =
   process.env.OFAC_BASE_URL || "https://sanctionslistservice.ofac.treas.gov";
 
+// Configurable timeout (in milliseconds) for fetching the SDN.XML dataset
+// Defaults to 60 seconds if not provided or invalid
+const DEFAULT_OFAC_FETCH_TIMEOUT_MS = 60_000;
+const OFAC_FETCH_TIMEOUT_MS = (() => {
+  const raw = process.env.OFAC_FETCH_TIMEOUT_MS;
+  const parsed = raw ? parseInt(raw, 10) : NaN;
+  return Number.isFinite(parsed) && parsed > 0
+    ? parsed
+    : DEFAULT_OFAC_FETCH_TIMEOUT_MS;
+})();
+
 export class OFACSanctionsService {
   private kvClient: MaestroKVClient;
 
@@ -65,7 +76,10 @@ export class OFACSanctionsService {
     const url = `${OFAC_BASE_URL}/api/download/SDN.XML`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      OFAC_FETCH_TIMEOUT_MS
+    );
 
     try {
       const response = await fetch(url, {
