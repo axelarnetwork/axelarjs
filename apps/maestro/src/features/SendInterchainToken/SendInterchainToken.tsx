@@ -436,7 +436,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   );
 
                   if (state.gasRaw && state.payWithToken) {
-                    bnValue += state.gasRaw;
+                    bnValue += parseUnits(state.gasRaw.toString(), Number(props.balance.decimals));
                   }
 
                   const bnBalance = parseUnits(
