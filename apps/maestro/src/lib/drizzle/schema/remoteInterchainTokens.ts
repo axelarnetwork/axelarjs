@@ -1,5 +1,5 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
+import { boolean, pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import {
@@ -40,6 +40,7 @@ export const remoteInterchainTokens = pgTable("remote_interchain_tokens", {
   tokenManagerType: tokenManagerTypeEnum("token_manager_type"),
   deploymentMessageId: deploymentMessageId.notNull(),
   deploymentStatus: deplymentStatusEnum("deployment_status").default("pending"),
+  imported: boolean("imported").notNull().default(false),
   createdAt,
   updatedAt,
 });
