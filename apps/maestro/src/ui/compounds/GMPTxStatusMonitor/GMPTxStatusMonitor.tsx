@@ -15,7 +15,8 @@ import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
-import { XRPL_CHAIN_ID } from "~/config/chains";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
+import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 
@@ -46,6 +47,7 @@ const STATUS_COLORS: Partial<
 };
 
 const CHAINS_WITHOUT_LOG_INDEX = [XRPL_CHAIN_ID];
+const NON_EVM_CHAINS = [SUI_CHAIN_ID, XRPL_CHAIN_ID, STELLAR_CHAIN_ID];
 
 export function useGMPTxProgress(txHash: string, chainId: number) {
   const { combinedComputed } = useAllChainConfigsQuery();
@@ -53,8 +55,7 @@ export function useGMPTxProgress(txHash: string, chainId: number) {
   const { data: chainInfo } = useChainInfoQuery({
     axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
   });
-
-  const isNonEvm = chainInfo?.id.includes("sui");
+  const isNonEvm = NON_EVM_CHAINS.includes(chainId);
 
   // Make sure this supports sui as well
   const { data: txInfo } = useTransaction({

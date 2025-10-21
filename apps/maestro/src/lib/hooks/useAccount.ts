@@ -105,7 +105,7 @@ export function useAccount(): CombinedAccountInfo {
     address:
       wagmiAccount.address ||
       (mystenAccount?.address as `0x${string}`) ||
-      (stellarAccount as string) || 
+      (stellarAccount as string) ||
       (xrplAccount?.address as string),
     isConnected: isWagmiConnected || isMystenConnected || isStellarConnected || isXRPLConnected,
     isDisconnected:

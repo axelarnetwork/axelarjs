@@ -100,7 +100,6 @@ async function getXRPLTokenDetails(tokenAddress: string, ctx: Context) {
   let decimals = 6; // XRP has 6 decimals
 
   if (tokenAddress !== "XRP") {
-    symbol = tokenAddress.split(".")[0];
     const tokenRecord = await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
       axelarChainId,
       tokenAddress

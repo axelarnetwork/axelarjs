@@ -93,73 +93,55 @@ export const checkXRPLNode = async () => {
 };
 
 export const getXRPLAccountBalance = async (accountAddress: string, tokenAddress: string) => {
-    try {
-        if (tokenAddress === "XRP") {
-            // fetch XRP balance
-            const balanceInDrops = await fetchXRPLBalance(accountAddress);
-
-            return {
-                isTokenOwner: false,
-                isTokenMinter: false,
-                tokenBalance: balanceInDrops,
-                decimals: 6,
-                isTokenPendingOwner: false,
-                hasPendingOwner: false,
-                hasMinterRole: false,
-                hasOperatorRole: false,
-                hasFlowLimiterRole: false,
-            };
-        }
-
-        const [currency, issuer] = tokenAddress.split(".");
-        if (!currency || !issuer) {
-            throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY.ISSUER`,
-            });
-        }
-
-        const response = await withXRPLClient(async (client) => {
-            // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"    
-            return await client.request({
-              command: "account_lines",
-              account: accountAddress,
-            });
-        });
-        
-        // Find the line that matches the token
-        const line = response.result.lines.find(
-            (l: { currency: string; account: string; }) => l.currency === currency && l.account === issuer
-        );
-
-        const XRPL_TOKEN_DECIMALS = 15;
-        const actualBalance = line ? Decimal(line.balance).times(new Decimal(10).pow(XRPL_TOKEN_DECIMALS)).toFixed(0) : "0";
+    if (tokenAddress === "XRP") {
+        // fetch XRP balance
+        const balanceInDrops = await fetchXRPLBalance(accountAddress);
 
         return {
             isTokenOwner: false,
             isTokenMinter: false,
-            tokenBalance: line ? actualBalance.toString() : "0",
-            decimals: XRPL_TOKEN_DECIMALS,
-            isTokenPendingOwner: false,
-            hasPendingOwner: false,
-            hasMinterRole: false,
-            hasOperatorRole: false,
-            hasFlowLimiterRole: false,
-        }
-    } catch (error) {
-        // TODO: should this throw an TRPCError ?
-        return {
-            isTokenOwner: false,
-            isTokenMinter: false,
-            tokenBalance: "0",
-            decimals: 0,
+            tokenBalance: balanceInDrops,
+            decimals: 6,
             isTokenPendingOwner: false,
             hasPendingOwner: false,
             hasMinterRole: false,
             hasOperatorRole: false,
             hasFlowLimiterRole: false,
         };
-    } 
+    }
+
+    const [currency, issuer] = tokenAddress.split(".");
+    if (!currency || !issuer) {
+        throw new Error("Invalid tokenAddress format for XRPL. Expected format is CURRENCY.ISSUER");
+    }
+
+    const response = await withXRPLClient(async (client) => {
+        // the tokenAddress for xrpl is in the format of "CURRENCY.ISSUER"
+        return await client.request({
+            command: "account_lines",
+            account: accountAddress,
+        });
+    });
+
+    // Find the line that matches the token
+    const line = response.result.lines.find(
+        (l: { currency: string; account: string; }) => l.currency === currency && l.account === issuer
+    );
+
+    const XRPL_TOKEN_DECIMALS = 15;
+    const actualBalance = line ? Decimal(line.balance).times(new Decimal(10).pow(XRPL_TOKEN_DECIMALS)).toFixed(0) : "0";
+
+    return {
+        isTokenOwner: false,
+        isTokenMinter: false,
+        tokenBalance: line ? actualBalance.toString() : "0",
+        decimals: XRPL_TOKEN_DECIMALS,
+        isTokenPendingOwner: false,
+        hasPendingOwner: false,
+        hasMinterRole: false,
+        hasOperatorRole: false,
+        hasFlowLimiterRole: false,
+    }
 }
 
 export const isXRPLChainName = (chainName: string) => (chainName.includes("xrpl") && !chainName.includes("evm"));

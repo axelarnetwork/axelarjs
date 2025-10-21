@@ -76,11 +76,11 @@ export function useSendInterchainTokenState(props: {
     ]
   );
 
-  const XRPL_EVM_XRPL_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+  const XRPL_EVM_XRP_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
   const shouldUseTokenService =
     CHAINS_REQUIRING_TOKEN_SERVICE.includes(props.sourceChain.chain_id) ||
     isApprovalRequired ||
-    (props.sourceChain.chain_id === XRPL_EVM_CHAIN_ID && props.tokenAddress === XRPL_EVM_XRPL_ADDRESS);
+    (props.sourceChain.chain_id === XRPL_EVM_CHAIN_ID && props.tokenAddress === XRPL_EVM_XRP_ADDRESS);
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
@@ -146,7 +146,7 @@ export function useSendInterchainTokenState(props: {
   });
   // TODO: Remove custom overrides before merging to main. For testing purposes, this is left here intentionally. 
   if (tokenDetails?.symbol === "FOO" && isXRPLChain && process.env.NEXT_PUBLIC_NETWORK_ENV === "testnet") {
-    gas = 1_000_000_000_000_000_000n;
+    gas = 10_000_000_000_000_000_000n;
   }
 
   let gasFeeDecimals =
