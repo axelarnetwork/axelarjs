@@ -254,6 +254,9 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const isMainnet = NEXT_PUBLIC_NETWORK_ENV === "mainnet";
   const dex = dexLinks[props.chain?.id as string]?.(props.tokenAddress);
 
+  const canMint = !isHederaChain || Boolean(isHederaAssociated);
+  const hasManageActions = Boolean(balance?.isTokenMinter && canMint);
+
   return (
     <Card
       $compact
@@ -281,8 +284,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               </Link>
             </Tooltip>
           )}
-          {props.isOriginToken &&
-          (balance?.isTokenMinter || balance?.isTokenOwner) ? (
+          {props.isOriginToken && hasManageActions ? (
             <ManageInterchainToken
               trigger={
                 <Button
@@ -298,13 +300,13 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               }
               tokenAddress={props.tokenAddress}
               tokenManagerAddress={props.tokenManagerAddress}
-              balance={BigInt(balance.tokenBalance)}
-              isTokenOwner={balance.isTokenOwner}
-              isTokenPendingOwner={balance.isTokenPendingOwner}
-              isTokenMinter={balance.isTokenMinter as boolean}
-              hasPendingOwner={balance.hasPendingOwner}
+              balance={BigInt(balance?.tokenBalance ?? 0)}
+              isTokenOwner={Boolean(balance?.isTokenOwner)}
+              isTokenPendingOwner={Boolean(balance?.isTokenPendingOwner)}
+              isTokenMinter={Boolean(balance?.isTokenMinter)}
+              hasPendingOwner={Boolean(balance?.hasPendingOwner)}
               tokenId={props.tokenId}
-              canMint={!isHederaChain || Boolean(isHederaAssociated)}
+              canMint={canMint}
             />
           ) : (
             <StatusIndicator

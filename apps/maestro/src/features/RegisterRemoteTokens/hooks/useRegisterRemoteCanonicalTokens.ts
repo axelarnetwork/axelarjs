@@ -12,6 +12,7 @@ import {
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
 import { useChainId } from "~/lib/hooks";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
@@ -21,6 +22,8 @@ import {
   type RegisterRemoteInterchainTokenOnStellarInput,
 } from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
+
+const SIMULATION_DISABLED_CHAIN_IDS = [SUI_CHAIN_ID, STELLAR_CHAIN_ID];
 
 export type RegisterRemoteCanonicalTokensInput = {
   chainIds: number[];
@@ -45,6 +48,9 @@ export default function useRegisterRemoteCanonicalTokens(
   );
 
   const destinationChainIds = destinationChains.map((chain) => chain.id);
+  const destinationChainNames = destinationChains.map(
+    (chain) => chain.chain_name
+  );
 
   const sourceChain = useMemo(
     () => combinedComputed.indexedByChainId[chainId],
@@ -65,37 +71,49 @@ export default function useRegisterRemoteCanonicalTokens(
   });
 
   const multicallArgs = useMemo(() => {
-    if (
-      !isValidEVMAddress(input.tokenAddress) || // This is only used for EVM chains
-      !tokenDetails ||
-      !gasFeesData ||
-      tokenDetails.kind !== "canonical" ||
-      chainId === SUI_CHAIN_ID
-    )
-      return [];
+    if (!isValidEVMAddress(input.tokenAddress)) return [] as `0x${string}`[];
+    if (!tokenDetails) return [] as `0x${string}`[];
+    if (!gasFeesData) return [] as `0x${string}`[];
+    if (tokenDetails.kind !== "canonical") return [] as `0x${string}`[];
+    if (chainId === SUI_CHAIN_ID) return [] as `0x${string}`[];
 
-    return destinationChainIds.map((axelarChainId, i) => {
-      const gasValue = gasFeesData.gasFees[i].fee;
-
-      return INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
+    const hasLengthMatch =
+      gasFeesData.gasFees.length === destinationChainNames.length;
+    if (!hasLengthMatch) {
+      console.error(
+        "gas fees data length does not match destination chain names length",
         {
-          originalTokenAddress: tokenDetails.tokenAddress as `0x${string}`,
-          destinationChain: axelarChainId,
-          gasValue,
+          gasFeesData,
+          destinationChainNames,
         }
       );
-    });
-  }, [tokenDetails, gasFeesData, chainId, input, destinationChainIds]);
+      // return empty args to disable simulation/write until fees align
+      return [] as `0x${string}`[];
+    }
+
+    return destinationChainNames.map((destinationChain, i) =>
+      INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteCanonicalInterchainToken.data(
+        {
+          originalTokenAddress: tokenDetails.tokenAddress as `0x${string}`,
+          destinationChain,
+          gasValue: scaleGasValue(chainId, gasFeesData.gasFees[i].fee),
+        }
+      )
+    );
+  }, [tokenDetails, gasFeesData, chainId, input, destinationChainNames]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
-  const { data: config } = useSimulateInterchainTokenFactoryMulticall({
-    value: totalGasFee,
-    args: [multicallArgs],
-    query: {
-      enabled: multicallArgs.length > 0 && totalGasFee > 0n,
-    },
-  });
+  const { data: config, error: simulationError } =
+    useSimulateInterchainTokenFactoryMulticall({
+      value: totalGasFee,
+      args: [multicallArgs],
+      query: {
+        enabled:
+          !SIMULATION_DISABLED_CHAIN_IDS.includes(chainId) &&
+          multicallArgs.length > 0,
+      },
+    });
 
   const mutation = useWriteInterchainTokenFactoryMulticall();
 
@@ -135,27 +153,40 @@ export default function useRegisterRemoteCanonicalTokens(
     onStatusUpdate: statusUpdateAdapter,
   };
 
+  let writeContract = undefined;
+  switch (chainId) {
+    case SUI_CHAIN_ID:
+      writeContract = () => registerRemoteInterchainTokenOnSui(suiInput);
+      break;
+    case STELLAR_CHAIN_ID:
+      writeContract = () =>
+        registerRemoteInterchainTokenOnStellar(stellarInput);
+      break;
+    default:
+      if (config) {
+        writeContract = () => mutation.writeContract(config.request);
+      }
+  }
+
+  let writeContractAsync = undefined;
+  switch (chainId) {
+    case SUI_CHAIN_ID:
+      writeContractAsync = () => registerRemoteInterchainTokenOnSui(suiInput);
+      break;
+    case STELLAR_CHAIN_ID:
+      writeContractAsync = () =>
+        registerRemoteInterchainTokenOnStellar(stellarInput);
+      break;
+    default:
+      if (config) {
+        writeContractAsync = () => mutation.writeContractAsync(config.request);
+      }
+  }
+
   return {
     ...mutation,
-    writeContract: () => {
-      if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnSui(suiInput);
-      }
-      if (chainId === STELLAR_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnStellar(stellarInput);
-      }
-      if (!config) return;
-      return mutation.writeContract(config.request);
-    },
-    writeContractAsync: async () => {
-      if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnSui(suiInput);
-      }
-      if (chainId === STELLAR_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnStellar(stellarInput);
-      }
-      if (!config) return;
-      return await mutation.writeContractAsync(config.request);
-    },
+    simulationError,
+    writeContract,
+    writeContractAsync,
   };
 }

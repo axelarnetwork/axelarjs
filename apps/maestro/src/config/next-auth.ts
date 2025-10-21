@@ -165,9 +165,6 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  jwt: {
-    secret: process.env.JWT_SECRET,
-  },
   callbacks: {
     async session({ session, token }) {
       const address = token.sub as string;
