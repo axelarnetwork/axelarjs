@@ -161,3 +161,5 @@ export const getXRPLAccountBalance = async (accountAddress: string, tokenAddress
         };
     } 
 }
+
+export const isXRPLChainName = (chainName: string) => (chainName.includes("xrpl") && !chainName.includes("evm"));

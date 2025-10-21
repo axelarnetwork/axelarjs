@@ -15,6 +15,7 @@ import { trpc } from "~/lib/trpc";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
 import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
 import { useXRPLInterchainTransfer } from "~/features/xrplHooks";
+import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -85,7 +86,7 @@ export function useInterchainTransferMutation(
         // Encode the recipient address for Stellar since it's a base64 string
         if (config.destinationChainName.toLowerCase().includes("stellar")) {
           encodedRecipient = stellarEncodedRecipient(destinationAddress);
-        } else if (config.destinationChainName.includes("xrpl") && !config.destinationChainName.includes("evm")) {
+        } else if (isXRPLChainName(config.destinationChainName)) {
           encodedRecipient = xrplEncodedRecipient(destinationAddress);
         } else {
           encodedRecipient = destinationAddress as `0x${string}`;
@@ -104,7 +105,7 @@ export function useInterchainTransferMutation(
             transaction: sendTokenTxJSON,
           });
           txHash = receipt.digest;
-        } else if (config.sourceChainName.toLowerCase().includes("xrpl") && !config.sourceChainName.toLowerCase().includes("evm")) {
+        } else if (isXRPLChainName(config.sourceChainName)) {
           const result = await xrplInterchainTransfer({
             caller: address,
             tokenId: tokenId,

@@ -26,6 +26,7 @@ import { logger } from "~/lib/logger";
 import { scaleGasValue } from "~/lib/utils/gas";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
 import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
+import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 // Chains that should use the Token Manager as the spender for approvals
 const CHAINS_USING_TOKEN_MANAGER_AS_SPENDER = [HEDERA_CHAIN_ID];
@@ -115,7 +116,7 @@ export function useInterchainTokenServiceTransferMutation(
         } else if (config.destinationChainName.toLowerCase().includes("stellar")) {
           // Encode the recipient address for Stellar since it's a base64 string
           encodedRecipient = encodeStellarAddressAsBytes(destinationAddress);
-        } else if (config.destinationChainName.includes("xrpl") && !config.destinationChainName.includes("evm")) {
+        } else if (isXRPLChainName(config.destinationChainName)) {
           // Encode the recipient address for XRPL
           encodedRecipient = xrplEncodedRecipient(destinationAddress);
         } else {

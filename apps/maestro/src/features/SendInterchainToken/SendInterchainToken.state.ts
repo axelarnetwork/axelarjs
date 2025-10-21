@@ -72,10 +72,11 @@ export function useSendInterchainTokenState(props: {
     ]
   );
 
+  const XRPL_EVM_XRPL_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
   const shouldUseTokenService =
     CHAINS_REQUIRING_TOKEN_SERVICE.includes(props.sourceChain.chain_id) ||
     isApprovalRequired ||
-    (props.sourceChain.chain_id === XRPL_EVM_CHAIN_ID && props.tokenAddress === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
+    (props.sourceChain.chain_id === XRPL_EVM_CHAIN_ID && props.tokenAddress === XRPL_EVM_XRPL_ADDRESS);
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
@@ -122,7 +123,7 @@ export function useSendInterchainTokenState(props: {
   const payWithToken = CHAINS_PAYING_GAS_WITH_BRIDGED_TOKEN.includes(props.sourceChain.chain_id);
 
   let sourceChainTokenSymbol;
-  if(isXRPLChain) {
+  if (isXRPLChain) {
     // on xrpl, we can only pay for gas with the token that is transferred
     // we will need the "prettySymbol" value of that token though
     sourceChainTokenSymbol = tokenSymbol;
@@ -148,7 +149,7 @@ export function useSendInterchainTokenState(props: {
           CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
           props.sourceChain.native_token.decimals;
 
-  if(isXRPLChain) {
+  if (isXRPLChain) {
     // when XRPL is the source chain, we have to remap the return value of the estimate gas fee query to the "actual" decimals
     ({gas, gasFeeDecimals} = xrplScaleGas(sourceChainTokenSymbol === nativeTokenSymbol, tokenDetails?.decimals, gas, gasFeeDecimals));
   }

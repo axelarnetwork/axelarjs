@@ -3,7 +3,7 @@ import { z } from "zod";
 import { CHAIN_CONFIGS } from "~/config/chains";
 import { sendRpcNodeIssueNotificationWithRateLimit } from "~/lib/utils/slack-notifications";
 import { publicProcedure, router } from "~/server/trpc";
-import { checkXRPLNode } from "~/lib/utils/xrpl";
+import { checkXRPLNode, isXRPLChainName } from "~/lib/utils/xrpl";
 
 async function checkRpcNode(
   url: string,
@@ -12,7 +12,7 @@ async function checkRpcNode(
   try {
     const chainNameLower = chainName.toLowerCase();
 
-    if(chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
+    if (isXRPLChainName(chainNameLower)) {
       // test via xrpl.js
       return checkXRPLNode();
     }

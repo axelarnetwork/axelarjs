@@ -35,6 +35,7 @@ import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
+import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 type FormState = {
   amountToTransfer: string;
@@ -502,7 +503,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     return "Invalid EVM address";
                   }
                   if (
-                    (state.selectedToChain.id.includes("xrpl") && !state.selectedToChain.id.includes("evm")) &&
+                    isXRPLChainName(state.selectedToChain.id) &&
                     !isValidXRPLWalletAddress(value)
                   ) {
                       return "Invalid XRPL address";
