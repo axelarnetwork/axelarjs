@@ -61,6 +61,7 @@
     "@vercel/kv": "^1.0.1",
     "@vercel/postgres": "^0.7.2",
     "@web3modal/wagmi": "^4.1.1",
+    "@xrpl-wallet-adapter/base": "^0.1.4",
     "@xrpl-wallet-adapter/crossmark": "^0.1.4",
     "@xrpl-wallet-adapter/ledger": "^0.1.0",
     "@xrpl-wallet-adapter/walletconnect": "^0.2.0",

@@ -1,6 +1,6 @@
 import { invariant } from '@axelarjs/utils'
 import { CrossmarkWallet } from '@xrpl-wallet-adapter/crossmark'
-import { XRPLBaseWallet } from '@xrpl-wallet-adapter/base';
+import { type XRPLBaseWallet } from '@xrpl-wallet-adapter/base';
 import { WalletConnectWallet } from '@xrpl-wallet-adapter/walletconnect'
 import { XamanWallet } from '@xrpl-wallet-adapter/xaman'
 import { WalletProvider as StandardWalletProvider } from '@xrpl-wallet-standard/react'

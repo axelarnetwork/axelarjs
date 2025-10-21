@@ -228,7 +228,7 @@ export function useWeb3SignIn({
     void signInWithWeb3Async(address);
   }, [
     xrplWallet?.accounts?.length,
-    xrplWallet.accounts,
+    xrplWallet?.accounts,
     xrplConnectionStatus,
     sessionStatus,
     session?.address,
