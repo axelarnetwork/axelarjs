@@ -136,7 +136,8 @@ export function useSendInterchainTokenState(props: {
     sourceChainTokenSymbol = nativeTokenSymbol;
   }
 
-  let { data: gas } = useEstimateGasFeeQuery({
+  // eslint-disable-next-line prefer-const
+  let { data: gas, isLoading: isGasLoading, isFetching: isGasFetching } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
     destinationChainId: selectedToChain?.id,
     sourceChainTokenSymbol,

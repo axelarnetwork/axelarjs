@@ -14,9 +14,7 @@ import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
-import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
-import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 

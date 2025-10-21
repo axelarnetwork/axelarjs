@@ -33,7 +33,7 @@ import {
 } from "~/config/chains";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
-import { hex64Literal } from "~/lib/utils/validation";
+import { hex64Literal, isValidXRPLWalletAddress } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
 
@@ -320,7 +320,7 @@ const ManageTokenIcon: FC<ManageTokenIconProps> = ({
         accountAddress: address,
       },
       {
-        enabled: Boolean(address),
+        enabled: Boolean(address) && !isValidXRPLWalletAddress(address),
       }
     );
 

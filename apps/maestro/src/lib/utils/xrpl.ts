@@ -1,7 +1,6 @@
 import { xrplChainConfig } from "~/config/chains";
 import { scaleDecimals } from "./gas";
 import * as xrpl from "xrpl";
-import { TRPCError } from "@trpc/server";
 import Decimal from "decimal.js";
 
 export const xrplScaleGas = (

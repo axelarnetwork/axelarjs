@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { hex40Literal, hex64Literal, xrplWalletAddress, isValidXRPLWalletAddress } from "~/lib/utils/validation";
+import { hex40Literal, hex64Literal, isValidXRPLWalletAddress } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 import {
   getRoleIndex,
@@ -12,7 +12,7 @@ export const getInterchainTokenRolesForAccount = publicProcedure
   .input(
     z.object({
       tokenId: hex64Literal(),
-      accountAddress: z.union([hex40Literal(), xrplWalletAddress()]),
+      accountAddress: hex40Literal(),
     })
   )
   .query(async ({ ctx, input }) => {

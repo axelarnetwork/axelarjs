@@ -227,7 +227,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       catch (error) {
         throw new TRPCError({
             code: "BAD_REQUEST",
-            message: `${error}`,
+            message: error instanceof Error ? error.message : String(error),
         });
       }
     }
