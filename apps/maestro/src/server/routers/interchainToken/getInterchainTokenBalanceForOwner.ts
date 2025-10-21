@@ -221,7 +221,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     }
 
     if (isValidXRPLTokenAddress(input.tokenAddress)) {
-      return getXRPLAccountBalance(input.owner, input.tokenAddress);
+      return await getXRPLAccountBalance(input.owner, input.tokenAddress);
     }
 
     // This is for ERC20 tokens

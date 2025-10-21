@@ -14,7 +14,7 @@ async function checkRpcNode(
 
     if (isXRPLChainName(chainNameLower)) {
       // test via xrpl.js
-      return checkXRPLNode();
+      return await checkXRPLNode();
     }
 
     const controller = new AbortController();
