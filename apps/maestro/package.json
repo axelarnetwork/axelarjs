@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "scripts/build.sh",
+    "postbuild": "tsx scripts/ofacSanctionsInit.ts",
     "build:analyze": "ANALYZE=true pnpm build",
     "start": "next start",
     "lint": "next lint",
@@ -32,7 +33,7 @@
     "drizzle:studio": "pnpm drizzle-kit studio",
     "postinstall": "patch-package",
     "release": "tsx scripts/release.ts",
-    "synctokens": "tsx scripts/syncTokens.ts"
+    "synctokens": "tsx scripts/synctokens.ts"
   },
   "dependencies": {
     "@axelar-network/axelar-cgp-sui": "0.0.0-snapshot.424bc13",

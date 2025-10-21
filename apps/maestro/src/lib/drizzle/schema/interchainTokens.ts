@@ -1,5 +1,11 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { pgEnum, pgTable, smallint, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  pgEnum,
+  pgTable,
+  smallint,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import {
@@ -37,6 +43,7 @@ export const interchainTokens = pgTable("interchain_tokens", {
   tokenManagerType: tokenManagerTypeEnum("token_manager_type"),
   originalMinterAddress: varchar("original_minter_address"),
   kind: tokenKindEnum("kind").notNull(),
+  imported: boolean("imported").notNull().default(false),
   createdAt,
   updatedAt,
   /**

@@ -11,16 +11,12 @@ import { parseUnits, TransactionExecutionError } from "viem";
 import { useBlockNumber, useWaitForTransactionReceipt } from "wagmi";
 
 import { HEDERA_CHAIN_ID } from "~/config/chains";
-import { NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS } from "~/config/env";
 import {
   useReadInterchainTokenAllowance,
   useReadInterchainTokenDecimals,
   useWriteInterchainTokenApprove,
 } from "~/lib/contracts/InterchainToken.hooks";
-import {
-  useReadInterchainTokenServiceTokenManagerAddress,
-  useWriteInterchainTokenServiceInterchainTransfer,
-} from "~/lib/contracts/InterchainTokenService.hooks";
+import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { scaleGasValue } from "~/lib/utils/gas";
@@ -28,8 +24,6 @@ import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
 import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
 import { isXRPLChainName } from "~/lib/utils/xrpl";
 
-// Chains that should use the Token Manager as the spender for approvals
-const CHAINS_USING_TOKEN_MANAGER_AS_SPENDER = [HEDERA_CHAIN_ID];
 const CHAINS_SCALED_GAS = [HEDERA_CHAIN_ID];
 
 export type UseSendInterchainTokenConfig = {
@@ -39,6 +33,7 @@ export type UseSendInterchainTokenConfig = {
   destinationChainName: string;
   destinationAddress?: string;
   gas?: bigint;
+  spenderAddress?: `0x${string}`;
 };
 
 export type UseSendInterchainTokenInput = {
@@ -53,9 +48,6 @@ export function useInterchainTokenServiceTransferMutation(
   const chainId = useChainId();
   const [txState, setTxState] = useTransactionState();
 
-  const shouldUseTokenManagerAsSpender =
-    CHAINS_USING_TOKEN_MANAGER_AS_SPENDER.includes(chainId);
-
   const shouldScaleGas = CHAINS_SCALED_GAS.includes(chainId);
 
   const { data: decimals } = useReadInterchainTokenDecimals({
@@ -64,23 +56,9 @@ export function useInterchainTokenServiceTransferMutation(
 
   const { address } = useAccount();
 
-  const { data: tokenManagerAddress } =
-    useReadInterchainTokenServiceTokenManagerAddress({
-      args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.tokenManagerAddress.args({
-        tokenId: config.tokenId,
-      }),
-      query: {
-        enabled: shouldUseTokenManagerAsSpender && Boolean(config.tokenId),
-      },
-    });
-
-  const approvalSpender = shouldUseTokenManagerAsSpender
-    ? (tokenManagerAddress ?? "0x")
-    : NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS;
-
   const { data: tokenAllowance } = useWatchInterchainTokenAllowance(
     config.tokenAddress as `0x${string}`,
-    approvalSpender
+    config.spenderAddress ?? "0x"
   );
 
   const {
@@ -208,7 +186,7 @@ export function useInterchainTokenServiceTransferMutation(
         decimals === undefined ||
         !address ||
         config.gas === undefined ||
-        !approvalSpender
+        !config.spenderAddress
       ) {
         toast.error("Transfer not ready: missing information");
         setTxState({ status: "idle" });
@@ -228,7 +206,7 @@ export function useInterchainTokenServiceTransferMutation(
           await approveInterchainTokenAsync({
             address: config.tokenAddress as `0x${string}`,
             args: INTERCHAIN_TOKEN_ENCODERS.approve.args({
-              spender: approvalSpender,
+              spender: config.spenderAddress,
               amount: approvedAmountRef.current,
             }),
           });
@@ -293,7 +271,6 @@ function useWatchInterchainTokenAllowance(
         queryClient.invalidateQueries({ queryKey }).catch((error) => {
           logger.error("Failed to invalidate token allowance query:", error);
         });
-        logger.info("Invalidating token allowance query");
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

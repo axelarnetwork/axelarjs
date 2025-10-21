@@ -67,6 +67,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     formState,
     reset: resetForm,
     setValue,
+    trigger,
   } = useForm<FormState>({
     mode: "onChange",
     reValidateMode: "onChange",
@@ -113,6 +114,21 @@ export const SendInterchainToken: FC<Props> = (props) => {
       isDestinationHedera,
     ]
   );
+
+  useEffect(() => {
+    if (!destinationAddress) return;
+    if (!isDestinationHedera) return;
+    void trigger("destinationAddress");
+  }, [
+    destinationAddress,
+    isDestinationHedera,
+    isCheckingDestinationAssociation,
+    isDestinationAssociated,
+    hasDestinationAssociationError,
+    state.selectedToChain?.chain_id,
+    state.destinationTokenAddress,
+    trigger,
+  ]);
 
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
@@ -185,6 +201,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
           };
         }
 
+        if (state.isEstimatingGas) {
+          return {
+            children: "Estimating gas...",
+            status: "loading",
+          };
+        }
+
         if (state.hasInsufficientGasBalance) {
           return {
             children: `Insufficient ${state.nativeTokenSymbol} for gas fees`,
@@ -207,6 +230,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     formState.errors.amountToTransfer?.message,
     formState.errors.destinationAddress?.message,
     formState.isValid,
+    state.isEstimatingGas,
     state.hasInsufficientGasBalance,
     state.nativeTokenSymbol,
     state.selectedToChain?.name,
@@ -462,7 +486,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 <Label.AltText
                   className="transition-opacity hover:cursor-pointer hover:opacity-30"
                   onClick={() => {
-                    setValue("destinationAddress", address ?? "");
+                    setValue("destinationAddress", address ?? "", {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
                   }}
                 >
                   Use connected wallet address
@@ -611,10 +638,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 disabled={
                   !formState.isValid ||
                   isFormDisabled ||
+                  state.isEstimatingGas ||
                   state.hasInsufficientGasBalance ||
                   mustBlockForHederaAssociation
                 }
-                $loading={state.isSending}
+                $loading={state.isSending || state.isEstimatingGas}
               >
                 {buttonChildren}
               </Button>

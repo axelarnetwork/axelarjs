@@ -1,0 +1,1 @@
+export { ofacSanctionsService } from "./ofacSanctions";

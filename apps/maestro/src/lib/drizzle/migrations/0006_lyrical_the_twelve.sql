@@ -1,0 +1,2 @@
+ALTER TABLE "interchain_tokens" ADD COLUMN "imported" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "remote_interchain_tokens" ADD COLUMN "imported" boolean DEFAULT false NOT NULL;
