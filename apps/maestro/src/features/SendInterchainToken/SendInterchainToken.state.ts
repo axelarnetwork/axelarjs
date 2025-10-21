@@ -1,7 +1,7 @@
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
-import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
+import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID, XRPL_EVM_CHAIN_ID } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
@@ -74,7 +74,8 @@ export function useSendInterchainTokenState(props: {
 
   const shouldUseTokenService =
     CHAINS_REQUIRING_TOKEN_SERVICE.includes(props.sourceChain.chain_id) ||
-    isApprovalRequired; 
+    isApprovalRequired ||
+    (props.sourceChain.chain_id === XRPL_EVM_CHAIN_ID && props.tokenAddress === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);

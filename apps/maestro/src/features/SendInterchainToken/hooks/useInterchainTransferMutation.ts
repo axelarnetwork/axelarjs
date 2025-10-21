@@ -40,7 +40,6 @@ export function useInterchainTransferMutation(
   const chainId = useChainId();
   const { address } = useAccount();
   const xrplInterchainTransfer = useXRPLInterchainTransfer();
-  
 
   const { sendToken: sendStellarToken } = useSendStellarToken();
 
