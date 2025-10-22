@@ -34,9 +34,10 @@ import {
 } from "~/config/chains";
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
-import { hex64Literal, isValidXRPLWalletAddress } from "~/lib/utils/validation";
+import { hex64Literal } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
+import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 
 export type TokenDetailsSectionProps = {
   name: string;

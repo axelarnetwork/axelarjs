@@ -1,12 +1,13 @@
 import { z } from "zod";
 
-import { hex40Literal, hex64Literal, isValidXRPLWalletAddress } from "~/lib/utils/validation";
+import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 import {
   getRoleIndex,
   ROLES_ENUM,
   type TokenRole,
 } from "./getInterchainTokenBalanceForOwner";
+import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 
 export const getInterchainTokenRolesForAccount = publicProcedure
   .input(

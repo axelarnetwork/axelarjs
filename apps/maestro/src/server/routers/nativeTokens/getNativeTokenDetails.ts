@@ -14,7 +14,7 @@ import {
 import {
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
-  isValidXRPLTokenAddress,
+  isXRPLTokenAddressFormat,
 } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
@@ -147,7 +147,7 @@ export const getNativeTokenDetails = publicProcedure
       );
     }
 
-    if (isValidXRPLTokenAddress(input.tokenAddress)) {
+    if (isXRPLTokenAddressFormat(input.tokenAddress)) {
       return getXRPLTokenDetails(input.tokenAddress, ctx);
     }
 

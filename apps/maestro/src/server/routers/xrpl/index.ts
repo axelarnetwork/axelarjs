@@ -5,7 +5,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "~/server/trpc";
 import { buildInterchainTransferTxBytes } from "./utils/tokenOperations";
 import { parseXRPLTokenAddress } from "./utils/utils";
-import { withXRPLClient } from "~/lib/utils/xrpl";
+import { isValidXRPLWalletAddress, withXRPLClient } from "~/lib/utils/xrpl";
 
 export const xrplRouter = router({
   getInterchainTransferTxBytes: publicProcedure
@@ -31,6 +31,12 @@ export const xrplRouter = router({
       })
     )
     .query(async ({ input }) => {
+      if (!isValidXRPLWalletAddress(input.account)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid account address for trust line",
+        });
+      }
       if (input.tokenAddress === "XRP") {
         // Native XRP doesn't require a trust line
         return { hasTrustLine: true };

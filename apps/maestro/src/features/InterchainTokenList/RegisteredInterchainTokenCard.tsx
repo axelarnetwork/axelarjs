@@ -28,7 +28,7 @@ import {
   isTokenAddressIncompatibleWithOwner,
   normalizeTokenAddressForCompatibility,
 } from "~/lib/utils/addressCompatibility";
-import { isValidXRPLWalletAddress } from "~/lib/utils/validation";
+import { isXRPLWalletAddressFormat } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -75,7 +75,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     address
   );
   if (props.chainId === xrplChainConfig.id) {
-    isIncompatibleChain = !isValidXRPLWalletAddress(address);
+    isIncompatibleChain = !isXRPLWalletAddressFormat(address);
   }
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,

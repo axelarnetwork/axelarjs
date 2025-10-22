@@ -27,7 +27,6 @@ import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,
-  isValidXRPLWalletAddress,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
@@ -36,7 +35,7 @@ import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
-import { isXRPLChainName } from "~/lib/utils/xrpl";
+import { isValidXRPLWalletAddress, isXRPLChainName } from "~/lib/utils/xrpl";
 
 type FormState = {
   amountToTransfer: string;
