@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 
 import { useSendStellarToken } from "~/features/stellarHooks";
+import { useXRPLInterchainTransfer } from "~/features/xrplHooks/useXRPLInterchainTransfer";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
@@ -14,7 +15,6 @@ import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
 import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
-import { useXRPLInterchainTransfer } from "~/features/xrplHooks";
 import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 export type UseSendInterchainTokenConfig = {
@@ -40,9 +40,9 @@ export function useInterchainTransferMutation(
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
   const { address } = useAccount();
-  const xrplInterchainTransfer = useXRPLInterchainTransfer();
 
   const { sendToken: sendStellarToken } = useSendStellarToken();
+  const xrplInterchainTransfer = useXRPLInterchainTransfer();
 
   const { writeContractAsync: transferAsync } =
     useWriteInterchainTokenInterchainTransfer();
@@ -115,10 +115,8 @@ export function useInterchainTransferMutation(
             amount: bnAmount.toString(),
             gasValue: config.gas.toString() ?? "0",
           });
-
           txHash = result.txHash;
-        }
-        else if (config.sourceChainName.toLowerCase().includes("stellar")) {
+        } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
           const result = await sendStellarToken.mutateAsync({
             caller: address,
             tokenId: tokenId,

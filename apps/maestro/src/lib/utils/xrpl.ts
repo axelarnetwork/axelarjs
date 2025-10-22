@@ -144,3 +144,5 @@ export const getXRPLAccountBalance = async (accountAddress: string, tokenAddress
 }
 
 export const isXRPLChainName = (chainName: string) => (chainName.includes("xrpl") && !chainName.includes("evm"));
+
+export const isValidXRPLWalletAddress = (address: string) => (xrpl.isValidClassicAddress(address));

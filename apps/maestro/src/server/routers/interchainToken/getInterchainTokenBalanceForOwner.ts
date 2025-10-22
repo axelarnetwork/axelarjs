@@ -7,8 +7,8 @@ import { suiClient as client } from "~/lib/clients/suiClient";
 import { isTokenAddressIncompatibleWithOwner } from "~/lib/utils/addressCompatibility";
 import {
   isValidStellarTokenAddress,
-  isValidXRPLTokenAddress,
-  isValidXRPLWalletAddress,
+  isXRPLTokenAddressFormat,
+  isXRPLWalletAddressFormat,
 } from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
@@ -75,8 +75,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       input.tokenAddress,
       input.owner
     );
-    if (isValidXRPLWalletAddress(input.owner)) { // xrpl address
-      isIncompatibleChain = !isValidXRPLTokenAddress(input.tokenAddress);
+    if (isXRPLWalletAddressFormat(input.owner)) { // xrpl address
+      isIncompatibleChain = !isXRPLTokenAddressFormat(input.tokenAddress);
     }
     if (isIncompatibleChain) {
       return {
@@ -220,7 +220,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       }
     }
 
-    if (isValidXRPLTokenAddress(input.tokenAddress)) {
+    if (isXRPLTokenAddressFormat(input.tokenAddress)) {
       try {
         return await getXRPLAccountBalance(input.owner, input.tokenAddress);
       }

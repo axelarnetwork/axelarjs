@@ -1,10 +1,9 @@
 import type { XRPLChainConfig } from "@axelarjs/api/axelar-config";
 
-import Decimal from "decimal.js";
-
 import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import type { Context } from "~/server/context";
+import Decimal from "decimal.js";
 
 const isXRPLChainConfig = (c: unknown): c is XRPLChainConfig => {
   return (c as { chainType?: string })?.chainType === "xrpl";
@@ -68,11 +67,12 @@ export const xrplEncodedRecipient = (
 
 export function parseTokenAmount(token: string, amountInDrops: string) {
   let parsedAmount;
+  const parsedToken = parseXRPLTokenAddress(token);
 
-  if (token === "XRP") {
+  if (parsedToken === null) {
     parsedAmount = amountInDrops;
   } else {
-    const [currency, issuer] = token.split(".");
+    const { currency, issuer } = parsedToken;
     // assert: amount != "0"
     // the token has 15 decimals -> add a decimal point between the 14th and the 15th from the right
     const amount = Decimal(amountInDrops).times(1e-15);
@@ -97,4 +97,30 @@ export function parseTokenGasValue(token: string, amount: string) {
       .replace(/0+$/, "")
       .replace(/\.$/, ""); // TODO: cannot cast to float, but if resulting number has too many digits, remove them from the right
   }
+}
+
+
+export function parseXRPLTokenAddress(
+  token: string
+): { currency: string; issuer: string } | null {
+  if (token === "XRP") {
+    return null;
+  }
+  const normalized = token.trim();
+  // Ensure exactly one dot separator
+  const firstDot = normalized.indexOf(".");
+  if (firstDot === -1 || firstDot !== normalized.lastIndexOf(".")) {
+    throw new Error(
+      "Invalid XRPL token address format. Expected CURRENCY.ISSUER or XRP"
+    );
+  }
+  const [rawCurrency, rawIssuer] = normalized.split(".");
+  const currency = rawCurrency.trim();
+  const issuer = rawIssuer.trim();
+  if (!currency || !issuer) {
+    throw new Error(
+      "Invalid XRPL token address format. Expected CURRENCY.ISSUER or XRP"
+    );
+  }
+  return { currency, issuer };
 }

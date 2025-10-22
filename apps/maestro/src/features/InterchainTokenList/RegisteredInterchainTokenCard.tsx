@@ -12,22 +12,23 @@ import {
 } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { maskAddress } from "@axelarjs/utils";
-import { useCallback, useMemo, useState, type FC } from "react";
+import { useCallback, useMemo, type FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 
-import { HEDERA_CHAIN_ID, xrplChainConfig } from "~/config/chains";
+import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID, xrplChainConfig } from "~/config/chains";
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useHederaTokenAssociation } from "~/features/hederaHooks";
+import { useXRPLTrustLine } from "~/features/xrplHooks";
 import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
 import {
   isTokenAddressIncompatibleWithOwner,
   normalizeTokenAddressForCompatibility,
 } from "~/lib/utils/addressCompatibility";
-import { isValidXRPLWalletAddress } from "~/lib/utils/validation";
+import { isXRPLWalletAddressFormat } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -35,7 +36,7 @@ import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
-import { HederaAssociation } from "./HederaAssociation";
+import { TokenAssociationSection } from "./TokenAssociationSection";
 import type { TokenInfo } from "./types";
 
 const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
@@ -74,7 +75,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
     address
   );
   if (props.chainId === xrplChainConfig.id) {
-    isIncompatibleChain = !isValidXRPLWalletAddress(address);
+    isIncompatibleChain = !isXRPLWalletAddressFormat(address);
   }
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
@@ -117,108 +118,17 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
   const isSourceChain = chainId === props.chainId;
   const isHederaChain = props.chainId === HEDERA_CHAIN_ID;
-  const {
-    isAssociated: isHederaAssociated,
-    isCheckingAssociation: isHederaCheckingAssoc,
-    hasAssociationError: hasHederaAssocError,
-    associateHederaToken,
-    dissociateHederaToken,
-    invalidateAssociation,
-  } = useHederaTokenAssociation(props.tokenAddress, {
-    enabled: isHederaChain && Boolean(address),
+  const isXRPLChain = props.chainId === xrplChainConfig.id;
+  const { isAssociated: isHederaAssociated } = useHederaTokenAssociation(
+    props.tokenAddress,
+    {
+      enabled: isHederaChain && Boolean(address),
+    }
+  );
+
+  const { hasXRPLTrustLine } = useXRPLTrustLine(props.tokenAddress, {
+    enabled: isXRPLChain && Boolean(address),
   });
-
-  const [isAssocSubmitting, setIsAssocSubmitting] = useState(false);
-
-  const onAssociate = useCallback(async () => {
-    if (!props.tokenAddress) return;
-    let loadingToastId: string | undefined;
-    try {
-      setIsAssocSubmitting(true);
-      loadingToastId = toast.loading("Associating with token");
-      const txHash = await associateHederaToken(props.tokenAddress);
-      if (loadingToastId) toast.dismiss(loadingToastId);
-      const txUrl = props.chain?.blockExplorers?.[0]?.url
-        ? `${props.chain?.blockExplorers?.[0]?.url}/tx/${txHash}`
-        : undefined;
-      toast.success(
-        txUrl ? (
-          <span>
-            Associated with token. Transaction hash:
-            <a
-              href={txUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1 underline"
-            >
-              {txHash}
-            </a>
-          </span>
-        ) : (
-          "Associated with token. Transaction hash: " + txHash
-        ),
-        { duration: 10000 }
-      );
-    } catch (error) {
-      if (loadingToastId) toast.dismiss(loadingToastId);
-      toast.error(
-        error instanceof Error ? error.message : "Association failed"
-      );
-    } finally {
-      setIsAssocSubmitting(false);
-      await invalidateAssociation();
-    }
-  }, [
-    associateHederaToken,
-    props.tokenAddress,
-    props.chain?.blockExplorers,
-    invalidateAssociation,
-  ]);
-
-  const onDissociate = useCallback(async () => {
-    if (!props.tokenAddress) return;
-    let loadingToastId: string | undefined;
-    try {
-      setIsAssocSubmitting(true);
-      loadingToastId = toast.loading("Dissociating from token");
-      const txHash = await dissociateHederaToken(props.tokenAddress);
-      if (loadingToastId) toast.dismiss(loadingToastId);
-      const txUrl = props.chain?.blockExplorers?.[0]?.url
-        ? `${props.chain?.blockExplorers?.[0]?.url}/tx/${txHash}`
-        : undefined;
-      toast.success(
-        txUrl ? (
-          <span>
-            Dissociated from token. Transaction hash:
-            <a
-              href={txUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-1 underline"
-            >
-              {txHash}
-            </a>
-          </span>
-        ) : (
-          "Dissociated from token. Transaction hash: " + txHash
-        ),
-        { duration: 10000 }
-      );
-    } catch (error) {
-      if (loadingToastId) toast.dismiss(loadingToastId);
-      toast.error(
-        error instanceof Error ? error.message : "Dissociation failed"
-      );
-    } finally {
-      setIsAssocSubmitting(false);
-      await invalidateAssociation();
-    }
-  }, [
-    dissociateHederaToken,
-    props.tokenAddress,
-    props.chain?.blockExplorers,
-    invalidateAssociation,
-  ]);
 
   const switchChainButton = (
     <Button
@@ -238,7 +148,9 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const isMainnet = NEXT_PUBLIC_NETWORK_ENV === "mainnet";
   const dex = dexLinks[props.chain?.id as string]?.(props.tokenAddress);
 
-  const canMint = !isHederaChain || Boolean(isHederaAssociated);
+  const canMint =
+    (!isHederaChain || Boolean(isHederaAssociated)) &&
+    (!isXRPLChain || Boolean(hasXRPLTrustLine));
   const hasManageActions = Boolean(balance?.isTokenMinter && canMint);
 
   return (
@@ -290,7 +202,10 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               isTokenMinter={Boolean(balance?.isTokenMinter)}
               hasPendingOwner={Boolean(balance?.hasPendingOwner)}
               tokenId={props.tokenId}
-              canMint={canMint}
+              canMint={
+                (!isHederaChain || Boolean(isHederaAssociated)) &&
+                (!isXRPLChain || Boolean(hasXRPLTrustLine))
+              }
             />
           ) : (
             <StatusIndicator
@@ -462,19 +377,29 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
           </CopyToClipboardButton>
         </Card.Actions>
 
-        {isHederaChain && address && (
-          <HederaAssociation
+        {isXRPLChain && address && (
+          <TokenAssociationSection
+            chainId={props.chainId}
             chainName={props.chain?.name}
             isSourceChain={isSourceChain}
             switchChainButton={switchChainButton}
             tokenBalance={balance?.tokenBalance}
             isBalanceAvailable={Boolean(balance?.tokenBalance)}
-            isAssociated={isHederaAssociated ?? null}
-            isCheckingAssociation={Boolean(isHederaCheckingAssoc)}
-            hasAssociationError={Boolean(hasHederaAssocError)}
-            isAssocSubmitting={isAssocSubmitting}
-            onAssociate={onAssociate}
-            onDissociate={onDissociate}
+            address={address}
+            tokenAddress={props.tokenAddress}
+          />
+        )}
+
+        {isHederaChain && address && (
+          <TokenAssociationSection
+            chainId={props.chainId}
+            chainName={props.chain?.name}
+            isSourceChain={isSourceChain}
+            switchChainButton={switchChainButton}
+            tokenBalance={balance?.tokenBalance}
+            isBalanceAvailable={Boolean(balance?.tokenBalance)}
+            address={address}
+            tokenAddress={props.tokenAddress}
           />
         )}
         {isMainnet && dex && (

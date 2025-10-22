@@ -36,7 +36,7 @@ const nextConfig = {
     styledComponents: true,
   },
   experimental: {
-    esmExternals: "loose",
+    esmExternals: true,
   },
 };
 
