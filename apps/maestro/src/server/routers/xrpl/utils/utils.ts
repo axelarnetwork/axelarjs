@@ -107,14 +107,17 @@ export function parseXRPLTokenAddress(
   if (token === "XRP") {
     return null;
   }
-  const parts = token.split(".");
-  if (parts.length !== 2) {
+  const normalized = token.trim();
+  // Ensure exactly one dot separator
+  const firstDot = normalized.indexOf(".");
+  if (firstDot === -1 || firstDot !== normalized.lastIndexOf(".")) {
     throw new Error(
       "Invalid XRPL token address format. Expected CURRENCY.ISSUER or XRP"
     );
   }
-  const currency = parts[0]?.trim();
-  const issuer = parts[1]?.trim();
+  const [rawCurrency, rawIssuer] = normalized.split(".");
+  const currency = rawCurrency.trim();
+  const issuer = rawIssuer.trim();
   if (!currency || !issuer) {
     throw new Error(
       "Invalid XRPL token address format. Expected CURRENCY.ISSUER or XRP"

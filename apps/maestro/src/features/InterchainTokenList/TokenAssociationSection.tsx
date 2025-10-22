@@ -161,6 +161,9 @@ export const TokenAssociationSection: FC<TokenAssociationSectionProps> = (
     props.tokenBalance !== undefined &&
     BigInt(props.tokenBalance) > 0n;
 
+  const isBlockedByUnknownBalance =
+    Boolean(active.isAssociated) && props.tokenBalance === undefined;
+
   let fieldContent: ReactNode;
 
   if (!props.isSourceChain) {
@@ -204,7 +207,11 @@ export const TokenAssociationSection: FC<TokenAssociationSectionProps> = (
             className="min-w-24"
             $loading={active.isSubmitting}
             aria-disabled={active.isSubmitting}
-            disabled={active.isSubmitting || isBlockedByBalance}
+            disabled={
+              active.isSubmitting ||
+              isBlockedByBalance ||
+              isBlockedByUnknownBalance
+            }
             tabIndex={active.isSubmitting ? -1 : 0}
             onClick={async (e) => {
               e.preventDefault();
