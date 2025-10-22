@@ -89,7 +89,6 @@
     "react-spinners": "^0.13.8",
     "ripple-binary-codec": "^2.5.0",
     "stellar-sdk": "^13.1.0",
-    "styled-components": "6.1.18",
     "superjson": "^2.2.1",
     "swagger-ui-react": "^5.12.0",
     "trpc-openapi": "^1.2.0",
@@ -144,5 +143,8 @@
     "vite": "^5.2.6",
     "vitest": "^1.4.0",
     "zx": "^7.2.3"
+  },
+  "peerDependencies": {
+    "pino-pretty": "^13.1.2"
   }
 }

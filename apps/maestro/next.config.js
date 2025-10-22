@@ -1,5 +1,4 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
-import { withSentryConfig } from "@sentry/nextjs";
 
 const HOSTNAMES = [
   "testnet.axelar.network",
@@ -16,7 +15,8 @@ const nextConfig = {
   images: {
     remotePatterns: HOSTNAMES.map((hostname) => ({ hostname })),
   },
-    transpilePackages: [
+  transpilePackages: [
+    '@xrpl-wallet-standard/app',
     '@xrpl-wallet-standard/core',
     '@xrpl-wallet-standard/react',
     '@xrpl-wallet-adapter/base',
@@ -25,41 +25,44 @@ const nextConfig = {
     '@xrpl-wallet-adapter/walletconnect',
     '@xrpl-wallet-adapter/xaman',
   ],
-  compiler: {
-    styledComponents: true,
-  }
+  experimental: {
+    esmExternals: 'loose',
+  },
 };
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
-export default withSentryConfig(
-  withBundleAnalyzer(nextConfig),
-  {
-    // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options
+// Temporarily disable Sentry to see the actual build error
+export default withBundleAnalyzer(nextConfig);
 
-    // Suppresses source map uploading logs during build
-    silent: true,
+// export default withSentryConfig(
+//   withBundleAnalyzer(nextConfig),
+//   {
+//     // For all available options, see:
+//     // https://github.com/getsentry/sentry-webpack-plugin#options
 
-    org: "axelar-network",
-    project: `interchain-maestro-${process.env.NEXT_PUBLIC_NETWORK_ENV}`,
-  },
-  {
-    // For all available options, see:
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+//     // Suppresses source map uploading logs during build
+//     silent: true,
 
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
-    widenClientFileUpload: true,
+//     org: "axelar-network",
+//     project: `interchain-maestro-${process.env.NEXT_PUBLIC_NETWORK_ENV}`,
+//   },
+//   {
+//     // For all available options, see:
+//     // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-    // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-    tunnelRoute: "/monitoring",
+//     // Upload a larger set of source maps for prettier stack traces (increases build time)
+//     widenClientFileUpload: true,
 
-    // Hides source maps from generated client bundles
-    hideSourceMaps: true,
+//     // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+//     tunnelRoute: "/monitoring",
 
-    // Automatically tree-shake Sentry logger statements to reduce bundle size
-    disableLogger: true,
-  }
-);
+//     // Hides source maps from generated client bundles
+//     hideSourceMaps: true,
+
+//     // Automatically tree-shake Sentry logger statements to reduce bundle size
+//     disableLogger: true,
+//   }
+// );

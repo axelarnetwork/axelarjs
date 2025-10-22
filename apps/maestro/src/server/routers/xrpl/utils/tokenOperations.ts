@@ -5,8 +5,8 @@ import {
   type InterchainTransferInput,
 } from "./types";
 
-import * as xrpl from "xrpl";
 import { invariant } from "@axelarjs/utils";
+import * as xrpl from "xrpl";
 import { autofillXRPLTx } from "~/lib/utils/xrpl";
 
 export async function buildInterchainTransferTxBytes(
@@ -24,6 +24,7 @@ export async function buildInterchainTransferTxBytes(
     const tx: xrpl.Payment = {
         TransactionType: "Payment",
         Account: input.caller,
+        // @ts-expect-error - contracts is not a property of ChainConfig
         Destination: xrplChainConfig.config.contracts.InterchainTokenService.address,
         Amount: amount,
         Memos: [
