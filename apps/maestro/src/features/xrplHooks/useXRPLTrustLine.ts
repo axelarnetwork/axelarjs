@@ -7,9 +7,12 @@ import {
 } from "@xrpl-wallet-standard/react";
 import * as xrpl from "xrpl";
 
-import { xrplChainConfig } from "~/config/chains";
+import { XRPL_CHAIN_ID, xrplChainConfig } from "~/config/chains";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
+import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
+import { withXRPLClient } from "~/lib/utils/xrpl";
+import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 
 export type UseXRPLTrustLineOptions = {
   accountAddress?: string;
@@ -24,7 +27,7 @@ export function useXRPLTrustLine(
   const chainId = useChainId();
   const trpcUtils = trpc.useUtils();
 
-  const isXRPLChain = chainId === xrplChainConfig.id;
+  const isXRPLChain = chainId === XRPL_CHAIN_ID;
   const accountAddressToCheck = options?.accountAddress ?? address;
 
   const {
@@ -41,7 +44,8 @@ export function useXRPLTrustLine(
         (options?.enabled ?? true) &&
         Boolean(tokenAddress) &&
         Boolean(accountAddressToCheck) &&
-        (options?.accountAddress ? true : Boolean(isXRPLChain)),
+        (options?.accountAddress ? true : Boolean(isXRPLChain)) && 
+        (accountAddressToCheck ? isValidXRPLWalletAddress(accountAddressToCheck) : true),
       retry: false,
     }
   );
@@ -73,25 +77,18 @@ export function useXRPLTrustLine(
         limit: "999999999999",
       });
       const decoded = xrpl.decode(txBase64) as xrpl.SubmittableTransaction;
-      const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-      await client.connect();
-      try {
-        const prepared = await client.autofill(decoded);
-        const result = await (
-          signAndSubmit as unknown as (tx: any, network: string) => Promise<any>
-        )(
-          prepared,
-          // TODO: fix this. use utility after transfers PR is merged
-          `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "0" : process.env.NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier" ? "2" : "1"}`
-        );
-        return result?.tx_hash || result?.hash || "";
-      } finally {
-        try {
-          await client.disconnect();
-        } catch {
-          console.error("Error disconnecting from XRPL client");
-        }
-      }
+
+      const prepared = await withXRPLClient(async (client) => {
+        return await client.autofill(decoded);
+      });
+
+      const result = await (
+        signAndSubmit as unknown as (tx: any, network: string) => Promise<any>
+      )(
+        prepared,
+        (xrplChainConfig as any as {xrplNetwork: XRPLIdentifierString}).xrplNetwork
+      );
+      return result?.tx_hash || result?.hash || "";
     },
   });
 
@@ -109,24 +106,18 @@ export function useXRPLTrustLine(
         limit: "0",
       });
       const decoded = xrpl.decode(txBase64);
-      const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-      await client.connect();
-      try {
-        const prepared = await client.autofill(decoded as any);
-        const result = await (
-          signAndSubmit as unknown as (tx: any, network: string) => Promise<any>
-        )(
-          prepared,
-          `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "0" : process.env.NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier" ? "2" : "1"}`
-        );
-        return result?.tx_hash || result?.hash || "";
-      } finally {
-        try {
-          await client.disconnect();
-        } catch {
-          console.error("Error disconnecting from XRPL client");
-        }
-      }
+
+      const prepared = await withXRPLClient(async (client) => {
+        return await client.autofill(decoded as any);
+      });
+
+      const result = await (
+        signAndSubmit as unknown as (tx: any, network: string) => Promise<any>
+      )(
+        prepared,
+        (xrplChainConfig as any as {xrplNetwork: XRPLIdentifierString}).xrplNetwork
+      );
+      return result?.tx_hash || result?.hash || "";
     },
   });
 

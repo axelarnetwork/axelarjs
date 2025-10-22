@@ -106,6 +106,11 @@ export const xrplRouter = router({
           value: input.limit,
         },
       };
+
+      if (input.limit === "0") {
+        tx.Flags = xrpl.TrustSetFlags.tfSetNoRipple + xrpl.TrustSetFlags.tfClearFreeze + xrpl.TrustSetFlags.tfClearDeepFreeze;
+      }
+
       const prepared = await withXRPLClient(async (client) => {
         return await client.autofill(tx);
       });

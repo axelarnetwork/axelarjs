@@ -36,6 +36,7 @@ export function useInterchainTokenBalanceForOwnerQuery(input: {
         !input.disabled &&
         Boolean(input.chainId) &&
         parseInt(String(input.tokenAddress), 16) !== 0,
+      refetchInterval: 60000,
     }
   );
 }
