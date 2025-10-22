@@ -17,7 +17,6 @@ const InterchainTokensPage: FC = () => {
     tokenAddress: `0x${string}`;
   };
 
-  console.log("Got tokenAddress", tokenAddress);
   const routeChain = useChainFromRoute();
   const {
     data: interchainToken,
@@ -27,8 +26,6 @@ const InterchainTokensPage: FC = () => {
     chainId: routeChain?.id,
     tokenAddress,
   });
-
-  console.log("Got interchainToken", interchainToken);
 
   const { data: interchainTokenDetails } = useInterchainTokenDetailsQuery({
     chainId: routeChain?.id,
