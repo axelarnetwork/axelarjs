@@ -4,7 +4,8 @@ import { z } from "zod";
 
 import { publicProcedure, router } from "~/server/trpc";
 import { buildInterchainTransferTxBytes } from "./utils/tokenOperations";
-import { getXRPLChainConfig, parseXRPLTokenAddress } from "./utils/utils";
+import { parseXRPLTokenAddress } from "./utils/utils";
+import { withXRPLClient } from "~/lib/utils/xrpl";
 
 export const xrplRouter = router({
   getInterchainTransferTxBytes: publicProcedure
@@ -29,40 +30,39 @@ export const xrplRouter = router({
         tokenAddress: z.string(),
       })
     )
-    .query(async ({ ctx, input }) => {
-      // TODO: use client request utility after transfers PR is merged
-      const xrplConfig = await getXRPLChainConfig(ctx);
-      const client = new xrpl.Client(xrplConfig.config.rpc[0]);
-      await client.connect();
+    .query(async ({ input }) => {
+      if (input.tokenAddress === "XRP") {
+        // Native XRP doesn't require a trust line
+        return { hasTrustLine: true };
+      }
+      let parsed;
       try {
-        if (input.tokenAddress === "XRP") {
-          // Native XRP doesn't require a trust line
-          return { hasTrustLine: true };
-        }
-        const parsed = parseXRPLTokenAddress(input.tokenAddress);
-        if (!parsed) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid token address for trust line",
-          });
-        }
-        const { currency, issuer } = parsed;
-        const res = await client.request({
+        parsed = parseXRPLTokenAddress(input.tokenAddress);
+      } catch (error) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid token address for trust line",
+        });
+      }
+      if (!parsed) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Assertion failed",
+        });
+      }
+      const { currency, issuer } = parsed;
+      const res = await withXRPLClient(async (client) => {
+        return await client.request({
           command: "account_lines",
           account: input.account,
           peer: issuer,
         });
-        const has = res.result.lines?.some(
-          (l: xrpl.AccountLinesTrustline) => l.currency === currency
-        );
-        return { hasTrustLine: !!has };
-      } finally {
-        try {
-          await client.disconnect();
-        } catch (e) {
-          console.error("Error disconnecting from XRPL client", e);
-        }
-      }
+      });
+
+      const has = res.result.lines?.some(
+        (l: xrpl.AccountLinesTrustline) => l.currency === currency
+      );
+      return { hasTrustLine: !!has };
     }),
   getTrustSetTxBytes: publicProcedure
     .input(
@@ -72,43 +72,39 @@ export const xrplRouter = router({
         limit: z.string().default("999999999999"), // default large limit
       })
     )
-    .mutation(async ({ ctx, input }) => {
-      // TODO: use client send utility after transfers PR is merged
+    .mutation(async ({ input }) => {
       if (input.tokenAddress === "XRP") {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "XRP does not require a trust line",
         });
       }
-      const parsed = parseXRPLTokenAddress(input.tokenAddress);
-      if (!parsed) {
+      let parsed;
+      try {
+        parsed = parseXRPLTokenAddress(input.tokenAddress);
+        if(!parsed)
+          throw Error("Assertion failed");
+      } catch (error) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Invalid token address for trust line",
         });
       }
-      const xrplConfig = await getXRPLChainConfig(ctx);
-      const client = new xrpl.Client(xrplConfig.config.rpc[0]);
-      await client.connect();
-      try {
-        const tx: xrpl.TrustSet = {
-          TransactionType: "TrustSet",
-          Account: input.account,
-          LimitAmount: {
-            currency: parsed.currency,
-            issuer: parsed.issuer,
-            value: input.limit,
-          },
-        };
-        const prepared = await client.autofill(tx);
-        const txBase64 = xrpl.encode(prepared);
-        return { txBase64 };
-      } finally {
-        try {
-          await client.disconnect();
-        } catch (e) {
-          console.error("Error disconnecting from XRPL client", e);
-        }
-      }
+
+      const tx: xrpl.TrustSet = {
+        TransactionType: "TrustSet",
+        Account: input.account,
+        LimitAmount: {
+          currency: parsed.currency,
+          issuer: parsed.issuer,
+          value: input.limit,
+        },
+      };
+      const prepared = await withXRPLClient(async (client) => {
+        return await client.autofill(tx);
+      });
+
+      const txBase64 = xrpl.encode(prepared);
+      return { txBase64 };
     }),
 });
