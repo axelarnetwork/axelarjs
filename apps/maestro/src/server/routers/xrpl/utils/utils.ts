@@ -1,7 +1,5 @@
 import type { XRPLChainConfig } from "@axelarjs/api/axelar-config";
 
-import * as xrpl from "xrpl";
-
 import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import type { Context } from "~/server/context";
@@ -69,11 +67,12 @@ export const xrplEncodedRecipient = (
 
 export function parseTokenAmount(token: string, amountInDrops: string) {
   let parsedAmount;
+  const parsedToken = parseXRPLTokenAddress(token);
 
-  if (token === "XRP") {
+  if (parsedToken === null) {
     parsedAmount = amountInDrops;
   } else {
-    const { currency, issuer } = parseXRPLTokenAddress(token) ?? {};
+    const { currency, issuer } = parsedToken;
     // assert: amount != "0"
     // the token has 15 decimals -> add a decimal point between the 14th and the 15th from the right
     const amount = Decimal(amountInDrops).times(1e-15);
