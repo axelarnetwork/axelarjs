@@ -23,7 +23,7 @@ export const CUSTOM_RPC_NODES: Record<
     linea: ["https://rpc.linea.build"], // Linea Mainnet (was: https://linea.drpc.org)
     mantle: ["https://rpc.mantle.xyz"], // Mantle Mainnet (was: https://mantle.drpc.org)
     moonbeam: ["https://rpc.api.moonbeam.network"], // Moonbeam Mainnet (was: https://moonbeam.drpc.org)
-    optimism: ["https://optimism-rpc.publicnode.com"], // Optimism Mainnet (was: https://optimism.lava.build)
+    optimism: ["https://optimism-rpc.publicnode.com"], // Optimism Mainnet (was: https://optimism.drpc.org)
     polygon: ["https://polygon.lava.build"], // Polygon Mainnet (was: https://polygon.drpc.org)
     "polygon-zkevm": ["https://polygon-zkevm.drpc.org"], // Polygon zkEVM Mainnet
     scroll: ["https://rpc.scroll.io"], // Scroll Mainnet (was: https://scroll.drpc.org)
@@ -54,8 +54,8 @@ export const CUSTOM_RPC_NODES: Record<
     "linea-sepolia": ["https://rpc.sepolia.linea.build"], // Linea Sepolia (was: https://linea-sepolia.drpc.org)
     mantle: ["https://rpc.sepolia.mantle.xyz"], // Mantle Testnet (was: https://mantle-sepolia.drpc.org)
     moonbeam: ["https://rpc.api.moonbase.moonbeam.network"], // Moonbase Alpha (was: https://moonbase-alpha.drpc.org)
-    optimism: ["https://sepolia.optimism.io"], // Optimism Sepolia (was: https://optimism.lava.build)
-    "optimism-sepolia": ["https://sepolia.optimism.io"], // Optimism Sepolia (was: https://optimism.lava.build)
+    optimism: ["https://sepolia.optimism.io"], // Optimism Sepolia (was: https://optimism-sepolia.drpc.org)
+    "optimism-sepolia": ["https://sepolia.optimism.io"], // Optimism Sepolia (was: https://optimism-sepolia.drpc.org)
     "polygon-sepolia": ["https://rpc-amoy.polygon.technology"], // Polygon Amoy (was: https://polygon-amoy.drpc.org)
     "polygon-zkevm": ["https://polygon-zkevm-cardona.drpc.org"], // Polygon zkEVM Testnet
     scroll: [], // No known public DRPC endpoint for Scroll Sepolia
@@ -70,9 +70,9 @@ export const CUSTOM_RPC_NODES: Record<
     ], // XRPL EVM Testnet
   },
   "devnet-amplifier": {
-    "avalanche-fuji": ["https://avalanche-fuji.drpc.org"], // Avalanche Fuji
-    "eth-sepolia": ["https://ethereum-sepolia.drpc.org"], // Ethereum Sepolia
-    "optimism-sepolia": ["https://optimism-sepolia.drpc.org"], // Optimism Sepolia
+    "avalanche-fuji": ["https://api.avax-test.network/ext/bc/C/rpc"], // Avalanche Fuji (was: https://avalanche-fuji.drpc.org)
+    "eth-sepolia": ["https://ethereum-sepolia.publicnode.com"], // Ethereum Sepolia (was: https://ethereum-sepolia.drpc.org)
+    "optimism-sepolia": ["https://sepolia.optimism.io"], // Optimism Sepolia (was: https://optimism-sepolia.drpc.org)
     "sui-2": [
       // No known public DRPC endpoint
     ], // Sui Devnet
