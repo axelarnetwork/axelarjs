@@ -1,3 +1,4 @@
+import path from "path";
 import bundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 
@@ -16,18 +17,27 @@ const nextConfig = {
   images: {
     remotePatterns: HOSTNAMES.map((hostname) => ({ hostname })),
   },
-    transpilePackages: [
-    '@xrpl-wallet-standard/core',
-    '@xrpl-wallet-standard/react',
-    '@xrpl-wallet-adapter/base',
-    '@xrpl-wallet-adapter/crossmark',
-    '@xrpl-wallet-adapter/ledger',
-    '@xrpl-wallet-adapter/walletconnect',
-    '@xrpl-wallet-adapter/xaman',
+  webpack(config, { isServer }) {
+    if (isServer) {
+      config.resolve = config.resolve || {};
+      config.resolve.alias = config.resolve.alias || {};
+      config.resolve.alias["@xrpl-wallet-standard/react"] = path.resolve(
+        process.cwd(),
+        "src/shims/xrpl-wallet-standard-react.server.tsx"
+      );
+    }
+    return config;
+  },
+  transpilePackages: [
+    "@xrpl-wallet-standard/core",
+    "@xrpl-wallet-standard/react",
   ],
   compiler: {
     styledComponents: true,
-  }
+  },
+  experimental: {
+    esmExternals: "loose",
+  },
 };
 
 const withBundleAnalyzer = bundleAnalyzer({
