@@ -18,7 +18,7 @@ import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 
-import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID, xrplChainConfig } from "~/config/chains";
+import { HEDERA_CHAIN_ID, xrplChainConfig } from "~/config/chains";
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
 import { useHederaTokenAssociation } from "~/features/hederaHooks";
