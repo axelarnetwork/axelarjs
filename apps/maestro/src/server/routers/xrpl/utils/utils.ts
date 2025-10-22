@@ -73,7 +73,7 @@ export function parseTokenAmount(token: string, amountInDrops: string) {
   if (token === "XRP") {
     parsedAmount = amountInDrops;
   } else {
-    const [currency, issuer] = token.split(".");
+    const { currency, issuer } = parseXRPLTokenAddress(token) ?? {};
     // assert: amount != "0"
     // the token has 15 decimals -> add a decimal point between the 14th and the 15th from the right
     const amount = Decimal(amountInDrops).times(1e-15);
@@ -107,7 +107,14 @@ export function parseXRPLTokenAddress(
   if (token === "XRP") {
     return null;
   }
-  const [currency, issuer] = token.split(".");
+  const parts = token.split(".");
+  if (parts.length !== 2) {
+    throw new Error(
+      "Invalid XRPL token address format. Expected CURRENCY.ISSUER or XRP"
+    );
+  }
+  const currency = parts[0]?.trim();
+  const issuer = parts[1]?.trim();
   if (!currency || !issuer) {
     throw new Error(
       "Invalid XRPL token address format. Expected CURRENCY.ISSUER or XRP"

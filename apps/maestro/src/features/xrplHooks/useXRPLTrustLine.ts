@@ -64,6 +64,7 @@ export function useXRPLTrustLine(
     { tokenAddress: string }
   >({
     mutationFn: async ({ tokenAddress }) => {
+      // TODO: use client send utility after transfers PR is merged
       if (!wallet || !accountAddressToCheck)
         throw new Error("XRPL wallet not connected");
       const { txBase64 } = await buildTx.mutateAsync({
@@ -71,15 +72,16 @@ export function useXRPLTrustLine(
         tokenAddress,
         limit: "999999999999",
       });
-      const decoded = xrpl.decode(txBase64);
+      const decoded = xrpl.decode(txBase64) as xrpl.SubmittableTransaction;
       const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
       await client.connect();
       try {
-        const prepared = await client.autofill(decoded as any);
+        const prepared = await client.autofill(decoded);
         const result = await (
           signAndSubmit as unknown as (tx: any, network: string) => Promise<any>
         )(
           prepared,
+          // TODO: fix this. use utility after transfers PR is merged
           `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "0" : process.env.NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier" ? "2" : "1"}`
         );
         return result?.tx_hash || result?.hash || "";

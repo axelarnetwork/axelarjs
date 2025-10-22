@@ -1,4 +1,5 @@
 import { Button, Card, InfoIcon, SpinnerIcon, Tooltip } from "@axelarjs/ui";
+import { toast } from "@axelarjs/ui/toaster";
 import { useEffect, useMemo, useState, type FC, type ReactNode } from "react";
 
 import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
@@ -209,8 +210,10 @@ export const TokenAssociationSection: FC<TokenAssociationSectionProps> = (
               e.preventDefault();
               if (active.isSubmitting) return;
               if (displayAssociation) {
-                if (props.tokenBalance === undefined) return;
-                if (BigInt(props.tokenBalance) > 0n) return;
+                if (props.tokenBalance === undefined) {
+                  toast.error("Token balance is not available");
+                  return;
+                }
                 await active.onDissociate();
               } else await active.onAssociate();
             }}

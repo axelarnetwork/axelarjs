@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import * as xrpl from "xrpl";
 import { z } from "zod";
 
@@ -29,6 +30,7 @@ export const xrplRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
+      // TODO: use client request utility after transfers PR is merged
       const xrplConfig = await getXRPLChainConfig(ctx);
       const client = new xrpl.Client(xrplConfig.config.rpc[0]);
       await client.connect();
@@ -39,7 +41,10 @@ export const xrplRouter = router({
         }
         const parsed = parseXRPLTokenAddress(input.tokenAddress);
         if (!parsed) {
-          return { hasTrustLine: true };
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid token address for trust line",
+          });
         }
         const { currency, issuer } = parsed;
         const res = await client.request({
@@ -47,7 +52,9 @@ export const xrplRouter = router({
           account: input.account,
           peer: issuer,
         });
-        const has = res.result.lines?.some((l: any) => l.currency === currency);
+        const has = res.result.lines?.some(
+          (l: xrpl.AccountLinesTrustline) => l.currency === currency
+        );
         return { hasTrustLine: !!has };
       } finally {
         try {
@@ -66,12 +73,19 @@ export const xrplRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // TODO: use client send utility after transfers PR is merged
       if (input.tokenAddress === "XRP") {
-        throw new Error("XRP does not require a trust line");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "XRP does not require a trust line",
+        });
       }
       const parsed = parseXRPLTokenAddress(input.tokenAddress);
       if (!parsed) {
-        throw new Error("Invalid token address for trust line");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid token address for trust line",
+        });
       }
       const xrplConfig = await getXRPLChainConfig(ctx);
       const client = new xrpl.Client(xrplConfig.config.rpc[0]);

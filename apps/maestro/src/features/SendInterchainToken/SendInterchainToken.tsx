@@ -175,7 +175,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     }
 
     if (state.selectedToChain.chain_id === XRPL_CHAIN_ID) {
-      if (hasDestinationXRPLTrustLine === false) {
+      if (!hasDestinationXRPLTrustLine) {
         toast.error(
           "The destination XRPL account is missing the trust line for this token. Please add it before sending."
         );
