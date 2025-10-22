@@ -108,7 +108,7 @@ export const xrplRouter = router({
       };
 
       if (input.limit === "0") {
-        tx.Flags = xrpl.TrustSetFlags.tfSetNoRipple + xrpl.TrustSetFlags.tfClearFreeze + xrpl.TrustSetFlags.tfClearDeepFreeze;
+        tx.Flags = xrpl.TrustSetFlags.tfSetNoRipple | xrpl.TrustSetFlags.tfClearFreeze | xrpl.TrustSetFlags.tfClearDeepFreeze;
       }
 
       const prepared = await withXRPLClient(async (client) => {

@@ -43,9 +43,8 @@ export function useXRPLTrustLine(
       enabled:
         (options?.enabled ?? true) &&
         Boolean(tokenAddress) &&
-        Boolean(accountAddressToCheck) &&
-        (options?.accountAddress ? true : Boolean(isXRPLChain)) && 
-        (accountAddressToCheck ? isValidXRPLWalletAddress(accountAddressToCheck) : true),
+        (Boolean(accountAddressToCheck) && isValidXRPLWalletAddress(accountAddressToCheck)) &&
+        (options?.accountAddress ? true : Boolean(isXRPLChain)),
       retry: false,
     }
   );
