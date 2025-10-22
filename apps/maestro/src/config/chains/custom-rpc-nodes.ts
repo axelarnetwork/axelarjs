@@ -3,30 +3,30 @@ export const CUSTOM_RPC_NODES: Record<
   Record<string, string[]>
 > = {
   mainnet: {
-    arbitrum: ["https://arbitrum.drpc.org"], // Arbitrum Mainnet
+    arbitrum: ["https://arb1.lava.build"], // Arbitrum Mainnet (was: https://arbitrum.drpc.org)
     aurora: ["https://aurora.drpc.org"], // Aurora Mainnet
-    avalanche: ["https://avalanche.drpc.org"], // Avalanche Mainnet
-    base: ["https://base.drpc.org"], // Base Mainnet
-    binance: ["https://bsc.drpc.org"], // BSC Mainnet
-    blast: ["https://blast.drpc.org"], // Blast Mainnet
-    celo: ["https://celo.drpc.org"], // Celo Mainnet
-    ethereum: ["https://eth.drpc.org"], // Ethereum Mainnet
-    fantom: ["https://fantom.drpc.org"], // Fantom Mainnet
-    filecoin: ["https://filecoin.drpc.org"], // Filecoin Mainnet
+    avalanche: ["https://avalanche-c-chain-rpc.publicnode.com"], // Avalanche Mainnet (was: https://avalanche.drpc.org)
+    base: ["https://developer-access-mainnet.base.org"], // Base Mainnet (was: https://base.drpc.org)
+    binance: ["https://api.zan.top/bsc-mainnet"], // BSC Mainnet (was: https://bsc.drpc.org)
+    blast: ["https://rpc.blast.io"], // Blast Mainnet (was: https://blast.drpc.org)
+    celo: ["https://forno.celo.org"], // Celo Mainnet (was: https://celo.drpc.org)
+    ethereum: ["https://eth1.lava.build"], // Ethereum Mainnet (was: https://eth.drpc.org)
+    fantom: ["https://rpc.fantom.network"], // Fantom Mainnet (was: https://fantom.drpc.org)
+    filecoin: ["https://api.chain.love/rpc/v2"], // Filecoin Mainnet (was: https://filecoin.drpc.org)
     flow: [
       // No known public DRPC endpoint
     ], // Flow Mainnet
-    fraxtal: ["https://fraxtal.drpc.org"], // Fraxtal Mainnet
+    fraxtal: ["https://rpc.frax.com"], // Fraxtal Mainnet (was: https://fraxtal.drpc.org)
     hedera: ["https://hedera-mainnet.rpc.axelar.dev"], // Hedera Mainnet
-    immutable: ["https://immutable-zkevm.drpc.org"], // Immutable zkEVM Mainnet
-    kava: ["https://kava.drpc.org"], // Kava Mainnet
-    linea: ["https://linea.drpc.org"], // Linea Mainnet
-    mantle: ["https://mantle.drpc.org"], // Mantle Mainnet
-    moonbeam: ["https://moonbeam.drpc.org"], // Moonbeam Mainnet
-    optimism: ["https://optimism.drpc.org"], // Optimism Mainnet
-    polygon: ["https://polygon.drpc.org"], // Polygon Mainnet
+    immutable: ["https://rpc.immutable.com"], // Immutable zkEVM Mainnet (was: https://immutable-zkevm.drpc.org)
+    kava: ["https://evm.data.axelar.kava.io"], // Kava Mainnet (was: https://kava.drpc.org)
+    linea: ["https://rpc.linea.build"], // Linea Mainnet (was: https://linea.drpc.org)
+    mantle: ["https://rpc.mantle.xyz"], // Mantle Mainnet (was: https://mantle.drpc.org)
+    moonbeam: ["https://rpc.api.moonbeam.network"], // Moonbeam Mainnet (was: https://moonbeam.drpc.org)
+    optimism: ["https://optimism-rpc.publicnode.com"], // Optimism Mainnet (was: https://optimism.lava.build)
+    polygon: ["https://polygon.lava.build"], // Polygon Mainnet (was: https://polygon.drpc.org)
     "polygon-zkevm": ["https://polygon-zkevm.drpc.org"], // Polygon zkEVM Mainnet
-    scroll: ["https://scroll.drpc.org"], // Scroll Mainnet
+    scroll: ["https://rpc.scroll.io"], // Scroll Mainnet (was: https://scroll.drpc.org)
     stellar: [
       // No known public DRPC endpoint
     ], // Stellar Mainnet
@@ -35,28 +35,28 @@ export const CUSTOM_RPC_NODES: Record<
     ], // Sui Mainnet
   },
   testnet: {
-    "arbitrum-sepolia": ["https://arbitrum-sepolia.drpc.org"], // Arbitrum Sepolia
+    "arbitrum-sepolia": ["https://sepolia-rollup.arbitrum.io/rpc"], // Arbitrum Sepolia (was: https://arbitrum-sepolia.blockpi.network/v1/rpc/public)
     aurora: ["https://aurora-testnet.drpc.org"], // Aurora Testnet
-    avalanche: ["https://avalanche-fuji.drpc.org"], // Avalanche Fuji
-    "base-sepolia": ["https://base-sepolia.drpc.org"], // Base Sepolia
-    binance: ["https://bsc-testnet.drpc.org"], // BSC Testnet
-    "blast-sepolia": ["https://rpc.ankr.com/blast"], // Blast Sepolia
-    ethereum: ["https://sepolia.drpc.org"], // Ethereum Sepolia
-    "ethereum-sepolia": ["https://sepolia.drpc.org"], // Ethereum Sepolia
+    avalanche: ["https://api.avax-test.network/ext/bc/C/rpc"], // Avalanche Fuji (was: https://avalanche-fuji.drpc.org)
+    "base-sepolia": ["https://base-sepolia-rpc.publicnode.com"], // Base Sepolia (was: https://base-sepolia.blockpi.network/v1/rpc/public)
+    binance: ["https://data-seed-prebsc-1-s1.bnbchain.org:8545"], // BSC Testnet (was: https://bsc-testnet.drpc.org)
+    "blast-sepolia": ["https://sepolia.blast.io"], // Blast Sepolia (was: https://rpc.ankr.com/blast)
+    ethereum: ["https://ethereum-sepolia.publicnode.com"], // Ethereum Sepolia (was: https://sepolia.drpc.org)
+    "ethereum-sepolia": ["https://ethereum-sepolia.publicnode.com"], // Ethereum Sepolia (was: https://sepolia.drpc.org)
     "filecoin-2": [], // Filecoin Calibration
     fantom: [], // No known public DRPC endpoint for Fantom Testnet
     flow: [], // No known public DRPC endpoint for Flow Testnet
-    fraxtal: ["https://fraxtal-testnet.drpc.org"], // Fraxtal Testnet
+    fraxtal: ["https://rpc.testnet.frax.com"], // Fraxtal Testnet (was: https://fraxtal-testnet.drpc.org)
     hedera: ["https://hedera-testnet.rpc.axelar.dev"], // Hedera Testnet
     immutable: [], // Immutable zkEVM Testnet
-    kava: ["https://kava-testnet.drpc.org"], // Kava Testnet
-    linea: ["https://linea-sepolia.drpc.org"], // Linea Sepolia
-    "linea-sepolia": ["https://linea-sepolia.drpc.org"], // Linea Sepolia
-    mantle: ["https://mantle-sepolia.drpc.org"], // Mantle Testnet
-    moonbeam: ["https://moonbase-alpha.drpc.org"], // Moonbase Alpha
-    optimism: ["https://optimism-sepolia.drpc.org"], // Optimism Sepolia
-    "optimism-sepolia": ["https://optimism-sepolia.drpc.org"], // Optimism Sepolia
-    "polygon-sepolia": ["https://polygon-amoy.drpc.org"], // Polygon Amoy
+    kava: ["https://evm.testnet.kava.io"], // Kava Testnet (was: https://kava-testnet.drpc.org)
+    linea: ["https://rpc.sepolia.linea.build"], // Linea Sepolia (was: https://linea-sepolia.drpc.org)
+    "linea-sepolia": ["https://rpc.sepolia.linea.build"], // Linea Sepolia (was: https://linea-sepolia.drpc.org)
+    mantle: ["https://rpc.sepolia.mantle.xyz"], // Mantle Testnet (was: https://mantle-sepolia.drpc.org)
+    moonbeam: ["https://rpc.api.moonbase.moonbeam.network"], // Moonbase Alpha (was: https://moonbase-alpha.drpc.org)
+    optimism: ["https://sepolia.optimism.io"], // Optimism Sepolia (was: https://optimism.lava.build)
+    "optimism-sepolia": ["https://sepolia.optimism.io"], // Optimism Sepolia (was: https://optimism.lava.build)
+    "polygon-sepolia": ["https://rpc-amoy.polygon.technology"], // Polygon Amoy (was: https://polygon-amoy.drpc.org)
     "polygon-zkevm": ["https://polygon-zkevm-cardona.drpc.org"], // Polygon zkEVM Testnet
     scroll: [], // No known public DRPC endpoint for Scroll Sepolia
     stellar: [
