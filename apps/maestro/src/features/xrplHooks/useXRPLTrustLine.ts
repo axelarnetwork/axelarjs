@@ -7,11 +7,10 @@ import {
 } from "@xrpl-wallet-standard/react";
 import * as xrpl from "xrpl";
 
-import { XRPL_CHAIN_ID, xrplChainConfig } from "~/config/chains";
+import { XRPL_CHAIN_ID } from "~/config/chains";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
-import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
-import { withXRPLClient } from "~/lib/utils/xrpl";
+import { XRPL_NETWORK_IDENTIFIER, withXRPLClient } from "~/lib/utils/xrpl";
 import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 
 export type UseXRPLTrustLineOptions = {
@@ -81,13 +80,11 @@ export function useXRPLTrustLine(
         return await client.autofill(decoded);
       });
 
-      const result = await (
-        signAndSubmit as unknown as (tx: any, network: string) => Promise<any>
-      )(
+      const result = await signAndSubmit(
         prepared,
-        (xrplChainConfig as any as {xrplNetwork: XRPLIdentifierString}).xrplNetwork
+        XRPL_NETWORK_IDENTIFIER
       );
-      return result?.tx_hash || result?.hash || "";
+      return result.tx_hash;
     },
   });
 
@@ -110,13 +107,11 @@ export function useXRPLTrustLine(
         return await client.autofill(decoded as any);
       });
 
-      const result = await (
-        signAndSubmit as unknown as (tx: any, network: string) => Promise<any>
-      )(
+      const result = await signAndSubmit(
         prepared,
-        (xrplChainConfig as any as {xrplNetwork: XRPLIdentifierString}).xrplNetwork
+        XRPL_NETWORK_IDENTIFIER
       );
-      return result?.tx_hash || result?.hash || "";
+      return result.tx_hash;
     },
   });
 

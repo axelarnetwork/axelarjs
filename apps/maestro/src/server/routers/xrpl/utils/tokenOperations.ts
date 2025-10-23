@@ -6,15 +6,25 @@ import {
 } from "./types";
 
 import * as xrpl from "xrpl";
-import { invariant } from "@axelarjs/utils";
 import { autofillXRPLTx } from "~/lib/utils/xrpl";
+import { TRPCError } from "@trpc/server";
 
 export async function buildInterchainTransferTxBytes(
   ctx: Context,
   input: InterchainTransferInput
 ): Promise<{ txBase64: string }> {
-    invariant(parseInt(input.amount) > 0);
-    invariant(parseInt(input.gasValue) >= 0);
+    if (BigInt(input.amount) <= 0) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Input must be positive",
+      });
+    }
+    if (BigInt(input.gasValue) < 0) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Input must be non-negative",
+      });
+    }
 
     const xrplChainConfig = await getXRPLChainConfig(ctx);
     const amountToTransfer = BigInt(input.amount) + BigInt(input.gasValue);

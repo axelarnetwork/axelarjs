@@ -7,7 +7,6 @@ import {
   ROLES_ENUM,
   type TokenRole,
 } from "./getInterchainTokenBalanceForOwner";
-import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 
 export const getInterchainTokenRolesForAccount = publicProcedure
   .input(
@@ -20,7 +19,7 @@ export const getInterchainTokenRolesForAccount = publicProcedure
     const tokenDetails =
       await ctx.persistence.postgres.getInterchainTokenByTokenId(input.tokenId);
 
-    if (!tokenDetails || isValidXRPLWalletAddress(input.accountAddress)) {
+    if (!tokenDetails) {
       return {
         tokenManager: [] as TokenRole[],
         token: [] as TokenRole[],

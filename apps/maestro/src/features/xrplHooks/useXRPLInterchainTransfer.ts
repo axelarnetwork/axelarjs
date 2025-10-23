@@ -4,9 +4,7 @@ import * as xrpl from "xrpl";
 import { toast } from "@axelarjs/ui/toaster";
 
 import { trpc } from "~/lib/trpc";
-import { xrplChainConfig } from "~/config/chains";
-import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
-import { autofillAndSimulateXRPLTx } from "~/lib/utils/xrpl";
+import { autofillAndSimulateXRPLTx, XRPL_NETWORK_IDENTIFIER } from "~/lib/utils/xrpl";
 
 export interface XRPLInterchainTransferParams {
     caller: string;
@@ -60,7 +58,7 @@ export function useXRPLInterchainTransfer() {
             }
 
             try {
-                const result = await signAndSubmit(preparedTx, (xrplChainConfig as any as {xrplNetwork: XRPLIdentifierString}).xrplNetwork); // TODO: refactor type?
+                const result = await signAndSubmit(preparedTx, XRPL_NETWORK_IDENTIFIER); // TODO: refactor type?
                 const txHash = result.tx_hash;
                 params.onStatusUpdate?.({ type: "sending", txHash: txHash });
 

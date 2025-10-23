@@ -2,6 +2,7 @@ import { xrplChainConfig } from "~/config/chains";
 import { scaleDecimals } from "./gas";
 import * as xrpl from "xrpl";
 import Decimal from "decimal.js";
+import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
 
 export const xrplScaleGas = (
     isNativeSymbol: boolean,
@@ -23,7 +24,7 @@ export const xrplScaleGas = (
     return {gas, gasFeeDecimals}
 };
 
-export const withXRPLClient = async (callback: (client: xrpl.Client) => Promise<any>) => {
+export const withXRPLClient = async <T>(callback: (client: xrpl.Client) => Promise<T>) => {
     let client;
     try {
         client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
@@ -146,3 +147,5 @@ export const getXRPLAccountBalance = async (accountAddress: string, tokenAddress
 export const isXRPLChainName = (chainName: string) => (chainName.includes("xrpl") && !chainName.includes("evm"));
 
 export const isValidXRPLWalletAddress = (address: string) => (xrpl.isValidClassicAddress(address));
+
+export const XRPL_NETWORK_IDENTIFIER: XRPLIdentifierString = (xrplChainConfig as any as {xrplNetwork: XRPLIdentifierString}).xrplNetwork;
