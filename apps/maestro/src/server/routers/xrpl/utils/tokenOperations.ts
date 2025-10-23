@@ -34,6 +34,7 @@ export async function buildInterchainTransferTxBytes(
     const tx: xrpl.Payment = {
         TransactionType: "Payment",
         Account: input.caller,
+        // @ts-expect-error - contracts is not a property of ChainConfig
         Destination: xrplChainConfig.config.contracts.InterchainTokenService.address,
         Amount: amount,
         Memos: [

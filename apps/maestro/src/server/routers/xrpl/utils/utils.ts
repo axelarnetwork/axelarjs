@@ -1,17 +1,17 @@
-import type { XRPLChainConfig } from "@axelarjs/api/axelar-config";
+import type { ChainConfig } from "@axelarjs/api/axelar-config";
 
 import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import type { Context } from "~/server/context";
 import Decimal from "decimal.js";
 
-const isXRPLChainConfig = (c: unknown): c is XRPLChainConfig => {
+const isXRPLChainConfig = (c: unknown): c is ChainConfig => {
   return (c as { chainType?: string })?.chainType === "xrpl";
 };
 
 export const getXRPLChainConfig = async (
   ctx: Context
-): Promise<XRPLChainConfig> => {
+): Promise<ChainConfig> => {
   const chainConfigs = await ctx.configs.axelarConfigs();
   // Determine the best key based on environment and available S3 keys
   const s3Keys = Object.keys(chainConfigs.chains);
