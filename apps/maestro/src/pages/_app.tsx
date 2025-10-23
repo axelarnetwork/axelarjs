@@ -13,6 +13,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
 
+import WalletProvider from '~/features/XRPLComponent';
+
 import "@mysten/dapp-kit/dist/index.css";
 import "~/lib/polyfills";
 import "~/styles/globals.css";
@@ -133,13 +135,15 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
               >
                 <StellarWalletProviderClient>
                   <SuiWalletProviderClient>
-                    <AuthProvider>
-                      <MainLayout>
-                        <Component {...pageProps} />
-                      </MainLayout>
-                      <ReactQueryDevtools />
-                      <Toaster />
-                    </AuthProvider>
+                    <WalletProvider>
+                      <AuthProvider>
+                        <MainLayout>
+                          <Component {...pageProps} />
+                        </MainLayout>
+                        <ReactQueryDevtools />
+                        <Toaster />
+                      </AuthProvider>
+                    </WalletProvider>
                   </SuiWalletProviderClient>
                 </StellarWalletProviderClient>
               </SuiClientProvider>
