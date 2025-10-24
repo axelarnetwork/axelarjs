@@ -2,7 +2,7 @@ import { useDisconnectWallet } from "@mysten/dapp-kit";
 import { useDisconnect as useWagmiDisconnect } from "wagmi";
 
 import { setStellarConnectionState } from "../utils/stellar";
-import { useWallet as useXRPLWallet, useDisconnect as useXRPLDisconnect } from "@xrpl-wallet-standard/react";
+import { useWallet as useXRPLWallet, useDisconnect as useXRPLDisconnect } from "@axelarjs/xrpl-wallet-standard-vendored";
 
 interface DisconnectResult {
   disconnect: () => void;

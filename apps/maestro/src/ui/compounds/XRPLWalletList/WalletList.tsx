@@ -1,7 +1,7 @@
-import type { XRPLWallet } from '@xrpl-wallet-standard/app'
+import type { XRPLWallet } from '@axelarjs/xrpl-wallet-standard-vendored'
 import styled from 'styled-components'
-import { useConnect } from '@xrpl-wallet-standard/react'
-import { getRegisterdXRPLWallets } from "@xrpl-wallet-standard/app";
+import { useConnect } from '@axelarjs/xrpl-wallet-standard-vendored'
+import { getRegisterdXRPLWallets } from "@axelarjs/xrpl-wallet-standard-vendored";
 
 const WalletListContainer = styled.ul`
   padding: 0;

@@ -7,7 +7,7 @@ import {
   useConnectWallet as useSuiConnectWallet,
   useWallets,
 } from "@mysten/dapp-kit";
-import { useConnect as useXRPLConnect, useWallets as useXRPLWallets } from "@xrpl-wallet-standard/react";
+import { useConnect as useXRPLConnect, useWallets as useXRPLWallets } from "@axelarjs/xrpl-wallet-standard-vendored";
 import { isBrowser, setAllowed } from "@stellar/freighter-api";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";

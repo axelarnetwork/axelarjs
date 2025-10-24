@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   useSignAndSubmitTransaction,
   useWallet,
-} from "@xrpl-wallet-standard/react";
+} from "@axelarjs/xrpl-wallet-standard-vendored";
 import * as xrpl from "xrpl";
 
 import { XRPL_CHAIN_ID } from "~/config/chains";

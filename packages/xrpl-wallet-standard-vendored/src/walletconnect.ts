@@ -1,9 +1,10 @@
-import { WalletConnectModal } from '@walletconnect/modal'
-import type { WalletConnectModalConfig } from '@walletconnect/modal'
+import { mainnet } from '@reown/appkit/networks'
+import { createAppKit } from '@reown/appkit/core'
+
 import type { SessionTypes } from '@walletconnect/types'
 import UniversalProvider from '@walletconnect/universal-provider'
 import { getSdkError } from '@walletconnect/utils'
-import { type XRPLBaseWallet, XRPLWalletAccount } from './base/'
+import { type XRPLBaseWallet, XRPLWalletAccount } from './base'
 import type {
   StandardConnectFeature,
   StandardConnectMethod,
@@ -122,15 +123,16 @@ export class WalletConnectWallet implements XRPLBaseWallet {
         console.debug('EVENT', 'session_delete')
         this.#onSessionDisonnected()
       })
+      this.#modal = createAppKit({
+        projectId: projectId,
+        networks: [mainnet],
+        universalProvider: this.#provider,
+        manualWCControl: true
+      })
+      // A spinner will be showing until it's connected.
+      //this.#modal.open()
     })
     this.#chains = networks.map((network) => convertNetworkToChainId(network))
-    this.#modal = new WalletConnectModal({
-      projectId,
-      chains: this.#chains,
-      explorerExcludedWalletIds: 'ALL',
-      desktopWallets,
-      mobileWallets,
-    })
 
     if (new.target === WalletConnectWallet) {
       Object.freeze(this)

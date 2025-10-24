@@ -2,7 +2,7 @@ import { xrplChainConfig } from "~/config/chains";
 import { scaleDecimals } from "./gas";
 import * as xrpl from "xrpl";
 import Decimal from "decimal.js";
-import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
+import type { XRPLIdentifierString } from "@axelarjs/xrpl-wallet-standard-vendored";
 
 export const xrplScaleGas = (
     isNativeSymbol: boolean,

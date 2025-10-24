@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { useCurrentAccount } from "@mysten/dapp-kit";
-import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
+import { useWallet as useXRPLWallet } from "@axelarjs/xrpl-wallet-standard-vendored";
 import { useChainId as useWagmiChainId } from "wagmi";
 
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";

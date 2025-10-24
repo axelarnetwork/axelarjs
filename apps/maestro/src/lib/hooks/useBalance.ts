@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
-import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
+import { useWallet as useXRPLWallet } from "@axelarjs/xrpl-wallet-standard-vendored";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {

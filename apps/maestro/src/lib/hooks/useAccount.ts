@@ -4,7 +4,7 @@ import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";
 import { getAddress, getNetwork, isConnected } from "@stellar/freighter-api";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
-import { useAccount as useXRPLAccount } from "@xrpl-wallet-standard/react";
+import { useAccount as useXRPLAccount } from "@axelarjs/xrpl-wallet-standard-vendored";
 
 import { 
   stellarChainConfig, 

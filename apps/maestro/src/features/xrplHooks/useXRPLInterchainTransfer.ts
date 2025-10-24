@@ -1,4 +1,4 @@
-import { useWallet, useSignAndSubmitTransaction } from "@xrpl-wallet-standard/react";
+import { useWallet, useSignAndSubmitTransaction } from "@axelarjs/xrpl-wallet-standard-vendored";
 import { useMutation } from "@tanstack/react-query";
 import * as xrpl from "xrpl";
 import { toast } from "@axelarjs/ui/toaster";

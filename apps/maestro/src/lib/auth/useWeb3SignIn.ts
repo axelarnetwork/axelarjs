@@ -11,7 +11,7 @@ import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
-import { useSignTransaction as useXRPLSignTransaction, useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
+import { useSignTransaction as useXRPLSignTransaction, useWallet as useXRPLWallet } from "@axelarjs/xrpl-wallet-standard-vendored";
 import { wagmiConfig } from "~/config/wagmi";
 import { useDisconnect } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
