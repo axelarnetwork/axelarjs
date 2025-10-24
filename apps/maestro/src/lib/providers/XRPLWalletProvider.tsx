@@ -1,39 +1,51 @@
-import { CrossmarkWallet } from '@xrpl-wallet-adapter/crossmark'
-import { LedgerWallet } from '@xrpl-wallet-adapter/ledger'
-import { WalletConnectWallet } from '@xrpl-wallet-adapter/walletconnect'
-import { XamanWallet } from '@xrpl-wallet-adapter/xaman'
-import { WalletProvider as StandardWalletProvider } from '@xrpl-wallet-standard/react'
-import { useEffect, useState } from 'react'
-import { xrplChainConfig } from '~/config/chains'
+import { useMemo, type FC, type PropsWithChildren } from "react";
 
-export default function WalletProvider({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  const [rendered, setRendered] = useState(false)
-  const [xrplRegisterWallets, setXRPLlRegisterWallets] = useState(null)
+import { type XRPLBaseWallet } from "@xrpl-wallet-adapter/base";
+import { CrossmarkWallet } from "@xrpl-wallet-adapter/crossmark";
+import { WalletConnectWallet } from "@xrpl-wallet-adapter/walletconnect";
+import { XamanWallet } from "@xrpl-wallet-adapter/xaman";
+import { WalletProvider as StandardWalletProvider } from "@xrpl-wallet-standard/react";
 
-  useEffect(() => {
-    setRendered(true);
-  }, [])
+import { xrplChainConfig } from "~/config/chains";
 
-  useEffect(() => {
-    if (rendered) {
-      setXRPLlRegisterWallets([
-        //new CrossmarkWallet(),
-        //new LedgerWallet(),
-        /*new WalletConnectWallet({
-          projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-          networks: [(xrplChainConfig as any).xrplNetwork],
-          desktopWallets: [],
-          mobileWallets: [],
-        }),*/
-        new XamanWallet('a9bf63cf-6798-4eef-bc6f-50ea5d2818b2'),
-      ]);
+export const XrplWalletProvider: FC<PropsWithChildren> = ({ children }) => {
+  const xrplWallets = useMemo(() => {
+    // Avoid constructing wallets during SSR
+    if (typeof window === "undefined") {
+      return [] as Array<XRPLBaseWallet>;
     }
-  }, [rendered, setXRPLlRegisterWallets])
 
+    const availableWallets: Array<XRPLBaseWallet> = [new CrossmarkWallet()];
 
-  return <StandardWalletProvider registerWallets={xrplRegisterWallets}>{children}</StandardWalletProvider>
-}
+    const walletConnectProjectId =
+      process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
+    if (walletConnectProjectId && walletConnectProjectId.length > 0) {
+      const walletConnectWallet = new WalletConnectWallet({
+        projectId: walletConnectProjectId,
+        networks: [(xrplChainConfig as any).xrplNetwork],
+        desktopWallets: [],
+        mobileWallets: [],
+      });
+
+      availableWallets.push(walletConnectWallet);
+    }
+
+    const xamanApiKey = process.env.NEXT_PUBLIC_XAMAN_API_KEY;
+    if (xamanApiKey && xamanApiKey.length > 0) {
+      const xamanWallet = new XamanWallet(xamanApiKey);
+
+      availableWallets.push(xamanWallet);
+    }
+
+    return availableWallets;
+  }, []);
+
+  // If wallets are not available (SSR/disabled), just render children
+  if (xrplWallets.length === 0) return <>{children}</>;
+
+  return (
+    <StandardWalletProvider registerWallets={xrplWallets} autoConnect={true}>
+      {children}
+    </StandardWalletProvider>
+  );
+};

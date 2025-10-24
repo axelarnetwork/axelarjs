@@ -1,5 +1,5 @@
 import { Button, Modal, type ButtonProps } from "@axelarjs/ui";
-import React, { forwardRef, useRef } from "react";
+import React, { forwardRef } from "react";
 
 import type { ISupportedWallet } from "@creit.tech/stellar-wallets-kit";
 import { ConnectModal } from "@mysten/dapp-kit";

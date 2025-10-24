@@ -12,14 +12,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
+import { XrplWalletProvider } from "~/lib/providers/XRPLWalletProvider";
 
-const XRPLWalletProviderClient = dynamic(
-  () =>
-    import("~/lib/providers/XRPLWalletProvider").then(
-      (mod) => mod.default
-    ),
-  { ssr: false }
-);
 import "@mysten/dapp-kit/dist/index.css";
 import "~/lib/polyfills";
 import "~/styles/globals.css";
@@ -138,7 +132,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
                     : "testnet"
                 }
               >
-                <XRPLWalletProviderClient>
+                <XrplWalletProvider>
                   <StellarWalletProviderClient>
                     <SuiWalletProviderClient>
                       <AuthProvider>
@@ -150,7 +144,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
                       </AuthProvider>
                     </SuiWalletProviderClient>
                   </StellarWalletProviderClient>
-                </XRPLWalletProviderClient>
+                </XrplWalletProvider>
               </SuiClientProvider>
             </WagmiConfigPropvider>
           </ThemeProvider>

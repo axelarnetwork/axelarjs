@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 
 import { useSendStellarToken } from "~/features/stellarHooks";
+import { useXRPLInterchainTransfer } from "~/features/xrplHooks/useXRPLInterchainTransfer";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
@@ -13,8 +14,8 @@ import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
-import { useConnect as useXRPLConnect, useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
-import { useXRPLInterchainTransfer } from "~/features/xrplHooks/useXRPLInterchainTransfer";
+import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
+import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -39,21 +40,14 @@ export function useInterchainTransferMutation(
   const [txState, setTxState] = useTransactionState();
   const chainId = useChainId();
   const { address } = useAccount();
-  const { connect: xrplConnection } = useXRPLConnect();
-  const { wallet: xrplWallet } = useXRPLWallet();
 
   const { sendToken: sendStellarToken } = useSendStellarToken();
+  const xrplInterchainTransfer = useXRPLInterchainTransfer();
 
   const { writeContractAsync: transferAsync } =
     useWriteInterchainTokenInterchainTransfer();
 
   const { mutateAsync: getSendTokenTx } = trpc.sui.getSendTokenTx.useMutation({
-    onError(error) {
-      console.log("error in getSendTokenTx", error.message);
-    },
-  });
-
-  const { mutateAsync: getXRPLSendTokenTx } = trpc.xrpl.getInterchainTransferTxBytes.useMutation({
     onError(error) {
       console.log("error in getSendTokenTx", error.message);
     },
@@ -92,6 +86,8 @@ export function useInterchainTransferMutation(
         // Encode the recipient address for Stellar since it's a base64 string
         if (config.destinationChainName.toLowerCase().includes("stellar")) {
           encodedRecipient = stellarEncodedRecipient(destinationAddress);
+        } else if (isXRPLChainName(config.destinationChainName)) {
+          encodedRecipient = xrplEncodedRecipient(destinationAddress);
         } else {
           encodedRecipient = destinationAddress as `0x${string}`;
         }
@@ -109,11 +105,8 @@ export function useInterchainTransferMutation(
             transaction: sendTokenTxJSON,
           });
           txHash = receipt.digest;
-        } else if (config.sourceChainName.toLowerCase().includes("xrpl") && !config.sourceChainName.toLowerCase().includes("evm")) {
-
-          const xrplInterchainTransfer = useXRPLInterchainTransfer();
-
-          xrplInterchainTransfer({
+        } else if (isXRPLChainName(config.sourceChainName)) {
+          const result = await xrplInterchainTransfer({
             caller: address,
             tokenId: tokenId,
             tokenAddress: config.tokenAddress,
@@ -122,8 +115,8 @@ export function useInterchainTransferMutation(
             amount: bnAmount.toString(),
             gasValue: config.gas.toString() ?? "0",
           });
-        }
-        else if (config.sourceChainName.toLowerCase().includes("stellar")) {
+          txHash = result.txHash;
+        } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
           const result = await sendStellarToken.mutateAsync({
             caller: address,
             tokenId: tokenId,

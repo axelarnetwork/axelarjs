@@ -28,3 +28,20 @@ export const scaleGasValue = (
 
   return value18Decimals / factor;
 };
+
+/**
+ * Scales a number `value` given as a BigInt with decimals `sourceDecimals` to a number with decimals `targetDecimals`
+ */
+export const scaleDecimals = (
+  value: bigint,
+  sourceDecimals: number,
+  targetDecimals: number,
+) => {
+  if (sourceDecimals > targetDecimals) {
+    return value / (10n ** BigInt(sourceDecimals - targetDecimals));
+  } else if (targetDecimals > sourceDecimals) {
+    return value * (10n ** BigInt(targetDecimals - sourceDecimals));
+  } else {
+    return value;
+  }
+};

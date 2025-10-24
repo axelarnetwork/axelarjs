@@ -1,110 +1,100 @@
-import { blackA, gray, mauve } from '@radix-ui/colors'
-import * as Dialog from '@radix-ui/react-dialog'
-import { Cross2Icon } from '@radix-ui/react-icons'
-import { useState } from 'react'
-import styled, { keyframes } from 'styled-components'
-import { WalletList } from './WalletList'
+import { useState } from "react";
 
-const CloseButton = styled.button`
-  font-family: inherit;
-  padding: 0;
-  border: none;
-  border-radius: 100%;
-  height: 25px;
-  width: 25px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: ${gray.gray11};
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: inherit;
-  &:hover {
-    background-color: ${blackA.blackA1};
-  }
-  &:focus {
-    outline: none;
-  }
-`
+import { gray, mauve } from "@radix-ui/colors";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Cross2Icon } from "@radix-ui/react-icons";
 
-const overlayShow = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`
+import { WalletList } from "./WalletList";
 
-const DialogOverlay = styled(Dialog.Overlay)`
-  background-color: rgba(0, 0, 0, 0.5);
-
-  position: fixed;
-  inset: 0;
-  animation: ${overlayShow} 150ms cubic-bezier(0.16, 1, 0.3, 1);
-`
-
-const contentShow = keyframes`
-  from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-`
-
-const DialogContent = styled(Dialog.Content)`
-  z-index: 50;
-  background-color: white;
-  border-radius: 6px;
-  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90vw;
-  max-width: 450px;
-  max-height: 85vh;
-  padding: 25px;
-  animation: ${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1);
-`
-
-const DialogTitle = styled(Dialog.Title)`
-  margin: 0;
-  text-align: center;
-  font-weight: 500;
-  color: ${mauve.mauve11};
-  font-size: 1.5em;
-`
+const styles = {
+  closeButton: {
+    fontFamily: "inherit",
+    padding: 0,
+    border: "none",
+    borderRadius: "100%",
+    height: "25px",
+    width: "25px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: gray.gray11,
+    position: "absolute" as const,
+    top: "10px",
+    right: "10px",
+    backgroundColor: "inherit",
+    cursor: "pointer",
+  },
+  dialogOverlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    position: "fixed" as const,
+    inset: 0,
+  },
+  dialogContent: {
+    zIndex: 50,
+    backgroundColor: "white",
+    borderRadius: "6px",
+    boxShadow:
+      "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
+    position: "fixed" as const,
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "90vw",
+    maxWidth: "450px",
+    maxHeight: "85vh",
+    padding: "25px",
+  },
+  dialogTitle: {
+    margin: 0,
+    textAlign: "center" as const,
+    fontWeight: 500,
+    color: mauve.mauve11,
+    fontSize: "1.5em",
+  },
+};
 
 type Props = {
-  trigger: React.ReactNode
-}
+  trigger: React.ReactNode;
+};
 
 export const ConnectModal = ({ trigger }: Props) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const handleConnectSuccess = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+  };
   const handleConnectError = (error: any) => {
-    console.error(error.message)
-    setOpen(false)
-  }
+    console.error(error.message);
+    setOpen(false);
+  };
 
   const preventOpenAutoFocus = (e: Event) => {
-    e.preventDefault()
-  }
+    e.preventDefault();
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
-        <DialogOverlay />
-        <DialogContent aria-describedby={undefined} onOpenAutoFocus={preventOpenAutoFocus}>
-          <DialogTitle>Connect to</DialogTitle>
+        <Dialog.Overlay style={styles.dialogOverlay} />
+        <Dialog.Content
+          style={styles.dialogContent}
+          aria-describedby={undefined}
+          onOpenAutoFocus={preventOpenAutoFocus}
+        >
+          <Dialog.Title style={styles.dialogTitle}>Connect to</Dialog.Title>
           <Dialog.Description />
-          <WalletList onConnectSuccess={handleConnectSuccess} onConnectError={handleConnectError} />
+          <WalletList
+            onConnectSuccess={handleConnectSuccess}
+            onConnectError={handleConnectError}
+          />
           <Dialog.Close asChild>
-            <CloseButton aria-label="Close">
+            <button style={styles.closeButton} aria-label="Close">
               <Cross2Icon width={24} height={24} />
-            </CloseButton>
+            </button>
           </Dialog.Close>
-        </DialogContent>
+        </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
-  )
-}
+  );
+};

@@ -57,6 +57,9 @@ import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
 export const HEDERA_CHAIN_ID =
   NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 295 : 296;
 
+export const XRPL_EVM_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 1440000 : 1449000;
+
 const ENVIRONMENTS = {
   mainnet: "mainnet",
   devnet: "devnet-amplifier",

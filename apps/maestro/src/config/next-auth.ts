@@ -130,22 +130,32 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           const encodedTx = signature; // this is the signed transaction blob that we received from the client
           const tx = binary.decode(encodedTx); // decode it to get the transaction object
 
-          if (!tx.Memos || tx.Memos.length === 0) {
+          if (
+            !tx.Memos || !Array.isArray(tx.Memos) || tx.Memos.length === 0
+          ) {
             console.warn("No memos found in the transaction");
             return null;
           }
           
-          const signerPulicKey = tx.SigningPubKey;
-          console.warn("Signer public key from transaction:", signerPulicKey);
+          const signerPublicKey = tx.SigningPubKey;
+          if (typeof signerPublicKey !== "string")
+            return null;
+          console.warn("Signer public key from transaction:", signerPublicKey);
+          if (!tx.Memos[0])
+            return null;
+          if (typeof tx.Memos[0] !== "object" || !("Memo" in tx.Memos[0]))
+            return null;
           const memo = tx.Memos[0].Memo;
-          const memoHex = memo.MemoData;
+          if (memo === null || typeof memo !== "object" || !("MemoData" in memo))
+            return null;
+          const memoHex = memo.MemoData as string;
           const memoData = Buffer.from(memoHex, "hex").toString("utf8");
 
           console.warn("Reconstructed memo from transaction:", memoData, message);
           isMessageSigned = 
             (memoData === message) // require that the memo matches the challenge (we don't care about the other data)
-            && (xrpl.verifySignature(encodedTx, signerPulicKey)) // AND that the signature is valid
-            && (xrpl.deriveAddress(signerPulicKey) === address); // AND that the public key matches the address
+            && (xrpl.verifySignature(encodedTx, signerPublicKey)) // AND that the signature is valid
+            && (xrpl.deriveAddress(signerPublicKey) === address); // AND that the public key matches the address
           console.log("isMessageSigned:", isMessageSigned);
         }
 

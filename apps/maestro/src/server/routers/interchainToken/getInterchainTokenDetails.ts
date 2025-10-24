@@ -7,7 +7,6 @@ import {
   stellarChainConfig,
   SUI_CHAIN_ID,
   suiChainConfig,
-  xrplChainConfig,
 } from "~/config/chains";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
@@ -90,7 +89,6 @@ export const getInterchainTokenDetails = publicProcedure
 
     // For Stellar tokens, we need to handle both symbol-issuer and contract address formats
     let tokenRecord = null;
-
     tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         axelarChainId,
@@ -148,23 +146,6 @@ export const getInterchainTokenDetails = publicProcedure
       }
     }
 
-    if (!tokenRecord && input.chainId === xrplChainConfig.id) {
-      console.log(
-        `[getInterchainTokenDetails] Token not found with original address on XRPL, trying alternative format`
-      );
-      if (input.tokenAddress === "xrp") {
-        // in that case, this is the native XRP token
-        console.log("Attempting to find the native XRP token record");
-        tokenRecord =
-          await ctx.persistence.postgres.getInterchainTokenByTokenId(
-            "0xba5a21ca88ef6bba2bfff5088994f90e1077e2a1cc3dcc38bd261f00fce2824f"
-          ); // TODO: derive?
-        console.log("Found:", tokenRecord);
-      } else {
-        console.error("Failed to find this XRPL token:", input.tokenAddress);
-      }
-    }
-
     // If we found a token but it doesn't have remoteTokens, get the full record
     if (tokenRecord && !tokenRecord.remoteTokens && tokenRecord.tokenId) {
       const fullTokenRecord =
@@ -188,6 +169,5 @@ export const getInterchainTokenDetails = publicProcedure
         message: `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`,
       });
     }
-
     return tokenRecord;
   });

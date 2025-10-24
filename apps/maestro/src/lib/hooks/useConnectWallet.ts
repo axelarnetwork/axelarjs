@@ -7,7 +7,7 @@ import {
   useConnectWallet as useSuiConnectWallet,
   useWallets,
 } from "@mysten/dapp-kit";
-import { useWallet as useXRPLWallet, useConnect as useXRPLConnect } from "@xrpl-wallet-standard/react";
+import { useConnect as useXRPLConnect, useWallets as useXRPLWallets } from "@xrpl-wallet-standard/react";
 import { isBrowser, setAllowed } from "@stellar/freighter-api";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
@@ -25,7 +25,8 @@ type WalletHandler = (chainId: number) => void;
 export function useConnectWallet() {
   const wallets = useWallets();
   const { mutateAsync: connectAsync } = useSuiConnectWallet();
-  const xrplWallet = useXRPLWallet();
+  const { connect: xrplConnect } = useXRPLConnect();
+  const xrplWallets = useXRPLWallets();
   const { open: openWeb3Modal } = useWeb3Modal();
   const { data: sessionData } = useSession();
   const { switchChain: switchChainWagmi } = useWagmiSwitchChain();
@@ -79,32 +80,22 @@ export function useConnectWallet() {
   };
 
   const tryConnectXRPLWallet = async () => {
-    // Try existing selected wallet first
-    if (xrplWallet.wallet && xrplWallet.status !== "connected") {
+    for (const xrplWallet of xrplWallets) {
       try {
-        await useXRPLConnect().connect(xrplWallet.wallet)
+        await xrplConnect(xrplWallet, { silent: true });
         return true;
       } catch (error) {
-        // fallthrough to try others
+        // ignore
       }
     }
-    // Try each available wallet (Wallet Standard)
-    /*for (const w of solanaWallet.wallets) {
-      try {
-        solanaWallet.select(w.adapter.name);
-        await solanaWallet.connect();
-        return true;
-      } catch (error) {
-        continue;
-      }
-    }*/ // TODO: what is this doing?
+    
     return false;
   };
 
   const chainHandlers: Record<number, WalletHandler> = {
     [suiChainConfig.id]: () => tryConnectSuiWallet(),
     [stellarChainConfig.id]: () => tryConnectStellarWallet(),
-    [xrplChainConfig?.id ?? 0]: () => tryConnectXRPLWallet(),
+    [xrplChainConfig.id]: () => tryConnectXRPLWallet(),
   };
 
   const defaultHandler: WalletHandler = (chainId) => {
