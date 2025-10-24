@@ -91,7 +91,7 @@ export const XrplWalletProvider: FC<PropsWithChildren> = ({ children }) => {
     import("@xrpl-wallet-standard/react")
       .then((mod) => {
         if (isMounted) {
-          setProviderComponent(() => (mod as any).WalletProvider);
+          setProviderComponent(() => mod.WalletProvider);
         }
       })
       .catch(() => {
