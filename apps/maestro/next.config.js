@@ -17,7 +17,7 @@ const nextConfig = {
   images: {
     remotePatterns: HOSTNAMES.map((hostname) => ({ hostname })),
   },
-  webpack(config, { isServer }) {
+  /*webpack(config, { isServer }) {
     if (isServer) {
       config.resolve = config.resolve || {};
       config.resolve.alias = config.resolve.alias || {};
@@ -31,13 +31,13 @@ const nextConfig = {
   transpilePackages: [
     "@xrpl-wallet-standard/core",
     "@xrpl-wallet-standard/react",
-  ],
+  ],*/
   compiler: {
     styledComponents: true,
-  },
+  }/*,
   experimental: {
     esmExternals: true,
-  },
+  },*/
 };
 
 const withBundleAnalyzer = bundleAnalyzer({
