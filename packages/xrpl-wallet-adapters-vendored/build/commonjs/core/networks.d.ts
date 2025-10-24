@@ -1,0 +1,16 @@
+import type { IdentifierString } from '@wallet-standard/core';
+export declare const XRPL_MAINNET: "xrpl:0";
+export declare const XRPL_TESTNET: "xrpl:1";
+export declare const XRPL_DEVNET: "xrpl:2";
+export declare const XAHAU_MAINNET: "xrpl:21337";
+export declare const XAHAU_TESTNET: "xrpl:21338";
+export declare const XRPL_NETWORKS: readonly ["xrpl:0", "xrpl:1", "xrpl:2"];
+export declare const XAHAU_NETWORKS: readonly ["xrpl:21337", "xrpl:21338"];
+export declare const XRPL_PROTOCOL_NETWORKS: readonly ["xrpl:0", "xrpl:1", "xrpl:2", "xrpl:21337", "xrpl:21338"];
+export type XRPLProtorcolNetwork = (typeof XRPL_PROTOCOL_NETWORKS)[number];
+export declare function isXRPLNetworks(network: IdentifierString): network is XRPLProtorcolNetwork;
+export type XRPLStandardIdentifier = `xrpl:${number}`;
+export type XRPLReserverdIdentifier = 'xrpl:mainnet' | 'xrpl:testnet' | 'xrpl:devnet' | 'xrpl:xahau-mainnet' | 'xrpl:xahau-testnet';
+export type XRPLIdentifierString = XRPLStandardIdentifier | XRPLReserverdIdentifier;
+export declare function convertNetworkToChainId(network: XRPLIdentifierString): `xrpl:${number}`;
+export declare function getNetworkWssEndpoint(network: XRPLIdentifierString): string | undefined;

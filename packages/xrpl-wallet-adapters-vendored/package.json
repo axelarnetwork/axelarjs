@@ -1,0 +1,59 @@
+{
+  "name": "@axelarjs/xrpl-wallet-adapters-vendored",
+  "version": "0.1.1",
+  "description": "Vendored",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/axelarjs"
+  },
+  "files": [
+    "./build",
+    "./index.js",
+    "./index.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./*": {
+      "import": "./build/module/*.js",
+      "require": "./build/commonjs/*.js"
+    }
+  },
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "clean": "./scripts/clean.sh",
+    "compile": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "docgen": "typedoc",
+    "deploy:docs": "gh-pages -d docs -e core"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LicenseRef-LICENSE",
+  "devDependencies": {
+    "@axelarjs/config": "workspace:*",
+    "gh-pages": "^6.1.1",
+    "rimraf": "^5.0.5",
+    "typedoc": "^0.25.12",
+    "typescript": "^5.4.3",
+    "pkgroll": "^2.4.1"
+  },
+  "dependencies": {
+    "@metamask/providers": "^22.1.1",
+    "@transia/xrpl": "4.4.4-alpha.1",
+    "@wallet-standard/core": "^1.1.1",
+    "@walletconnect/modal": "^2.7.0",
+    "@walletconnect/types": "^2.22.4",
+    "@walletconnect/universal-provider": "^2.22.4",
+    "@walletconnect/utils": "^2.22.4",
+    "@xrplf/isomorphic": "^1.0.1",
+    "xrpl": "^4.4.2",
+    "xumm-oauth2-pkce": "^2.8.7"
+  }
+}

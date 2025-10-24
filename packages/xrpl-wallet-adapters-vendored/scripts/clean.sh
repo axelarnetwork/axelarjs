@@ -1,0 +1,1 @@
+npx rimraf build docs *.js *.d.ts
