@@ -1,41 +1,16 @@
 {
-  "name": "@axelarjs/xrpl-wallet-adapters-vendored",
-  "version": "0.1.1",
-  "description": "Vendored",
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/axelarnetwork/axelarjs"
-  },
-  "files": [
-    "./build",
-    "./index.js",
-    "./index.d.ts"
-  ],
-  "exports": {
-    ".": {
-      "import": "./build/module/index.js",
-      "require": "./build/commonjs/index.js"
-    },
-    "./*": {
-      "import": "./build/module/*.js",
-      "require": "./build/commonjs/*.js"
-    }
-  },
+  "name": "@xrpl-wallet-adapter/metamask",
+  "version": "0.1.2",
+  "description": "",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
   "scripts": {
-    "build": "./scripts/build.sh",
-    "clean": "./scripts/clean.sh",
-    "compile": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
-    "docgen": "typedoc",
-    "deploy:docs": "gh-pages -d docs -e core"
+    "build": "pkgroll"
   },
   "keywords": [],
   "author": "",
-  "license": "LicenseRef-LICENSE",
+  "license": "ISC",
   "devDependencies": {
     "@axelarjs/config": "workspace:*",
     "gh-pages": "^6.1.1",
@@ -55,5 +30,8 @@
     "@xrplf/isomorphic": "^1.0.1",
     "xrpl": "^4.4.2",
     "xumm-oauth2-pkce": "^2.8.7"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -1,0 +1,15 @@
+/node_modules
+/build
+/lib
+/axelarscan
+/gmp
+/axelar-query
+/axelar-config
+/deposit-address
+/deposit-service
+/axelar-recovery
+/docs
+/dist
+*.d.ts
+*.js
+.turbo/
