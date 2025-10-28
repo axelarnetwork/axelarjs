@@ -8,7 +8,7 @@ import { uniq, without } from "rambda";
 import { z } from "zod";
 
 import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
-import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
+import { CHAINS_WITHOUT_DEPLOYMENT, stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { numericString } from "~/lib/utils/validation";
@@ -85,6 +85,7 @@ export const INITIAL_STATE = {
   onDeployTxHash(txHash: string) {
     logger.log("onDeployTxHash", txHash);
   },
+  cannotDeployOnSelectedChain: false,
 };
 
 export type InterchainTokenDeploymentState = typeof INITIAL_STATE;
@@ -113,6 +114,14 @@ function useInterchainTokenDeploymentState(
 
   const { address } = useAccount();
   const chainId = useChainId();
+
+  // maintains invariant: state.cannotDeployOnSelectedChain == cannot deploy on current chainId
+  useEffect(
+    () => {
+      setState({...state, cannotDeployOnSelectedChain: CHAINS_WITHOUT_DEPLOYMENT.includes(chainId)});
+    },
+    [chainId, state, setState]
+  );
 
   /**
    * Generate a random salt on first render
