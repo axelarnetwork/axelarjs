@@ -756,7 +756,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
     rpcUrls: createRpcUrlConfig(
       hederaTestnet,
       ENVIRONMENTS.testnet,
-      [],
+      ["https://testnet.hashio.io/api"],
       "hedera"
     ),
     axelarChainId: "hedera",
@@ -766,7 +766,7 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
   },
   {
     ...hedera,
-    rpcUrls: createRpcUrlConfig(hedera, ENVIRONMENTS.mainnet, [], "hedera"),
+    rpcUrls: createRpcUrlConfig(hedera, ENVIRONMENTS.mainnet, ["https://mainnet.hashio.io/api"], "hedera"),
     axelarChainId: "hedera",
     axelarChainName: "hedera",
     supportWagmi: true,
