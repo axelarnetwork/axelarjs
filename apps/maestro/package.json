@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "scripts/build.sh",
-    "postbuild": "tsx scripts/ofacSanctionsInit.ts",
+    "postbuild": "tsx scripts/ofacSanctionsInit.ts; tsx scripts/synctokens.ts",
     "build:analyze": "ANALYZE=true pnpm build",
     "start": "next start",
     "lint": "next lint",
