@@ -175,7 +175,8 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   const isSignedIn =
     status === "authenticated" &&
     address &&
-    data?.address;
+    data?.address &&
+    data.address.toLowerCase() === address.toLowerCase();
 
   const handleClose = useCallback(() => {
     if (disableClose || !onClose) {

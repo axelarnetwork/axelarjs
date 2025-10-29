@@ -14,6 +14,7 @@ import {
   type TokenDetails,
 } from "./InterchainTokenDeployment.state";
 import { CHAINS_WITHOUT_DEPLOYMENT } from "~/config/chains";
+import { useChainId } from "~/lib/hooks";
 
 const Step1 = dynamic(() => import("./steps/token-details"), {
   loading: StepLoading,
@@ -49,11 +50,13 @@ const InterchainTokenDeployment = () => {
     [state]
   );
 
+  const chainId = useChainId();
+
   return (
     <MultiStepDialog
       triggerLabel="Deploy a new Interchain Token"
       disabledLabel="Cannot deploy on this chain"
-      disabled={state.cannotDeployOnSelectedChain}
+      disabled={CHAINS_WITHOUT_DEPLOYMENT.includes(chainId)}
       title={
         <Dialog.Title className="flex items-center justify-center gap-1 sm:gap-2">
           {showBackButton && <BackButton onClick={actions.prevStep} />}
