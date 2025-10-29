@@ -12,15 +12,13 @@ import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 import { useSignTransaction as useXRPLSignTransaction, useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
-
-import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { wagmiConfig } from "~/config/wagmi";
 import { useDisconnect } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "../trpc";
 import { setStellarConnectionState } from "../utils/stellar";
 
-import { Client, Wallet, multisign } from "xrpl";
+import { XRPL_NETWORK_IDENTIFIER } from "../utils/xrpl";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
@@ -71,14 +69,12 @@ export function useWeb3SignIn({
     ...mutation
   } = useMutation({
     mutationFn: async (address?: string | null) => {
-      console.log("Starting sign in with web3 for address", address);
       try {
         invariant(address, "Address is required");
 
         signInAddressRef.current = address;
         isSigningInRef.current = true;
 
-        console.log("Creating sign in message now", address);
         const { message } = await createSignInMessage({ address }).catch(
           (error) => {
             console.error("Error creating sign in message", error);
@@ -105,7 +101,6 @@ export function useWeb3SignIn({
           signature = result.signedMessage;
         } else if (address.startsWith("r")) {
           // XRPL
-          console.log("Signing using this XRPL account now");
 
           // things are more difficult for xrpl, since the wallet library does not allow to sign arbitrary messages
           // we have to create a transaction, sign it and extract the signature from there
@@ -123,14 +118,10 @@ export function useWeb3SignIn({
             Sequence: 0,  // impossible sequence
             Fee: "0"
           };
-          console.log("Signing this XRPL transaction", tx);
 
-          const result = await xrplSignTransaction(tx, `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? '0' : process.env.NEXT_PUBLIC_NETWORK_ENV === 'devnet-amplifier' ? '2' : '1'}`);
-          console.log("XRPL sign transaction result", result);
+          const result = await xrplSignTransaction(tx, XRPL_NETWORK_IDENTIFIER);
           signature = result.signed_tx_blob;
-          console.log("XRPL signature (signed tx blob)", signature);
         }
-        console.log("Checking signature:", signature);
         const response = await signIn("credentials", {
           address,
           signature,
@@ -235,6 +226,7 @@ export function useWeb3SignIn({
     void signInWithWeb3Async(address);
   }, [
     xrplWallet?.accounts?.length,
+    xrplWallet?.accounts,
     xrplConnectionStatus,
     sessionStatus,
     session?.address,

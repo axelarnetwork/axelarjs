@@ -191,3 +191,7 @@ export const stellarChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
 export const xrplChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
   chain.axelarChainId.includes("xrpl")
 ) as ExtendedWagmiChainConfig;
+
+// cannot deploy on these chains
+export const CHAINS_WITHOUT_DEPLOYMENT = [XRPL_CHAIN_ID];
+

@@ -1,65 +1,79 @@
-import type { XRPLWallet } from '@xrpl-wallet-standard/app'
-import styled from 'styled-components'
-import { useConnect, useWallets } from '@xrpl-wallet-standard/react'
-import { getRegisterdXRPLWallets } from "@xrpl-wallet-standard/app";
+import Image from "next/image";
 
-const WalletListContainer = styled.ul`
-  padding: 0;
-  margin: 0;
-`
+import {
+  getRegisterdXRPLWallets,
+  type XRPLWallet,
+} from "@xrpl-wallet-standard/app";
+import { useConnect } from "@xrpl-wallet-standard/react";
 
-const WalletItem = styled.li`
-  list-style: none;
-  display: flex;
-`
-
-const WalletButton = styled.button`
-  display: flex;
-  width: 100%;
-  justify-content: stretch;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.2rem;
-  margin: 0.3rem;
-`
-
-const WalletIcon = styled.img`
-  height: 36px;
-  vertical-align: middle;
-`
-
-const WalletName = styled.span`
-  vertical-align: middle;
-`
+const styles = {
+  walletListContainer: {
+    padding: 0,
+    margin: 0,
+    listStyle: "none",
+  },
+  walletItem: {
+    listStyle: "none",
+    display: "flex",
+  },
+  walletButton: {
+    display: "flex",
+    width: "100%",
+    justifyContent: "stretch" as const,
+    alignItems: "center",
+    gap: "1rem",
+    padding: "1.2rem",
+    margin: "0.3rem",
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+  },
+  walletIcon: {
+    height: "36px",
+    verticalAlign: "middle" as const,
+  },
+  walletName: {
+    verticalAlign: "middle" as const,
+  },
+};
 
 type Props = {
-  onConnectSuccess: () => void
-  onConnectError: (error: Error) => void
-}
+  onConnectSuccess: () => void;
+  onConnectError: (error: Error) => void;
+};
 
 export const WalletList = ({ onConnectSuccess, onConnectError }: Props) => {
-  const wallets = getRegisterdXRPLWallets()
-  const { connect } = useConnect()
+  const wallets = getRegisterdXRPLWallets();
+  const { connect } = useConnect();
 
   const handleConnect = async (wallet: XRPLWallet) => {
     try {
-      await connect(wallet)
-      onConnectSuccess()
+      await connect(wallet);
+      onConnectSuccess();
     } catch (error: any) {
-      onConnectError(error)
+      onConnectError(error);
     }
-  }
+  };
 
   return (
-    <WalletListContainer>
+    <ul style={styles.walletListContainer}>
       {wallets.map((wallet) => (
-        <WalletItem key={wallet.name}>
-          <WalletButton onClick={() => handleConnect(wallet)}>
-            <WalletIcon src={wallet.icon} alt={wallet.name} />
-            <WalletName>{wallet.name}</WalletName>
-          </WalletButton>
-        </WalletItem>
+        <li key={wallet.name} style={styles.walletItem}>
+          <button
+            style={styles.walletButton}
+            onClick={() => handleConnect(wallet)}
+          >
+            <Image
+              src={wallet.icon}
+              alt={wallet.name}
+              width={36}
+              height={36}
+              style={styles.walletIcon}
+            />
+            <span style={styles.walletName}>{wallet.name}</span>
+          </button>
+        </li>
       ))}
-    </WalletListContainer>
-  )
-}
+    </ul>
+  );
+};

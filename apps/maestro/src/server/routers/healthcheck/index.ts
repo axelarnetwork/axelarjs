@@ -3,49 +3,55 @@ import { z } from "zod";
 import { CHAIN_CONFIGS } from "~/config/chains";
 import { sendRpcNodeIssueNotificationWithRateLimit } from "~/lib/utils/slack-notifications";
 import { publicProcedure, router } from "~/server/trpc";
+import { checkXRPLNode, isXRPLChainName } from "~/lib/utils/xrpl";
 
 async function checkRpcNode(
   url: string,
   chainName: string
 ): Promise<"up" | "down" | "timeout"> {
   try {
+    const chainNameLower = chainName.toLowerCase();
+
+    if (isXRPLChainName(chainNameLower)) {
+      // test via xrpl.js
+      return await checkXRPLNode();
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => {
       controller.abort();
     }, 60000); // will timeout if RPC node dont respond in 60s
     try {
       let method = "net_version";
-      const chainNameLower = chainName.toLowerCase();
       
       if (chainNameLower === "sui") {
         method = "sui_getTotalTransactionBlocks";
       } else if (chainNameLower === "stellar" || chainNameLower.includes("stellar")) {
         method = "getVersionInfo";
-      } else if (chainNameLower.includes("xrpl") && !chainNameLower.includes("evm")) {
-        method = "server_info";
       }
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: 1,
-          method,
-        }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeout);
       let json;
       try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeout);
+        if (!response.ok) return "down";
+
         json = await response.json();
       } catch (error) {
         return "down";
       }
 
       // Verify if the response is valid
-      if (!response.ok) return "down";
       if (!json || json.error) {
         return "down";
       }

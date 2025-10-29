@@ -1,15 +1,14 @@
 import { TRPCError } from "@trpc/server";
 import { always } from "rambda";
 import { Account, Address, scValToNative } from "stellar-sdk";
-import * as xrpl from "xrpl";
 import { z } from "zod";
 
-import { xrplChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { isTokenAddressIncompatibleWithOwner } from "~/lib/utils/addressCompatibility";
 import {
   isValidStellarTokenAddress,
-  isValidXRPLTokenAddress,
+  isXRPLTokenAddressFormat,
+  isXRPLWalletAddressFormat,
 } from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
@@ -17,6 +16,7 @@ import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { simulateCall } from "../stellar/utils/transactions";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
+import { getXRPLAccountBalance } from "~/lib/utils/xrpl";
 
 // Helper function to call Stellar contract methods and handle errors
 async function callStellarContractMethod<T>({
@@ -75,9 +75,8 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       input.tokenAddress,
       input.owner
     );
-    if (input.owner[0] === "r") {
-      // xrpl address
-      isIncompatibleChain = !input.tokenAddress?.includes(".");
+    if (isXRPLWalletAddressFormat(input.owner)) { // xrpl address
+      isIncompatibleChain = !isXRPLTokenAddressFormat(input.tokenAddress);
     }
     if (isIncompatibleChain) {
       return {
@@ -220,66 +219,16 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         };
       }
     }
-    console.log("Fetching token balance for", input);
 
-    if (isValidXRPLTokenAddress(input.tokenAddress)) {
-      console.log("Fetching XRPL token balance for", input);
+    if (isXRPLTokenAddressFormat(input.tokenAddress)) {
       try {
-        // the tokenAddress for xrpl is in the format of "CURRENCY:ISSUER"
-        const [currency, issuer] = input.tokenAddress.split(".");
-        if (!currency || !issuer) {
-          throw new TRPCError({
+        return await getXRPLAccountBalance(input.owner, input.tokenAddress);
+      }
+      catch (error) {
+        throw new TRPCError({
             code: "BAD_REQUEST",
-            message: `Invalid tokenAddress format for XRPL. Expected format is CURRENCY:ISSUER`,
-          });
-        }
-        console.log("Connecting now", input);
-
-        const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-        await client.connect();
-
-        console.log("Requesting now", input);
-
-        const response = await client.request({
-          command: "account_lines",
-          account: input.owner,
+            message: error instanceof Error ? error.message : String(error),
         });
-
-        console.log("Response is", response);
-
-        await client.disconnect();
-        console.log("Result is:", response.result);
-
-        // Find the line that matches the token
-        const line = response.result.lines.find(
-          (l) => l.currency === currency && l.account === issuer
-        );
-
-        console.log("Line is", line);
-
-        return {
-          isTokenOwner: false,
-          isTokenMinter: false,
-          tokenBalance: line ? line.balance : "0",
-          decimals: 15, // TODO: fetch actual decimals
-          isTokenPendingOwner: false,
-          hasPendingOwner: false,
-          hasMinterRole: false,
-          hasOperatorRole: false,
-          hasFlowLimiterRole: false,
-        };
-      } catch (_) {
-        return {
-          isTokenOwner: false,
-          isTokenMinter: false,
-          tokenBalance: "0",
-          decimals: 0,
-          isTokenPendingOwner: false,
-          hasPendingOwner: false,
-          hasMinterRole: false,
-          hasOperatorRole: false,
-          hasFlowLimiterRole: false,
-        };
       }
     }
 

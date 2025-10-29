@@ -1,40 +1,52 @@
 import type { Context } from "~/server/context";
-import { getXRPLChainConfig, hex, parseTokenAmount } from "./utils";
+import { getXRPLChainConfig, hex, parseTokenAmount, parseTokenGasValue } from "./utils";
 
 import {
   type InterchainTransferInput,
 } from "./types";
 
 import * as xrpl from "xrpl";
+import { autofillXRPLTx } from "~/lib/utils/xrpl";
+import { TRPCError } from "@trpc/server";
 
 export async function buildInterchainTransferTxBytes(
   ctx: Context,
   input: InterchainTransferInput
 ): Promise<{ txBase64: string }> {
-    console.log(ctx);
+    if (BigInt(input.amount) <= 0) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Input must be positive",
+      });
+    }
+    if (BigInt(input.gasValue) < 0) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Input must be non-negative",
+      });
+    }
 
     const xrplChainConfig = await getXRPLChainConfig(ctx);
-
-    const client = new xrpl.Client(xrplChainConfig.config.rpc[0]);
-    await client.connect();
+    const amountToTransfer = BigInt(input.amount) + BigInt(input.gasValue);
+    const gasFeeAmount = parseTokenGasValue(input.tokenAddress, input.gasValue);
+    const amount = parseTokenAmount(input.tokenAddress, amountToTransfer.toString());
 
     const tx: xrpl.Payment = {
         TransactionType: "Payment",
         Account: input.caller,
-        Destination: xrplChainConfig.config.contracts.InterchainTokenService as any, // TODO: fix
-        Amount: parseTokenAmount(input.tokenAddress, input.amount),
+        // @ts-expect-error - contracts is not a property of ChainConfig
+        Destination: xrplChainConfig.config.contracts.InterchainTokenService.address,
+        Amount: amount,
         Memos: [
             { Memo: { MemoType: hex("type"), MemoData: hex("interchain_transfer") } },
             { Memo: { MemoType: hex("destination_address"), MemoData: hex(input.destinationAddress.replace(/^0x/, "")) } },
             { Memo: { MemoType: hex("destination_chain"), MemoData: hex(input.destinationChain) } },
-            { Memo: { MemoType: hex("gas_fee_amount"), MemoData: hex(input.gasValue) } },
+            { Memo: { MemoType: hex("gas_fee_amount"), MemoData: hex(gasFeeAmount) } },
         ]
     };
 
     // Fill in missing fields (Fee, Sequence, LastLedgerSequence, etc.)
-    const prepared = await client.autofill(tx);
-
-    console.log("Prepared XRPL transaction:", prepared);
+    const prepared = await autofillXRPLTx(tx);
 
     const txBase64 = xrpl.encode(prepared);
     return { txBase64 };

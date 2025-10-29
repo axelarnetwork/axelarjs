@@ -1,9 +1,10 @@
 import { useWallet, useSignAndSubmitTransaction } from "@xrpl-wallet-standard/react";
 import { useMutation } from "@tanstack/react-query";
 import * as xrpl from "xrpl";
+import { toast } from "@axelarjs/ui/toaster";
 
 import { trpc } from "~/lib/trpc";
-import { xrplChainConfig } from "~/config/chains";
+import { autofillAndSimulateXRPLTx, XRPL_NETWORK_IDENTIFIER } from "~/lib/utils/xrpl";
 
 export interface XRPLInterchainTransferParams {
     caller: string;
@@ -20,12 +21,8 @@ export interface XRPLInterchainTransferParams {
 }
 
 export function useXRPLInterchainTransfer() {
-    const { wallet, status } = useWallet();
+    const { wallet } = useWallet();
     const signAndSubmit = useSignAndSubmitTransaction();
-    
-
-    // TODO: check status?
-    console.log("wallet:", wallet, "status:", status);
 
     const buildTx = trpc.xrpl.getInterchainTransferTxBytes.useMutation();
 
@@ -48,33 +45,30 @@ export function useXRPLInterchainTransfer() {
 
             const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type
 
-            console.log("Decoded tx:", tx);
-
-            const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-            await client.connect();
-            
             let preparedTx;
             try {
-                preparedTx = await client.autofill(tx);
-                const sim = await client.simulate(preparedTx);
-
-                console.log("Simulation result:", sim);
+                preparedTx = await autofillAndSimulateXRPLTx(tx);
             }
             catch (error) {
+                const message = error instanceof Error ? error.message : String(error);
+                
+                toast.error(`Error during XRPL transaction simulation: ${message}`);
                 console.error("Error during XRPL transaction simulation:", error);
                 throw error;
             }
 
             try {
-                const result = await signAndSubmit(preparedTx, `xrpl:${process.env.NEXT_PUBLIC_NETWORK_ENV === 'mainnet' ? '0' : process.env.NEXT_PUBLIC_NETWORK_ENV === 'devnet-amplifier' ? '2' : '1'}`);
+                const result = await signAndSubmit(preparedTx, XRPL_NETWORK_IDENTIFIER); // TODO: refactor type?
                 const txHash = result.tx_hash;
-                console.log("Submitted transaction successfully:", txHash);
                 params.onStatusUpdate?.({ type: "sending", txHash: txHash });
 
                 return { txHash };
             }
             catch (error) {
-                console.error("Error during XRPL transaction signing/submission:", error);
+                const message = error instanceof Error ? error.message : String(error);
+
+                toast.error(`Error during XRPL transaction signing/submission: ${message}`);
+                console.error("Error during XRPL transaction signing/submission", error);
                 throw error;
             }
         },

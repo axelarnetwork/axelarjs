@@ -1,11 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
-import {
-  useConnect as useXRPLConnect,
-  useWallet as useXRPLWallet,
-} from "@xrpl-wallet-standard/react";
-import * as xrpl from "xrpl";
+import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {
@@ -20,6 +16,7 @@ import {
 } from "~/config/chains/vm-chains";
 import { STELLAR_HORIZON_URL } from "~/server/routers/stellar/utils/config";
 import { useAccount } from "./useAccount";
+import { fetchXRPLBalance } from "../utils/xrpl";
 
 // Define a type for the balance result
 interface BalanceResult {
@@ -35,7 +32,7 @@ export function useBalance(): BalanceResult | undefined {
   const { address, chainName } = useAccount();
   const [stellarBalance, setStellarBalance] = useState<string | null>(null);
   const { wallet: xrplWallet } = useXRPLWallet();
-  const [XRPLDrops, setXRPLDrops] = useState<number | null>(null);
+  const [XRPLDrops, setXRPLDrops] = useState<string | null>(null);
 
   // Wagmi balance hook
   const { data: wagmiBalance } = useWagmiBalance({
@@ -68,29 +65,13 @@ export function useBalance(): BalanceResult | undefined {
   }, [chainName, address]);
 
   useEffect(() => {
-    console.log("Running XRPL get balance effect:", chainName, xrplChainConfig.name, address, xrplWallet);
-
     if (chainName === xrplChainConfig.name && address && xrplWallet?.accounts.length) { // TODO: fix XRPL connection check
-      const fetchXRPLBalance = async () => {
-        const client = new xrpl.Client(xrplChainConfig.rpcUrls.default.http[0]);
-        await client.connect();
-
-        try {
-          const accountInfo = await client.request({
-            command: "account_info",
-            account: address,
-          });
-          // Balance is returned in drops (1 XRP = 1,000,000 drops)
-          const drops = parseInt(accountInfo.result.account_data.Balance);
-          setXRPLDrops(drops);
-          console.log("Fetched XRPL balance in drops:", drops);
-        } finally {
-          client.disconnect();
-        }
-      }
-      fetchXRPLBalance();
+      void (async () => {
+        const drops = await fetchXRPLBalance(address);
+        setXRPLDrops(drops);
+      })();
     }
-  }, [chainName, address])
+  }, [chainName, address, xrplWallet?.accounts.length]);
 
   const balance = useMemo(() => {
     if (wagmiBalance) {
@@ -118,11 +99,7 @@ export function useBalance(): BalanceResult | undefined {
     }
     if (XRPLDrops) {
       const value = BigInt(XRPLDrops);
-      const { decimals, symbol } = (
-        xrplChainConfig ?? {
-          nativeCurrency: { decimals: 6, symbol: "XRP" },
-        }
-      ).nativeCurrency as { decimals: number; symbol: string };
+      const { decimals, symbol } = xrplChainConfig.nativeCurrency;
       return {
         value,
         formatted: formatUnits(value, decimals),
