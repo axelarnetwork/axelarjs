@@ -65,6 +65,7 @@
     "@xrpl-wallet-adapter/base": "^0.1.4",
     "@xrpl-wallet-adapter/crossmark": "^0.1.4",
     "@xrpl-wallet-adapter/ledger": "^0.1.0",
+    "@xrpl-wallet-adapter/metamask": "^0.1.2",
     "@xrpl-wallet-adapter/walletconnect": "^0.2.0",
     "@xrpl-wallet-adapter/xaman": "^0.1.4",
     "@xrpl-wallet-standard/app": "0.1.4",

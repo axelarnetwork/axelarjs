@@ -4,6 +4,7 @@ import { type XRPLBaseWallet } from "@xrpl-wallet-adapter/base";
 import { CrossmarkWallet } from "@xrpl-wallet-adapter/crossmark";
 import { WalletConnectWallet } from "@xrpl-wallet-adapter/walletconnect";
 import { XamanWallet } from "@xrpl-wallet-adapter/xaman";
+import { MetaMaskWallet} from "@xrpl-wallet-adapter/metamask";
 import { WalletProvider as StandardWalletProvider } from "@xrpl-wallet-standard/react";
 
 import { xrplChainConfig } from "~/config/chains";
@@ -15,7 +16,7 @@ export const XrplWalletProvider: FC<PropsWithChildren> = ({ children }) => {
       return [] as Array<XRPLBaseWallet>;
     }
 
-    const availableWallets: Array<XRPLBaseWallet> = [new CrossmarkWallet()];
+    const availableWallets: Array<XRPLBaseWallet> = [new CrossmarkWallet(), new MetaMaskWallet()];
 
     const walletConnectProjectId =
       process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
