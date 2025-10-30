@@ -56,6 +56,8 @@ import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
 
 export const HEDERA_CHAIN_ID =
   NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 295 : 296;
+export const HEDERA_WALLET_RPC =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "https://mainnet.hashio.io/api" : "https://testnet.hashio.io/api";
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",

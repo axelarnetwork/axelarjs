@@ -11,7 +11,7 @@ import { isBrowser, setAllowed } from "@stellar/freighter-api";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
-import { suiChainConfig } from "~/config/chains";
+import { HEDERA_CHAIN_ID, HEDERA_WALLET_RPC, suiChainConfig } from "~/config/chains";
 import { stellarChainConfig } from "~/config/chains/vm-chains";
 import { setStellarConnectionState } from "../utils/stellar";
 import { isValidEVMAddress } from "../utils/validation";
@@ -36,7 +36,7 @@ export function useConnectWallet() {
       isValidEVMAddress(sessionData?.address) &&
       pendingChainId
     ) {
-      switchChainWagmi({ chainId: pendingChainId });
+      switchChainWagmi({ chainId: pendingChainId, addEthereumChainParameter: pendingChainId === HEDERA_CHAIN_ID ? {rpcUrls: [HEDERA_WALLET_RPC]} : undefined });
       setPendingChainId(null);
     }
   }, [sessionData, pendingChainId, switchChainWagmi, setPendingChainId]);
