@@ -117,7 +117,7 @@ importers:
         specifier: ^1.6.1
         version: 1.9.5(@solana/sysvars@2.3.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2))(@stellar/stellar-base@13.1.0)(@stellar/stellar-sdk@13.3.0)(@trezor/connect@9.6.2(@solana/sysvars@2.3.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2))(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(tslib@2.8.1)(typescript@5.9.2)(utf-8-validate@6.0.3)(ws@8.18.3(bufferutil@4.0.8)(utf-8-validate@6.0.3)))(@types/react@18.2.21)(@vercel/kv@1.0.1)(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(near-api-js@5.1.1)(react@18.3.1)(tslib@2.8.1)(typescript@5.9.2)(utf-8-validate@6.0.3)(ws@8.18.3(bufferutil@4.0.8)(utf-8-validate@6.0.3))
       '@hookform/resolvers':
-        specifier: 3.9.1
+        specifier: ^3.3.4
         version: 3.9.1(react-hook-form@7.63.0(react@18.3.1))
       '@mysten/bcs':
         specifier: ^1.1.0
@@ -276,7 +276,7 @@ importers:
         specifier: ^4.4.2
         version: 4.4.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       zod:
-        specifier: 3.24.1
+        specifier: ^3.22.4
         version: 3.24.1
     devDependencies:
       '@babel/core':
