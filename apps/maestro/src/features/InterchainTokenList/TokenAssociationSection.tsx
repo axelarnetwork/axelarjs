@@ -210,7 +210,8 @@ export const TokenAssociationSection: FC<TokenAssociationSectionProps> = (
             disabled={
               active.isSubmitting ||
               isBlockedByBalance ||
-              isBlockedByUnknownBalance
+              isBlockedByUnknownBalance ||
+              props.tokenAddress === "XRP" // cannot disassociate from XRP
             }
             tabIndex={active.isSubmitting ? -1 : 0}
             onClick={async (e) => {

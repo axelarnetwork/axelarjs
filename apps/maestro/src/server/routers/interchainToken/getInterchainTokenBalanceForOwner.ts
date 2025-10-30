@@ -69,6 +69,17 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
+    const emptyObject = {
+      decimals: 0,
+      isTokenOwner: false,
+      isTokenMinter: false,
+      tokenBalance: "0",
+      isTokenPendingOwner: false,
+      hasPendingOwner: false,
+      hasMinterRole: false,
+      hasOperatorRole: false,
+      hasFlowLimiterRole: false,
+    };
     // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
     // To check sui for example, they need to connect with a sui wallet
     let isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
@@ -79,17 +90,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       isIncompatibleChain = !isXRPLTokenAddressFormat(input.tokenAddress);
     }
     if (isIncompatibleChain) {
-      return {
-        isTokenOwner: false,
-        isTokenMinter: false,
-        tokenBalance: "0",
-        decimals: 0,
-        isTokenPendingOwner: false,
-        hasPendingOwner: false,
-        hasMinterRole: false,
-        hasOperatorRole: false,
-        hasFlowLimiterRole: false,
-      };
+      return emptyObject;
     }
     // Sui coin type is in the format of packageId::module::MODULE
     if (input.tokenAddress?.includes(":")) {
@@ -206,17 +207,7 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           `[Stellar] Error in token balance retrieval for ${input.tokenAddress}:`,
           error
         );
-        return {
-          decimals: 0,
-          isTokenOwner: false,
-          isTokenMinter: false,
-          tokenBalance: "0",
-          isTokenPendingOwner: false,
-          hasPendingOwner: false,
-          hasMinterRole: false,
-          hasOperatorRole: false,
-          hasFlowLimiterRole: false,
-        };
+        return emptyObject;
       }
     }
 
@@ -225,9 +216,13 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         return await getXRPLAccountBalance(input.owner, input.tokenAddress);
       }
       catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        if (errorMsg.includes("Account not found")) {
+          return emptyObject; // an account that is not activated does not have a balance
+        }
         throw new TRPCError({
             code: "BAD_REQUEST",
-            message: error instanceof Error ? error.message : String(error),
+            message: errorMsg,
         });
       }
     }

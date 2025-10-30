@@ -67,8 +67,16 @@ export function useBalance(): BalanceResult | undefined {
   useEffect(() => {
     if (chainName === xrplChainConfig.name && address && xrplWallet?.accounts.length) { // TODO: fix XRPL connection check
       void (async () => {
-        const drops = await fetchXRPLBalance(address);
-        setXRPLDrops(drops);
+        let drops = "0";
+        try {
+          drops = await fetchXRPLBalance(address);
+        }
+        catch (error) {
+          // ignore
+        }
+        finally {
+          setXRPLDrops(drops);
+        }
       })();
     }
   }, [chainName, address, xrplWallet?.accounts.length]);

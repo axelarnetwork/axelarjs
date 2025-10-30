@@ -118,9 +118,14 @@ export function useXRPLTrustLine(
     () => trustLineData?.hasTrustLine ?? null,
     [trustLineData]
   );
+  const isEnabledOnXRPL = useMemo(
+    () => trustLineData?.isEnabled ?? false,
+    [trustLineData]
+  );
 
   return {
     hasXRPLTrustLine,
+    isEnabledOnXRPL,
     isCheckingXRPLTrustLine,
     hasTrustLineError,
     createXRPLTrustLine,

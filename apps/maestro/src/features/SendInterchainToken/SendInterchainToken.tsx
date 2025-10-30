@@ -102,6 +102,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const isDestinationXRPL = state.selectedToChain?.chain_id === XRPL_CHAIN_ID;
   const {
     hasXRPLTrustLine: hasDestinationXRPLTrustLine,
+    isEnabledOnXRPL: isDestinationEnabledOnXRPL, 
     isCheckingXRPLTrustLine: isCheckingDestinationXRPLTrustLine,
     hasTrustLineError: hasDestinationXRPLTrustLineError,
   } = useXRPLTrustLine(state.destinationTokenAddress, {
@@ -177,6 +178,13 @@ export const SendInterchainToken: FC<Props> = (props) => {
       if (!hasDestinationXRPLTrustLine) {
         toast.error(
           "The destination XRPL account is invalid or is missing the trust line for this token."
+        );
+        return;
+      }
+      // if we are transferring XRP and the destination account is disabled, we need to make sure that at least 1 XRP is transferred 
+      if(!isDestinationEnabledOnXRPL && state.tokenSymbol === "XRP" && Number(data.amountToTransfer) < 1) {
+        toast.error(
+          "The destination XRPL account is not enabled, so it is necessary to transfer at least 1 XRP."
         );
         return;
       }

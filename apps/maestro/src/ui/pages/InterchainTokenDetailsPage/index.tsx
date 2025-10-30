@@ -11,7 +11,6 @@ import ConnectedInterchainTokensPage from "./ConnectedInterchainTokensPage";
 import TokenDetailsSection from "./TokenDetailsSection";
 
 const InterchainTokensPage: FC = () => {
-  console.log("Got query", useRouter().query);
   const { tokenAddress } = useRouter().query as {
     chainName: string;
     tokenAddress: `0x${string}`;
