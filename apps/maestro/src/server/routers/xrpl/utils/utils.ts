@@ -4,6 +4,7 @@ import { xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import type { Context } from "~/server/context";
 import Decimal from "decimal.js";
+import { XRPL_TOKEN_DECIMALS } from "~/lib/utils/xrpl";
 
 const isXRPLChainConfig = (c: unknown): c is ChainConfig => {
   return (c as { chainType?: string })?.chainType === "xrpl";
@@ -74,13 +75,13 @@ export function parseTokenAmount(token: string, amountInDrops: string) {
   } else {
     const { currency, issuer } = parsedToken;
     // assert: amount != "0"
-    // the token has 15 decimals -> add a decimal point between the 14th and the 15th from the right
-    const amount = Decimal(amountInDrops).times(1e-15);
+    // the token has 15 significant digits (safe to round, because the RPC itself has no better precision)
+    const amount = Decimal(amountInDrops).times(Decimal(0.1).pow(XRPL_TOKEN_DECIMALS)).toNumber();
 
     parsedAmount = {
       currency,
       issuer,
-      value: amount.toFixed(15).replace(/0+$/, "").replace(/\.$/, ""), // TODO: just cast to float, and loose precision which is acceptable and required
+      value: amount.toString(),
     };
   }
 
@@ -91,11 +92,7 @@ export function parseTokenGasValue(token: string, amount: string) {
   if (token === "XRP") {
     return amount;
   } else {
-    return Decimal(amount)
-      .times(1e-15)
-      .toFixed(15)
-      .replace(/0+$/, "")
-      .replace(/\.$/, ""); // TODO: cannot cast to float, but if resulting number has too many digits, remove them from the right
+    return Decimal(amount).times(Decimal(0.1).pow(XRPL_TOKEN_DECIMALS)).toNumber().toString();
   }
 }
 

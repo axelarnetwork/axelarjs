@@ -12,7 +12,7 @@ import { TRPCError } from "@trpc/server";
 export async function buildInterchainTransferTxBytes(
   ctx: Context,
   input: InterchainTransferInput
-): Promise<{ txBase64: string }> {
+): Promise<{ txHex: string }> {
     if (BigInt(input.amount) <= 0) {
       throw new TRPCError({
         code: "BAD_REQUEST",
@@ -48,6 +48,6 @@ export async function buildInterchainTransferTxBytes(
     // Fill in missing fields (Fee, Sequence, LastLedgerSequence, etc.)
     const prepared = await autofillXRPLTx(tx);
 
-    const txBase64 = xrpl.encode(prepared);
-    return { txBase64 };
+    const txHex = xrpl.encode(prepared);
+    return { txHex };
 }

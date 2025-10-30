@@ -1,8 +1,9 @@
 import { xrplChainConfig } from "~/config/chains";
 import { scaleDecimals } from "./gas";
 import * as xrpl from "xrpl";
-import Decimal from "decimal.js";
 import type { XRPLIdentifierString } from "@xrpl-wallet-standard/app";
+
+export const XRPL_TOKEN_DECIMALS = 15;
 
 export const xrplScaleGas = (
     isNativeSymbol: boolean,
@@ -128,13 +129,12 @@ export const getXRPLAccountBalance = async (accountAddress: string, tokenAddress
         (l: { currency: string; account: string; }) => l.currency === currency && l.account === issuer
     );
 
-    const XRPL_TOKEN_DECIMALS = 15;
-    const actualBalance = line ? Decimal(line.balance).times(new Decimal(10).pow(XRPL_TOKEN_DECIMALS)).toFixed(0) : "0";
+    const actualBalance = line ? BigInt(Number(line.balance) * (10 ** XRPL_TOKEN_DECIMALS)) : 0; // the RPC returns a float
 
     return {
         isTokenOwner: false,
         isTokenMinter: false,
-        tokenBalance: line ? actualBalance.toString() : "0",
+        tokenBalance: actualBalance.toString(),
         decimals: XRPL_TOKEN_DECIMALS,
         isTokenPendingOwner: false,
         hasPendingOwner: false,

@@ -12,9 +12,9 @@ import { getSignInMessage } from "~/server/routers/auth/createSignInMessage";
 import MaestroKVClient, { AccountStatus } from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres/MaestroPostgresClient";
 
-// TODO-XRPL: Restrict to only necessary imports
 import * as xrpl from "xrpl"
 import * as binary from "ripple-binary-codec"
+import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 
 export type Web3Session = {
   address: string;
@@ -121,7 +121,7 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
             console.error("Failed to verify Stellar signature:", error);
           }
         }
-        else if (address.startsWith("r")) {
+        else if (isValidXRPLWalletAddress(address)) {
           // xrpl address
 
           // Check if the credentials that we received is a transaction that was created just like in the frontend
@@ -133,14 +133,12 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           if (
             !tx.Memos || !Array.isArray(tx.Memos) || tx.Memos.length === 0
           ) {
-            console.warn("No memos found in the transaction");
             return null;
           }
           
           const signerPublicKey = tx.SigningPubKey;
           if (typeof signerPublicKey !== "string")
             return null;
-          console.warn("Signer public key from transaction:", signerPublicKey);
           if (!tx.Memos[0])
             return null;
           if (typeof tx.Memos[0] !== "object" || !("Memo" in tx.Memos[0]))
@@ -156,7 +154,6 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
             (memoData === message) // require that the memo matches the challenge (we don't care about the other data)
             && (xrpl.verifySignature(encodedTx, signerPublicKey)) // AND that the signature is valid
             && (xrpl.deriveAddress(signerPublicKey) === address); // AND that the public key matches the address
-          console.log("isMessageSigned:", isMessageSigned);
         }
 
         if (!isMessageSigned) {

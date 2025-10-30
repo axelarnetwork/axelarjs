@@ -33,7 +33,7 @@ export function useXRPLInterchainTransfer() {
             }
             params.onStatusUpdate?.({ type: "pending_approval" });
 
-            const { txBase64 } = await buildTx.mutateAsync({
+            const { txHex } = await buildTx.mutateAsync({
                 caller: params.caller,
                 tokenId: params.tokenId,
                 tokenAddress: params.tokenAddress,
@@ -43,7 +43,11 @@ export function useXRPLInterchainTransfer() {
                 gasValue: params.gasValue ?? "0",
             });
 
-            const tx = xrpl.decode(txBase64) as xrpl.Payment; // todo: check for proper type
+            const decoded = xrpl.decode(txHex);
+            if (decoded.TransactionType !== "Payment") {
+                throw Error("Failed to decode XRPL Payment transaction");
+            }
+            const tx = decoded as xrpl.Payment;
 
             let preparedTx;
             try {
@@ -58,7 +62,7 @@ export function useXRPLInterchainTransfer() {
             }
 
             try {
-                const result = await signAndSubmit(preparedTx, XRPL_NETWORK_IDENTIFIER); // TODO: refactor type?
+                const result = await signAndSubmit(preparedTx, XRPL_NETWORK_IDENTIFIER);
                 const txHash = result.tx_hash;
                 params.onStatusUpdate?.({ type: "sending", txHash: txHash });
 

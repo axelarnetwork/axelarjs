@@ -33,10 +33,9 @@ export function useChainId(): number {
       return SUI_CHAIN_ID;
     }
 
-    // Check if XRPL wallet is connected // TODO: why?
     if (
       XRPLWallet.status === "connected" &&
-      (XRPLWallet.wallet?.accounts.length ?? -1 > 0)
+      XRPLWallet.wallet?.accounts.length
     ) {
       return XRPL_CHAIN_ID;
     }

@@ -66,7 +66,6 @@ export function useXRPLTrustLine(
     { tokenAddress: string }
   >({
     mutationFn: async ({ tokenAddress }) => {
-      // TODO: use client send utility after transfers PR is merged
       if (!wallet || !accountAddressToCheck)
         throw new Error("XRPL wallet not connected");
       const { txBase64 } = await buildTx.mutateAsync({
