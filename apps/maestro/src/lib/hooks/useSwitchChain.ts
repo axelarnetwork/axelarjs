@@ -1,6 +1,10 @@
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
-import { HEDERA_CHAIN_ID, HEDERA_WALLET_RPC, stellarChainConfig, suiChainConfig } from "~/config/chains";
+import {
+  getSwitchChainEthParamWithRpc,
+  stellarChainConfig,
+  suiChainConfig,
+} from "~/config/chains";
 import { useChainId, useDisconnect } from "~/lib/hooks";
 import useConnectWallet from "./useConnectWallet";
 
@@ -22,7 +26,10 @@ export function useSwitchChain() {
         !isCurrentChainStellar &&
         !isTargetChainStellar;
       if (evmToEvm) {
-        switchChainWagmi({ chainId, addEthereumChainParameter: chainId === HEDERA_CHAIN_ID ? {rpcUrls: [HEDERA_WALLET_RPC]} : undefined });
+        switchChainWagmi({
+          chainId,
+          addEthereumChainParameter: getSwitchChainEthParamWithRpc(chainId),
+        });
       } else if (chainId) {
         disconnect();
         connectWallet({ chainId });
