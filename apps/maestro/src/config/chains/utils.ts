@@ -65,7 +65,7 @@ const createServerRpcUrlConfig = (
   const serverOnlyUrls: string[] = [];
 
   // parse server-only URLs from environment variables
-  const envKey = `RPC_${chainId}_${environment}` as const;
+  const envKey = `RPC_${chainId.replace(/-/g, "_")}_${environment}` as const;
   const envValue = process.env[envKey];
   if (envValue) {
     serverOnlyUrls.push(envValue);
