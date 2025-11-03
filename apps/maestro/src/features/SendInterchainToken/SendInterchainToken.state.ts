@@ -145,10 +145,6 @@ export function useSendInterchainTokenState(props: {
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
     gasMultiplier: "auto",
   });
-  // TODO: Remove custom overrides before merging to main. For testing purposes, this is left here intentionally. 
-  if (tokenDetails?.symbol === "FOO" && isXRPLChain && process.env.NEXT_PUBLIC_NETWORK_ENV === "testnet") {
-    gas = 1_001_002_003_004_005_006n;
-  }
 
   let gasFeeDecimals =
           CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
