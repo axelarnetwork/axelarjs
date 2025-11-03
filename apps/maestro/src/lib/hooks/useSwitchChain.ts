@@ -1,6 +1,7 @@
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
 import { 
+  getSwitchChainEthParamWithRpc,
   stellarChainConfig, 
   suiChainConfig,
   xrplChainConfig,
@@ -31,7 +32,10 @@ export function useSwitchChain() {
         !isCurrentChainXRPL &&
         !isTargetChainXRPL;
       if (evmToEvm) {
-        switchChainWagmi({ chainId });
+        switchChainWagmi({
+          chainId,
+          addEthereumChainParameter: getSwitchChainEthParamWithRpc(chainId),
+        });
       } else if (chainId) {
         disconnect();
         connectWallet({ chainId });

@@ -12,7 +12,7 @@ import { isBrowser, setAllowed } from "@stellar/freighter-api";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
-import { suiChainConfig } from "~/config/chains";
+import { getSwitchChainEthParamWithRpc, suiChainConfig } from "~/config/chains";
 import { 
   stellarChainConfig,
   xrplChainConfig,
@@ -42,7 +42,11 @@ export function useConnectWallet() {
       isValidEVMAddress(sessionData?.address) &&
       pendingChainId
     ) {
-      switchChainWagmi({ chainId: pendingChainId });
+      switchChainWagmi({
+        chainId: pendingChainId,
+        addEthereumChainParameter:
+          getSwitchChainEthParamWithRpc(pendingChainId),
+      });
       setPendingChainId(null);
     }
   }, [sessionData, pendingChainId, switchChainWagmi, setPendingChainId]);

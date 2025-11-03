@@ -1,6 +1,8 @@
-import { Chain } from "viem/chains";
+import { Chain, hedera, hederaTestnet } from "viem/chains";
 
+import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import { CUSTOM_RPC_NODES } from "./custom-rpc-nodes";
+import { HEDERA_CHAIN_ID } from "./evm-chains";
 
 export interface ExtendedWagmiChainConfig extends Chain {
   axelarChainId: string;
@@ -8,6 +10,24 @@ export interface ExtendedWagmiChainConfig extends Chain {
   supportWagmi: boolean;
   environment: "mainnet" | "testnet" | "devnet-amplifier";
 }
+
+/**
+ * Function which returns the Ethereum chain parameter for the switchChain function.
+ * It handles chain-specific overrides for the RPC URL.
+ */
+export const getSwitchChainEthParamWithRpc = (chainId: number) => {
+  if (chainId === HEDERA_CHAIN_ID) {
+    // Hedera uses a private RPC for the calls within the app, which is origin-restricted
+    // However, the wallet needs to use a public RPC to connect to the chain
+    const rpcUrl =
+      NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+        ? hedera.rpcUrls.default.http[0]
+        : hederaTestnet.rpcUrls.default.http[0];
+    return { rpcUrls: [rpcUrl] };
+  }
+
+  return undefined;
+};
 
 const createClientRpcUrlConfig = (
   chainIdOrChain: string | Chain,
