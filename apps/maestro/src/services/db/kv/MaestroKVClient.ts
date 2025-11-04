@@ -1,8 +1,11 @@
 import type { VercelKV } from "@vercel/kv";
 import { z } from "zod";
 
+import { logger } from "~/lib/logger";
+
 export const COLLECTIONS = {
   accounts: "accounts",
+  ofac: "ofac",
 } as const;
 
 /**
@@ -23,6 +26,9 @@ export const COLLECTION_KEYS = {
     `messages:${accountAddress}` as const,
   tokenMeta: (tokenId: string) => `tokens:${tokenId}:meta` as const,
   cached: (key: string) => `cached:${key}` as const,
+  // OFAC Sanctions keys
+  ofacSanctionsWallets: "sanctions:wallets" as const,
+  ofacSanctionsLastUpdate: "sanctions:lastUpdate" as const,
 };
 
 export const messageSchema = z.object({
@@ -134,5 +140,90 @@ export default class MaestroKVClient extends BaseMaestroKVClient {
   async getTokenMeta(tokenId: string) {
     const key = COLLECTION_KEYS.tokenMeta(tokenId);
     return await this.kv.hgetall<TokenMeta>(key);
+  }
+
+  // OFAC Sanctions Methods
+  async isWalletSanctioned(walletAddress: string): Promise<boolean> {
+    return (
+      (await this.kv.sismember(
+        COLLECTION_KEYS.ofacSanctionsWallets,
+        walletAddress.toLowerCase()
+      )) === 1
+    );
+  }
+
+  async setSanctionedWallets(walletAddresses: string[]): Promise<void> {
+    const key = COLLECTION_KEYS.ofacSanctionsWallets;
+
+    const normalizedAddresses = walletAddresses.map((addr) =>
+      addr.toLowerCase()
+    );
+
+    let existing: string[] = [];
+    try {
+      existing = await this.kv.smembers<string[]>(key);
+    } catch (error) {
+      logger.error("Failed to read existing sanctioned wallets from KV", error);
+      existing = [];
+    }
+
+    const existingSet = new Set(existing);
+    const newSet = new Set(normalizedAddresses);
+
+    const toAdd = normalizedAddresses.filter((addr) => !existingSet.has(addr));
+    const toRemove = existing.filter((addr) => !newSet.has(addr));
+
+    if (toAdd.length > 0) {
+      try {
+        await this.kv.sadd(key, ...toAdd);
+      } catch (error) {
+        // Adding failed: log and rethrow since this could create false negatives
+        logger.error("Failed adding new sanctioned wallets to KV", error);
+        throw error;
+      }
+    }
+
+    if (toRemove.length > 0) {
+      try {
+        await this.kv.srem(key, ...toRemove);
+      } catch (error) {
+        logger.warn("Failed removing stale sanctioned wallets from KV", error);
+      }
+    }
+  }
+
+  async getSanctionsLastUpdate(): Promise<string | null> {
+    const key = COLLECTION_KEYS.ofacSanctionsLastUpdate;
+    return await this.kv.get<string>(key);
+  }
+
+  async setSanctionsLastUpdate(timestamp: string): Promise<void> {
+    const key = COLLECTION_KEYS.ofacSanctionsLastUpdate;
+    await this.kv.set(key, timestamp);
+  }
+
+  async addSanctionedWallets(walletAddresses: string[]): Promise<void> {
+    const key = COLLECTION_KEYS.ofacSanctionsWallets;
+    if (walletAddresses.length > 0) {
+      const normalizedAddresses = walletAddresses.map((addr) =>
+        addr.toLowerCase()
+      );
+      await this.kv.sadd(key, ...normalizedAddresses);
+    }
+  }
+
+  async getSanctionedWalletsCount(): Promise<number> {
+    const key = COLLECTION_KEYS.ofacSanctionsWallets;
+    return await this.kv.scard(key);
+  }
+
+  async removeSanctionedWallets(walletAddresses: string[]): Promise<void> {
+    const key = COLLECTION_KEYS.ofacSanctionsWallets;
+    if (walletAddresses.length > 0) {
+      const normalizedAddresses = walletAddresses.map((addr) =>
+        addr.toLowerCase()
+      );
+      await this.kv.srem(key, ...normalizedAddresses);
+    }
   }
 }

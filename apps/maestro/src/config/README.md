@@ -4,7 +4,8 @@ This directory contains configuration files for the project, such as environment
 
 ## Overriding RPC Nodes for the server
 
-To override RPC nodes for server-side operations, update the corresponding environment variable following the pattern `RPC_{CHAIN_ID}_{ENVIRONMENT}`. For example:
+To override RPC nodes for server-side operations, update the corresponding environment variable following the pattern `RPC_{CHAIN_ID}_{ENVIRONMENT}`. Note that hyphens in chain IDs are automatically converted to underscores for valid environment variable names. For example:
 
-- `RPC_hedera_testnet` - Hedera testnet RPC URL
-- `RPC_ethereum_mainnet` - Ethereum mainnet RPC URL
+- `RPC_hedera_testnet` - hedera testnet RPC URL
+- `RPC_ethereum_mainnet` - ethereum mainnet RPC URL
+- `RPC_polygon_sepolia_testnet` - polygon-sepolia testnet RPC URL (note underscores instead of hyphens)
