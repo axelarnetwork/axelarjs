@@ -442,6 +442,12 @@ export const suiRouter = router({
         // Recipient of operatorship must have an existing Channel
         const recipientChannelId = (await getChannelId(recipientAddress, chainConfig)) as string;
 
+        if (!channelId || !recipientChannelId) {
+          throw new Error(
+            `Operator channel and recipient channel are required, got: ${{channelId, recipientChannelId}}`
+          );
+        }
+
         const recipientChannelAddress = await txBuilder.moveCall({
           target: `${AxelarGateway.address}::channel::to_address`,
           arguments: [recipientChannelId]
