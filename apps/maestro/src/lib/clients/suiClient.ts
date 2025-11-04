@@ -12,9 +12,9 @@ export const suiClient = new SuiClient({
 });
 
 const SUI_GRAPHQL_URLS = {
-  mainnet: "https://sui-mainnet.mystenlabs.com/graphql",
-  testnet: "https://sui-testnet.mystenlabs.com/graphql",
-  ["devnet-amplifier"]: "https://sui-testnet.mystenlabs.com/graphql",
+  mainnet: "https://graphql.mainnet.sui.io/graphql",
+  testnet: "https://graphql.testnet.sui.io/graphql",
+  ["devnet-amplifier"]: "https://graphql.devnet.sui.io/graphql",
 };
 
 export const suiGraphQLClient = new SuiGraphQLClient({
