@@ -444,7 +444,7 @@ export const suiRouter = router({
 
         if (!channelId || !recipientChannelId) {
           throw new Error(
-            `Operator channel and recipient channel are required, got: ${{channelId, recipientChannelId}}`
+            `Operator channel and recipient channel are required, got: ${JSON.stringify({channelId, recipientChannelId})}`
           );
         }
 
