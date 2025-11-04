@@ -107,6 +107,7 @@ export const useHandleSubmit = () => {
           rootActions.setTxState({
             type: "idle",
           });
+          actions.setIsDeploying(false);
           return;
         }
 
@@ -114,6 +115,7 @@ export const useHandleSubmit = () => {
         rootActions.setTxState({
           type: "idle",
         });
+        actions.setIsDeploying(false);
 
         return;
       });
@@ -146,6 +148,7 @@ export const useHandleSubmit = () => {
           rootActions.setTxState({
             type: "idle",
           });
+          actions.setIsDeploying(false);
         }
         return;
       }
@@ -171,17 +174,21 @@ export const useHandleSubmit = () => {
                 txType: "INTERCHAIN_DEPLOYMENT",
               });
             }
+            actions.setIsDeploying(false);
             return;
           } else {
             rootActions.setTxState({
               type: "idle",
             });
+            actions.setIsDeploying(false);
+            return;
           }
         } catch (e: any) {
           toast.error(e.message);
           rootActions.setTxState({
             type: "idle",
           });
+          actions.setIsDeploying(false);
         }
       }
 
@@ -251,6 +258,17 @@ export const useButtonChildren = ({
       return { children: "Check your wallet", status: "loading" };
     }
 
+    // After Sui success, txState is set to "deployed" but step advances after DB recording.
+    // Keep loading state until step transitions to "review".
+    if (rootState.txState.type === "deployed" && rootState.step < 2) {
+      return { children: "Finalizing deployment", status: "loading" };
+    }
+
+    // Keep loading state visible while deployment is in progress
+    if (state.isDeploying) {
+      return { children: "Deploying interchain token", status: "loading" };
+    }
+
     if (state.isEstimatingGasFees) {
       return { children: "Loading gas fees", status: "loading" };
     }
@@ -293,6 +311,7 @@ export const useButtonChildren = ({
   }, [
     isReady,
     rootState.txState,
+    rootState.step,
     state.isEstimatingGasFees,
     state.hasGasFeesEstimationError,
     state.totalGasFee,
@@ -300,5 +319,6 @@ export const useButtonChildren = ({
     validDestinationChainIds.length,
     sourceChain?.native_token.decimals,
     nativeTokenSymbol,
+    state.isDeploying,
   ]);
 };
