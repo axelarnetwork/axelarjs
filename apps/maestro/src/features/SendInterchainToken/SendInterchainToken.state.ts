@@ -2,7 +2,7 @@ import { INTERCHAIN_TOKEN_SERVICE_ENCODERS } from "@axelarjs/evm";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
-import { HEDERA_CHAIN_ID } from "~/config/chains";
+import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID, XRPL_EVM_CHAIN_ID } from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
@@ -24,6 +24,7 @@ import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
+import { xrplScaleGas } from "~/lib/utils/xrpl";
 
 // Chains that should force using Interchain Token Service path
 const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
@@ -31,6 +32,7 @@ const TOKEN_MANAGER_SPENDER_CHAINS = [HEDERA_CHAIN_ID];
 const CHAINS_GAS_FEE_DECIMALS = {
   [HEDERA_CHAIN_ID]: 18,
 };
+const CHAINS_PAYING_GAS_WITH_BRIDGED_TOKEN = [XRPL_CHAIN_ID];
 
 export function useSendInterchainTokenState(props: {
   tokenAddress: string;
@@ -74,9 +76,11 @@ export function useSendInterchainTokenState(props: {
     ]
   );
 
+  const XRPL_EVM_XRP_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
   const shouldUseTokenService =
     CHAINS_REQUIRING_TOKEN_SERVICE.includes(props.sourceChain.chain_id) ||
-    isApprovalRequired;
+    isApprovalRequired ||
+    (props.sourceChain.chain_id === XRPL_EVM_CHAIN_ID && props.tokenAddress === XRPL_EVM_XRP_ADDRESS);
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
@@ -118,19 +122,38 @@ export function useSendInterchainTokenState(props: {
   const balance = useBalance();
 
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
+  const isXRPLChain = props.sourceChain.chain_id == XRPL_CHAIN_ID;
 
-  const {
-    data: gas,
-    isLoading: isGasLoading,
-    isFetching: isGasFetching,
-  } = useEstimateGasFeeQuery({
+  const payWithToken = CHAINS_PAYING_GAS_WITH_BRIDGED_TOKEN.includes(props.sourceChain.chain_id);
+
+  let sourceChainTokenSymbol;
+  if (isXRPLChain) {
+    // on xrpl, we can only pay for gas with the token that is transferred
+    // we will need the "prettySymbol" value of that token though
+    sourceChainTokenSymbol = tokenSymbol;
+  } else {
+    // in all other cases, use the native token of the chain
+    sourceChainTokenSymbol = nativeTokenSymbol;
+  }
+
+  // eslint-disable-next-line prefer-const
+  let { data: gas, isLoading: isGasLoading, isFetching: isGasFetching } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
     destinationChainId: selectedToChain?.id,
-    sourceChainTokenSymbol: nativeTokenSymbol,
+    sourceChainTokenSymbol,
     gasLimit: NEXT_PUBLIC_INTERCHAIN_TRANSFER_GAS_LIMIT,
     executeData: NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
     gasMultiplier: "auto",
   });
+
+  let gasFeeDecimals =
+          CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
+          props.sourceChain.native_token.decimals;
+
+  if (isXRPLChain) {
+    // when XRPL is the source chain, we have to remap the return value of the estimate gas fee query to the "actual" decimals
+    ({gas, gasFeeDecimals} = xrplScaleGas(sourceChainTokenSymbol === nativeTokenSymbol, tokenDetails?.decimals, gas, gasFeeDecimals));
+  }
 
   // Compute spender address for approvals
   const { data: tokenManagerAddress } =
@@ -159,8 +182,11 @@ export function useSendInterchainTokenState(props: {
     if (!balance || !gas) {
       return false;
     }
+    if (payWithToken) {
+      return false; // don't check here
+    }
     return gas > balance.value;
-  }, [balance, gas]);
+  }, [balance, gas, payWithToken]);
 
   const {
     mutateAsync: interchainTransferAsync,
@@ -234,12 +260,11 @@ export function useSendInterchainTokenState(props: {
       selectedToChain,
       eligibleTargetChains,
       tokenSymbol,
+      payWithToken, // whether to pay with the bridged token or with the native token
+      gasRaw: gas, // the actual gas value, as a BigInt
       gasFee: Maybe.of(gas).mapOrUndefined((gasValue) => {
-        const decimals =
-          CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
-          props.sourceChain.native_token.decimals;
-        return toNumericString(gasValue, decimals);
-      }),
+        return toNumericString(gasValue, gasFeeDecimals);
+      }), // just for displaying the value
       nativeTokenSymbol,
       hasInsufficientGasBalance,
       estimatedWaitTimeInMinutes: Maybe.of(sourceChainInfo).mapOr(

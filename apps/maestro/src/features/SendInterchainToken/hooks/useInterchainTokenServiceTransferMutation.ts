@@ -21,6 +21,8 @@ import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { scaleGasValue } from "~/lib/utils/gas";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
+import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
+import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 const CHAINS_SCALED_GAS = [HEDERA_CHAIN_ID];
 
@@ -86,15 +88,24 @@ export function useInterchainTokenServiceTransferMutation(
 
         invariant(address, "need address");
 
+        let encodedRecipient: `0x${string}`;
+        if (!destinationAddress) {
+          encodedRecipient = address;
+        } else if (config.destinationChainName.toLowerCase().includes("stellar")) {
+          // Encode the recipient address for Stellar since it's a base64 string
+          encodedRecipient = encodeStellarAddressAsBytes(destinationAddress);
+        } else if (isXRPLChainName(config.destinationChainName)) {
+          // Encode the recipient address for XRPL
+          encodedRecipient = xrplEncodedRecipient(destinationAddress);
+        } else {
+          encodedRecipient = ((destinationAddress as `0x${string}`) ?? address);
+        }
+
         const txHash = await interchainTransferAsync({
           args: INTERCHAIN_TOKEN_SERVICE_ENCODERS.interchainTransfer.args({
             tokenId: config.tokenId,
             destinationChain: config.destinationChainName,
-            destinationAddress: config.destinationChainName
-              .toLowerCase()
-              .includes("stellar")
-              ? encodeStellarAddressAsBytes(destinationAddress)
-              : ((destinationAddress as `0x${string}`) ?? address),
+            destinationAddress: encodedRecipient,
             amount: approvedAmountRef.current,
             metadata: "0x",
             gasValue: shouldScaleGas

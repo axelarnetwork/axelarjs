@@ -22,7 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { APP_NAME } from "~/config/app";
-import { stellarChainConfig } from "~/config/chains/vm-chains";
+import { stellarChainConfig, xrplChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import Transactions from "~/features/Transactions/Transactions";
 import { useAccount, useDisconnect } from "~/lib/hooks";
@@ -46,7 +46,7 @@ const Appbar: FC<AppbarProps> = (props) => {
 
   const explorerUrl =
     address && chain?.blockExplorers?.default.url
-      ? `${chain.blockExplorers.default.url}/${chain.id === stellarChainConfig.id ? "account" : "address"}/${address}`
+      ? `${chain.blockExplorers.default.url}/${chain.id === stellarChainConfig.id ? "account" : (chain.id === xrplChainConfig.id ? "accounts" : "address")}/${address}`
       : null;
 
   const connectedAccountDetails = address ? (

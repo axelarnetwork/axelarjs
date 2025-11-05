@@ -129,3 +129,9 @@ export const STELLAR_RPC_URLS = {
   testnet: "https://soroban-testnet.stellar.org",
   mainnet: "https://mainnet.sorobanrpc.com",
 };
+
+export const XRPL_RPC_URLS = {
+  "devnet-amplifier": "https://s.altnet.rippletest.net:51234",
+  testnet: "https://s.altnet.rippletest.net:51234",
+  mainnet: "https://xrplcluster.com",
+};
