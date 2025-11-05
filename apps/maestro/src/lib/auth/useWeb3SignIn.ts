@@ -11,12 +11,14 @@ import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
 import { useMutation } from "@tanstack/react-query";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
-
+import { useSignTransaction as useXRPLSignTransaction, useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
 import { wagmiConfig } from "~/config/wagmi";
 import { useDisconnect } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "../trpc";
 import { setStellarConnectionState } from "../utils/stellar";
+
+import { XRPL_NETWORK_IDENTIFIER } from "../utils/xrpl";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
@@ -48,6 +50,8 @@ export function useWeb3SignIn({
   const { disconnect } = useDisconnect();
   const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
   const currentSuiAccount = useCurrentAccount();
+  const xrplSignTransaction = useXRPLSignTransaction();
+  const {wallet: xrplWallet, status: xrplConnectionStatus } = useXRPLWallet();
 
   const signInAddressRef = useRef<string | null>(null);
 
@@ -95,8 +99,29 @@ export function useWeb3SignIn({
           invariant(kit, "Stellar wallet kit not initialized");
           const result = await kit.signMessage(message);
           signature = result.signedMessage;
-        }
+        } else if (address.startsWith("r")) {
+          // XRPL
 
+          // things are more difficult for xrpl, since the wallet library does not allow to sign arbitrary messages
+          // we have to create a transaction, sign it and extract the signature from there
+          // at the same time, we must make sure that the transaction is not valid on the network
+          // therefore, we create a transaction that has LastLedgerSequence set to 0
+
+          const tx = {
+            TransactionType: "AccountSet",
+            Account: address,
+            Memos: [
+              { Memo: { MemoType: Buffer.from("auth-challenge").toString('hex'), MemoData: Buffer.from(message).toString('hex') } }
+            ],
+            // make it explicitly expired / un-submittable:
+            LastLedgerSequence: 0,
+            Sequence: 0,  // impossible sequence
+            Fee: "0"
+          };
+
+          const result = await xrplSignTransaction(tx, XRPL_NETWORK_IDENTIFIER);
+          signature = result.signed_tx_blob;
+        }
         const response = await signIn("credentials", {
           address,
           signature,
@@ -115,6 +140,7 @@ export function useWeb3SignIn({
 
         isSigningInRef.current = false;
       } catch (error) {
+        console.warn("Error signing in with web3", error);
         if (error instanceof Error) {
           disconnect();
           await signOut();
@@ -172,6 +198,36 @@ export function useWeb3SignIn({
     void signInWithWeb3Async(address);
   }, [
     currentSuiAccount,
+    sessionStatus,
+    session?.address,
+    enabled,
+    signInWithWeb3Async,
+  ]);
+
+  // Same check as above, but for XRPL
+  useEffect(() => {
+    if (
+      enabled === false ||
+      isSigningInRef.current ||
+      sessionStatus === "loading" ||
+      !xrplWallet?.accounts?.length
+    ) {
+      return;
+    }
+
+    const address = xrplWallet.accounts[0].address;
+    if (
+      session?.address === address ||
+      signInAddressRef.current === address
+    ) {
+      return;
+    }
+
+    void signInWithWeb3Async(address);
+  }, [
+    xrplWallet?.accounts?.length,
+    xrplWallet?.accounts,
+    xrplConnectionStatus,
     sessionStatus,
     session?.address,
     enabled,

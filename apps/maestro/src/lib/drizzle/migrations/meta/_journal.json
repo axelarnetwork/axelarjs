@@ -43,6 +43,13 @@
       "when": 1730926202479,
       "tag": "0005_abnormal_tombstone",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1760979446992,
+      "tag": "0006_lyrical_the_twelve",
+      "breakpoints": true
     }
   ]
 }

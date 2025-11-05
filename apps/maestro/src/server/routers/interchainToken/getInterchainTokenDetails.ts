@@ -89,7 +89,6 @@ export const getInterchainTokenDetails = publicProcedure
 
     // For Stellar tokens, we need to handle both symbol-issuer and contract address formats
     let tokenRecord = null;
-
     tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         axelarChainId,
@@ -170,6 +169,5 @@ export const getInterchainTokenDetails = publicProcedure
         message: `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`,
       });
     }
-
     return tokenRecord;
   });
