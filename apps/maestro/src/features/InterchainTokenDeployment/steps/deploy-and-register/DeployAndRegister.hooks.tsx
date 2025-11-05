@@ -132,6 +132,7 @@ export const useHandleSubmit = () => {
                 txType: "INTERCHAIN_DEPLOYMENT",
               });
             }
+            actions.setIsDeploying(false);
             return;
           } else {
             rootActions.setTxState({
@@ -192,12 +193,20 @@ export const useHandleSubmit = () => {
         }
       }
 
+      if (!txPromise) {
+        rootActions.setTxState({ type: "idle" });
+        actions.setIsDeploying(false);
+        return;
+      }
+
+      let didSucceed = false;
       await handleTransactionResult(txPromise as Promise<WriteContractData>, {
         onSuccess(txHash) {
           rootActions.setTxState({
             type: "deploying",
             txHash: txHash,
           });
+          didSucceed = true;
 
           if (rootState.selectedChains.length > 0) {
             addTransaction({
@@ -208,7 +217,18 @@ export const useHandleSubmit = () => {
             });
           }
         },
+        onUnknownError() {
+          actions.setIsDeploying(false);
+        },
+        onTransactionError() {
+          actions.setIsDeploying(false);
+        },
       });
+
+      if (!didSucceed) {
+        rootActions.setTxState({ type: "idle" });
+        actions.setIsDeploying(false);
+      }
     },
     [
       rootState,

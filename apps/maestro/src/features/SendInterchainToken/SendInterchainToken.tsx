@@ -29,13 +29,13 @@ import {
   isValidEVMAddress,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
+import { isValidXRPLWalletAddress, isXRPLChainName } from "~/lib/utils/xrpl";
 import { ITSChainConfig } from "~/server/chainConfig";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
 import GMPTxStatusMonitor from "~/ui/compounds/GMPTxStatusMonitor";
 import { ShareHaikuButton } from "~/ui/compounds/MultiStepForm";
 import { useSendInterchainTokenState } from "./SendInterchainToken.state";
-import { isValidXRPLWalletAddress, isXRPLChainName } from "~/lib/utils/xrpl";
 
 type FormState = {
   amountToTransfer: string;
@@ -102,7 +102,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
   const isDestinationXRPL = state.selectedToChain?.chain_id === XRPL_CHAIN_ID;
   const {
     hasXRPLTrustLine: hasDestinationXRPLTrustLine,
-    isEnabledOnXRPL: isDestinationEnabledOnXRPL, 
+    isEnabledOnXRPL: isDestinationEnabledOnXRPL,
     isCheckingXRPLTrustLine: isCheckingDestinationXRPLTrustLine,
     hasTrustLineError: hasDestinationXRPLTrustLineError,
   } = useXRPLTrustLine(state.destinationTokenAddress, {
@@ -181,8 +181,12 @@ export const SendInterchainToken: FC<Props> = (props) => {
         );
         return;
       }
-      // if we are transferring XRP and the destination account is disabled, we need to make sure that at least 1 XRP is transferred 
-      if(!isDestinationEnabledOnXRPL && state.tokenSymbol === "XRP" && Number(data.amountToTransfer) < 1) {
+      // if we are transferring XRP and the destination account is disabled, we need to make sure that at least 1 XRP is transferred
+      if (
+        !isDestinationEnabledOnXRPL &&
+        state.tokenSymbol === "XRP" &&
+        Number(data.amountToTransfer) < 1
+      ) {
         toast.error(
           "The destination XRPL account is not enabled, so it is necessary to transfer at least 1 XRP."
         );
@@ -507,7 +511,10 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   );
 
                   if (state.gasRaw && state.payWithToken) {
-                    bnValue += parseUnits(state.gasRaw.toString(), Number(props.balance.decimals));
+                    bnValue += parseUnits(
+                      state.gasRaw.toString(),
+                      Number(props.balance.decimals)
+                    );
                   }
 
                   const bnBalance = parseUnits(
@@ -579,7 +586,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     isXRPLChainName(state.selectedToChain.id) &&
                     !isValidXRPLWalletAddress(value)
                   ) {
-                      return "Invalid XRPL address";
+                    return "Invalid XRPL address";
                   }
 
                   if (state.selectedToChain.chain_id === HEDERA_CHAIN_ID) {
@@ -703,6 +710,15 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <GMPTxStatusMonitor
               txHash={state.txState.hash}
               onAllChainsExecuted={handleAllChainsExecuted}
+              onError={() => {
+                const currentHash =
+                  "hash" in state.txState ? state.txState.hash : undefined;
+                actions.resetTxState();
+                toast.error(
+                  "Interchain transfer failed. Please review status and try again.",
+                  { id: `gmp-transfer-error:${currentHash ?? ""}` }
+                );
+              }}
             />
           )}
 
@@ -713,7 +729,11 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 <Label.AltText>
                   <Tooltip tip="Approximate gas cost">
                     <span className="ml-2 whitespace-nowrap text-xs">
-                      (≈ {state.gasFee} {state.payWithToken ? state.tokenSymbol : state.nativeTokenSymbol} in fees)
+                      (≈ {state.gasFee}{" "}
+                      {state.payWithToken
+                        ? state.tokenSymbol
+                        : state.nativeTokenSymbol}{" "}
+                      in fees)
                     </span>
                   </Tooltip>
                 </Label.AltText>

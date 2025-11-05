@@ -23,6 +23,8 @@ const TX_LABEL_MAP: Record<TxType, string> = {
   INTERCHAIN_TRANSFER: "Interchain Transfer",
 } as const;
 
+const TX_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
 function useGroupedStatuses(txHash: string) {
   const { data: statuses } = useGetTransactionStatusOnDestinationChainsQuery({
     txHash,
@@ -65,6 +67,7 @@ type ToastElementProps = {
   txType: TxType;
   onRemoveTx?: (txHash: string) => void;
   intervalId?: number;
+  timeoutId?: number;
 };
 
 const ToastElement: FC<ToastElementProps> = ({
@@ -73,6 +76,7 @@ const ToastElement: FC<ToastElementProps> = ({
   txType,
   onRemoveTx,
   intervalId,
+  timeoutId,
 }) => {
   const { elapsedBlocks, expectedConfirmations, progress } = useGMPTxProgress(
     txHash,
@@ -169,6 +173,9 @@ const ToastElement: FC<ToastElementProps> = ({
     if (intervalId) {
       window.clearInterval(intervalId);
     }
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
 
     toast.dismiss(txHash);
 
@@ -180,7 +187,7 @@ const ToastElement: FC<ToastElementProps> = ({
     ) {
       onRemoveTx?.(txHash);
     }
-  }, [groupedStatusesProps, onRemoveTx, txHash, intervalId]);
+  }, [groupedStatusesProps, onRemoveTx, txHash, intervalId, timeoutId]);
 
   return (
     <div className="relative grid gap-2 rounded-md border-base-200 bg-base-300 p-2 pl-4 pr-8 shadow-md shadow-black/10">
@@ -209,6 +216,7 @@ type GMPTxStatusProps = {
 
 const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
   const {
+    data: statuses,
     computed: { chains: total, executed },
     isLoading,
   } = useGetTransactionStatusOnDestinationChainsQuery({ txHash: props.txHash });
@@ -216,38 +224,79 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
   const [, actions] = useTransactionsContainer();
 
   const intervalRef = useRef<number>();
+  const timeoutRef = useRef<number>();
   const toastIdRef = useRef<string>();
+
+  // Keep latest values in refs to avoid re-creating the watcher on every data change
+  const isLoadingRef = useRef(isLoading);
+  const totalRef = useRef(total);
+  const executedRef = useRef(executed);
+  const statusesRef = useRef(statuses);
+
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
+  useEffect(() => {
+    totalRef.current = total;
+  }, [total]);
+  useEffect(() => {
+    executedRef.current = executed;
+  }, [executed]);
+  useEffect(() => {
+    statusesRef.current = statuses;
+  }, [statuses]);
 
   const watchTxToCompletion = useCallback(
     async () =>
       new Promise((resolve) => {
+        // Safety timeout to avoid infinite waiting (15 minutes)
+        timeoutRef.current = window.setTimeout(() => {
+          if (intervalRef.current) {
+            window.clearInterval(intervalRef.current);
+          }
+          resolve({ status: "timeout" as const });
+        }, TX_TIMEOUT_MS);
+
         intervalRef.current = window.setInterval(() => {
-          if (isLoading) {
+          if (isLoadingRef.current) {
             return;
           }
 
-          if (total > 0 && executed >= total) {
+          if (totalRef.current > 0 && executedRef.current >= totalRef.current) {
             window.clearInterval(intervalRef.current);
-
+            if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
             resolve({
-              status: "success",
-              executed,
-              total,
+              status: "success" as const,
+              executed: executedRef.current,
+              total: totalRef.current,
             });
+            return;
+          }
+
+          const statusValues = Object.values(statusesRef.current ?? {});
+          const hasTerminalError = statusValues.some(
+            (s) => s.status === "error" || s.status === "insufficient_fee"
+          );
+          if (hasTerminalError) {
+            window.clearInterval(intervalRef.current);
+            if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+            resolve({ status: "failed" as const });
           }
         }, 5000);
       }),
-    [isLoading, total, executed]
+    []
   );
 
   useEffect(() => {
     // Create the toast *once* and store the ID.
     toastIdRef.current = props.txHash;
+    const watchingPromise = watchTxToCompletion();
     toast.custom(
       <ToastElement
         {...props}
         onRemoveTx={actions.removeTransaction}
         intervalId={intervalRef.current}
+        timeoutId={timeoutRef.current}
       />,
       {
         id: toastIdRef.current,
@@ -256,7 +305,7 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
     );
 
     async function task() {
-      await watchTxToCompletion();
+      await watchingPromise;
       toast.dismiss(toastIdRef.current);
       actions.removeTransaction(props.txHash);
     }
@@ -266,8 +315,9 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
 
     return () => {
       window.clearInterval(intervalRef.current);
+      window.clearTimeout(timeoutRef.current);
     };
-  }, [props, actions, watchTxToCompletion]);
+  }, [props.txHash, actions]);
 
   return <></>;
 };

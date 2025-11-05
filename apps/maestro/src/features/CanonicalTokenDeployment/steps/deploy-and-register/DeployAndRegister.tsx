@@ -121,10 +121,12 @@ export const Step3: FC = () => {
         if (e.message?.toLowerCase().includes("reject")) {
           toast.error("Transaction rejected by user");
           rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
           return;
         }
         toast.error(String(e?.message ?? "Unknown error"));
         rootActions.setTxState({ type: "idle" });
+        actions.setIsDeploying(false);
         return;
       });
 
@@ -133,6 +135,7 @@ export const Step3: FC = () => {
           const result = (await txPromise) as RegisterCanonicalTokenResult;
           if (!result) {
             rootActions.setTxState({ type: "idle" });
+            actions.setIsDeploying(false);
             return;
           }
           rootActions.setTxState({
@@ -153,6 +156,7 @@ export const Step3: FC = () => {
         } catch (e: any) {
           toast.error(String(e?.message ?? "Unknown error"));
           rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
         }
       };
 
@@ -165,6 +169,7 @@ export const Step3: FC = () => {
             "hash" in result &&
             "tokenAddress" in result
           ) {
+            actions.setIsDeploying(false);
             if (rootState.selectedChains.length > 0) {
               addTransaction({
                 status: "submitted",
@@ -179,17 +184,25 @@ export const Step3: FC = () => {
         } catch (e: any) {
           toast.error(String(e?.message ?? "Stellar deployment failed"));
           rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
         }
       };
 
       const handleEvm = async () => {
+        if (!txPromise) {
         if (!txPromise) return;
+          rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
+          return;
+        }
         try {
+          let didSucceed = false;
           await handleTransactionResult(
             txPromise as Promise<WriteContractData>,
             {
               onSuccess(txHash) {
                 rootActions.setTxState({ type: "deploying", txHash });
+                didSucceed = true;
                 if (validDestinationChainIds.length > 0) {
                   addTransaction({
                     status: "submitted",
@@ -204,12 +217,18 @@ export const Step3: FC = () => {
                 toast.error(
                   String(txError.shortMessage ?? "Transaction failed")
                 );
+                actions.setIsDeploying(false);
               },
             }
           );
+          if (!didSucceed) {
+            rootActions.setTxState({ type: "idle" });
+            actions.setIsDeploying(false);
+          }
         } catch (e: any) {
           toast.error(String(e?.message ?? "Unknown error"));
           rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
         }
       };
 
