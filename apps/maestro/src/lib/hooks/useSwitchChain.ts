@@ -1,9 +1,10 @@
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
-import {
+import { 
   getSwitchChainEthParamWithRpc,
-  stellarChainConfig,
+  stellarChainConfig, 
   suiChainConfig,
+  xrplChainConfig,
 } from "~/config/chains";
 import { useChainId, useDisconnect } from "~/lib/hooks";
 import useConnectWallet from "./useConnectWallet";
@@ -20,11 +21,16 @@ export function useSwitchChain() {
       const isCurrentChainSui = currentChainId === suiChainConfig.id;
       const isCurrentChainStellar = currentChainId === stellarChainConfig.id;
       const isTargetChainStellar = chainId === stellarChainConfig.id;
+      const isCurrentChainXRPL = currentChainId === xrplChainConfig.id;
+      const isTargetChainXRPL = chainId === xrplChainConfig.id;
+      
       const evmToEvm =
         !isTargetChainSui &&
         !isCurrentChainSui &&
         !isCurrentChainStellar &&
-        !isTargetChainStellar;
+        !isTargetChainStellar &&
+        !isCurrentChainXRPL &&
+        !isTargetChainXRPL;
       if (evmToEvm) {
         switchChainWagmi({
           chainId,

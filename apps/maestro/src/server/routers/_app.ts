@@ -13,6 +13,7 @@ import { nativeTokensRouter } from "./nativeTokens";
 import { openaiRouter } from "./openai";
 import { stellarRouter } from "./stellar";
 import { suiRouter } from "./sui";
+import { xrplRouter } from "./xrpl";
 
 export const appRouter = router({
   uptime: publicProcedure.query(() => ({
@@ -30,6 +31,7 @@ export const appRouter = router({
   sui: suiRouter,
   stellar: stellarRouter,
   hedera: hederaRouter,
+  xrpl: xrplRouter,
   healthcheck: healthcheckRouter,
 });
 

@@ -12,6 +12,10 @@ import { getSignInMessage } from "~/server/routers/auth/createSignInMessage";
 import MaestroKVClient, { AccountStatus } from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres/MaestroPostgresClient";
 
+import * as xrpl from "xrpl"
+import * as binary from "ripple-binary-codec"
+import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
+
 export type Web3Session = {
   address: string;
   accountStatus: AccountStatus;
@@ -116,6 +120,40 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           } catch (error) {
             console.error("Failed to verify Stellar signature:", error);
           }
+        }
+        else if (isValidXRPLWalletAddress(address)) {
+          // xrpl address
+
+          // Check if the credentials that we received is a transaction that was created just like in the frontend
+          // Then, verify the signature against the address
+          
+          const encodedTx = signature; // this is the signed transaction blob that we received from the client
+          const tx = binary.decode(encodedTx); // decode it to get the transaction object
+
+          if (
+            !tx.Memos || !Array.isArray(tx.Memos) || tx.Memos.length === 0
+          ) {
+            return null;
+          }
+          
+          const signerPublicKey = tx.SigningPubKey;
+          if (typeof signerPublicKey !== "string")
+            return null;
+          if (!tx.Memos[0])
+            return null;
+          if (typeof tx.Memos[0] !== "object" || !("Memo" in tx.Memos[0]))
+            return null;
+          const memo = tx.Memos[0].Memo;
+          if (memo === null || typeof memo !== "object" || !("MemoData" in memo))
+            return null;
+          const memoHex = memo.MemoData as string;
+          const memoData = Buffer.from(memoHex, "hex").toString("utf8");
+
+          console.warn("Reconstructed memo from transaction:", memoData, message);
+          isMessageSigned = 
+            (memoData === message) // require that the memo matches the challenge (we don't care about the other data)
+            && (xrpl.verifySignature(encodedTx, signerPublicKey)) // AND that the signature is valid
+            && (xrpl.deriveAddress(signerPublicKey) === address); // AND that the public key matches the address
         }
 
         if (!isMessageSigned) {

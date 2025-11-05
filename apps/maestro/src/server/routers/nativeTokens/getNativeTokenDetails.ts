@@ -9,10 +9,12 @@ import {
   ExtendedWagmiChainConfig,
   stellarChainConfig,
   suiChainConfig,
+  xrplChainConfig,
 } from "~/config/chains";
 import {
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
+  isXRPLTokenAddressFormat,
 } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
@@ -91,6 +93,41 @@ export const getStellarTokenDetails = async (
   };
 };
 
+async function getXRPLTokenDetails(tokenAddress: string, ctx: Context) {
+  let name = tokenAddress;
+  let symbol = tokenAddress;
+  const { name: chainName, axelarChainId, axelarChainName } = xrplChainConfig;
+  let decimals = 6; // XRP has 6 decimals
+
+  if (tokenAddress !== "XRP") {
+    const tokenRecord = await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+      axelarChainId,
+      tokenAddress
+    );
+    if (!tokenRecord) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Token metadata not found for ${tokenAddress} on chain ${axelarChainId}`,
+      });
+    }
+    name = tokenRecord.tokenName;
+    symbol = tokenRecord.tokenSymbol;
+    decimals = tokenRecord.tokenDecimals;
+  }
+
+  // we cannot get the token data from the chain, so we need to ask the database
+
+  return {
+    name: name,
+    decimals: decimals,
+    symbol: symbol,
+    chainId: xrplChainConfig.id,
+    chainName,
+    axelarChainId,
+    axelarChainName,
+  };
+}
+
 export const getNativeTokenDetails = publicProcedure
   .input(
     z.object({
@@ -108,6 +145,10 @@ export const getNativeTokenDetails = publicProcedure
         normalizedTokenAddress,
         input.chainId as number
       );
+    }
+
+    if (isXRPLTokenAddressFormat(input.tokenAddress)) {
+      return getXRPLTokenDetails(input.tokenAddress, ctx);
     }
 
     // Enter here if the token is a Stellar token

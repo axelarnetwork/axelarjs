@@ -7,12 +7,16 @@ import {
   useConnectWallet as useSuiConnectWallet,
   useWallets,
 } from "@mysten/dapp-kit";
+import { useConnect as useXRPLConnect, useWallets as useXRPLWallets } from "@xrpl-wallet-standard/react";
 import { isBrowser, setAllowed } from "@stellar/freighter-api";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
 import { getSwitchChainEthParamWithRpc, suiChainConfig } from "~/config/chains";
-import { stellarChainConfig } from "~/config/chains/vm-chains";
+import { 
+  stellarChainConfig,
+  xrplChainConfig,
+} from "~/config/chains/vm-chains";
 import { setStellarConnectionState } from "../utils/stellar";
 import { isValidEVMAddress } from "../utils/validation";
 
@@ -21,6 +25,8 @@ type WalletHandler = (chainId: number) => void;
 export function useConnectWallet() {
   const wallets = useWallets();
   const { mutateAsync: connectAsync } = useSuiConnectWallet();
+  const { connect: xrplConnect } = useXRPLConnect();
+  const xrplWallets = useXRPLWallets();
   const { open: openWeb3Modal } = useWeb3Modal();
   const { data: sessionData } = useSession();
   const { switchChain: switchChainWagmi } = useWagmiSwitchChain();
@@ -77,9 +83,23 @@ export function useConnectWallet() {
     }
   };
 
+  const tryConnectXRPLWallet = async () => {
+    for (const xrplWallet of xrplWallets) {
+      try {
+        await xrplConnect(xrplWallet, { silent: true });
+        return true;
+      } catch (error) {
+        // ignore
+      }
+    }
+    
+    return false;
+  };
+
   const chainHandlers: Record<number, WalletHandler> = {
     [suiChainConfig.id]: () => tryConnectSuiWallet(),
     [stellarChainConfig.id]: () => tryConnectStellarWallet(),
+    [xrplChainConfig.id]: () => tryConnectXRPLWallet(),
   };
 
   const defaultHandler: WalletHandler = (chainId) => {
