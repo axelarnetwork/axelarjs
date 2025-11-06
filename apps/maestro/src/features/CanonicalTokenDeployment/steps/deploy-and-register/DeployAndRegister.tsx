@@ -153,6 +153,7 @@ export const Step3: FC = () => {
               txType: "INTERCHAIN_DEPLOYMENT",
             });
           }
+          actions.setIsDeploying(false);
         } catch (e: any) {
           toast.error(String(e?.message ?? "Unknown error"));
           rootActions.setTxState({ type: "idle" });
@@ -211,6 +212,11 @@ export const Step3: FC = () => {
                     txType: "INTERCHAIN_DEPLOYMENT",
                   });
                 }
+              },
+              onUnknownError() {
+                errorHandled = true;
+                rootActions.setTxState({ type: "idle" });
+                actions.setIsDeploying(false);
               },
               onTransactionError(txError) {
                 rootActions.setTxState({ type: "idle" });

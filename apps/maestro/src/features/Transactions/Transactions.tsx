@@ -218,6 +218,7 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
   const intervalRef = useRef<number>();
   const timeoutRef = useRef<number>();
   const toastIdRef = useRef<string>();
+  const removeTxRef = useRef<(hash: string) => void>();
 
   // Keep latest values in refs to avoid re-creating the watcher on every data change
   const isLoadingRef = useRef(isLoading);
@@ -237,6 +238,9 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
   useEffect(() => {
     statusesRef.current = statuses;
   }, [statuses]);
+  useEffect(() => {
+    removeTxRef.current = actions.removeTransaction;
+  }, [actions.removeTransaction]);
 
   const watchTxToCompletion = useCallback(
     async () =>
@@ -286,7 +290,7 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
     toast.custom(
       <ToastElement
         {...props}
-        onRemoveTx={actions.removeTransaction}
+        onRemoveTx={removeTxRef.current}
         onBeforeDismiss={() => {
           if (intervalRef.current) {
             window.clearInterval(intervalRef.current);
@@ -305,7 +309,7 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
     async function task() {
       await watchingPromise;
       toast.dismiss(toastIdRef.current);
-      actions.removeTransaction(props.txHash);
+      removeTxRef.current?.(props.txHash);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -315,7 +319,7 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
       window.clearInterval(intervalRef.current);
       window.clearTimeout(timeoutRef.current);
     };
-  }, [props.txHash, actions]);
+  }, [props, watchTxToCompletion]);
 
   return <></>;
 };
