@@ -66,8 +66,7 @@ type ToastElementProps = {
   chainId: number;
   txType: TxType;
   onRemoveTx?: (txHash: string) => void;
-  intervalId?: number;
-  timeoutId?: number;
+  onBeforeDismiss?: () => void;
 };
 
 const ToastElement: FC<ToastElementProps> = ({
@@ -75,8 +74,7 @@ const ToastElement: FC<ToastElementProps> = ({
   chainId,
   txType,
   onRemoveTx,
-  intervalId,
-  timeoutId,
+  onBeforeDismiss,
 }) => {
   const { elapsedBlocks, expectedConfirmations, progress } = useGMPTxProgress(
     txHash,
@@ -169,13 +167,7 @@ const ToastElement: FC<ToastElementProps> = ({
   );
 
   const handleDismiss = useCallback(() => {
-    // Clear the interval *before* dismissing
-    if (intervalId) {
-      window.clearInterval(intervalId);
-    }
-    if (timeoutId) {
-      window.clearTimeout(timeoutId);
-    }
+    onBeforeDismiss?.();
 
     toast.dismiss(txHash);
 
@@ -187,7 +179,7 @@ const ToastElement: FC<ToastElementProps> = ({
     ) {
       onRemoveTx?.(txHash);
     }
-  }, [groupedStatusesProps, onRemoveTx, txHash, intervalId, timeoutId]);
+  }, [groupedStatusesProps, onRemoveTx, txHash, onBeforeDismiss]);
 
   return (
     <div className="relative grid gap-2 rounded-md border-base-200 bg-base-300 p-2 pl-4 pr-8 shadow-md shadow-black/10">
@@ -295,8 +287,14 @@ const GMPTransaction: FC<GMPTxStatusProps> = (props) => {
       <ToastElement
         {...props}
         onRemoveTx={actions.removeTransaction}
-        intervalId={intervalRef.current}
-        timeoutId={timeoutRef.current}
+        onBeforeDismiss={() => {
+          if (intervalRef.current) {
+            window.clearInterval(intervalRef.current);
+          }
+          if (timeoutRef.current) {
+            window.clearTimeout(timeoutRef.current);
+          }
+        }}
       />,
       {
         id: toastIdRef.current,

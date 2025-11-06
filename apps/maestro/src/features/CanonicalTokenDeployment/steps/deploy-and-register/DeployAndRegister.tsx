@@ -196,6 +196,7 @@ export const Step3: FC = () => {
         }
         try {
           let didSucceed = false;
+          let errorHandled = false;
           await handleTransactionResult(
             txPromise as Promise<WriteContractData>,
             {
@@ -217,10 +218,11 @@ export const Step3: FC = () => {
                   String(txError.shortMessage ?? "Transaction failed")
                 );
                 actions.setIsDeploying(false);
+                errorHandled = true;
               },
             }
           );
-          if (!didSucceed) {
+          if (!didSucceed && !errorHandled) {
             rootActions.setTxState({ type: "idle" });
             actions.setIsDeploying(false);
           }
