@@ -190,7 +190,6 @@ export const Step3: FC = () => {
 
       const handleEvm = async () => {
         if (!txPromise) {
-        if (!txPromise) return;
           rootActions.setTxState({ type: "idle" });
           actions.setIsDeploying(false);
           return;
