@@ -51,7 +51,6 @@ import {
   XRPL_TESTNET,
 } from '@xrpl-wallet-standard/core'
 import type { BaseTransaction, SubmitResponse } from 'xrpl'
-import type { EIP1193Provider } from './EthereumProviderTypes';
 
 export const SNAP_ORIGIN = 'npm:xrpl-snap'
 
@@ -85,9 +84,9 @@ export class MetaMaskWallet implements XRPLBaseWallet {
 
   readonly #listeners: { [E in StandardEventsNames]?: StandardEventsListeners[E][] } = {}
   
-  #discoveredProvider?: EIP1193Provider
+  #discoveredProvider?: BaseProvider
 
-  constructor(provider?: EIP1193Provider) {
+  constructor(provider?: BaseProvider) {
     this.#discoveredProvider = provider
   }
 
