@@ -119,6 +119,7 @@ export function useGMPTxProgress(txHash: string, chainId: number) {
 type Props = {
   txHash: string;
   onAllChainsExecuted?: () => void;
+  onError?: () => void;
 };
 
 const TxFinalityProgress: FC<{ txHash: string; chainId: number }> = ({
@@ -150,7 +151,7 @@ const TxFinalityProgress: FC<{ txHash: string; chainId: number }> = ({
   );
 };
 
-const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
+const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted, onError }: Props) => {
   const chainId = useChainId();
   const hideLogIndex = CHAINS_WITHOUT_LOG_INDEX.includes(chainId); // TODO: only because the currently open chain is xrpl, this does not mean that we are looking at a xrpl tx -> determine from actual source chain
   const { combinedComputed } = useAllChainConfigsQuery();
@@ -170,6 +171,16 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       onAllChainsExecuted?.();
     }
   }, [statusList, onAllChainsExecuted]);
+
+  useEffect(() => {
+    if (!statusList.length) return;
+    const hasTerminalError = statusList.some(
+      (s) => s.status === "error" || s.status === "insufficient_fee"
+    );
+    if (hasTerminalError) {
+      onError?.();
+    }
+  }, [statusList, onError]);
 
   if (!statuses || Object.keys(statuses).length === 0) {
     if (!isLoading) {
