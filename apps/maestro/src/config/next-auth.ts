@@ -149,7 +149,6 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           const memoHex = memo.MemoData as string;
           const memoData = Buffer.from(memoHex, "hex").toString("utf8");
 
-          console.warn("Reconstructed memo from transaction:", memoData, message);
           isMessageSigned = 
             (memoData === message) // require that the memo matches the challenge (we don't care about the other data)
             && (xrpl.verifySignature(encodedTx, signerPublicKey)) // AND that the signature is valid
