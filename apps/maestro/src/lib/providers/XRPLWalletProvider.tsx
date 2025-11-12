@@ -22,7 +22,7 @@ export const XrplWalletProvider: FC<PropsWithChildren> = ({ children }) => {
 
     const availableWallets: Array<XRPLBaseWallet> = [new CrossmarkWallet()];
 
-    if(metamaskProvider) {
+    if (metamaskProvider) {
       availableWallets.push(new MetaMaskWallet(metamaskProvider));
     }
 
