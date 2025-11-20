@@ -1,4 +1,3 @@
-import { CHAINS_WITHOUT_DEPLOYMENT } from "~/config/chains";
 import { NEXT_PUBLIC_WHITELISTED_DEST_CHAINS_FOR_VM } from "~/config/env";
 import { ITSChainConfig } from "~/server/chainConfig";
 
@@ -33,8 +32,6 @@ export const filterEligibleChains = (
   const isAllChainsWhitelisted = whitelistedChains[0] === "all";
 
   return destinationChains.filter((chain) => {
-    if (CHAINS_WITHOUT_DEPLOYMENT.includes(chain.chain_id))
-      return false;
     const isOriginChainSameAsDestinationChain =
       chain.chain_id === currentChainId;
     const areDifferentChainTypes = chain.chain_type !== currentChain.chain_type;
