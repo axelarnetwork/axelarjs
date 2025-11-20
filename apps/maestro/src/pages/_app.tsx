@@ -10,8 +10,10 @@ import Script from "next/script";
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Analytics } from "@vercel/analytics/next";
 
 import { WagmiConfigPropvider } from "~/lib/providers/WagmiConfigPropvider";
+import { XrplWalletProvider } from "~/lib/providers/XRPLWalletProvider";
 
 import "@mysten/dapp-kit/dist/index.css";
 import "~/lib/polyfills";
@@ -131,17 +133,20 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
                     : "testnet"
                 }
               >
-                <StellarWalletProviderClient>
-                  <SuiWalletProviderClient>
-                    <AuthProvider>
-                      <MainLayout>
-                        <Component {...pageProps} />
-                      </MainLayout>
-                      <ReactQueryDevtools />
-                      <Toaster />
-                    </AuthProvider>
-                  </SuiWalletProviderClient>
-                </StellarWalletProviderClient>
+                <XrplWalletProvider>
+                  <StellarWalletProviderClient>
+                    <SuiWalletProviderClient>
+                      <AuthProvider>
+                        <MainLayout>
+                          <Component {...pageProps} />
+                        </MainLayout>
+                        <Analytics />
+                        <ReactQueryDevtools />
+                        <Toaster />
+                      </AuthProvider>
+                    </SuiWalletProviderClient>
+                  </StellarWalletProviderClient>
+                </XrplWalletProvider>
               </SuiClientProvider>
             </WagmiConfigPropvider>
           </ThemeProvider>

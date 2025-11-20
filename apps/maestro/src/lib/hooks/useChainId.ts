@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
 import { useChainId as useWagmiChainId } from "wagmi";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
 import { getStellarConnectionState } from "~/lib/utils/stellar";
 import { useAccount } from "./useAccount";
 
@@ -12,6 +13,7 @@ export function useChainId(): number {
   const wagmiChainId = useWagmiChainId();
   const suiAccount = useCurrentAccount();
   const { chain } = useAccount();
+  const XRPLWallet = useXRPLWallet();
 
   const chainId = useMemo(() => {
     // Check if Stellar wallet is connected
@@ -19,6 +21,10 @@ export function useChainId(): number {
       // this saves us from having to listen to the storage event but we could find a better way
       return STELLAR_CHAIN_ID;
     }
+    if (chain?.id === XRPL_CHAIN_ID) {
+      return XRPL_CHAIN_ID;
+    }
+
     const isStellarConnected = getStellarConnectionState() ?? false;
     if (isStellarConnected) {
       return STELLAR_CHAIN_ID;
@@ -26,8 +32,16 @@ export function useChainId(): number {
     if (suiAccount) {
       return SUI_CHAIN_ID;
     }
+
+    if (
+      XRPLWallet.status === "connected" &&
+      XRPLWallet.wallet?.accounts.length
+    ) {
+      return XRPL_CHAIN_ID;
+    }
+
     return wagmiChainId;
-  }, [wagmiChainId, suiAccount, chain]);
+  }, [wagmiChainId, suiAccount, chain, XRPLWallet]);
 
   return chainId;
 }

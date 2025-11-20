@@ -20,14 +20,16 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 import { StrKey } from "stellar-sdk";
 import { formatUnits, parseUnits } from "viem";
 
-import { HEDERA_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
+import { HEDERA_CHAIN_ID, SUI_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
 import { useHederaTokenAssociation } from "~/features/hederaHooks";
+import { useXRPLTrustLine } from "~/features/xrplHooks";
 import { useAccount } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import {
   isValidEVMAddress,
   preventNonNumericInput,
 } from "~/lib/utils/validation";
+import { isValidXRPLWalletAddress, isXRPLChainName } from "~/lib/utils/xrpl";
 import { ITSChainConfig } from "~/server/chainConfig";
 import BigNumberText from "~/ui/components/BigNumberText";
 import ChainsDropdown from "~/ui/components/ChainsDropdown";
@@ -84,6 +86,7 @@ export const SendInterchainToken: FC<Props> = (props) => {
     originTokenChainId: props.originTokenChainId,
   });
 
+  // Hedera association check
   const isDestinationHedera =
     state.selectedToChain?.chain_id === HEDERA_CHAIN_ID;
   const {
@@ -95,8 +98,18 @@ export const SendInterchainToken: FC<Props> = (props) => {
     enabled: isDestinationHedera && Boolean(destinationAddress),
   });
 
-  const amountToTransfer = watch("amountToTransfer");
-  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+  // XRPL trust line check
+  const isDestinationXRPL = state.selectedToChain?.chain_id === XRPL_CHAIN_ID;
+  const {
+    hasXRPLTrustLine: hasDestinationXRPLTrustLine,
+    isEnabledOnXRPL: isDestinationEnabledOnXRPL,
+    isCheckingXRPLTrustLine: isCheckingDestinationXRPLTrustLine,
+    hasTrustLineError: hasDestinationXRPLTrustLineError,
+  } = useXRPLTrustLine(state.destinationTokenAddress, {
+    accountAddress: destinationAddress,
+    enabled: isDestinationXRPL && Boolean(destinationAddress),
+  });
+
   const mustBlockForHederaAssociation = useMemo(
     () =>
       isDestinationHedera &&
@@ -128,6 +141,25 @@ export const SendInterchainToken: FC<Props> = (props) => {
     trigger,
   ]);
 
+  const mustBlockForXRPLTrustLine = useMemo(
+    () =>
+      isDestinationXRPL &&
+      Boolean(destinationAddress) &&
+      (isCheckingDestinationXRPLTrustLine ||
+        hasDestinationXRPLTrustLine !== true ||
+        hasDestinationXRPLTrustLineError),
+    [
+      destinationAddress,
+      hasDestinationXRPLTrustLine,
+      hasDestinationXRPLTrustLineError,
+      isCheckingDestinationXRPLTrustLine,
+      isDestinationXRPL,
+    ]
+  );
+
+  const amountToTransfer = watch("amountToTransfer");
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
   const submitHandler: SubmitHandler<FormState> = async (data, e) => {
     e?.preventDefault();
 
@@ -137,6 +169,26 @@ export const SendInterchainToken: FC<Props> = (props) => {
       if (isDestinationAssociated === false) {
         toast.error(
           "The destination Hedera account is not associated with this token. Please associate it before sending."
+        );
+        return;
+      }
+    }
+
+    if (state.selectedToChain.chain_id === XRPL_CHAIN_ID) {
+      if (!hasDestinationXRPLTrustLine) {
+        toast.error(
+          "The destination XRPL account is invalid or is missing the trust line for this token."
+        );
+        return;
+      }
+      // if we are transferring XRP and the destination account is disabled, we need to make sure that at least 1 XRP is transferred
+      if (
+        !isDestinationEnabledOnXRPL &&
+        state.tokenSymbol === "XRP" &&
+        Number(data.amountToTransfer) < 1
+      ) {
+        toast.error(
+          "The destination XRPL account is not enabled, so it is necessary to transfer at least 1 XRP."
         );
         return;
       }
@@ -453,10 +505,17 @@ export const SendInterchainToken: FC<Props> = (props) => {
                     return "Amount must be greater than 0";
                   }
 
-                  const bnValue = parseUnits(
+                  let bnValue = parseUnits(
                     value as `${number}`,
                     Number(props.balance.decimals) * 2
                   );
+
+                  if (state.gasRaw && state.payWithToken) {
+                    bnValue += parseUnits(
+                      state.gasRaw.toString(),
+                      Number(props.balance.decimals)
+                    );
+                  }
 
                   const bnBalance = parseUnits(
                     props.balance.tokenBalance,
@@ -523,12 +582,26 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   ) {
                     return "Invalid EVM address";
                   }
+                  if (
+                    isXRPLChainName(state.selectedToChain.id) &&
+                    !isValidXRPLWalletAddress(value)
+                  ) {
+                    return "Invalid XRPL address";
+                  }
 
                   if (state.selectedToChain.chain_id === HEDERA_CHAIN_ID) {
                     if (hasDestinationAssociationError) {
                       return "Error checking Hedera association";
                     }
                     // Do not fail field validation solely due to association status.
+                    // We block submission and show a warning elsewhere.
+                  }
+
+                  if (state.selectedToChain.chain_id === XRPL_CHAIN_ID) {
+                    if (hasDestinationXRPLTrustLineError) {
+                      return "Error checking XRPL trust line";
+                    }
+                    // Do not fail field validation solely due to trust line status.
                     // We block submission and show a warning elsewhere.
                   }
 
@@ -574,6 +647,44 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   )}
               </div>
             )}
+
+            {isDestinationXRPL && destinationAddress && (
+              <div className="mt-2">
+                {isCheckingDestinationXRPLTrustLine && (
+                  <div className="flex items-center justify-between rounded-xl bg-base-300 p-2 pl-4 text-xs dark:bg-base-100">
+                    <span className="mx-auto">Checking XRPL trust line...</span>
+                  </div>
+                )}
+                {!isCheckingDestinationXRPLTrustLine &&
+                  hasDestinationXRPLTrustLine !== true && (
+                    <Alert
+                      icon={<InfoIcon />}
+                      $status="warning"
+                      className="my-2 rounded-xl p-3"
+                    >
+                      <div className="flex flex-col gap-2">
+                        <span>
+                          The destination XRPL account is missing the trust line
+                          for this token.
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs">
+                            The recipient can add the trust line by opening this
+                            page:
+                          </span>
+                          <CopyToClipboardButton
+                            $size="sm"
+                            $variant="ghost"
+                            copyText={currentUrl}
+                          >
+                            Copy link
+                          </CopyToClipboardButton>
+                        </div>
+                      </div>
+                    </Alert>
+                  )}
+              </div>
+            )}
           </FormControl>
 
           {state.txState.status === "idle" &&
@@ -599,6 +710,15 @@ export const SendInterchainToken: FC<Props> = (props) => {
             <GMPTxStatusMonitor
               txHash={state.txState.hash}
               onAllChainsExecuted={handleAllChainsExecuted}
+              onError={() => {
+                const currentHash =
+                  "hash" in state.txState ? state.txState.hash : undefined;
+                actions.resetTxState();
+                toast.error(
+                  "Interchain transfer failed. Please review status and try again.",
+                  { id: `gmp-transfer-error:${currentHash ?? ""}` }
+                );
+              }}
             />
           )}
 
@@ -609,13 +729,19 @@ export const SendInterchainToken: FC<Props> = (props) => {
                 <Label.AltText>
                   <Tooltip tip="Approximate gas cost">
                     <span className="ml-2 whitespace-nowrap text-xs">
-                      (≈ {state.gasFee} {state.nativeTokenSymbol} in fees)
+                      (≈ {state.gasFee}{" "}
+                      {state.payWithToken
+                        ? state.tokenSymbol
+                        : state.nativeTokenSymbol}{" "}
+                      in fees)
                     </span>
                   </Tooltip>
                 </Label.AltText>
               )}
             </Label>
-            {buttonStatus === "error" && !mustBlockForHederaAssociation ? (
+            {buttonStatus === "error" &&
+            !mustBlockForHederaAssociation &&
+            !mustBlockForXRPLTrustLine ? (
               <Alert role="alert" $status="error">
                 {buttonChildren}
               </Alert>
@@ -628,7 +754,8 @@ export const SendInterchainToken: FC<Props> = (props) => {
                   isFormDisabled ||
                   state.isEstimatingGas ||
                   state.hasInsufficientGasBalance ||
-                  mustBlockForHederaAssociation
+                  mustBlockForHederaAssociation ||
+                  mustBlockForXRPLTrustLine
                 }
                 $loading={state.isSending || state.isEstimatingGas}
               >

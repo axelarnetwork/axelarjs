@@ -4,8 +4,13 @@ import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";
 import { getAddress, getNetwork, isConnected } from "@stellar/freighter-api";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
+import { useAccount as useXRPLAccount } from "@xrpl-wallet-standard/react";
 
-import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
+import { 
+  stellarChainConfig, 
+  suiChainConfig,
+  xrplChainConfig
+} from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import {
   getStellarConnectionState,
@@ -31,6 +36,7 @@ interface CombinedAccountInfo {
 export function useAccount(): CombinedAccountInfo {
   const wagmiAccount = useWagmiAccount();
   const mystenAccount = useMystenAccount();
+  const xrplAccount = useXRPLAccount();
   const [stellarAccount, setStellarAccount] = useState<string | null>(null);
   const [stellarNetwork, setStellarNetwork] = useState<string | null>(null);
   const [isLoadingStellar, setIsLoadingStellar] = useState(true);
@@ -88,6 +94,7 @@ export function useAccount(): CombinedAccountInfo {
   const isWagmiConnected = wagmiAccount.isConnected;
   const isMystenConnected = !!mystenAccount;
   const isStellarConnected = !!stellarAccount;
+  const isXRPLConnected = !!xrplAccount?.address;
 
   const evmChain = useMemo(
     () => evmChains?.find?.((x) => x.chain_id === wagmiAccount?.chain?.id),
@@ -98,20 +105,23 @@ export function useAccount(): CombinedAccountInfo {
     address:
       wagmiAccount.address ||
       (mystenAccount?.address as `0x${string}`) ||
-      (stellarAccount as string),
-    isConnected: isWagmiConnected || isMystenConnected || isStellarConnected,
+      (stellarAccount as string) ||
+      (xrplAccount?.address as string),
+    isConnected: isWagmiConnected || isMystenConnected || isStellarConnected || isXRPLConnected,
     isDisconnected:
-      !isWagmiConnected && !isMystenConnected && !isStellarConnected,
+      !isWagmiConnected && !isMystenConnected && !isStellarConnected && !isXRPLConnected,
     chain:
       wagmiAccount.chain ||
       (isMystenConnected && suiChainConfig) ||
       (isStellarConnected && stellarChainConfig) ||
+      (isXRPLConnected && xrplChainConfig) ||
       undefined,
     isEvmChain: !!evmChain,
     chainName:
       evmChain?.chain_name ||
       (isMystenConnected && "Sui") ||
       (isStellarConnected && "Stellar") ||
+      (isXRPLConnected && xrplChainConfig.name) ||
       undefined,
     isWrongSuiNetwork:
       isMystenConnected && mystenAccount?.chains[0] !== APP_SUI_NETWORK,

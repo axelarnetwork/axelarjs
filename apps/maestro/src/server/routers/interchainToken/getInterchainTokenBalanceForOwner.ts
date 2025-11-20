@@ -4,17 +4,19 @@ import { Account, Address, scValToNative } from "stellar-sdk";
 import { z } from "zod";
 
 import { suiClient as client } from "~/lib/clients/suiClient";
+import { isTokenAddressIncompatibleWithOwner } from "~/lib/utils/addressCompatibility";
 import {
-  isTokenAddressIncompatibleWithOwner,
-  normalizeTokenAddressForCompatibility,
-} from "~/lib/utils/addressCompatibility";
-import { isValidStellarTokenAddress } from "~/lib/utils/validation";
+  isValidStellarTokenAddress,
+  isXRPLTokenAddressFormat,
+  isXRPLWalletAddressFormat,
+} from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
 import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { simulateCall } from "../stellar/utils/transactions";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
+import { getXRPLAccountBalance } from "~/lib/utils/xrpl";
 
 // Helper function to call Stellar contract methods and handle errors
 async function callStellarContractMethod<T>({
@@ -67,27 +69,28 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    const normalizedTokenAddress = normalizeTokenAddressForCompatibility(
-      input.tokenAddress
-    );
+    const emptyObject = {
+      decimals: 0,
+      isTokenOwner: false,
+      isTokenMinter: false,
+      tokenBalance: "0",
+      isTokenPendingOwner: false,
+      hasPendingOwner: false,
+      hasMinterRole: false,
+      hasOperatorRole: false,
+      hasFlowLimiterRole: false,
+    };
     // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
     // To check sui for example, they need to connect with a sui wallet
-    const isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
-      normalizedTokenAddress,
+    let isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
+      input.tokenAddress,
       input.owner
     );
+    if (isXRPLWalletAddressFormat(input.owner)) { // xrpl address
+      isIncompatibleChain = !isXRPLTokenAddressFormat(input.tokenAddress);
+    }
     if (isIncompatibleChain) {
-      return {
-        isTokenOwner: false,
-        isTokenMinter: false,
-        tokenBalance: "0",
-        decimals: 0,
-        isTokenPendingOwner: false,
-        hasPendingOwner: false,
-        hasMinterRole: false,
-        hasOperatorRole: false,
-        hasFlowLimiterRole: false,
-      };
+      return emptyObject;
     }
     // Sui coin type is in the format of packageId::module::MODULE
     if (input.tokenAddress?.includes(":")) {
@@ -204,19 +207,26 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           `[Stellar] Error in token balance retrieval for ${input.tokenAddress}:`,
           error
         );
-        return {
-          decimals: 0,
-          isTokenOwner: false,
-          isTokenMinter: false,
-          tokenBalance: "0",
-          isTokenPendingOwner: false,
-          hasPendingOwner: false,
-          hasMinterRole: false,
-          hasOperatorRole: false,
-          hasFlowLimiterRole: false,
-        };
+        return emptyObject;
       }
     }
+
+    if (isXRPLTokenAddressFormat(input.tokenAddress)) {
+      try {
+        return await getXRPLAccountBalance(input.owner, input.tokenAddress);
+      }
+      catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        if (errorMsg.includes("Account not found")) {
+          return emptyObject; // an account that is not activated does not have a balance
+        }
+        throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: errorMsg,
+        });
+      }
+    }
+
     // This is for ERC20 tokens
     const balanceOwner = input.owner as `0x${string}`;
     const tokenAddress = input.tokenAddress as `0x${string}`;
