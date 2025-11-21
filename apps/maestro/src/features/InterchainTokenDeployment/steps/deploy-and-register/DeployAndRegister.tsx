@@ -4,7 +4,7 @@ import { ComponentRef, useMemo, useRef, type FC } from "react";
 import { parseUnits } from "viem";
 
 import { useBalance, useChainId } from "~/lib/hooks";
-import { filterEligibleChains } from "~/lib/utils/chains";
+import { filterEligibleChainsForRemoteDeployment } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton } from "~/ui/compounds/MultiStepForm";
@@ -31,7 +31,7 @@ export const Step2: FC = () => {
 
   const { handleSubmit, isReady } = useHandleSubmit();
 
-  const eligibleChains = filterEligibleChains(state.chains, chainId);
+  const eligibleChains = filterEligibleChainsForRemoteDeployment(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
