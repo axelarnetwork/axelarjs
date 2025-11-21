@@ -25,7 +25,7 @@ import { RegisterCanonicalTokenResult } from "~/features/suiHooks/useRegisterCan
 import { useTransactionsContainer } from "~/features/Transactions";
 import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
-import { filterEligibleChains } from "~/lib/utils/chains";
+import { filterEligibleChainsForRemoteDeployment } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
@@ -258,7 +258,7 @@ export const Step3: FC = () => {
     ]
   );
 
-  const eligibleChains = filterEligibleChains(state.chains, chainId);
+  const eligibleChains = filterEligibleChainsForRemoteDeployment(state.chains, chainId);
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
