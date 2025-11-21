@@ -423,7 +423,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   // There are some chains where we cannot remote deploy to
   // Thus, we need to remove these chains from the `unregistered` object.
-  const unregistered = unregisteredUnfiltered.filter((token) => !(CHAINS_WITHOUT_DEPLOYMENT.includes(token.chainId)));
+  const unregistered = unregisteredUnfiltered.filter((token) => !CHAINS_WITHOUT_DEPLOYMENT.includes(token.chainId));
 
   const destinationChainIds = useMemo(
     () =>
