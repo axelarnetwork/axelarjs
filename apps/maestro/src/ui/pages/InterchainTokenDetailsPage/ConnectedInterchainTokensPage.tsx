@@ -404,8 +404,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     tokenAddress: props.tokenAddress,
   });
 
-  // eslint-disable-next-line prefer-const
-  let [registered, unregistered] = Maybe.of(interchainToken?.matchingTokens)
+  const [registered, unregisteredUnfiltered] = Maybe.of(interchainToken?.matchingTokens)
     .map(
       map(
         (token) =>
@@ -424,7 +423,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
 
   // There are some chains where we cannot remote deploy to
   // Thus, we need to remove these chains from the `unregistered` object.
-  unregistered = unregistered.filter((token) => !(CHAINS_WITHOUT_DEPLOYMENT.includes(token.chainId)));
+  const unregistered = unregisteredUnfiltered.filter((token) => !(CHAINS_WITHOUT_DEPLOYMENT.includes(token.chainId)));
 
   const destinationChainIds = useMemo(
     () =>
