@@ -1,5 +1,13 @@
 # @axelarjs/api
 
+## 0.4.8
+
+### Patch Changes
+
+- Updated dependencies [[`dd036a5c4dbd67c7e78b9493849cccc4b2010001`](https://github.com/axelarnetwork/axelarjs/commit/dd036a5c4dbd67c7e78b9493849cccc4b2010001)]:
+  - @axelarjs/core@0.2.13
+  - @axelarjs/cosmos@0.2.14
+
 ## 0.4.7
 
 ### Patch Changes
@@ -95,7 +103,6 @@
 ### Patch Changes
 
 - [`2011bbf4ee3200f1799752bc65147cd2f5325e11`](https://github.com/axelarnetwork/axelarjs/commit/2011bbf4ee3200f1799752bc65147cd2f5325e11) Thanks [@alanrsoares](https://github.com/alanrsoares)! - apps/maestro:
-
   - optimize searchGMP calls
   - fix token details line height
   - fix search results to center lookup token to origin token
@@ -103,7 +110,6 @@
   - upgrade dependencies
 
   packages/api:
-
   - update searchGMP params to support array of contract methods
 
 ## 0.3.10

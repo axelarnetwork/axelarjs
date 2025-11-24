@@ -1,5 +1,33 @@
 # @axelarjs/maestro
 
+## 0.5.0
+
+### Minor Changes
+
+- [#542](https://github.com/axelarnetwork/axelarjs/pull/542) [`3964a14a4fbfbd0c389ba1511acc76461e53f2ea`](https://github.com/axelarnetwork/axelarjs/commit/3964a14a4fbfbd0c389ba1511acc76461e53f2ea) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - Added support for non-evm chains
+
+  Full support for sui chain
+  - Sui wallet integration
+  - Deploy and manage interchain tokens to and from sui
+
+  Partial support for stellar chain
+  - Use stellar as a remote chain for interchain deployments and transfers
+
+  Added support for devnet-amplifier environment
+
+  Bug fixes and improvements
+
+### Patch Changes
+
+- [#664](https://github.com/axelarnetwork/axelarjs/pull/664) [`6a51fb4e2666dd7e2c232ccfc9c747681115211b`](https://github.com/axelarnetwork/axelarjs/commit/6a51fb4e2666dd7e2c232ccfc9c747681115211b) Thanks [@themetalfleece](https://github.com/themetalfleece)! - fix: improve chains dropdown visuals
+  - Fixed dropdown hitbox issues
+  - Enabled vertical scrolling for dropdown
+  - Fixed z-index of SearchInterchainToken
+
+- Updated dependencies [[`dd036a5c4dbd67c7e78b9493849cccc4b2010001`](https://github.com/axelarnetwork/axelarjs/commit/dd036a5c4dbd67c7e78b9493849cccc4b2010001)]:
+  - @axelarjs/core@0.2.13
+  - @axelarjs/api@0.4.8
+
 ## 0.4.1
 
 ### Patch Changes
@@ -235,7 +263,6 @@
 ### Patch Changes
 
 - [`2011bbf4ee3200f1799752bc65147cd2f5325e11`](https://github.com/axelarnetwork/axelarjs/commit/2011bbf4ee3200f1799752bc65147cd2f5325e11) Thanks [@alanrsoares](https://github.com/alanrsoares)! - apps/maestro:
-
   - optimize searchGMP calls
   - fix token details line height
   - fix search results to center lookup token to origin token
@@ -243,7 +270,6 @@
   - upgrade dependencies
 
   packages/api:
-
   - update searchGMP params to support array of contract methods
 
 - Updated dependencies [[`2011bbf4ee3200f1799752bc65147cd2f5325e11`](https://github.com/axelarnetwork/axelarjs/commit/2011bbf4ee3200f1799752bc65147cd2f5325e11)]:
@@ -254,7 +280,6 @@
 ### Patch Changes
 
 - [`e4e1664fc4a6616f30b2a6749a35a0c30746908b`](https://github.com/axelarnetwork/axelarjs/commit/e4e1664fc4a6616f30b2a6749a35a0c30746908b) Thanks [@alanrsoares](https://github.com/alanrsoares)! - Bug fixes:
-
   - fix: polyfill BigInt.prototype.toJSON
   - fix: eligible target chains state derivation
 
@@ -278,7 +303,6 @@
 ### Minor Changes
 
 - [#211](https://github.com/axelarnetwork/axelarjs/pull/211) [`f4ef92e88669fc0cad487d63d70cda3fa5c69e80`](https://github.com/axelarnetwork/axelarjs/commit/f4ef92e88669fc0cad487d63d70cda3fa5c69e80) Thanks [@alanrsoares](https://github.com/alanrsoares)!
-
   - Major dependency upgrades:
     - react-query v5.x
     - wagmi v2.x
@@ -286,12 +310,10 @@
     - tprc v11.x
 
   Bugfixes:
-
   - [#206](https://github.com/axelarnetwork/axelarjs/issues/206) locale related bigint parse issue on token deployment and interchain transfer flows -
   - [#204](https://github.com/axelarnetwork/axelarjs/pull/204) use 'auto' flag for gas multiplier to allow for dynamic multiplier when retrieving gas quotes
 
   UX:
-
   - Interhcain token page: new pending section for remote interchain tokens being deployed
   - [#210](https://github.com/axelarnetwork/axelarjs/pull/210) Token manager address for each registered token now appears in the card on the token details page
   - [#209](https://github.com/axelarnetwork/axelarjs/pull/209) Indexing custom token deployments now appears in leaderboard
