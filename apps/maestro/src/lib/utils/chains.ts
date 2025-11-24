@@ -9,8 +9,9 @@ type ChainConfigIndex = {
 };
 
 /**
- * Filters out destination chains that are not eligible for the current chain vm chain.
+ * Filters out destination chains that are not eligible for the current chain vm chain for ITS transfers.
  * Currently, only VM chains are eligible for the current chain type.
+ * Use filterEligibleChainsForRemoteDeployment instead to get the chains that support remote deployments 
  * @param destinationChains - The list of chains to filter.
  * @param currentChainId - The ID of the current chain.
  * @returns A filtered list of chains.
@@ -33,8 +34,6 @@ export const filterEligibleChains = (
   const isAllChainsWhitelisted = whitelistedChains[0] === "all";
 
   return destinationChains.filter((chain) => {
-    if (CHAINS_WITHOUT_DEPLOYMENT.includes(chain.chain_id))
-      return false;
     const isOriginChainSameAsDestinationChain =
       chain.chain_id === currentChainId;
     const areDifferentChainTypes = chain.chain_type !== currentChain.chain_type;
@@ -53,6 +52,16 @@ export const filterEligibleChains = (
     // Chains with the same chain type are always included
     return true;
   });
+};
+
+export const filterEligibleChainsForRemoteDeployment = (
+  destinationChains: ITSChainConfig[],
+  currentChainId: number
+): ITSChainConfig[] => {
+  const eligibleDestinationChains = filterEligibleChains(destinationChains, currentChainId);
+  return eligibleDestinationChains.filter((chain) => (
+    !CHAINS_WITHOUT_DEPLOYMENT.includes(chain.chain_id)
+  ));
 };
 
 /**

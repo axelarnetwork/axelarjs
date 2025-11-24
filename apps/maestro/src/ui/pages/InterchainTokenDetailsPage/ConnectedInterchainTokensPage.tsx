@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { concat, isEmpty, map, partition, uniq, without } from "rambda";
 
 import {
+  CHAINS_WITHOUT_DEPLOYMENT,
   EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
   SUI_CHAIN_ID,
 } from "~/config/chains";
@@ -403,7 +404,7 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
     tokenAddress: props.tokenAddress,
   });
 
-  const [registered, unregistered] = Maybe.of(interchainToken?.matchingTokens)
+  const [registered, unregisteredUnfiltered] = Maybe.of(interchainToken?.matchingTokens)
     .map(
       map(
         (token) =>
@@ -419,6 +420,10 @@ const ConnectedInterchainTokensPage: FC<ConnectedInterchainTokensPageProps> = (
       [[], []],
       partition((x) => x.isRegistered)
     );
+
+  // There are some chains where we cannot remote deploy to
+  // Thus, we need to remove these chains from the `unregistered` object.
+  const unregistered = unregisteredUnfiltered.filter((token) => !CHAINS_WITHOUT_DEPLOYMENT.includes(token.chainId));
 
   const destinationChainIds = useMemo(
     () =>
