@@ -95,7 +95,7 @@
     "swagger-ui-react": "^5.12.0",
     "trpc-openapi": "^1.2.0",
     "unfetch": "^4.2.0",
-    "viem": "^2.30.1",
+    "viem": "^2.40.0",
     "wagmi": "^2.5.12",
     "xrpl": "^4.4.2",
     "zod": "^3.22.4"
