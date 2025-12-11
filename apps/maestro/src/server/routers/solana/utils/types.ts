@@ -36,3 +36,9 @@ export type InterchainTransferInput = {
   amount: string;
   gasValue: string;
 };
+
+export type MintInterchainTokenInput = {
+  caller: string;
+  tokenId: string;
+  amount: string;
+};

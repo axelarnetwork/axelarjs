@@ -14,6 +14,8 @@ const DEPLOYMENT_APPROVAL_SEED = "deployment-approval";
 const USER_ROLES_SEED = "user-roles";
 const ROLE_RPOPOSAL_SEED = "role-proposal";
 const CALL_CONTRACT_SIGNING_SEED = "gtw-call-contract";
+const GAS_TREASURY_SEED = "gas-service";
+const EVENT_AUTHORITY_SEED = "__event_authority";
 
 export const TOKEN_METADATA_PROGRAM_ID = new PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
@@ -141,6 +143,24 @@ export function findGasConfigPda(
   return PublicKey.findProgramAddressSync(
     [Buffer.from("config")],
     gasServiceProgramId
+  );
+}
+
+export function findEventAuthority(
+  programId: PublicKey
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from(EVENT_AUTHORITY_SEED)],
+    programId
+  );
+}
+
+export function findGasTreasuryPda(
+  programId: PublicKey
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from(GAS_TREASURY_SEED)],
+    programId
   );
 }
 

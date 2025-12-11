@@ -2,6 +2,7 @@ import { SolanaChainConfig } from "@axelarjs/api";
 
 import { Metaplex } from "@metaplex-foundation/js";
 import { Connection, PublicKey } from "@solana/web3.js";
+import { createHash } from "crypto";
 
 import { solanaChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
@@ -57,6 +58,15 @@ export const getSolanaChainConfig = async (
 
   return chainConfig;
 };
+
+export async function anchorInstructionDiscriminator(
+  methodName: string
+): Promise<Buffer> {
+  const preimage = `global:${methodName}`;
+  const hash = createHash("sha256").update(preimage, "utf8").digest();
+  // first 8 bytes = discriminator
+  return Buffer.from(hash.subarray(0, 8));
+}
 
 export async function getItsProgramId(ctx: Context): Promise<PublicKey> {
   const chainConfig = await getSolanaChainConfig(ctx);
