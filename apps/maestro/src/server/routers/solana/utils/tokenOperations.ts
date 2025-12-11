@@ -53,12 +53,12 @@ const SPL_TOKEN_PROGRAM_ID = new PublicKey(
   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 );
 
-  const DEPLOY_INTERCHAIN_TOKEN_INSTRUCTION_ID = await anchorInstructionDiscriminator("deploy_interchain_token");
-  const REGISTER_CANONICAL_INTERCHAIN_TOKEN_INSTRUCTION_ID = await anchorInstructionDiscriminator("register_canonical_interchain_token");
-  const DEPLOY_REMOTE_INTERCHAIN_TOKEN_INSTRUCTION_ID = await anchorInstructionDiscriminator("deploy_remote_interchain_token");
-  const DEPLOY_REMOTE_CANONICAL_INTERCHAIN_TOKEN_INSTRUCTION_ID = await anchorInstructionDiscriminator("deploy_remote_canonical_interchain_token");
-  const INTERCHAIN_TRANSFER_INSTRUCTION_ID = await anchorInstructionDiscriminator("interchain_transfer");
-  const MINT_INTERCHAIN_TOKEN_INSTRUCTION_ID = await anchorInstructionDiscriminator("mint_interchain_token");
+  const DEPLOY_INTERCHAIN_TOKEN_INSTRUCTION_ID = anchorInstructionDiscriminator("deploy_interchain_token");
+  const REGISTER_CANONICAL_INTERCHAIN_TOKEN_INSTRUCTION_ID = anchorInstructionDiscriminator("register_canonical_interchain_token");
+  const DEPLOY_REMOTE_INTERCHAIN_TOKEN_INSTRUCTION_ID = anchorInstructionDiscriminator("deploy_remote_interchain_token");
+  const DEPLOY_REMOTE_CANONICAL_INTERCHAIN_TOKEN_INSTRUCTION_ID = anchorInstructionDiscriminator("deploy_remote_canonical_interchain_token");
+  const INTERCHAIN_TRANSFER_INSTRUCTION_ID = anchorInstructionDiscriminator("interchain_transfer");
+  const MINT_INTERCHAIN_TOKEN_INSTRUCTION_ID = anchorInstructionDiscriminator("mint_interchain_token");
 
 export async function buildDeployInterchainTokenTxBytes(
   ctx: Context,

@@ -59,7 +59,7 @@ const InterchainTokensPage: FC = () => {
         <TokenDetailsSection
           chain={interchainToken.chain}
           tokenAddress={tokenAddress}
-          decimals={tokenDetails.decimals}
+          decimals={tokenDetails.decimals ?? 18}
           name={tokenDetails.name}
           symbol={tokenDetails.symbol}
           deploymentMessageId={interchainTokenDetails?.deploymentMessageId}
@@ -89,7 +89,7 @@ const InterchainTokensPage: FC = () => {
             tokenAddress={tokenAddress}
             tokenName={tokenDetails.name}
             tokenSymbol={tokenDetails.symbol}
-            decimals={tokenDetails.decimals}
+            decimals={tokenDetails.decimals ?? 18}
             tokenId={interchainToken.tokenId}
           />
         </>

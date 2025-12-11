@@ -38,10 +38,11 @@ export const getSolanaChainConfig = async (
     );
   };
 
-  const chainConfig = (chainConfigs.chains[preferredKey] ||
-    chainConfigs.chains[pickKeyForEnv(NEXT_PUBLIC_NETWORK_ENV)]) as
-    | SolanaChainConfig
-    | undefined;
+  const chainConfig =
+    (chainConfigs.chains[preferredKey] ||
+      chainConfigs.chains[pickKeyForEnv(NEXT_PUBLIC_NETWORK_ENV)]) as
+      | SolanaChainConfig
+      | undefined;
 
   if (!chainConfig || chainConfig.chainType !== "svm") {
     console.error("[SolanaConfig] Invalid Solana chain config", {
@@ -49,8 +50,8 @@ export const getSolanaChainConfig = async (
       env: NEXT_PUBLIC_NETWORK_ENV,
       availableKeys: s3Keys,
       resolved: chainConfig && {
-        id: (chainConfig as any).id,
-        chainType: (chainConfig as any).chainType,
+        id: chainConfig.id,
+        chainType: chainConfig.chainType,
       },
     });
     throw new Error("Invalid Solana chain config");
@@ -59,9 +60,9 @@ export const getSolanaChainConfig = async (
   return chainConfig;
 };
 
-export async function anchorInstructionDiscriminator(
+export function anchorInstructionDiscriminator(
   methodName: string
-): Promise<Buffer> {
+): Buffer {
   const preimage = `global:${methodName}`;
   const hash = createHash("sha256").update(preimage, "utf8").digest();
   // first 8 bytes = discriminator
@@ -70,8 +71,8 @@ export async function anchorInstructionDiscriminator(
 
 export async function getItsProgramId(ctx: Context): Promise<PublicKey> {
   const chainConfig = await getSolanaChainConfig(ctx);
-  const itsAddr = (chainConfig.config as any)?.contracts?.InterchainTokenService
-    ?.address as string | undefined;
+  const itsAddr = (chainConfig.config as { contracts?: { InterchainTokenService?: { address?: string } } })?.contracts
+    ?.InterchainTokenService?.address;
   if (!itsAddr) {
     throw new Error(
       "InterchainTokenService address not found in Solana config"
@@ -84,8 +85,8 @@ export async function getItsProgramId(ctx: Context): Promise<PublicKey> {
 
 export async function getGatewayProgramId(ctx: Context): Promise<PublicKey> {
   const chainConfig = await getSolanaChainConfig(ctx);
-  const gatewayAddr = (chainConfig.config as any)?.contracts?.AxelarGateway
-    ?.address as string | undefined;
+  const gatewayAddr = (chainConfig.config as { contracts?: { AxelarGateway?: { address?: string } } })?.contracts
+    ?.AxelarGateway?.address;
   if (!gatewayAddr) {
     throw new Error("AxelarGateway address not found in Solana config");
   }
@@ -98,8 +99,9 @@ export async function getAxelarGasServiceProgramId(
   ctx: Context
 ): Promise<PublicKey> {
   const chainConfig = await getSolanaChainConfig(ctx);
-  const gasServiceAddr = (chainConfig.config as any)?.contracts
-    ?.AxelarGasService?.address as string | undefined;
+  const gasServiceAddr = (chainConfig.config as {
+    contracts?: { AxelarGasService?: { address?: string } };
+  })?.contracts?.AxelarGasService?.address;
   if (!gasServiceAddr) {
     throw new Error("AxelarGasService address not found in config");
   }
@@ -134,7 +136,16 @@ export function stringToBytes(input: string): Uint8Array {
   return Buffer.from(input, "utf8");
 }
 
-export async function getMetadata(tokenAddress: string, ctx: Context) {
+type SolanaTokenMetadata = {
+  name: string;
+  symbol: string;
+  decimals: number | null;
+};
+
+export async function getMetadata(
+  tokenAddress: string,
+  ctx: Context
+): Promise<SolanaTokenMetadata | null> {
   const solanaConfig = await getSolanaChainConfig(ctx);
   const connection = new Connection(solanaConfig.config.rpc[0], "confirmed");
   const metaplex = Metaplex.make(connection);
@@ -149,8 +160,14 @@ export async function getMetadata(tokenAddress: string, ctx: Context) {
 
     // Fetch mint for decimals
     const mintInfo = await connection.getParsedAccountInfo(mint);
+
+    type ParsedMintInfo = {
+      parsed?: { info?: { decimals?: number } };
+    };
+
     const decimals =
-      (mintInfo.value?.data as any)?.parsed?.info?.decimals ??
+      (mintInfo.value?.data as ParsedMintInfo | null | undefined)?.parsed?.info
+        ?.decimals ??
       tokenMetadata.mint?.decimals ??
       null;
 
@@ -158,9 +175,9 @@ export async function getMetadata(tokenAddress: string, ctx: Context) {
       name,
       symbol,
       decimals,
-    } as any;
+    };
   } catch {
-    return null as any;
+    return null;
   }
 }
 
