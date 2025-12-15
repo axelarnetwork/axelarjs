@@ -145,8 +145,7 @@ export function useInterchainTransferMutation(
           trackTokenTransfer(
             config.sourceChainName,
             config.destinationChainName,
-            config.tokenAddress,
-            amount
+            config.tokenAddress
           );
 
           setTxState({

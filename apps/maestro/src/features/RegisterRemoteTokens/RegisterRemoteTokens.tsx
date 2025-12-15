@@ -114,7 +114,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     });
 
     // Track analytics events for remote tokens
-    trackRemoteTokenEvents(props.deploymentKind, remoteTokens);
+    trackRemoteTokenDeployments(props.deploymentKind, remoteTokens);
 
     setTxState({
       status: "confirmed",
@@ -149,7 +149,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     });
 
     // Track analytics events for remote tokens
-    trackRemoteTokenEvents(props.deploymentKind, remoteTokens);
+    trackRemoteTokenDeployments(props.deploymentKind, remoteTokens);
 
     setTxState({ status: "confirmed", hash: txState.hash });
   }, [

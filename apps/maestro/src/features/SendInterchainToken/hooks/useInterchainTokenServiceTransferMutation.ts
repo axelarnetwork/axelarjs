@@ -123,8 +123,7 @@ export function useInterchainTokenServiceTransferMutation(
           trackTokenTransfer(
             config.sourceChainName,
             config.destinationChainName,
-            config.tokenAddress,
-            approvedAmountRef.current.toString()
+            config.tokenAddress
           );
 
           setTxState({

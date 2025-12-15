@@ -60,13 +60,11 @@ export function trackRemoteTokenDeployments(
 export function trackTokenTransfer(
   originChain: string,
   destinationChain: string,
-  tokenAddress: string,
-  amount: string
+  tokenAddress: string
 ) {
   track("token_transfer", {
     originChain,
     destinationChain,
     tokenAddress,
-    amount,
   });
 }
