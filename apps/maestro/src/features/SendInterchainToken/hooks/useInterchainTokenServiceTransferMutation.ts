@@ -165,6 +165,8 @@ export function useInterchainTokenServiceTransferMutation(
       config.destinationChainName,
       config.gas,
       config.tokenId,
+      config.sourceChainName,
+      config.tokenAddress,
       interchainTransferAsync,
       setTxState,
       shouldScaleGas,

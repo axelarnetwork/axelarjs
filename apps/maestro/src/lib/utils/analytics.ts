@@ -55,7 +55,6 @@ export function trackRemoteTokenDeployments(
  * @param originChain - The chain where the transfer originates
  * @param destinationChain - The destination chain for the transfer
  * @param tokenAddress - The address of the token being transferred
- * @param amount - The amount being transferred (as string)
  */
 export function trackTokenTransfer(
   originChain: string,
