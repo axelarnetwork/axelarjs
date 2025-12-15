@@ -2,7 +2,11 @@ import { INTERCHAIN_TOKEN_SERVICE_ENCODERS } from "@axelarjs/evm";
 import { Maybe } from "@axelarjs/utils";
 import { useMemo, useState } from "react";
 
-import { HEDERA_CHAIN_ID, XRPL_CHAIN_ID, XRPL_EVM_CHAIN_ID } from "~/config/chains";
+import {
+  HEDERA_CHAIN_ID,
+  XRPL_CHAIN_ID,
+  XRPL_EVM_CHAIN_ID,
+} from "~/config/chains";
 import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_TOKEN_SERVICE_ADDRESS,
@@ -13,6 +17,7 @@ import { useBalance } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { toNumericString } from "~/lib/utils/bigint";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
+import { xrplScaleGas } from "~/lib/utils/xrpl";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import {
@@ -24,7 +29,6 @@ import { useNativeTokenDetailsQuery } from "~/services/nativeTokens/hooks";
 import { useTransactionsContainer } from "../Transactions";
 import { useInterchainTokenServiceTransferMutation } from "./hooks/useInterchainTokenServiceTransferMutation";
 import { useInterchainTransferMutation } from "./hooks/useInterchainTransferMutation";
-import { xrplScaleGas } from "~/lib/utils/xrpl";
 
 // Chains that should force using Interchain Token Service path
 const CHAINS_REQUIRING_TOKEN_SERVICE = [HEDERA_CHAIN_ID];
@@ -80,7 +84,8 @@ export function useSendInterchainTokenState(props: {
   const shouldUseTokenService =
     CHAINS_REQUIRING_TOKEN_SERVICE.includes(props.sourceChain.chain_id) ||
     isApprovalRequired ||
-    (props.sourceChain.chain_id === XRPL_EVM_CHAIN_ID && props.tokenAddress === XRPL_EVM_XRP_ADDRESS);
+    (props.sourceChain.chain_id === XRPL_EVM_CHAIN_ID &&
+      props.tokenAddress === XRPL_EVM_XRP_ADDRESS);
 
   const [isModalOpen, setIsModalOpen] = useState(props.isModalOpen ?? false);
   const [toChainId, selectToChain] = useState(5);
@@ -124,7 +129,9 @@ export function useSendInterchainTokenState(props: {
   const nativeTokenSymbol = getNativeToken(props.sourceChain.id.toLowerCase());
   const isXRPLChain = props.sourceChain.chain_id == XRPL_CHAIN_ID;
 
-  const payWithToken = CHAINS_PAYING_GAS_WITH_BRIDGED_TOKEN.includes(props.sourceChain.chain_id);
+  const payWithToken = CHAINS_PAYING_GAS_WITH_BRIDGED_TOKEN.includes(
+    props.sourceChain.chain_id
+  );
 
   let sourceChainTokenSymbol;
   if (isXRPLChain) {
@@ -136,8 +143,13 @@ export function useSendInterchainTokenState(props: {
     sourceChainTokenSymbol = nativeTokenSymbol;
   }
 
-  // eslint-disable-next-line prefer-const
-  let { data: gas, isLoading: isGasLoading, isFetching: isGasFetching } = useEstimateGasFeeQuery({
+  let {
+    data: gas,
+    // eslint-disable-next-line prefer-const
+    isLoading: isGasLoading,
+    // eslint-disable-next-line prefer-const
+    isFetching: isGasFetching,
+  } = useEstimateGasFeeQuery({
     sourceChainId: props.sourceChain.id,
     destinationChainId: selectedToChain?.id,
     sourceChainTokenSymbol,
@@ -147,12 +159,19 @@ export function useSendInterchainTokenState(props: {
   });
 
   let gasFeeDecimals =
-          CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
-          props.sourceChain.native_token.decimals;
+    CHAINS_GAS_FEE_DECIMALS[props.sourceChain.chain_id] ||
+    props.sourceChain.native_token.decimals;
+
+  const tokenDecimals = tokenDetails?.decimals ?? undefined;
 
   if (isXRPLChain) {
     // when XRPL is the source chain, we have to remap the return value of the estimate gas fee query to the "actual" decimals
-    ({gas, gasFeeDecimals} = xrplScaleGas(sourceChainTokenSymbol === nativeTokenSymbol, tokenDetails?.decimals, gas, gasFeeDecimals));
+    ({ gas, gasFeeDecimals } = xrplScaleGas(
+      sourceChainTokenSymbol === nativeTokenSymbol,
+      tokenDecimals,
+      gas,
+      gasFeeDecimals
+    ));
   }
 
   // Compute spender address for approvals

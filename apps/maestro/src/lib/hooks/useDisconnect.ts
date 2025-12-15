@@ -1,8 +1,12 @@
 import { useDisconnectWallet } from "@mysten/dapp-kit";
+import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react";
+import {
+  useDisconnect as useXRPLDisconnect,
+  useWallet as useXRPLWallet,
+} from "@xrpl-wallet-standard/react";
 import { useDisconnect as useWagmiDisconnect } from "wagmi";
 
 import { setStellarConnectionState } from "../utils/stellar";
-import { useWallet as useXRPLWallet, useDisconnect as useXRPLDisconnect } from "@xrpl-wallet-standard/react";
 
 interface DisconnectResult {
   disconnect: () => void;
@@ -13,6 +17,7 @@ export function useDisconnect(): DisconnectResult {
   const { disconnect: wagmiDisconnect, error: wagmiError } =
     useWagmiDisconnect();
   const { mutate: suiDisconnect } = useDisconnectWallet();
+  const solana = useSolanaWallet();
   const xrplDisconnect = useXRPLDisconnect();
   const xrpl = useXRPLWallet();
   let error: Error | null = wagmiError;
@@ -30,14 +35,22 @@ export function useDisconnect(): DisconnectResult {
       // Attempt to disconnect from SUI wallet
       suiDisconnect();
 
+      // Attempt to disconnect from Solana wallet
+      if (solana?.connected) {
+        solana.disconnect().catch((e) => {
+          throw new Error("[Disconnect] Solana disconnect error", e?.message);
+        });
+      }
+
       // Attempt to disconnect from xrpl wallet
       if (xrpl.status === "connected") {
-        xrplDisconnect().catch(err => {
+        xrplDisconnect().catch((err) => {
           console.error("Failed to disconnect XRPL:", err); // we don't really care if that fails
         });
       }
     } catch (e) {
       error = e as Error;
+      console.error("[Disconnect] Error", error?.message);
     }
   };
 

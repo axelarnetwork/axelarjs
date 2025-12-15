@@ -3,6 +3,7 @@ import { ComponentRef, useMemo, useRef, type FC } from "react";
 
 import { parseUnits } from "viem";
 
+import { SOLANA_CHAIN_ID } from "~/config/chains";
 import { useBalance, useChainId } from "~/lib/hooks";
 import { filterEligibleChainsForRemoteDeployment } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
@@ -31,7 +32,10 @@ export const Step2: FC = () => {
 
   const { handleSubmit, isReady } = useHandleSubmit();
 
-  const eligibleChains = filterEligibleChainsForRemoteDeployment(state.chains, chainId);
+  const eligibleChains = filterEligibleChainsForRemoteDeployment(
+    state.chains,
+    chainId
+  );
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
@@ -47,7 +51,9 @@ export const Step2: FC = () => {
       return false;
     }
 
-    const gasFeeBn = parseUnits(state.totalGasFee, balance.decimals);
+    // Remove thousands separators before parsing (e.g., 15,227.5011 -> 15227.5011)
+    const sanitizedGasFee = String(state.totalGasFee ?? "").replace(/,/g, "");
+    const gasFeeBn = parseUnits(sanitizedGasFee, balance.decimals);
 
     return gasFeeBn > balance.value;
   }, [balance, state.remoteDeploymentGasFees, state.totalGasFee]);
@@ -71,32 +77,36 @@ export const Step2: FC = () => {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <FormControl>
-          <Label>
-            <Label.Text>Additional chains (optional):</Label.Text>
-            {Boolean(state.remoteDeploymentGasFees?.gasFees.length) && (
-              <Label.AltText>
-                <Tooltip tip="Approximate gas cost">
-                  <span className="ml-2 whitespace-nowrap text-xs">
-                    (≈ {state.totalGasFee}{" "}
-                    {state?.sourceChainId && nativeTokenSymbol} in fees)
-                  </span>
-                </Tooltip>
-              </Label.AltText>
-            )}
-          </Label>
-          <ChainPicker
-            eligibleChains={eligibleChains}
-            selectedChains={rootState.selectedChains}
-            onChainClick={rootActions.toggleAdditionalChain}
-            disabled={
-              rootState.txState.type === "pending_approval" ||
-              rootState.txState.type === "deploying"
-            }
-            erroredChains={erroredDestinationChainIds}
-            loading={state.isEstimatingGasFees}
-          />
-        </FormControl>
+        {/* TODO: add support for Solana destination chains */}
+        {/* Hide Additional chains section for Solana since it doesn't support destination chains */}
+        {sourceChain?.chain_id !== SOLANA_CHAIN_ID && (
+          <FormControl>
+            <Label>
+              <Label.Text>Additional chains (optional):</Label.Text>
+              {Boolean(state.remoteDeploymentGasFees?.gasFees.length) && (
+                <Label.AltText>
+                  <Tooltip tip="Approximate gas cost">
+                    <span className="ml-2 whitespace-nowrap text-xs">
+                      (≈ {state.totalGasFee}{" "}
+                      {state?.sourceChainId && nativeTokenSymbol} in fees)
+                    </span>
+                  </Tooltip>
+                </Label.AltText>
+              )}
+            </Label>
+            <ChainPicker
+              eligibleChains={eligibleChains}
+              selectedChains={rootState.selectedChains}
+              onChainClick={rootActions.toggleAdditionalChain}
+              disabled={
+                rootState.txState.type === "pending_approval" ||
+                rootState.txState.type === "deploying"
+              }
+              erroredChains={erroredDestinationChainIds}
+              loading={state.isEstimatingGasFees}
+            />
+          </FormControl>
+        )}
         <button type="submit" ref={formSubmitRef} />
       </form>
       <Dialog.Actions>

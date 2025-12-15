@@ -34,7 +34,11 @@ export function useInterchainTokensQuery(input: {
 
   const destinationChainConfigs = matchingTokens
     .map((token) => {
-      return combinedComputed.indexedById[token.axelarChainId];
+      // prefer axelarChainId index; fallback to numeric chain_id index
+      return (
+        combinedComputed.indexedById[token.axelarChainId] ||
+        combinedComputed.indexedByChainId[token.chainId]
+      );
     })
     .filter(Boolean);
 
@@ -42,12 +46,38 @@ export function useInterchainTokensQuery(input: {
     ? filterEligibleChains(destinationChainConfigs, input.chainId)
     : destinationChainConfigs;
 
+  const topLevelChain = useMemo(() => {
+    // try direct route-provided chainId
+    const direct = input.chainId
+      ? combinedComputed.indexedByChainId[input.chainId]
+      : undefined;
+    if (direct) return direct;
+
+    // try from result axelarChainId
+    const byAxelarId = data?.axelarChainId
+      ? combinedComputed.indexedById[data.axelarChainId]
+      : undefined;
+    if (byAxelarId) return byAxelarId;
+
+    // try from result numeric chainId
+    const byNumeric = data?.chainId
+      ? combinedComputed.indexedByChainId[data.chainId]
+      : undefined;
+    return byNumeric;
+  }, [
+    combinedComputed.indexedByChainId,
+    combinedComputed.indexedById,
+    data?.axelarChainId,
+    data?.chainId,
+    input.chainId,
+  ]);
+
   return {
     ...queryResult,
     data: {
       ...data,
       matchingTokens: data?.matchingTokens
-        .filter((token) => {
+        ?.filter((token) => {
           return (
             !!eligibleChainConfigs.find((x) => x.id === token.axelarChainId) ||
             token.chainId === input.chainId
@@ -55,14 +85,14 @@ export function useInterchainTokensQuery(input: {
         })
         .map((token) => ({
           ...token,
-          chain: combinedComputed.indexedById[token.axelarChainId ?? ""],
+          chain:
+            combinedComputed.indexedById[token.axelarChainId ?? ""] ||
+            combinedComputed.indexedByChainId[token.chainId],
           wagmiConfig: combinedComputed.wagmiChains?.find(
             (x) => x?.id === Number(token.chainId)
           ),
         })),
-      chain: Maybe.of(input.chainId).mapOrUndefined(
-        (x) => combinedComputed.indexedByChainId[x]
-      ),
+      chain: topLevelChain,
       wagmiConfig: Maybe.of(input.chainId)
         .map(Number)
         .mapOrUndefined((chainId) =>

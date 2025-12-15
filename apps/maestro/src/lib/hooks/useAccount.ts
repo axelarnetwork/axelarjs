@@ -1,15 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount as useMystenAccount } from "@mysten/dapp-kit";
+import {
+  useConnection,
+  useWallet as useSolanaWallet,
+} from "@solana/wallet-adapter-react";
+import { clusterApiUrl } from "@solana/web3.js";
 import { getAddress, getNetwork, isConnected } from "@stellar/freighter-api";
+import { useAccount as useXRPLAccount } from "@xrpl-wallet-standard/react";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
-import { useAccount as useXRPLAccount } from "@xrpl-wallet-standard/react";
 
-import { 
-  stellarChainConfig, 
+import {
+  solanaChainConfig,
+  stellarChainConfig,
   suiChainConfig,
-  xrplChainConfig
+  xrplChainConfig,
 } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import {
@@ -29,6 +35,7 @@ interface CombinedAccountInfo {
   isEvmChain: boolean;
   chainName?: string;
   isWrongSuiNetwork?: boolean;
+  isWrongSolanaNetwork?: boolean;
   isWrongStellarNetwork?: boolean;
   isLoadingStellar?: boolean;
 }
@@ -36,6 +43,8 @@ interface CombinedAccountInfo {
 export function useAccount(): CombinedAccountInfo {
   const wagmiAccount = useWagmiAccount();
   const mystenAccount = useMystenAccount();
+  const solanaWallet = useSolanaWallet();
+  const { connection: solanaConnection } = useConnection();
   const xrplAccount = useXRPLAccount();
   const [stellarAccount, setStellarAccount] = useState<string | null>(null);
   const [stellarNetwork, setStellarNetwork] = useState<string | null>(null);
@@ -44,6 +53,12 @@ export function useAccount(): CombinedAccountInfo {
   const { data: evmChains } = useEVMChainConfigsQuery();
   const APP_SUI_NETWORK =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "sui:mainnet" : "sui:testnet";
+  const APP_SOLANA_CLUSTER =
+    NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+      ? "mainnet-beta"
+      : NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier"
+        ? "devnet"
+        : "testnet";
   const APP_STELLAR_NETWORK =
     NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? "PUBLIC" : "TESTNET";
   const checkFreighterStatus = useCallback(async () => {
@@ -93,6 +108,7 @@ export function useAccount(): CombinedAccountInfo {
 
   const isWagmiConnected = wagmiAccount.isConnected;
   const isMystenConnected = !!mystenAccount;
+  const isSolanaConnected = !!solanaWallet.publicKey;
   const isStellarConnected = !!stellarAccount;
   const isXRPLConnected = !!xrplAccount?.address;
 
@@ -105,14 +121,25 @@ export function useAccount(): CombinedAccountInfo {
     address:
       wagmiAccount.address ||
       (mystenAccount?.address as `0x${string}`) ||
+      (solanaWallet.publicKey?.toBase58() as unknown as `0x${string}`) ||
       (stellarAccount as string) ||
       (xrplAccount?.address as string),
-    isConnected: isWagmiConnected || isMystenConnected || isStellarConnected || isXRPLConnected,
+    isConnected:
+      isWagmiConnected ||
+      isMystenConnected ||
+      isSolanaConnected ||
+      isStellarConnected ||
+      isXRPLConnected,
     isDisconnected:
-      !isWagmiConnected && !isMystenConnected && !isStellarConnected && !isXRPLConnected,
+      !isWagmiConnected &&
+      !isMystenConnected &&
+      !isSolanaConnected &&
+      !isStellarConnected &&
+      !isXRPLConnected,
     chain:
       wagmiAccount.chain ||
       (isMystenConnected && suiChainConfig) ||
+      (isSolanaConnected && solanaChainConfig) ||
       (isStellarConnected && stellarChainConfig) ||
       (isXRPLConnected && xrplChainConfig) ||
       undefined,
@@ -120,11 +147,16 @@ export function useAccount(): CombinedAccountInfo {
     chainName:
       evmChain?.chain_name ||
       (isMystenConnected && "Sui") ||
+      (isSolanaConnected && solanaChainConfig.name) ||
       (isStellarConnected && "Stellar") ||
       (isXRPLConnected && xrplChainConfig.name) ||
       undefined,
     isWrongSuiNetwork:
       isMystenConnected && mystenAccount?.chains[0] !== APP_SUI_NETWORK,
+    isWrongSolanaNetwork:
+      isSolanaConnected &&
+      !!solanaConnection &&
+      solanaConnection.rpcEndpoint !== clusterApiUrl(APP_SOLANA_CLUSTER),
     isWrongStellarNetwork:
       isStellarConnected &&
       !!stellarNetwork &&

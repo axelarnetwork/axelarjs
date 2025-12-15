@@ -28,6 +28,7 @@ import { z } from "zod";
 
 import {
   HEDERA_CHAIN_ID,
+  SOLANA_CHAIN_ID,
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
   XRPL_CHAIN_ID,
@@ -35,9 +36,9 @@ import {
 import { useAccount } from "~/lib/hooks";
 import { trpc } from "~/lib/trpc";
 import { hex64Literal } from "~/lib/utils/validation";
+import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
-import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 
 export type TokenDetailsSectionProps = {
   name: string;
@@ -72,6 +73,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
 
   const isSuiChain = props.chain.chain_id === SUI_CHAIN_ID;
   const isStellarChain = props.chain.chain_id === STELLAR_CHAIN_ID;
+  const isSolanaChain = props.chain.chain_id === SOLANA_CHAIN_ID;
   const isHederaChain = props.chain.chain_id === HEDERA_CHAIN_ID;
   const isXRPLChain = props.chain.chain_id === XRPL_CHAIN_ID;
   const tokenAddress = props.tokenAddress;
@@ -97,6 +99,7 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
     wallet &&
     !isSuiChain &&
     !isStellarChain &&
+    !isSolanaChain &&
     !isHederaChain &&
     !isXRPLChain
   ) {
@@ -239,6 +242,8 @@ const TokenDetailsSection: FC<TokenDetailsSectionProps> = (props) => {
       return `${explorer?.url}/coin/${props.tokenAddress}`;
     } else if (props.chain.chain_type.includes("stellar")) {
       return `${explorer?.url}/coin/${props.tokenAddress}`;
+    } else if (isSolanaChain) {
+      return `${explorer?.url}/address/${props.tokenAddress}`;
     } else if (props.chain.id.includes("stellar")) {
       if (props.tokenAddress.includes("-")) {
         return `${explorer?.url}/asset/${props.tokenAddress}`;

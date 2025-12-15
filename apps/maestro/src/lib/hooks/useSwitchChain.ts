@@ -1,8 +1,9 @@
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
-import { 
+import {
   getSwitchChainEthParamWithRpc,
-  stellarChainConfig, 
+  solanaChainConfig,
+  stellarChainConfig,
   suiChainConfig,
   xrplChainConfig,
 } from "~/config/chains";
@@ -21,14 +22,18 @@ export function useSwitchChain() {
       const isCurrentChainSui = currentChainId === suiChainConfig.id;
       const isCurrentChainStellar = currentChainId === stellarChainConfig.id;
       const isTargetChainStellar = chainId === stellarChainConfig.id;
+      const isCurrentChainSolana = currentChainId === solanaChainConfig?.id;
+      const isTargetChainSolana = chainId === solanaChainConfig?.id;
       const isCurrentChainXRPL = currentChainId === xrplChainConfig.id;
       const isTargetChainXRPL = chainId === xrplChainConfig.id;
-      
+
       const evmToEvm =
         !isTargetChainSui &&
         !isCurrentChainSui &&
         !isCurrentChainStellar &&
         !isTargetChainStellar &&
+        !isCurrentChainSolana &&
+        !isTargetChainSolana &&
         !isCurrentChainXRPL &&
         !isTargetChainXRPL;
       if (evmToEvm) {

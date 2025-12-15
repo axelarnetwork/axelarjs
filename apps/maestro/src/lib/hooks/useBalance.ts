@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
+import {
+  useConnection,
+  useWallet as useSolanaWallet,
+} from "@solana/wallet-adapter-react";
 import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
@@ -9,14 +13,15 @@ import {
   useBalance as useWagmiBalance,
 } from "wagmi";
 
-import { 
-  stellarChainConfig, 
+import {
+  solanaChainConfig,
+  stellarChainConfig,
   suiChainConfig,
   xrplChainConfig,
 } from "~/config/chains/vm-chains";
 import { STELLAR_HORIZON_URL } from "~/server/routers/stellar/utils/config";
-import { useAccount } from "./useAccount";
 import { fetchXRPLBalance } from "../utils/xrpl";
+import { useAccount } from "./useAccount";
 
 // Define a type for the balance result
 interface BalanceResult {
@@ -31,6 +36,9 @@ export function useBalance(): BalanceResult | undefined {
   const suiAccount = useCurrentAccount();
   const { address, chainName } = useAccount();
   const [stellarBalance, setStellarBalance] = useState<string | null>(null);
+  const { connection: solanaConnection } = useConnection();
+  const { publicKey: solanaPublicKey } = useSolanaWallet();
+  const [solanaLamports, setSolanaLamports] = useState<number | null>(null);
   const { wallet: xrplWallet } = useXRPLWallet();
   const [XRPLDrops, setXRPLDrops] = useState<string | null>(null);
 
@@ -65,16 +73,38 @@ export function useBalance(): BalanceResult | undefined {
   }, [chainName, address]);
 
   useEffect(() => {
-    if (chainName === xrplChainConfig.name && address && xrplWallet?.accounts.length) { // TODO: fix XRPL connection check
+    if (
+      chainName === solanaChainConfig.name &&
+      address &&
+      solanaConnection &&
+      solanaPublicKey
+    ) {
+      const fetchSolBalance = async () => {
+        try {
+          const lamports = await solanaConnection.getBalance(solanaPublicKey);
+          setSolanaLamports(lamports);
+        } catch (error) {
+          setSolanaLamports(null);
+        }
+      };
+      void fetchSolBalance();
+    }
+  }, [chainName, address, solanaConnection, solanaPublicKey]);
+
+  useEffect(() => {
+    if (
+      chainName === xrplChainConfig?.name &&
+      address &&
+      xrplWallet?.accounts.length
+    ) {
+      // TODO: fix XRPL connection check
       void (async () => {
         let drops = "0";
         try {
           drops = await fetchXRPLBalance(address);
-        }
-        catch (error) {
+        } catch (error) {
           // ignore
-        }
-        finally {
+        } finally {
           setXRPLDrops(drops);
         }
       })();
@@ -88,6 +118,20 @@ export function useBalance(): BalanceResult | undefined {
     if (suiBalance) {
       const value = BigInt(suiBalance.totalBalance);
       const { decimals, symbol } = suiChainConfig.nativeCurrency;
+      return {
+        value,
+        formatted: formatUnits(value, decimals),
+        symbol,
+        decimals,
+      };
+    }
+    if (solanaLamports) {
+      const value = BigInt(solanaLamports);
+      const { decimals, symbol } = (
+        solanaChainConfig ?? {
+          nativeCurrency: { decimals: 9, symbol: "SOL" },
+        }
+      ).nativeCurrency as { decimals: number; symbol: string };
       return {
         value,
         formatted: formatUnits(value, decimals),
@@ -116,7 +160,7 @@ export function useBalance(): BalanceResult | undefined {
       };
     }
     return undefined;
-  }, [wagmiBalance, suiBalance, stellarBalance, XRPLDrops]);
+  }, [wagmiBalance, suiBalance, solanaLamports, stellarBalance, XRPLDrops]);
 
   return balance;
 }

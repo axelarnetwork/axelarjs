@@ -7,9 +7,11 @@ import { useWaitForTransactionReceipt } from "wagmi";
 
 import {
   HEDERA_CHAIN_ID,
+  SOLANA_CHAIN_ID,
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
 } from "~/config/chains";
+import { useRegisterCanonicalToken as useRegisterSolanaCanonicalToken } from "~/features/solanaHooks/useRegisterCanonicalToken";
 import { useRegisterStellarTokenWithContractDeployment } from "~/features/stellarHooks";
 import useRegisterCanonicalToken from "~/features/suiHooks/useRegisterCanonicalToken";
 import {
@@ -60,6 +62,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const { combinedComputed } = useAllChainConfigsQuery();
   const { registerCanonicalToken } = useRegisterCanonicalToken();
+  const { registerCanonicalToken: solanaRegisterCanonicalToken } =
+    useRegisterSolanaCanonicalToken();
   const { registerTokenWithContractDeployment } =
     useRegisterStellarTokenWithContractDeployment();
   const { kit } = useStellarKit();
@@ -316,6 +320,53 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     deployerAddress,
   ]);
 
+  const writeOnSolana = useCallback(async () => {
+    if (!input) return;
+
+    const result = await solanaRegisterCanonicalToken({
+      caller: deployerAddress,
+      tokenAddress: input.tokenAddress,
+      onStatusUpdate: (status) => {
+        // Forward status updates to the UI, adapting to shared transaction state
+        if (config.onStatusUpdate) {
+          if (status.type === "registering" && status.txHash) {
+            config.onStatusUpdate({
+              type: "deploying",
+              txHash: status.txHash,
+            });
+          } else {
+            config.onStatusUpdate({
+              type: "pending_approval",
+            });
+          }
+        }
+      },
+    });
+
+    if (result?.signature) {
+      setRecordDeploymentArgs({
+        kind: "canonical",
+        deploymentMessageId: result.signature,
+        tokenId: result.tokenId || "",
+        deployerAddress,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        axelarChainId: input.sourceChainId,
+        destinationAxelarChainIds: [], // Solana doesn't support destination chains for canonical tokens
+        tokenAddress: result.tokenAddress || input.tokenAddress,
+        tokenManagerAddress: result.tokenManagerAddress || "",
+      });
+      return { signature: result.signature };
+    }
+  }, [
+    input,
+    solanaRegisterCanonicalToken,
+    deployerAddress,
+    config,
+    setRecordDeploymentArgs,
+  ]);
+
   const writeOnHedera = useCallback(async () => {
     // Hedera: skip prepare/simulation but still submit the transaction
     if (!multicallArgs.length) {
@@ -343,6 +394,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
   const writeAsync = useCallback(async () => {
     await recordDeploymentDraft();
+
     // If input is missing, fall back to default EVM flow with prepared request
     if (!input) {
       invariant(
@@ -359,6 +411,8 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
         return await writeOnStellar();
       case HEDERA_CHAIN_ID:
         return await writeOnHedera();
+      case SOLANA_CHAIN_ID:
+        return await writeOnSolana();
       default:
         return await writeOnEvm();
     }
@@ -371,6 +425,7 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
     writeOnSui,
     writeOnStellar,
     writeOnHedera,
+    writeOnSolana,
     writeOnEvm,
   ]);
 

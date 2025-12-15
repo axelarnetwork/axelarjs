@@ -16,6 +16,7 @@ import { WriteContractData } from "wagmi/query";
 
 import {
   HEDERA_CHAIN_ID,
+  SOLANA_CHAIN_ID,
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
 } from "~/config/chains";
@@ -189,6 +190,36 @@ export const Step3: FC = () => {
         }
       };
 
+      const handleSolana = async () => {
+        try {
+          const result = await txPromise;
+
+          if (result && typeof result === "object" && "signature" in result) {
+            rootActions.setTxState({
+              type: "deployed",
+              tokenAddress: rootState.tokenDetails.tokenAddress,
+              txHash: result.signature,
+            });
+
+            addTransaction({
+              status: "submitted",
+              hash: result.signature,
+              chainId: sourceChain.chain_id,
+              txType: "INTERCHAIN_DEPLOYMENT",
+            });
+            return;
+          }
+
+          throw new Error("Solana deployment result incomplete.");
+        } catch (e: any) {
+          toast.error(e?.message || "Solana deployment failed");
+          rootActions.setTxState({
+            type: "idle",
+          });
+          actions.setIsDeploying(false);
+        }
+      };
+
       const handleEvm = async () => {
         if (!txPromise) {
           rootActions.setTxState({ type: "idle" });
@@ -241,6 +272,7 @@ export const Step3: FC = () => {
 
       if (sourceChain.chain_id === SUI_CHAIN_ID) return handleSui();
       if (sourceChain.chain_id === STELLAR_CHAIN_ID) return handleStellar();
+      if (sourceChain.chain_id === SOLANA_CHAIN_ID) return handleSolana();
       return handleEvm();
     },
     [
@@ -258,7 +290,10 @@ export const Step3: FC = () => {
     ]
   );
 
-  const eligibleChains = filterEligibleChainsForRemoteDeployment(state.chains, chainId);
+  const eligibleChains = filterEligibleChainsForRemoteDeployment(
+    state.chains,
+    chainId
+  );
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
@@ -327,12 +362,14 @@ export const Step3: FC = () => {
       children: (
         <>
           Register{" "}
-          {Maybe.of(validDestinationChainIds.length).mapOrNull((length) => (
-            <>
-              {length > 0 && <span>& deploy</span>}
-              {` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}
-            </>
-          ))}
+          {sourceChain?.chain_id === SOLANA_CHAIN_ID
+            ? "on Solana"
+            : Maybe.of(validDestinationChainIds.length).mapOrNull((length) => (
+                <>
+                  {length > 0 && <span>& deploy</span>}
+                  {` on ${length + 1} chain${length + 1 > 1 ? "s" : ""}`}
+                </>
+              ))}
         </>
       ),
       status: "idle" as const,
@@ -350,33 +387,37 @@ export const Step3: FC = () => {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <FormControl>
-          <Label>
-            <Label.Text>Additional chains (optional):</Label.Text>
+        {/* TODO: add support for Solana destination chains */}
+        {/* Hide Additional chains section for Solana since it doesn't support destination chains */}
+        {sourceChain?.chain_id !== SOLANA_CHAIN_ID && (
+          <FormControl>
+            <Label>
+              <Label.Text>Additional chains (optional):</Label.Text>
 
-            {Boolean(state.remoteDeploymentGasFees?.gasFees.length) && (
-              <Label.AltText>
-                <Tooltip tip="Approximate gas cost">
-                  <span className="ml-2 whitespace-nowrap text-xs">
-                    (≈ {state.totalGasFee}{" "}
-                    {state?.sourceChainId && nativeTokenSymbol} in fees)
-                  </span>
-                </Tooltip>
-              </Label.AltText>
-            )}
-          </Label>
-          <ChainPicker
-            eligibleChains={eligibleChains}
-            selectedChains={rootState.selectedChains}
-            onChainClick={rootActions.toggleAdditionalChain}
-            disabled={
-              rootState.txState.type === "pending_approval" ||
-              rootState.txState.type === "deploying"
-            }
-            erroredChains={erroredDestinationChainIds}
-            loading={state.isEstimatingGasFees}
-          />
-        </FormControl>
+              {Boolean(state.remoteDeploymentGasFees?.gasFees.length) && (
+                <Label.AltText>
+                  <Tooltip tip="Approximate gas cost">
+                    <span className="ml-2 whitespace-nowrap text-xs">
+                      (≈ {state.totalGasFee}{" "}
+                      {state?.sourceChainId && nativeTokenSymbol} in fees)
+                    </span>
+                  </Tooltip>
+                </Label.AltText>
+              )}
+            </Label>
+            <ChainPicker
+              eligibleChains={eligibleChains}
+              selectedChains={rootState.selectedChains}
+              onChainClick={rootActions.toggleAdditionalChain}
+              disabled={
+                rootState.txState.type === "pending_approval" ||
+                rootState.txState.type === "deploying"
+              }
+              erroredChains={erroredDestinationChainIds}
+              loading={state.isEstimatingGasFees}
+            />
+          </FormControl>
+        )}
         <button type="submit" ref={formSubmitRef} />
       </form>
       <TokenNameAlert />

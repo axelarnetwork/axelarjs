@@ -32,7 +32,7 @@ export type AssetConfig = {
   };
 };
 
-export type CHAIN_TYPE = "axelarnet" | "evm" | "sui" | "xrpl";
+export type CHAIN_TYPE = "axelarnet" | "evm" | "sui" | "svm" | "xrpl";
 
 export type ChainEvmSubconfig = {
   contracts?: {
@@ -100,6 +100,16 @@ export interface ChainCosmosSubconfig {
   grpc: string[];
 }
 
+export interface ChainSolanaSubconfig {
+  contracts: {
+    AxelarGateway: SolanaProgram;
+    AxelarGasService: SolanaProgram;
+    InterchainGovernance: SolanaProgram;
+    InterchainTokenService: SolanaProgram;
+  };
+  rpc: string[];
+}
+
 export interface BaseContracts {
   [contractName: string]: { address: string };
 }
@@ -112,6 +122,10 @@ export interface SuiContract {
 export interface StellarContract {
   address: string;
   objects: Record<string, string>;
+}
+
+export interface SolanaProgram {
+  address: string;
 }
 
 interface BaseChainConfig {
@@ -143,7 +157,7 @@ interface AxelarChainConfig extends BaseChainConfig {
 }
 
 export interface VmChainConfig extends BaseChainConfig {
-  chainType: "sui" | "stellar" | "xrpl";
+  chainType: "sui" | "stellar" | "svm" | "xrpl";
   externalChainId: string;
   config: ChainVmSubconfig;
 }
@@ -158,15 +172,20 @@ export interface StellarChainConfig extends VmChainConfig {
   config: ChainStellarSubconfig;
 }
 
-export interface XRPLAddress{
+export interface SolanaChainConfig extends VmChainConfig {
+  chainType: "svm";
+  config: ChainSolanaSubconfig;
+}
+
+export interface XRPLAddress {
   address: string;
 }
 
 export interface XRPLSubconfig {
   contracts: {
-    AxelarGateway: XRPLAddress,
-    AxelarGasService: XRPLAddress,
-    InterchainTokenService: XRPLAddress,
+    AxelarGateway: XRPLAddress;
+    AxelarGasService: XRPLAddress;
+    InterchainTokenService: XRPLAddress;
   };
   rpc: string[];
 }
@@ -182,6 +201,7 @@ export type ChainConfig =
   | AxelarChainConfig
   | SuiChainConfig
   | StellarChainConfig
+  | SolanaChainConfig
   | XRPLChainConfig;
 
 export interface AxelarConfigsResponse {

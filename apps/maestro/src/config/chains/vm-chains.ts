@@ -1,11 +1,19 @@
 import { STELLAR_RPC_URLS, SUI_RPC_URLS } from "@axelarjs/core";
 
+import { clusterApiUrl } from "@solana/web3.js";
+
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
 import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
 
 export const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
 export const STELLAR_CHAIN_ID =
   NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 109 : 110;
+export const SOLANA_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+    ? 111
+    : NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier"
+      ? 113
+      : 112;
 export const XRPL_CHAIN_ID =
   NEXT_PUBLIC_NETWORK_ENV === "mainnet"
     ? 114
@@ -101,6 +109,63 @@ const stellarDevnet = {
   environment: ENVIRONMENTS.devnet,
 };
 
+const solana = {
+  id: 111,
+  axelarChainId: "solana",
+  axelarChainName: "solana",
+  environment: ENVIRONMENTS.mainnet,
+  name: "Solana",
+  nativeCurrency: {
+    name: "SOL",
+    symbol: "SOL",
+    decimals: 9,
+  },
+  rpcUrls: {
+    default: { http: [clusterApiUrl("mainnet-beta")] },
+    public: { http: [clusterApiUrl("mainnet-beta")] },
+  },
+  blockExplorers: {
+    default: { name: "Solana Explorer", url: "https://explorer.solana.com/" },
+  },
+  supportWagmi: false,
+};
+
+const solanaTestnet = {
+  ...solana,
+  id: 112,
+  environment: ENVIRONMENTS.testnet,
+  name: "Solana Testnet",
+  rpcUrls: {
+    default: { http: [clusterApiUrl("testnet")] },
+    public: { http: [clusterApiUrl("testnet")] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Solana Explorer",
+      url: "https://explorer.solana.com/?cluster=testnet",
+    },
+  },
+};
+
+const solanaDevnet = {
+  ...solana,
+  id: 113,
+  environment: ENVIRONMENTS.devnet,
+  axelarChainId: "solana-2",
+  axelarChainName: "solana-2",
+  name: "Solana Devnet",
+  rpcUrls: {
+    default: { http: [clusterApiUrl("devnet")] },
+    public: { http: [clusterApiUrl("devnet")] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Solana Explorer (Devnet)",
+      url: "https://explorer.solana.com/?cluster=devnet",
+    },
+  },
+};
+
 export const xrpl = {
   id: 114,
   axelarChainId: "xrpl",
@@ -167,6 +232,9 @@ export const VM_CHAINS: ExtendedWagmiChainConfig[] = [
   stellar,
   stellarTestnet,
   stellarDevnet,
+  solana,
+  solanaTestnet,
+  solanaDevnet,
   xrpl,
   xrplTestnet,
   xrplDevnet,
@@ -188,10 +256,13 @@ export const stellarChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
   chain.axelarChainId.includes("stellar")
 ) as ExtendedWagmiChainConfig;
 
+export const solanaChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
+  chain.axelarChainId.includes("solana")
+) as ExtendedWagmiChainConfig;
+
 export const xrplChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
   chain.axelarChainId.includes("xrpl")
 ) as ExtendedWagmiChainConfig;
 
 // cannot deploy on these chains
 export const CHAINS_WITHOUT_DEPLOYMENT = [XRPL_CHAIN_ID];
-

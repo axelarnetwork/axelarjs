@@ -11,10 +11,12 @@ import { useWaitForTransactionReceipt } from "wagmi";
 import {
   EVM_CHAIN_IDS_WITH_NON_DETERMINISTIC_TOKEN_ADDRESS,
   HEDERA_CHAIN_ID,
+  SOLANA_CHAIN_ID,
   STELLAR_CHAIN_ID,
   SUI_CHAIN_ID,
 } from "~/config/chains";
 import { useHederaDeployment } from "~/features/hederaHooks";
+import { useDeploySolanaToken } from "~/features/solanaHooks/useDeploySolanaToken";
 import { useDeployStellarToken } from "~/features/stellarHooks/useDeployStellarToken";
 import useDeployToken from "~/features/suiHooks/useDeployToken";
 import { useReadInterchainTokenServiceRegisteredTokenAddress } from "~/lib/contracts/hedera/HederaInterchainTokenService.hooks";
@@ -41,7 +43,7 @@ import { type DeployAndRegisterTransactionState } from "../InterchainTokenDeploy
 
 // In an effort to keep the codebase without hardcoded chains, we create lists of chains up here
 /** a token address is not needed in advance if the chain name includes the following strings */
-const CHAINS_WITHOUT_TOKEN_ADDRESS = ["sui", "stellar", "hedera"];
+const CHAINS_WITHOUT_TOKEN_ADDRESS = ["sui", "stellar", "hedera", "solana"];
 /** chains that don't have their deployment draft recorded - check if chain name includes any of these strings */
 const CHAIN_IDS_SKIP_DEPLOYMENT_DRAFT_RECORDING = ["sui", "stellar"];
 /** a multicall is not needed for these chains */
@@ -153,7 +155,6 @@ export interface UseDeployAndRegisterRemoteInterchainTokenConfig {
   onStatusUpdate?: (message: DeployAndRegisterTransactionState) => void;
   onFinished?: () => void;
 }
-
 interface UseMulticallParams {
   input: UseDeployAndRegisterInterchainTokenInput | undefined;
   tokenId: `0x${string}` | undefined;
@@ -592,6 +593,7 @@ const useRequestDeployToken = ({
   const { deployToken } = useDeployToken();
 
   const { deployStellarToken } = useDeployStellarToken();
+  const { deploySolanaToken } = useDeploySolanaToken();
 
   const deployGenericEVM = useCallback(async () => {
     invariant(
@@ -678,6 +680,76 @@ const useRequestDeployToken = ({
     deployStellarToken,
   ]);
 
+  const deploySolana = useCallback(async () => {
+    if (!input) {
+      throw new Error("Input is not defined");
+    }
+
+    if (!address) {
+      throw new Error("Solana wallet not connected");
+    }
+
+    const result = await deploySolanaToken({
+      caller: address as string,
+      tokenName: input.tokenName,
+      tokenSymbol: input.tokenSymbol,
+      decimals: input.decimals,
+      initialSupply: String(input.initialSupply ?? 0n),
+      salt: input.salt,
+      minterAddress: input.minterAddress,
+      destinationChainIds: input.destinationChainIds,
+      gasValues: input.remoteDeploymentGasFees?.gasFees?.map((x) =>
+        String(x.fee)
+      ),
+      onStatusUpdate: (status) => {
+        // Adapt Solana hook status into the shared transaction state
+        if (status.type === "pending_approval") {
+          onStatusUpdate({
+            type: "pending_approval",
+            step: status.step ?? 1,
+            totalSteps:
+              status.totalSteps ?? (input.destinationChainIds.length ? 2 : 1),
+          });
+          return;
+        }
+        if (status.type === "deploying") {
+          onStatusUpdate({ type: "deploying", txHash: status.txHash ?? "" });
+          return;
+        }
+        // Do not emit "deployed" here; the outer flow will set deployed after persistence
+        onStatusUpdate({ type: "idle" });
+      },
+    });
+
+    if (result?.signature) {
+      setRecordDeploymentArgs({
+        kind: "interchain",
+        deploymentMessageId: result.signature,
+        tokenId: (result.tokenId as string) ?? "",
+        deployerAddress,
+        salt: input.salt,
+        tokenName: input.tokenName,
+        tokenSymbol: input.tokenSymbol,
+        tokenDecimals: input.decimals,
+        tokenManagerType: undefined,
+        axelarChainId: input.sourceChainId,
+        originalMinterAddress: input.minterAddress,
+        destinationAxelarChainIds: input.destinationChainIds,
+        tokenManagerAddress: result.tokenManagerAddress ?? "",
+        tokenAddress: result.tokenAddress ?? "",
+      });
+    }
+
+    return result;
+  }, [
+    input,
+    address,
+    deploySolanaToken,
+    onStatusUpdate,
+    setRecordDeploymentArgs,
+    deployerAddress,
+  ]);
+
   const deploySui = useCallback(async () => {
     if (!input) {
       throw new Error("Input is not defined");
@@ -737,6 +809,10 @@ const useRequestDeployToken = ({
       return deployHedera();
     }
 
+    if (chainId === SOLANA_CHAIN_ID && input) {
+      return deploySolana();
+    }
+
     return deployGenericEVM();
   }, [
     chainId,
@@ -746,6 +822,7 @@ const useRequestDeployToken = ({
     deployStellar,
     deploySui,
     deployHedera,
+    deploySolana,
   ]);
 
   return writeAsync;

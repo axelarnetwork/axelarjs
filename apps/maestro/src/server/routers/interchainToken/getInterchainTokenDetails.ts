@@ -3,6 +3,8 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
+  SOLANA_CHAIN_ID,
+  solanaChainConfig,
   STELLAR_CHAIN_ID,
   stellarChainConfig,
   SUI_CHAIN_ID,
@@ -79,7 +81,9 @@ export const getInterchainTokenDetails = publicProcedure
         ? suiChainConfig.axelarChainId
         : input.chainId === STELLAR_CHAIN_ID
           ? stellarChainConfig.axelarChainId
-          : configs.info.id;
+          : input.chainId === SOLANA_CHAIN_ID
+            ? solanaChainConfig?.axelarChainId
+            : configs?.info?.id;
     // if (!configs) {
     //   throw new TRPCError({
     //     code: "NOT_FOUND",

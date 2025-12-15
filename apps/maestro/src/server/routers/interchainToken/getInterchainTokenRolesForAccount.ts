@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
+import { hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 import {
   getRoleIndex,
@@ -12,7 +12,7 @@ export const getInterchainTokenRolesForAccount = publicProcedure
   .input(
     z.object({
       tokenId: hex64Literal(),
-      accountAddress: hex40Literal(),
+      accountAddress: z.string(),
     })
   )
   .query(async ({ ctx, input }) => {
@@ -44,6 +44,15 @@ export const getInterchainTokenRolesForAccount = publicProcedure
       };
     }
 
+    // If no wagmi config (i.e., non-EVM like Solana/Sui/Stellar), we currently do not
+    // support on-chain role introspection via this endpoint. Return empty roles.
+    if (!("wagmi" in configs) || !configs.wagmi) {
+      return {
+        tokenManager: [] as TokenRole[],
+        token: [] as TokenRole[],
+      };
+    }
+
     const tokenManagerClient = ctx.contracts.createTokenManagerClient(
       configs.wagmi,
       tokenDetails.tokenManagerAddress as `0x${string}`
@@ -59,7 +68,7 @@ export const getInterchainTokenRolesForAccount = publicProcedure
         ROLES_ENUM.map((role) =>
           tokenClient.reads
             .hasRole({
-              account: input.accountAddress,
+              account: input.accountAddress as `0x${string}`,
               role: getRoleIndex(role),
             })
             .then((hasRole) => [role, hasRole] as const)
@@ -70,7 +79,7 @@ export const getInterchainTokenRolesForAccount = publicProcedure
         ROLES_ENUM.map((role) =>
           tokenManagerClient.reads
             .hasRole({
-              account: input.accountAddress,
+              account: input.accountAddress as `0x${string}`,
               role: getRoleIndex(role),
             })
             .then((hasRole) => [role, hasRole] as const)

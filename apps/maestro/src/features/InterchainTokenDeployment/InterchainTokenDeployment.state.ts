@@ -7,8 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq, without } from "rambda";
 import { z } from "zod";
 
-import { STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/config/chains";
-import { stellarChainConfig, suiChainConfig } from "~/config/chains/vm-chains";
+import {
+  SOLANA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
+import {
+  solanaChainConfig,
+  stellarChainConfig,
+  suiChainConfig,
+} from "~/config/chains/vm-chains";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { numericString } from "~/lib/utils/validation";
@@ -144,6 +152,13 @@ function useInterchainTokenDeploymentState(
           { shouldValidate: true }
         );
       }
+
+      if (chainId === SOLANA_CHAIN_ID) {
+        tokenDetailsForm.setValue(
+          "tokenDecimals",
+          solanaChainConfig?.nativeCurrency?.decimals
+        );
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [address]
@@ -207,6 +222,13 @@ function useInterchainTokenDeploymentState(
               "tokenDecimals",
               stellarChainConfig.nativeCurrency.decimals,
               { shouldValidate: true }
+            );
+          }
+
+          if (chainId === SOLANA_CHAIN_ID) {
+            tokenDetailsForm.setValue(
+              "tokenDecimals",
+              solanaChainConfig?.nativeCurrency?.decimals
             );
           }
 

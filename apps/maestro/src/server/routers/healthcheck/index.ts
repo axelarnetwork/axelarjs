@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { CHAIN_CONFIGS } from "~/config/chains";
 import { sendRpcNodeIssueNotificationWithRateLimit } from "~/lib/utils/slack-notifications";
-import { publicProcedure, router } from "~/server/trpc";
 import { checkXRPLNode, isXRPLChainName } from "~/lib/utils/xrpl";
+import { publicProcedure, router } from "~/server/trpc";
 
 async function checkRpcNode(
   url: string,
@@ -23,11 +23,21 @@ async function checkRpcNode(
     }, 60000); // will timeout if RPC node dont respond in 60s
     try {
       let method = "net_version";
-      
+
       if (chainNameLower === "sui") {
         method = "sui_getTotalTransactionBlocks";
-      } else if (chainNameLower === "stellar" || chainNameLower.includes("stellar")) {
+      } else if (
+        chainNameLower === "stellar" ||
+        chainNameLower.includes("stellar")
+      ) {
         method = "getVersionInfo";
+      } else if (
+        chainNameLower === "solana" ||
+        chainNameLower.includes("solana")
+      ) {
+        // For Solana, use a JSON-RPC method supported by the cluster
+        // getVersion returns an object result when healthy
+        method = "getVersion";
       }
 
       let json;
@@ -105,12 +115,12 @@ export const healthcheckRouter = router({
       }
 
       // If no cache hit, proceed with the normal flow
-      const chain = CHAIN_CONFIGS.find(
+      let chain = CHAIN_CONFIGS.find(
         (c) =>
           c.environment === input.env &&
-            ((c.axelarChainName &&
-              c.axelarChainName.toLowerCase() ===
-                input.chainName.toLowerCase()) ||
+          ((c.axelarChainName &&
+            c.axelarChainName.toLowerCase() ===
+              input.chainName.toLowerCase()) ||
             (c.name &&
               c.name.toLowerCase() === input.chainName.toLowerCase()) ||
             ((c as any).chain_name &&
@@ -119,6 +129,20 @@ export const healthcheckRouter = router({
             (c.axelarChainId &&
               c.axelarChainId.toLowerCase() === input.chainName.toLowerCase()))
       );
+
+      // Fallback: allow includes matching for aliases like "solana-2"
+      if (!chain) {
+        const needle = input.chainName.toLowerCase();
+        chain = CHAIN_CONFIGS.find(
+          (c) =>
+            c.environment === input.env &&
+            ((c.axelarChainId &&
+              c.axelarChainId.toLowerCase().includes(needle)) ||
+              (c.axelarChainName &&
+                c.axelarChainName.toLowerCase().includes(needle)) ||
+              (c.name && c.name.toLowerCase().includes(needle)))
+        );
+      }
 
       if (!chain) {
         return { status: "unknown" as const };

@@ -1,3 +1,4 @@
+import { PublicKey } from "@solana/web3.js";
 import { getAddress } from "viem";
 import { z } from "zod";
 
@@ -163,6 +164,15 @@ export function isValidStellarWalletAddress(address: string): boolean {
   return stellarWalletAddress().safeParse(address).success;
 }
 
+export function isValidSolanaAddress(address: string): boolean {
+  try {
+    new PublicKey(address);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 const XRPL_ADDRESS_REGEX = /^r[a-km-zA-HJ-NP-Z1-9]{25,34}$/;
 const XRPL_TOKEN_REGEX = /^[A-Za-z0-9]+\.r[a-km-zA-HJ-NP-Z1-9]{25,34}$/;
 
@@ -170,15 +180,10 @@ export const xrplTokenAddress = () =>
   z
     .string()
     .regex(XRPL_TOKEN_REGEX, "Invalid XRPL token address")
-    .or(
-      z
-        .literal("XRP")
-    );
+    .or(z.literal("XRP"));
 
 export const xrplWalletAddress = () =>
-  z
-    .string()
-    .regex(XRPL_ADDRESS_REGEX, "Invalid XRPL wallet address");
+  z.string().regex(XRPL_ADDRESS_REGEX, "Invalid XRPL wallet address");
 
 export function isXRPLTokenAddressFormat(address: string): boolean {
   return xrplTokenAddress().safeParse(address).success;
@@ -186,7 +191,7 @@ export function isXRPLTokenAddressFormat(address: string): boolean {
 
 /**
  * Checks if a string is a well-formed XRPL wallet address (account public key)
- * NOTE: This does not mean that the wallet is actually correct (checksum not checked). 
+ * NOTE: This does not mean that the wallet is actually correct (checksum not checked).
  * This function solely checks the format, use isValidXRPLWalletAddress to check the address
  * @param address The address to check
  * @returns boolean indicating if the address is a valid XRPL wallet address

@@ -4,17 +4,18 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
 import { kv } from "@vercel/kv";
+import bs58 from "bs58";
+import * as binary from "ripple-binary-codec";
 import { Keypair } from "stellar-sdk";
+import nacl from "tweetnacl";
 import { verifyMessage } from "viem";
+import * as xrpl from "xrpl";
 
 import db from "~/lib/drizzle/client";
+import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 import { getSignInMessage } from "~/server/routers/auth/createSignInMessage";
 import MaestroKVClient, { AccountStatus } from "~/services/db/kv";
 import MaestroPostgresClient from "~/services/db/postgres/MaestroPostgresClient";
-
-import * as xrpl from "xrpl"
-import * as binary from "ripple-binary-codec"
-import { isValidXRPLWalletAddress } from "~/lib/utils/xrpl";
 
 export type Web3Session = {
   address: string;
@@ -120,39 +121,53 @@ export const NEXT_AUTH_OPTIONS: NextAuthOptions = {
           } catch (error) {
             console.error("Failed to verify Stellar signature:", error);
           }
-        }
-        else if (isValidXRPLWalletAddress(address)) {
+        } else if (isValidXRPLWalletAddress(address)) {
           // xrpl address
 
           // Check if the credentials that we received is a transaction that was created just like in the frontend
           // Then, verify the signature against the address
-          
+
           const encodedTx = signature; // this is the signed transaction blob that we received from the client
           const tx = binary.decode(encodedTx); // decode it to get the transaction object
 
-          if (
-            !tx.Memos || !Array.isArray(tx.Memos) || tx.Memos.length === 0
-          ) {
+          if (!tx.Memos || !Array.isArray(tx.Memos) || tx.Memos.length === 0) {
             return null;
           }
-          
+
           const signerPublicKey = tx.SigningPubKey;
-          if (typeof signerPublicKey !== "string")
-            return null;
-          if (!tx.Memos[0])
-            return null;
+          if (typeof signerPublicKey !== "string") return null;
+          if (!tx.Memos[0]) return null;
           if (typeof tx.Memos[0] !== "object" || !("Memo" in tx.Memos[0]))
             return null;
           const memo = tx.Memos[0].Memo;
-          if (memo === null || typeof memo !== "object" || !("MemoData" in memo))
+          if (
+            memo === null ||
+            typeof memo !== "object" ||
+            !("MemoData" in memo)
+          )
             return null;
           const memoHex = memo.MemoData as string;
           const memoData = Buffer.from(memoHex, "hex").toString("utf8");
 
-          isMessageSigned = 
-            (memoData === message) // require that the memo matches the challenge (we don't care about the other data)
-            && (xrpl.verifySignature(encodedTx, signerPublicKey)) // AND that the signature is valid
-            && (xrpl.deriveAddress(signerPublicKey) === address); // AND that the public key matches the address
+          isMessageSigned =
+            memoData === message && // require that the memo matches the challenge (we don't care about the other data)
+            xrpl.verifySignature(encodedTx, signerPublicKey) && // AND that the signature is valid
+            xrpl.deriveAddress(signerPublicKey) === address; // AND that the public key matches the address
+        }
+        // is Solana address (base58 ~32 bytes) — verify via ed25519 (tweetnacl)
+        else {
+          try {
+            const publicKey = bs58.decode(address);
+            const signatureBytes = Buffer.from(signature, "base64");
+            const messageBytes = new TextEncoder().encode(message);
+            isMessageSigned = nacl.sign.detached.verify(
+              messageBytes,
+              new Uint8Array(signatureBytes),
+              new Uint8Array(publicKey)
+            );
+          } catch (error) {
+            isMessageSigned = false;
+          }
         }
 
         if (!isMessageSigned) {
