@@ -118,7 +118,7 @@ importers:
         version: 0.29.0(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)
       '@creit.tech/stellar-wallets-kit':
         specifier: ^1.6.1
-        version: 1.7.3(li2vrc6zzy5vktl56n222hw62y)
+        version: 1.7.3(d1de3cde44d99ac351a0378ac3aa4269)
       '@hookform/resolvers':
         specifier: ^3.3.4
         version: 3.9.1(react-hook-form@7.54.0(react@18.3.1))
@@ -202,7 +202,7 @@ importers:
         version: 0.7.2
       '@web3modal/wagmi':
         specifier: ^4.1.1
-        version: 4.2.3(gvfzbfhwsgnuhlhwwq2fexv4e4)
+        version: 4.2.3(93b94165b28c89b0c72b7563001387fd)
       '@xrpl-wallet-adapter/base':
         specifier: ^0.1.4
         version: 0.1.4(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -235,7 +235,7 @@ importers:
         version: 10.6.0
       drizzle-orm:
         specifier: ^0.29.5
-        version: 0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.13.1)(react@18.3.1)
+        version: 0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.16.3)(react@18.3.1)
       ethers:
         specifier: ^5.7.2
         version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -258,8 +258,8 @@ importers:
         specifier: ^4.29.2
         version: 4.76.1(zod@3.24.1)
       pg:
-        specifier: ^8.11.3
-        version: 8.13.1
+        specifier: ^8.16.3
+        version: 8.16.3
       pino-pretty:
         specifier: ^13.1.2
         version: 13.1.3
@@ -404,7 +404,7 @@ importers:
         version: 0.20.18
       drizzle-zod:
         specifier: ^0.5.1
-        version: 0.5.1(drizzle-orm@0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.13.1)(react@18.3.1))(zod@3.24.1)
+        version: 0.5.1(drizzle-orm@0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.16.3)(react@18.3.1))(zod@3.24.1)
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
@@ -4097,36 +4097,42 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [arm]
     os: [linux]
+    libc: [glibc]
 
   '@parcel/watcher-linux-arm-musl@2.5.0':
     resolution: {integrity: sha512-6uHywSIzz8+vi2lAzFeltnYbdHsDm3iIB57d4g5oaB9vKwjb6N6dRIgZMujw4nm5r6v9/BQH0noq6DzHrqr2pA==}
     engines: {node: '>= 10.0.0'}
     cpu: [arm]
     os: [linux]
+    libc: [musl]
 
   '@parcel/watcher-linux-arm64-glibc@2.5.0':
     resolution: {integrity: sha512-BfNjXwZKxBy4WibDb/LDCriWSKLz+jJRL3cM/DllnHH5QUyoiUNEp3GmL80ZqxeumoADfCCP19+qiYiC8gUBjA==}
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@parcel/watcher-linux-arm64-musl@2.5.0':
     resolution: {integrity: sha512-S1qARKOphxfiBEkwLUbHjCY9BWPdWnW9j7f7Hb2jPplu8UZ3nes7zpPOW9bkLbHRvWM0WDTsjdOTUgW0xLBN1Q==}
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@parcel/watcher-linux-x64-glibc@2.5.0':
     resolution: {integrity: sha512-d9AOkusyXARkFD66S6zlGXyzx5RvY+chTP9Jp0ypSTC9d4lzyRs9ovGf/80VCxjKddcUvnsGwCHWuF2EoPgWjw==}
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@parcel/watcher-linux-x64-musl@2.5.0':
     resolution: {integrity: sha512-iqOC+GoTDoFyk/VYSFHwjHhYrk8bljW6zOhPuhi5t9ulqiYq1togGJB5e3PwYVFFfeVgc6pbz3JdQyDoBszVaA==}
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@parcel/watcher-wasm@2.5.0':
     resolution: {integrity: sha512-Z4ouuR8Pfggk1EYYbTaIoxc+Yv4o7cGQnH0Xy8+pQ+HbiW+ZnwhcD2LPf/prfq1nIWpAxjOkQ8uSMFWMtBLiVQ==}
@@ -4912,11 +4918,13 @@ packages:
     resolution: {integrity: sha512-vPul4uodvWvLhRco2w0GcyZcdyBfpfDRgNKU+p35AWEbJ/HPs1tOUrkSueVbBS0RQHAf/A+nNtDpvw95PeVKOA==}
     cpu: [loong64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-powerpc64le-gnu@4.28.1':
     resolution: {integrity: sha512-pTnTdBuC2+pt1Rmm2SV7JWRqzhYpEILML4PKODqLz+C7Ou2apEV52h19CR7es+u04KlqplggmN9sqZlekg3R1A==}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-gnu@4.28.1':
     resolution: {integrity: sha512-vWXy1Nfg7TPBSuAncfInmAI/WZDd5vOklyLJDdIRKABcZWojNDY0NJwruY2AcnCLnRJKSaBgf/GiJfauu8cQZA==}
@@ -11519,20 +11527,23 @@ packages:
     resolution: {integrity: sha512-iuh7L6jA7JEGu2WxDwtQP1ddOpaJNC4KlDEFfdQajSGgGPNi4OyDc2R7QnbY2bR9QjBVGwgvTdNJZoE7RaxUMA==}
     engines: {node: '>=0.12'}
 
-  pg-cloudflare@1.1.1:
-    resolution: {integrity: sha512-xWPagP/4B6BgFO+EKz3JONXv3YDgvkbVrGw2mTo3D6tVDQRh1e7cqVGvyR3BE+eQgAvx1XhW/iEASj4/jCWl3Q==}
+  pg-cloudflare@1.2.7:
+    resolution: {integrity: sha512-YgCtzMH0ptvZJslLM1ffsY4EuGaU0cx4XSdXLRFae8bPP4dS5xL1tNB3k2o/N64cHJpwU7dxKli/nZ2lUa5fLg==}
 
-  pg-connection-string@2.7.0:
-    resolution: {integrity: sha512-PI2W9mv53rXJQEOb8xNR8lH7Hr+EKa6oJa38zsK0S/ky2er16ios1wLKhZyxzD7jUReiWokc9WK5nxSnC7W1TA==}
+  pg-connection-string@2.9.1:
+    resolution: {integrity: sha512-nkc6NpDcvPVpZXxrreI/FOtX3XemeLl8E0qFr6F2Lrm/I8WOnaWNhIPK2Z7OHpw7gh5XJThi6j6ppgNoaT1w4w==}
 
   pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
 
-  pg-pool@3.7.0:
-    resolution: {integrity: sha512-ZOBQForurqh4zZWjrgSwwAtzJ7QiRX0ovFkZr2klsen3Nm0aoh33Ls0fzfv3imeH/nw/O27cjdz5kzYJfeGp/g==}
+  pg-pool@3.10.1:
+    resolution: {integrity: sha512-Tu8jMlcX+9d8+QVzKIvM/uJtp07PKr82IUOYEphaWcoBhIYkoHpLXN3qO59nAI11ripznDsEzEv8nUxBVWajGg==}
     peerDependencies:
       pg: '>=8.0'
+
+  pg-protocol@1.10.3:
+    resolution: {integrity: sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==}
 
   pg-protocol@1.7.0:
     resolution: {integrity: sha512-hTK/mE36i8fDDhgDFjy6xNOG+LCorxLG3WO17tku+ij6sVHXh1jQUJ8hYAnRhNla4QVD2H8er/FOjc/+EgC6yQ==}
@@ -11541,9 +11552,9 @@ packages:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
     engines: {node: '>=4'}
 
-  pg@8.13.1:
-    resolution: {integrity: sha512-OUir1A0rPNZlX//c7ksiu7crsGZTKSOXJPgtNiHGIlC9H0lO+NC6ZDYksSgBYY/thSWhnSRBv8w1lieNNGATNQ==}
-    engines: {node: '>= 8.0.0'}
+  pg@8.16.3:
+    resolution: {integrity: sha512-enxc1h0jA/aq5oSDMvqyW3q89ra6XIIDZgCX9vkMrnz5DFTw/Ny3Li2lFQ+pt3L6MCgm/5o2o8HW9hiJji+xvw==}
+    engines: {node: '>= 16.0.0'}
     peerDependencies:
       pg-native: '>=3.0.1'
     peerDependenciesMeta:
@@ -15952,7 +15963,7 @@ snapshots:
 
   '@cosmjs/utils@0.32.4': {}
 
-  '@creit.tech/stellar-wallets-kit@1.7.3(li2vrc6zzy5vktl56n222hw62y)':
+  '@creit.tech/stellar-wallets-kit@1.7.3(d1de3cde44d99ac351a0378ac3aa4269)':
     dependencies:
       '@albedo-link/intent': 0.12.0
       '@creit.tech/xbull-wallet-connect': 0.3.0
@@ -23048,7 +23059,7 @@ snapshots:
       lit: 3.1.0
       qrcode: 1.5.3
 
-  '@web3modal/wagmi@4.2.3(gvfzbfhwsgnuhlhwwq2fexv4e4)':
+  '@web3modal/wagmi@4.2.3(93b94165b28c89b0c72b7563001387fd)':
     dependencies:
       '@wagmi/connectors': 5.5.3(@react-native-async-storage/async-storage@1.21.0(react-native@0.76.5(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.2.21)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@6.0.3)))(@types/react@18.2.21)(@vercel/kv@1.0.1)(@wagmi/core@2.15.2(@tanstack/query-core@5.62.7)(@types/react@18.2.21)(immer@10.1.1)(react@18.3.1)(typescript@5.7.2)(use-sync-external-store@1.2.0(react@18.3.1))(viem@2.41.2(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)(zod@3.24.1)))(bufferutil@4.0.8)(react@18.3.1)(typescript@5.7.2)(utf-8-validate@6.0.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)(zod@3.24.1))(zod@3.24.1)
       '@wagmi/core': 2.15.2(@tanstack/query-core@5.62.7)(@types/react@18.2.21)(immer@10.1.1)(react@18.3.1)(typescript@5.7.2)(use-sync-external-store@1.2.0(react@18.3.1))(viem@2.41.2(bufferutil@4.0.8)(typescript@5.7.2)(utf-8-validate@6.0.3)(zod@3.24.1))
@@ -24794,19 +24805,19 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.13.1)(react@18.3.1):
+  drizzle-orm@0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.16.3)(react@18.3.1):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20241205.0
       '@neondatabase/serverless': 0.7.2
       '@types/pg': 8.16.0
       '@types/react': 18.2.21
       '@vercel/postgres': 0.7.2
-      pg: 8.13.1
+      pg: 8.16.3
       react: 18.3.1
 
-  drizzle-zod@0.5.1(drizzle-orm@0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.13.1)(react@18.3.1))(zod@3.24.1):
+  drizzle-zod@0.5.1(drizzle-orm@0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.16.3)(react@18.3.1))(zod@3.24.1):
     dependencies:
-      drizzle-orm: 0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.13.1)(react@18.3.1)
+      drizzle-orm: 0.29.5(@cloudflare/workers-types@4.20241205.0)(@neondatabase/serverless@0.7.2)(@types/pg@8.16.0)(@types/react@18.2.21)(@vercel/postgres@0.7.2)(pg@8.16.3)(react@18.3.1)
       zod: 3.24.1
 
   dunder-proto@1.0.0:
@@ -28575,16 +28586,18 @@ snapshots:
       safe-buffer: 5.2.1
       sha.js: 2.4.11
 
-  pg-cloudflare@1.1.1:
+  pg-cloudflare@1.2.7:
     optional: true
 
-  pg-connection-string@2.7.0: {}
+  pg-connection-string@2.9.1: {}
 
   pg-int8@1.0.1: {}
 
-  pg-pool@3.7.0(pg@8.13.1):
+  pg-pool@3.10.1(pg@8.16.3):
     dependencies:
-      pg: 8.13.1
+      pg: 8.16.3
+
+  pg-protocol@1.10.3: {}
 
   pg-protocol@1.7.0: {}
 
@@ -28596,15 +28609,15 @@ snapshots:
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
 
-  pg@8.13.1:
+  pg@8.16.3:
     dependencies:
-      pg-connection-string: 2.7.0
-      pg-pool: 3.7.0(pg@8.13.1)
-      pg-protocol: 1.7.0
+      pg-connection-string: 2.9.1
+      pg-pool: 3.10.1(pg@8.16.3)
+      pg-protocol: 1.10.3
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
-      pg-cloudflare: 1.1.1
+      pg-cloudflare: 1.2.7
 
   pgpass@1.0.5:
     dependencies:
