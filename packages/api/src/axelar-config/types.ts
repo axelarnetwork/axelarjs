@@ -32,7 +32,7 @@ export type AssetConfig = {
   };
 };
 
-export type CHAIN_TYPE = "axelarnet" | "evm" | "sui" | "svm";
+export type CHAIN_TYPE = "axelarnet" | "evm" | "sui" | "svm" | "xrpl";
 
 export type ChainEvmSubconfig = {
   contracts?: {
@@ -157,7 +157,7 @@ interface AxelarChainConfig extends BaseChainConfig {
 }
 
 export interface VmChainConfig extends BaseChainConfig {
-  chainType: "sui" | "stellar" | "svm";
+  chainType: "sui" | "stellar" | "svm" | "xrpl";
   externalChainId: string;
   config: ChainVmSubconfig;
 }
@@ -177,13 +177,32 @@ export interface SolanaChainConfig extends VmChainConfig {
   config: ChainSolanaSubconfig;
 }
 
+export interface XRPLAddress {
+  address: string;
+}
+
+export interface XRPLSubconfig {
+  contracts: {
+    AxelarGateway: XRPLAddress;
+    AxelarGasService: XRPLAddress;
+    InterchainTokenService: XRPLAddress;
+  };
+  rpc: string[];
+}
+
+export interface XRPLChainConfig extends VmChainConfig {
+  chainType: "xrpl";
+  config: XRPLSubconfig;
+}
+
 // Union type of all possible chain configs
 export type ChainConfig =
   | EvmChainConfig
   | AxelarChainConfig
   | SuiChainConfig
   | StellarChainConfig
-  | SolanaChainConfig;
+  | SolanaChainConfig
+  | XRPLChainConfig;
 
 export interface AxelarConfigsResponse {
   chains: { [chainId: string]: ChainConfig };

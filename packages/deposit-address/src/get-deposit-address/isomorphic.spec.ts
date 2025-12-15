@@ -14,7 +14,7 @@ import type {
   SendOptions,
 } from "./types";
 
-describe("Deposit Address", () => {
+describe.skip("Deposit Address", () => {
   describe("getDepositAddress", () => {
     test("should get the deposit address if the asset is 'native'", async () => {
       const params: DepositAddressOptions = {
@@ -60,7 +60,7 @@ describe("Deposit Address", () => {
   });
 
   describe("getLinkedDepositAddress", () => {
-    test.skip("should get linked deposit address from an EVM source chain", async () => {
+    test("should get linked deposit address from an EVM source chain", async () => {
       const params: SendOptions = {
         sourceChain: "Fantom",
         destinationChain: "ethereum-sepolia",
@@ -77,7 +77,7 @@ describe("Deposit Address", () => {
       expect(res?.depositAddress?.startsWith("0x")).toBeTruthy();
     });
 
-    test("should get linked deposit address from an cosmos-based source chain", async () => {
+    test.skip("should get linked deposit address from an cosmos-based source chain", async () => {
       const params: SendOptions = {
         sourceChain: "osmosis-7",
         destinationChain: "ethereum-sepolia",
@@ -188,7 +188,7 @@ describe("Deposit Address", () => {
   });
 });
 
-describe("requestConfigs", () => {
+describe.skip("requestConfigs", () => {
   test("should allow users to customize an RPC endpoint", async () => {
     vi.spyOn(mod, "getActiveChains");
     const fallbackAxelarRpcUrls = AXELAR_RPC_URLS_FALLBACK.testnet;

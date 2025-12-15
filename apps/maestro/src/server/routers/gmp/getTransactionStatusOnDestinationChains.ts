@@ -10,7 +10,7 @@ import MaestroKVClient from "~/services/db/kv";
 import { getSuiEventsByTxHash } from "../sui/utils/utils";
 
 export type ChainStatus = {
-  status: GMPTxStatus;
+  status: GMPTxStatus | undefined;
   txHash: string;
   txId: string;
   lastHop: boolean;
@@ -87,13 +87,13 @@ async function findDestinationChainFromEvent(
 export async function getSecondHopStatus(
   messageId: string,
   ctx: Context
-): Promise<GMPTxStatus> {
+): Promise<GMPTxStatus | undefined> {
   const secondHopData = await ctx.services.gmp.searchGMP({
     messageId,
     _source: SEARCHGMP_SOURCE,
   });
 
-  return secondHopData.length > 0 ? secondHopData[0].status : "pending";
+  return secondHopData.length > 0 ? secondHopData[0].status : undefined;
 }
 
 export async function processGMPData(

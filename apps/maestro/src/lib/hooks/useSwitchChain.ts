@@ -1,9 +1,11 @@
 import { useSwitchChain as useWagmiSwitchChain } from "wagmi";
 
 import {
+  getSwitchChainEthParamWithRpc,
   solanaChainConfig,
   stellarChainConfig,
   suiChainConfig,
+  xrplChainConfig,
 } from "~/config/chains";
 import { useChainId, useDisconnect } from "~/lib/hooks";
 import useConnectWallet from "./useConnectWallet";
@@ -22,15 +24,23 @@ export function useSwitchChain() {
       const isTargetChainStellar = chainId === stellarChainConfig.id;
       const isCurrentChainSolana = currentChainId === solanaChainConfig?.id;
       const isTargetChainSolana = chainId === solanaChainConfig?.id;
+      const isCurrentChainXRPL = currentChainId === xrplChainConfig.id;
+      const isTargetChainXRPL = chainId === xrplChainConfig.id;
+
       const evmToEvm =
         !isTargetChainSui &&
         !isCurrentChainSui &&
         !isCurrentChainStellar &&
         !isTargetChainStellar &&
         !isCurrentChainSolana &&
-        !isTargetChainSolana;
+        !isTargetChainSolana &&
+        !isCurrentChainXRPL &&
+        !isTargetChainXRPL;
       if (evmToEvm) {
-        switchChainWagmi({ chainId });
+        switchChainWagmi({
+          chainId,
+          addEthereumChainParameter: getSwitchChainEthParamWithRpc(chainId),
+        });
       } else if (chainId) {
         disconnect();
         connectWallet({ chainId });

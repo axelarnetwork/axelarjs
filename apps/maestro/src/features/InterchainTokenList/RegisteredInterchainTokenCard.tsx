@@ -18,9 +18,17 @@ import Link from "next/link";
 
 import { TransactionExecutionError } from "viem";
 
+import { HEDERA_CHAIN_ID, xrplChainConfig } from "~/config/chains";
 import { dexLinks } from "~/config/dex";
 import { NEXT_PUBLIC_NETWORK_ENV, shouldDisableSend } from "~/config/env";
+import { useHederaTokenAssociation } from "~/features/hederaHooks";
+import { useXRPLTrustLine } from "~/features/xrplHooks";
 import { useAccount, useChainId, useSwitchChain } from "~/lib/hooks";
+import {
+  isTokenAddressIncompatibleWithOwner,
+  normalizeTokenAddressForCompatibility,
+} from "~/lib/utils/addressCompatibility";
+import { isXRPLWalletAddressFormat } from "~/lib/utils/validation";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { useInterchainTokenBalanceForOwnerQuery } from "~/services/interchainToken/hooks";
 import BigNumberText from "~/ui/components/BigNumberText";
@@ -28,6 +36,7 @@ import { ChainIcon } from "~/ui/components/ChainsDropdown";
 import { AcceptInterchainTokenOwnership } from "../AcceptInterchainTokenOwnership";
 import ManageInterchainToken from "../ManageInterchainToken/ManageInterchainToken";
 import { SendInterchainToken } from "../SendInterchainToken";
+import { TokenAssociationSection } from "./TokenAssociationSection";
 import type { TokenInfo } from "./types";
 
 const StatusIndicator: FC<Pick<TokenInfo, "isOriginToken" | "isRegistered">> = (
@@ -56,13 +65,18 @@ export type Props = TokenInfo & {
 export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   const { address } = useAccount();
   const chainId = useChainId();
-  const normalizedTokenAddress = props.tokenAddress?.includes(":")
-    ? props.tokenAddress.split(":")[0] // use only the first part of the address for sui
-    : props.tokenAddress;
+  const normalizedTokenAddress = normalizeTokenAddressForCompatibility(
+    props.tokenAddress
+  );
   // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
   // To check sui for example, they need to connect with a sui wallet
-  const isIncompatibleChain =
-    normalizedTokenAddress?.length !== address?.length;
+  let isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
+    normalizedTokenAddress,
+    address
+  );
+  if (props.chainId === xrplChainConfig.id) {
+    isIncompatibleChain = !isXRPLWalletAddressFormat(address);
+  }
   const result = useInterchainTokenBalanceForOwnerQuery({
     chainId: props.chainId,
     tokenAddress: props.isRegistered ? props.tokenAddress : undefined,
@@ -103,6 +117,18 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
   }, [props.chainId, switchChain]);
 
   const isSourceChain = chainId === props.chainId;
+  const isHederaChain = props.chainId === HEDERA_CHAIN_ID;
+  const isXRPLChain = props.chainId === xrplChainConfig.id;
+  const { isAssociated: isHederaAssociated } = useHederaTokenAssociation(
+    props.tokenAddress,
+    {
+      enabled: isHederaChain && Boolean(address),
+    }
+  );
+
+  const { hasXRPLTrustLine } = useXRPLTrustLine(props.tokenAddress, {
+    enabled: isXRPLChain && Boolean(address),
+  });
 
   const switchChainButton = (
     <Button
@@ -121,6 +147,11 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
 
   const isMainnet = NEXT_PUBLIC_NETWORK_ENV === "mainnet";
   const dex = dexLinks[props.chain?.id as string]?.(props.tokenAddress);
+
+  const canMint =
+    (!isHederaChain || Boolean(isHederaAssociated)) &&
+    (!isXRPLChain || Boolean(hasXRPLTrustLine));
+  const hasManageActions = Boolean(balance?.isTokenMinter && canMint);
 
   return (
     <Card
@@ -149,8 +180,7 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
               </Link>
             </Tooltip>
           )}
-          {props.isOriginToken &&
-          (balance?.isTokenMinter || balance?.isTokenOwner) ? (
+          {props.isOriginToken && hasManageActions ? (
             <ManageInterchainToken
               trigger={
                 <Button
@@ -165,12 +195,17 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
                 </Button>
               }
               tokenAddress={props.tokenAddress}
-              balance={BigInt(balance.tokenBalance)}
-              isTokenOwner={balance.isTokenOwner}
-              isTokenPendingOnwer={balance.isTokenPendingOwner}
-              isTokenMinter={balance.isTokenMinter as boolean}
-              hasPendingOwner={balance.hasPendingOwner}
+              tokenManagerAddress={props.tokenManagerAddress}
+              balance={BigInt(balance?.tokenBalance ?? 0)}
+              isTokenOwner={Boolean(balance?.isTokenOwner)}
+              isTokenPendingOwner={Boolean(balance?.isTokenPendingOwner)}
+              isTokenMinter={Boolean(balance?.isTokenMinter)}
+              hasPendingOwner={Boolean(balance?.hasPendingOwner)}
               tokenId={props.tokenId}
+              canMint={
+                (!isHederaChain || Boolean(isHederaAssociated)) &&
+                (!isXRPLChain || Boolean(hasXRPLTrustLine))
+              }
             />
           ) : (
             <StatusIndicator
@@ -341,6 +376,32 @@ export const RegisteredInterchainTokenCard: FC<Props> = (props) => {
             })}
           </CopyToClipboardButton>
         </Card.Actions>
+
+        {isXRPLChain && address && (
+          <TokenAssociationSection
+            chainId={props.chainId}
+            chainName={props.chain?.name}
+            isSourceChain={isSourceChain}
+            switchChainButton={switchChainButton}
+            tokenBalance={balance?.tokenBalance}
+            isBalanceAvailable={Boolean(balance?.tokenBalance)}
+            address={address}
+            tokenAddress={props.tokenAddress}
+          />
+        )}
+
+        {isHederaChain && address && (
+          <TokenAssociationSection
+            chainId={props.chainId}
+            chainName={props.chain?.name}
+            isSourceChain={isSourceChain}
+            switchChainButton={switchChainButton}
+            tokenBalance={balance?.tokenBalance}
+            isBalanceAvailable={Boolean(balance?.tokenBalance)}
+            address={address}
+            tokenAddress={props.tokenAddress}
+          />
+        )}
         {isMainnet && dex && (
           <Card.Actions className="mt-2 flex flex-col justify-between">
             Add Liquidity

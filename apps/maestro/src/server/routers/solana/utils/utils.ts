@@ -1,8 +1,8 @@
 import { SolanaChainConfig } from "@axelarjs/api";
 
+import { createHash } from "crypto";
 import { Metaplex } from "@metaplex-foundation/js";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { createHash } from "crypto";
 
 import { solanaChainConfig } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
@@ -38,11 +38,10 @@ export const getSolanaChainConfig = async (
     );
   };
 
-  const chainConfig =
-    (chainConfigs.chains[preferredKey] ||
-      chainConfigs.chains[pickKeyForEnv(NEXT_PUBLIC_NETWORK_ENV)]) as
-      | SolanaChainConfig
-      | undefined;
+  const chainConfig = (chainConfigs.chains[preferredKey] ||
+    chainConfigs.chains[pickKeyForEnv(NEXT_PUBLIC_NETWORK_ENV)]) as
+    | SolanaChainConfig
+    | undefined;
 
   if (!chainConfig || chainConfig.chainType !== "svm") {
     console.error("[SolanaConfig] Invalid Solana chain config", {
@@ -60,9 +59,7 @@ export const getSolanaChainConfig = async (
   return chainConfig;
 };
 
-export function anchorInstructionDiscriminator(
-  methodName: string
-): Buffer {
+export function anchorInstructionDiscriminator(methodName: string): Buffer {
   const preimage = `global:${methodName}`;
   const hash = createHash("sha256").update(preimage, "utf8").digest();
   // first 8 bytes = discriminator
@@ -71,8 +68,11 @@ export function anchorInstructionDiscriminator(
 
 export async function getItsProgramId(ctx: Context): Promise<PublicKey> {
   const chainConfig = await getSolanaChainConfig(ctx);
-  const itsAddr = (chainConfig.config as { contracts?: { InterchainTokenService?: { address?: string } } })?.contracts
-    ?.InterchainTokenService?.address;
+  const itsAddr = (
+    chainConfig.config as {
+      contracts?: { InterchainTokenService?: { address?: string } };
+    }
+  )?.contracts?.InterchainTokenService?.address;
   if (!itsAddr) {
     throw new Error(
       "InterchainTokenService address not found in Solana config"
@@ -85,8 +85,11 @@ export async function getItsProgramId(ctx: Context): Promise<PublicKey> {
 
 export async function getGatewayProgramId(ctx: Context): Promise<PublicKey> {
   const chainConfig = await getSolanaChainConfig(ctx);
-  const gatewayAddr = (chainConfig.config as { contracts?: { AxelarGateway?: { address?: string } } })?.contracts
-    ?.AxelarGateway?.address;
+  const gatewayAddr = (
+    chainConfig.config as {
+      contracts?: { AxelarGateway?: { address?: string } };
+    }
+  )?.contracts?.AxelarGateway?.address;
   if (!gatewayAddr) {
     throw new Error("AxelarGateway address not found in Solana config");
   }
@@ -99,9 +102,11 @@ export async function getAxelarGasServiceProgramId(
   ctx: Context
 ): Promise<PublicKey> {
   const chainConfig = await getSolanaChainConfig(ctx);
-  const gasServiceAddr = (chainConfig.config as {
-    contracts?: { AxelarGasService?: { address?: string } };
-  })?.contracts?.AxelarGasService?.address;
+  const gasServiceAddr = (
+    chainConfig.config as {
+      contracts?: { AxelarGasService?: { address?: string } };
+    }
+  )?.contracts?.AxelarGasService?.address;
   if (!gasServiceAddr) {
     throw new Error("AxelarGasService address not found in config");
   }

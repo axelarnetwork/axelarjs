@@ -10,6 +10,10 @@ import {
 import { useCurrentAccount, useSignPersonalMessage } from "@mysten/dapp-kit";
 import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react";
 import { useMutation } from "@tanstack/react-query";
+import {
+  useSignTransaction as useXRPLSignTransaction,
+  useWallet as useXRPLWallet,
+} from "@xrpl-wallet-standard/react";
 import { useSignMessage } from "wagmi";
 import { watchAccount } from "wagmi/actions";
 
@@ -18,6 +22,7 @@ import { useDisconnect } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "../trpc";
 import { setStellarConnectionState } from "../utils/stellar";
+import { XRPL_NETWORK_IDENTIFIER } from "../utils/xrpl";
 
 export type UseWeb3SignInOptions = {
   enabled?: boolean;
@@ -50,6 +55,8 @@ export function useWeb3SignIn({
   const { mutateAsync: signSuiMessageAsync } = useSignPersonalMessage();
   const currentSuiAccount = useCurrentAccount();
   const solanaWallet = useSolanaWallet();
+  const xrplSignTransaction = useXRPLSignTransaction();
+  const { wallet: xrplWallet, status: xrplConnectionStatus } = useXRPLWallet();
 
   const signInAddressRef = useRef<string | null>(null);
 
@@ -107,8 +114,33 @@ export function useWeb3SignIn({
           const sig = await solanaWallet.signMessage(encodedMessage);
           // encode signature as base64 string
           signature = btoa(String.fromCharCode(...sig));
-        }
+        } else if (address.startsWith("r")) {
+          // XRPL
+          // things are more difficult for xrpl, since the wallet library does not allow to sign arbitrary messages
+          // we have to create a transaction, sign it and extract the signature from there
+          // at the same time, we must make sure that the transaction is not valid on the network
+          // therefore, we create a transaction that has LastLedgerSequence set to 0
 
+          const tx = {
+            TransactionType: "AccountSet",
+            Account: address,
+            Memos: [
+              {
+                Memo: {
+                  MemoType: Buffer.from("auth-challenge").toString("hex"),
+                  MemoData: Buffer.from(message).toString("hex"),
+                },
+              },
+            ],
+            // make it explicitly expired / un-submittable:
+            LastLedgerSequence: 0,
+            Sequence: 0, // impossible sequence
+            Fee: "0",
+          };
+
+          const result = await xrplSignTransaction(tx, XRPL_NETWORK_IDENTIFIER);
+          signature = result.signed_tx_blob;
+        }
         const response = await signIn("credentials", {
           address,
           signature,
@@ -128,6 +160,7 @@ export function useWeb3SignIn({
         isSigningInRef.current = false;
         attemptedAddressesRef.current.add(address);
       } catch (error) {
+        console.warn("Error signing in with web3", error);
         if (error instanceof Error) {
           // Only disconnect EVM on error; avoid disconnect loops for Sui/Solana
           if (address?.length === 42) {
@@ -221,6 +254,33 @@ export function useWeb3SignIn({
     void signInWithWeb3Async(address);
   }, [
     solanaWallet?.publicKey,
+    sessionStatus,
+    session?.address,
+    enabled,
+    signInWithWeb3Async,
+  ]);
+
+  // Same check as above, but for XRPL
+  useEffect(() => {
+    if (
+      enabled === false ||
+      isSigningInRef.current ||
+      sessionStatus === "loading" ||
+      !xrplWallet?.accounts?.length
+    ) {
+      return;
+    }
+
+    const address = xrplWallet.accounts[0].address;
+    if (session?.address === address || signInAddressRef.current === address) {
+      return;
+    }
+
+    void signInWithWeb3Async(address);
+  }, [
+    xrplWallet?.accounts?.length,
+    xrplWallet?.accounts,
+    xrplConnectionStatus,
     sessionStatus,
     session?.address,
     enabled,

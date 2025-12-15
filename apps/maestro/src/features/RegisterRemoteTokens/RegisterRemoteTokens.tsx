@@ -141,10 +141,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       deploymentMessageId: txState.hash,
       remoteTokens,
     });
-    setTxState({
-      status: "confirmed",
-      hash: txState.hash,
-    });
+    setTxState({ status: "confirmed", hash: txState.hash });
   }, [
     baseRemoteTokens,
     props.originChainId,
@@ -218,6 +215,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   const {
     writeContractAsync: registerCanonicalTokensAsync,
     reset: resetCanonical,
+    simulationError: canonicalSimulationError,
   } = useRegisterRemoteCanonicalTokens({
     chainIds: props.chainIds,
     deployerAddress: deployerAddress,
@@ -228,11 +226,16 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
   const {
     writeContractAsync: registerInterchainTokensAsync,
     reset: resetInterchain,
+    simulationError: interchainSimulationError,
   } = useRegisterRemoteInterchainTokens({
     chainIds: props.chainIds,
     tokenAddress: props.tokenAddress,
     originChainId: props.originChainId ?? -1,
-  }) ?? { writeContractAsync: undefined, reset: () => {} };
+  }) ?? {
+    writeContractAsync: undefined,
+    reset: () => {},
+    simulationError: undefined,
+  };
 
   useEffect(
     () => {
@@ -272,9 +275,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         status: "awaiting_approval",
       });
 
-      const txPromise = registerTokensAsync();
-
-      const result = await txPromise;
+      const result = await registerTokensAsync();
 
       if (!result) {
         throw new Error("registerTokensAsync returned undefined");
@@ -305,8 +306,15 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         status: "idle",
       });
 
-      toast.error(`Transaction failed: ${error.cause?.shortMessage}`);
-      logger.error("Failed to register remote tokens", error.cause);
+      toast.error(
+        `Failed to register remote tokens: ${
+          error?.cause?.shortMessage ??
+          error?.shortMessage ??
+          error?.message ??
+          "Unknown error"
+        }`
+      );
+      logger.error("Failed to register remote tokens", error);
     }
   }, [registerTokensAsync, setTxState, props.originChainId]);
 
@@ -316,11 +324,29 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     return userGasBalance.value > gasFees.reduce((a, b) => a + b, 0n);
   }, [props]);
 
+  const isSimErrorBlocking = useMemo(() => {
+    if (props.deploymentKind === "canonical") {
+      return Boolean(canonicalSimulationError);
+    }
+    if (props.deploymentKind === "interchain") {
+      return Boolean(interchainSimulationError);
+    }
+    return false;
+  }, [
+    props.deploymentKind,
+    canonicalSimulationError,
+    interchainSimulationError,
+  ]);
+
   const buttonChildren = useMemo(() => {
-    if (!hasEnoughGasBalance)
-      return `Insufficient ${
-        props.originChain?.native_token?.symbol ?? ""
-      } balance for gas fees`;
+    if (!hasEnoughGasBalance) {
+      return `Insufficient ${props.originChain?.native_token?.symbol ?? ""} balance for gas fees`;
+    }
+
+    if (isSimErrorBlocking && !registerTokensAsync)
+      return "Preparing transaction failed";
+    if (!registerTokensAsync) return "Preparing transaction...";
+
     switch (txState.status) {
       case "idle":
         return (
@@ -341,9 +367,19 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     txState.status,
     hasEnoughGasBalance,
     props.originChain,
+    registerTokensAsync,
+    isSimErrorBlocking,
   ]);
 
-  return hasEnoughGasBalance ? (
+  if (!hasEnoughGasBalance) {
+    return (
+      <Alert $status={"error"} className="max-w-96">
+        {buttonChildren}
+      </Alert>
+    );
+  }
+
+  return (
     <Button
       $variant="primary"
       onClick={handleClick}
@@ -352,9 +388,5 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     >
       {buttonChildren}
     </Button>
-  ) : (
-    <Alert $status={"error"} className="max-w-96">
-      {buttonChildren}
-    </Alert>
   );
 };

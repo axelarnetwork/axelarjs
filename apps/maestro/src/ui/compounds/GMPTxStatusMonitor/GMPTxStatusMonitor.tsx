@@ -7,13 +7,14 @@ import { clamp, splitAt } from "rambda";
 import { useBlockNumber, useTransaction } from "wagmi";
 
 import { NEXT_PUBLIC_EXPLORER_URL } from "~/config/env";
-import { ITSChainConfig } from "~/server/chainConfig";
 import { useChainId } from "~/lib/hooks";
-import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
+import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
+import { ITSChainConfig } from "~/server/chainConfig";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
+import { useChainInfoQuery } from "~/services/axelarjsSDK/hooks";
 import { useGetTransactionStatusOnDestinationChainsQuery } from "~/services/gmp/hooks";
 import { ChainIcon } from "~/ui/components/ChainsDropdown";
-import { getNormalizedTwoHopChainConfig } from "~/lib/utils/chains";
+import { STELLAR_CHAIN_ID, SUI_CHAIN_ID, XRPL_CHAIN_ID } from "~/config/chains";
 
 export type ExtendedGMPTxStatus = GMPTxStatus | "pending";
 
@@ -43,14 +44,16 @@ const STATUS_COLORS: Partial<
   pending: "neutral",
 };
 
+const CHAINS_WITHOUT_LOG_INDEX = [XRPL_CHAIN_ID];
+const NON_EVM_CHAINS = [SUI_CHAIN_ID, XRPL_CHAIN_ID, STELLAR_CHAIN_ID];
+
 export function useGMPTxProgress(txHash: string, chainId: number) {
   const { combinedComputed } = useAllChainConfigsQuery();
 
   const { data: chainInfo } = useChainInfoQuery({
     axelarChainId: combinedComputed.indexedByChainId[chainId]?.id,
   });
-
-  const isNonEvm = chainInfo?.id.includes("sui");
+  const isNonEvm = NON_EVM_CHAINS.includes(chainId);
 
   // Make sure this supports sui as well
   const { data: txInfo } = useTransaction({
@@ -116,6 +119,7 @@ export function useGMPTxProgress(txHash: string, chainId: number) {
 type Props = {
   txHash: string;
   onAllChainsExecuted?: () => void;
+  onError?: () => void;
 };
 
 const TxFinalityProgress: FC<{ txHash: string; chainId: number }> = ({
@@ -147,8 +151,9 @@ const TxFinalityProgress: FC<{ txHash: string; chainId: number }> = ({
   );
 };
 
-const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
+const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted, onError }: Props) => {
   const chainId = useChainId();
+  const hideLogIndex = CHAINS_WITHOUT_LOG_INDEX.includes(chainId); // TODO: only because the currently open chain is xrpl, this does not mean that we are looking at a xrpl tx -> determine from actual source chain
   const { combinedComputed } = useAllChainConfigsQuery();
   const {
     data: statuses,
@@ -166,6 +171,16 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       onAllChainsExecuted?.();
     }
   }, [statusList, onAllChainsExecuted]);
+
+  useEffect(() => {
+    if (!statusList.length) return;
+    const hasTerminalError = statusList.some(
+      (s) => s.status === "error" || s.status === "insufficient_fee"
+    );
+    if (hasTerminalError) {
+      onError?.();
+    }
+  }, [statusList, onError]);
 
   if (!statuses || Object.keys(statuses).length === 0) {
     if (!isLoading) {
@@ -199,13 +214,12 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
       <ul className="grid gap-2 rounded-box bg-base-300 p-4">
         {[...Object.entries(statuses ?? {})].map(
           ([axelarChainId, { status, logIndex }]) => {
-
             const chain = getNormalizedTwoHopChainConfig(
               axelarChainId,
               combinedComputed,
               chainId
             );
-             
+
             if (!chain) {
               console.log("chain not found", axelarChainId);
               return undefined;
@@ -215,9 +229,10 @@ const GMPTxStatusMonitor = ({ txHash, onAllChainsExecuted }: Props) => {
               <ChainStatusItem
                 key={`chain-status-${axelarChainId}`}
                 chain={chain}
-                status={status}
+                status={status ?? "pending"}
                 txHash={txHash}
                 logIndex={logIndex}
+                hideLogIndex={hideLogIndex}
               />
             );
           }
@@ -237,6 +252,7 @@ export type ChainStatusItemProps = {
   className?: string;
   compact?: boolean;
   offset?: number;
+  hideLogIndex?: boolean; // some chains use only the format `0x${tx_hash}` for GMP calls
 };
 
 export type ChainStatusItemsProps = Omit<
@@ -325,6 +341,7 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
   txHash,
   className,
   compact,
+  hideLogIndex,
 }) => {
   const chainName = chain?.name || "chain";
   return (
@@ -339,7 +356,7 @@ export const ChainStatusItem: FC<ChainStatusItemProps> = ({
         </Tooltip>{" "}
         {!compact && chainName}
       </span>
-      <GMPStatusIndicator txHash={`${txHash}-${logIndex}`} status={status} />
+      <GMPStatusIndicator txHash={hideLogIndex ? `${txHash}` : `${txHash}-${logIndex}`} status={status} />
     </li>
   );
 };

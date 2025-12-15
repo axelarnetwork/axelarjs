@@ -44,12 +44,17 @@ ModalFormInput.defaultProps = {
 };
 
 export const NextButton: FC<ButtonProps> = ({ children, ...props }) => {
+  const contentClassName = cn({
+    "opacity-60": props.disabled || props.$loading,
+  });
+  const rightIconClassName = cn(
+    { hidden: props.$loading, "opacity-60": props.disabled },
+    "text-indigo-600"
+  );
   return (
     <Button {...props} $variant="neutral">
-      {children}
-      <ChevronRightIcon
-        className={cn({ hidden: props.$loading }, "text-indigo-600")}
-      />
+      <span className={contentClassName}>{children}</span>
+      <ChevronRightIcon className={rightIconClassName} />
     </Button>
   );
 };
@@ -120,7 +125,7 @@ export const StepsSummary: FC<StepsSummaryProps> = (
   );
 };
 
-export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
+export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean, excludeChainIds?: number[] }> = (
   props
 ) => {
   const { width } = useWindowSize();
@@ -135,6 +140,7 @@ export const ChainsDropdown: FC<{ disabled?: boolean; shift?: boolean }> = (
       contentClassName={cn("translate-x-28 sm:translate-x-12 z-40", {
         "translate-x-16 sm:translate-x-0": props.shift,
       })}
+      excludeChainIds={props.excludeChainIds}
     />
   );
 };
@@ -145,6 +151,7 @@ export type ProtectedDialogProps = PropsWithChildren<{
   disableClose?: boolean;
   step: number;
   triggerLabel?: string;
+  disabledLabel?: string;
   steps: string[];
   title?: ReactNode;
   disabled?: boolean;
@@ -154,6 +161,7 @@ export type ProtectedDialogProps = PropsWithChildren<{
 
 export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   triggerLabel,
+  disabledLabel,
   steps,
   onClose,
   disableClose,
@@ -187,13 +195,14 @@ export const MultiStepDialog: FC<ProtectedDialogProps> = ({
   return (
     <Dialog
       onClose={handleClose}
+      className="top-[64px] max-h-[calc(100vh-64px)]"
       renderTrigger={(props) => (
         <TriggerButton {...props} disabled={disabled}>
-          {triggerLabel}
+          {disabled && disabledLabel ? disabledLabel : triggerLabel}
         </TriggerButton>
       )}
     >
-      <Dialog.Body $as="section">
+      <Dialog.Body $as="section" className="overflow-x-hidden">
         <Dialog.CornerCloseAction
           onClick={handleClose}
           disabled={disableClose}

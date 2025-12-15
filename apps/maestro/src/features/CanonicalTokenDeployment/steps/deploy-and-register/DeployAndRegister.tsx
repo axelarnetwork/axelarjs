@@ -1,9 +1,10 @@
 import { Alert, Dialog, FormControl, Label, Tooltip } from "@axelarjs/ui";
 import { toast } from "@axelarjs/ui/toaster";
 import { invariant, Maybe } from "@axelarjs/utils";
-import React, {
+import {
   ComponentRef,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   type FC,
@@ -13,23 +14,29 @@ import React, {
 import { parseUnits } from "viem";
 import { WriteContractData } from "wagmi/query";
 
+import {
+  HEDERA_CHAIN_ID,
+  SOLANA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
 import { useCanonicalTokenDeploymentStateContainer } from "~/features/CanonicalTokenDeployment/CanonicalTokenDeployment.state";
 import { useDeployAndRegisterRemoteCanonicalTokenMutation } from "~/features/CanonicalTokenDeployment/hooks";
 import { RegisterCanonicalTokenResult } from "~/features/suiHooks/useRegisterCanonicalToken";
 import { useTransactionsContainer } from "~/features/Transactions";
-import {
-  SOLANA_CHAIN_ID,
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useBalance,
-  useChainId,
-} from "~/lib/hooks";
+import { useBalance, useChainId } from "~/lib/hooks";
 import { handleTransactionResult } from "~/lib/transactions/handlers";
-import { filterEligibleChains } from "~/lib/utils/chains";
+import { filterEligibleChainsForRemoteDeployment } from "~/lib/utils/chains";
 import { getNativeToken } from "~/lib/utils/getNativeToken";
 import ChainPicker from "~/ui/compounds/ChainPicker";
 import { NextButton, TokenNameAlert } from "~/ui/compounds/MultiStepForm";
 import { useStep3ChainSelectionState } from "./DeployAndRegister.state";
+
+const SIMULATION_DISABLED_CHAIN_IDS = [
+  SUI_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  HEDERA_CHAIN_ID,
+];
 
 export const Step3: FC = () => {
   const { state: rootState, actions: rootActions } =
@@ -54,7 +61,7 @@ export const Step3: FC = () => {
     [state.remoteDeploymentGasFees?.gasFees]
   );
 
-  const { writeAsync: deployCanonicalTokenAsync } =
+  const { writeAsync: deployCanonicalTokenAsync, simulationError } =
     useDeployAndRegisterRemoteCanonicalTokenMutation(
       {
         onStatusUpdate(txState) {
@@ -82,6 +89,16 @@ export const Step3: FC = () => {
 
   const [, { addTransaction }] = useTransactionsContainer();
 
+  useEffect(() => {
+    if (!simulationError) return;
+    const err = simulationError as unknown as {
+      shortMessage?: string;
+      message?: string;
+    };
+    const msg = `${err.shortMessage ?? err.message ?? "Failed to prepare transaction"}`;
+    toast.error(msg);
+  }, [simulationError]);
+
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     async (e) => {
       e.preventDefault();
@@ -98,78 +115,63 @@ export const Step3: FC = () => {
       }
 
       actions.setIsDeploying(true);
-
       invariant(sourceChain, "source chain not found");
+      rootActions.setTxState({ type: "pending_approval" });
 
-      rootActions.setTxState({
-        type: "pending_approval",
-      });
-
-      const txPromise = deployCanonicalTokenAsync().catch((e) => {
-        // Handle user rejection from any wallet
+      const txPromise = deployCanonicalTokenAsync().catch((e: any) => {
         if (e.message?.toLowerCase().includes("reject")) {
           toast.error("Transaction rejected by user");
-          rootActions.setTxState({
-            type: "idle",
-          });
+          rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
           return;
         }
-
-        toast.error(e.message);
-        rootActions.setTxState({
-          type: "idle",
-        });
-
+        toast.error(String(e?.message ?? "Unknown error"));
+        rootActions.setTxState({ type: "idle" });
+        actions.setIsDeploying(false);
         return;
       });
 
-      // Sui will return a digest equivalent to the txHash
-      if (sourceChain.chain_id === SUI_CHAIN_ID) {
+      const handleSui = async () => {
         try {
           const result = (await txPromise) as RegisterCanonicalTokenResult;
-          // if tx is successful, we will get a digest
-          if (result) {
-            rootActions.setTxState({
-              type: "deployed",
-              suiTx: result,
-              tokenAddress: rootState.tokenDetails.tokenAddress,
-              txHash: result.digest,
-            });
-
-            if (rootState.selectedChains.length > 0) {
-              addTransaction({
-                status: "submitted",
-                suiTx: result,
-                hash: result.digest,
-                chainId: sourceChain.chain_id,
-                txType: "INTERCHAIN_DEPLOYMENT",
-              });
-            }
+          if (!result) {
+            rootActions.setTxState({ type: "idle" });
+            actions.setIsDeploying(false);
             return;
-          } else {
-            rootActions.setTxState({
-              type: "idle",
+          }
+          rootActions.setTxState({
+            type: "deployed",
+            suiTx: result,
+            tokenAddress: rootState.tokenDetails.tokenAddress,
+            txHash: result.digest,
+          });
+          if (rootState.selectedChains.length > 0) {
+            addTransaction({
+              status: "submitted",
+              suiTx: result,
+              hash: result.digest,
+              chainId: sourceChain.chain_id,
+              txType: "INTERCHAIN_DEPLOYMENT",
             });
           }
+          actions.setIsDeploying(false);
         } catch (e: any) {
-          toast.error(e.message);
-          rootActions.setTxState({
-            type: "idle",
-          });
+          toast.error(String(e?.message ?? "Unknown error"));
+          rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
         }
-      }
+      };
 
-      // Handle Stellar token deployment
-      if (sourceChain.chain_id === STELLAR_CHAIN_ID) {
+      const handleStellar = async () => {
         try {
           const result = await txPromise;
-
           if (
             result &&
             typeof result === "object" &&
             "hash" in result &&
             "tokenAddress" in result
           ) {
+            actions.setIsDeploying(false);
             if (rootState.selectedChains.length > 0) {
               addTransaction({
                 status: "submitted",
@@ -177,22 +179,18 @@ export const Step3: FC = () => {
                 chainId: sourceChain.chain_id,
                 txType: "INTERCHAIN_DEPLOYMENT",
               });
-              return;
             }
           } else {
             throw new Error("Stellar deployment result incomplete.");
           }
         } catch (e: any) {
-          toast.error(e.message || "Stellar deployment failed");
-          rootActions.setTxState({
-            type: "idle",
-          });
+          toast.error(String(e?.message ?? "Stellar deployment failed"));
+          rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
         }
-        return;
-      }
+      };
 
-      // Handle Solana token deployment
-      if (sourceChain.chain_id === SOLANA_CHAIN_ID) {
+      const handleSolana = async () => {
         try {
           const result = await txPromise;
 
@@ -210,30 +208,33 @@ export const Step3: FC = () => {
               txType: "INTERCHAIN_DEPLOYMENT",
             });
             return;
-          } else {
-            throw new Error("Solana deployment result incomplete.");
           }
+
+          throw new Error("Solana deployment result incomplete.");
         } catch (e: any) {
-          toast.error(e.message || "Solana deployment failed");
+          toast.error(e?.message || "Solana deployment failed");
           rootActions.setTxState({
             type: "idle",
           });
+          actions.setIsDeploying(false);
         }
-        return;
-      }
+      };
 
-      // For EVM chains, handle the transaction result
-      if (txPromise) {
+      const handleEvm = async () => {
+        if (!txPromise) {
+          rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
+          return;
+        }
         try {
+          let didSucceed = false;
+          let errorHandled = false;
           await handleTransactionResult(
             txPromise as Promise<WriteContractData>,
             {
               onSuccess(txHash) {
-                rootActions.setTxState({
-                  type: "deploying",
-                  txHash: txHash,
-                });
-
+                rootActions.setTxState({ type: "deploying", txHash });
+                didSucceed = true;
                 if (validDestinationChainIds.length > 0) {
                   addTransaction({
                     status: "submitted",
@@ -243,21 +244,36 @@ export const Step3: FC = () => {
                   });
                 }
               },
+              onUnknownError() {
+                errorHandled = true;
+                rootActions.setTxState({ type: "idle" });
+                actions.setIsDeploying(false);
+              },
               onTransactionError(txError) {
-                rootActions.setTxState({
-                  type: "idle",
-                });
-                toast.error(txError.shortMessage);
+                rootActions.setTxState({ type: "idle" });
+                toast.error(
+                  String(txError.shortMessage ?? "Transaction failed")
+                );
+                actions.setIsDeploying(false);
+                errorHandled = true;
               },
             }
           );
+          if (!didSucceed && !errorHandled) {
+            rootActions.setTxState({ type: "idle" });
+            actions.setIsDeploying(false);
+          }
         } catch (e: any) {
-          toast.error(e.message);
-          rootActions.setTxState({
-            type: "idle",
-          });
+          toast.error(String(e?.message ?? "Unknown error"));
+          rootActions.setTxState({ type: "idle" });
+          actions.setIsDeploying(false);
         }
-      }
+      };
+
+      if (sourceChain.chain_id === SUI_CHAIN_ID) return handleSui();
+      if (sourceChain.chain_id === STELLAR_CHAIN_ID) return handleStellar();
+      if (sourceChain.chain_id === SOLANA_CHAIN_ID) return handleSolana();
+      return handleEvm();
     },
     [
       rootState.selectedChains.length,
@@ -274,7 +290,10 @@ export const Step3: FC = () => {
     ]
   );
 
-  const eligibleChains = filterEligibleChains(state.chains, chainId);
+  const eligibleChains = filterEligibleChainsForRemoteDeployment(
+    state.chains,
+    chainId
+  );
 
   const formSubmitRef = useRef<ComponentRef<"button">>(null);
 
@@ -297,7 +316,20 @@ export const Step3: FC = () => {
     return gasFeeBn > balance.value;
   }, [balance, state.remoteDeploymentGasFees, state.totalGasFee]);
 
+  let isSimErrorBlocking: boolean;
+  if (SIMULATION_DISABLED_CHAIN_IDS.includes(chainId)) {
+    isSimErrorBlocking = false;
+  } else {
+    isSimErrorBlocking = Boolean(simulationError);
+  }
+
   const { children: buttonChildren, status: buttonStatus } = useMemo(() => {
+    if (isSimErrorBlocking) {
+      return {
+        children: "Preparing transaction failed",
+        status: "error" as const,
+      };
+    }
     if (rootState.txState.type === "pending_approval") {
       return { children: "Check your wallet", status: "loading" as const };
     }
@@ -349,6 +381,7 @@ export const Step3: FC = () => {
     hasInsufficientGasBalance,
     validDestinationChainIds.length,
     nativeTokenSymbol,
+    isSimErrorBlocking,
   ]);
 
   return (

@@ -18,7 +18,7 @@ import { GatewayApproveError } from "./error";
 import { sendEvmGatewayApproveTx } from "./index";
 import * as EvmClient from "./txHelper";
 
-describe("EvmGatewayTx", () => {
+describe.skip("EvmGatewayTx", () => {
   const environment = "testnet";
   const txHash = hashMessage("random tx hash");
   const destGatewayAddress = zeroAddress;

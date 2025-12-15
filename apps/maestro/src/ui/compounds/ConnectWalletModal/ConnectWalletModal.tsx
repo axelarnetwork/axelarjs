@@ -9,6 +9,8 @@ import { useAuth } from "~/contexts/AuthContext";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import ConnectWalletButton from "../ConnectWalletButton/ConnectWalletButton";
 
+import { ConnectModal as XRPLConnectModal } from "../XRPLWalletList/ConnectModal";
+
 const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -40,6 +42,7 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
         console.error("Failed to connect Stellar wallet:", error);
       }
     };
+
     return (
       <Modal
         open={isModalOpen}
@@ -94,6 +97,18 @@ const ConnectWalletModal = forwardRef<HTMLButtonElement, ButtonProps>(
           >
             Stellar
           </Button>
+          <XRPLConnectModal
+            trigger={
+              <Button
+                $size={$size}
+                $variant={$variant}
+                className="w-full"
+                aria-label="Open wallet connection modal for XRPL"
+              >
+                XRPL
+              </Button>
+            }
+          />
         </Modal.Body>
       </Modal>
     );

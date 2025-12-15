@@ -134,3 +134,9 @@ export const SOLANA_RPC_URLS = {
   testnet: "https://api.testnet.solana.com",
   mainnet: "https://api.mainnet-beta.solana.com",
 };
+
+export const XRPL_RPC_URLS = {
+  "devnet-amplifier": "https://s.altnet.rippletest.net:51234",
+  testnet: "https://s.altnet.rippletest.net:51234",
+  mainnet: "https://xrplcluster.com",
+};

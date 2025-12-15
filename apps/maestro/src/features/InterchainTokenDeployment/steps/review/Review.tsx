@@ -1,12 +1,14 @@
 import {
   Alert,
+  cn,
   CopyToClipboardButton,
   Dialog,
   ExternalLinkIcon,
   LinkButton,
 } from "@axelarjs/ui";
 import { maskAddress } from "@axelarjs/utils";
-import { useCallback, useEffect, useMemo, useState, type FC } from "react";
+import { useEffect, useMemo, useState, type FC } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { useAccount, useChainFromRoute } from "~/lib/hooks";
@@ -27,11 +29,14 @@ const Review: FC = () => {
 
   const [shouldFetch, setShouldFetch] = useState(false);
 
+  const txTokenAddress =
+    state.txState.type === "deployed" ? state.txState.tokenAddress : null;
+
   useInterchainTokensQuery(
-    shouldFetch && routeChain?.id && state.txState.type === "deployed"
+    shouldFetch && routeChain?.id && txTokenAddress
       ? {
           chainId: routeChain.id,
-          tokenAddress: state.txState.tokenAddress,
+          tokenAddress: txTokenAddress,
         }
       : {}
   );
@@ -64,15 +69,17 @@ const Review: FC = () => {
     return combinedComputed.indexedByChainId[chain.id];
   }, [chain, combinedComputed.indexedByChainId]);
 
-  const handleGoToTokenPage = useCallback(async () => {
-    if (chainConfig && state.txState.type === "deployed") {
-      actions.reset();
-
-      await router.push(
-        `/${chainConfig.id.toLowerCase()}/${state.txState.tokenAddress}`
-      );
+  const deployedTokenHref = useMemo(() => {
+    if (routeChain) {
+      return router.asPath;
     }
-  }, [actions, chainConfig, router, state.txState]);
+
+    if (txTokenAddress && chainConfig?.id) {
+      return `/${chainConfig.id.toLowerCase()}/${txTokenAddress}`;
+    }
+
+    return "";
+  }, [routeChain, txTokenAddress, chainConfig, router]);
 
   const isVMChain = chainConfig?.chain_type !== "evm";
 
@@ -134,23 +141,26 @@ const Review: FC = () => {
         )}
       </div>
       <Dialog.Actions>
-        <Dialog.CloseAction
-          $length="block"
-          $variant="primary"
-          disabled={
-            !routeChain && (!chainConfig || state.txState.type !== "deployed")
-          }
-          onClick={async () => {
-            setShouldFetch(true);
-            if (routeChain) {
-              await router.replace(router.asPath);
-            } else {
-              await handleGoToTokenPage();
-            }
-          }}
+        <Link
+          href={deployedTokenHref}
+          className={cn(`w-full`, {
+            "pointer-events-none cursor-not-allowed": !deployedTokenHref,
+          })}
         >
-          {routeChain ? "View token page!" : "Go to token page!"}
-        </Dialog.CloseAction>
+          <Dialog.CloseAction
+            $length="block"
+            $variant="primary"
+            disabled={!deployedTokenHref}
+            onClick={() => {
+              setShouldFetch(true);
+              if (!routeChain) {
+                actions.reset();
+              }
+            }}
+          >
+            {routeChain ? "View token page!" : "Go to token page!"}
+          </Dialog.CloseAction>
+        </Link>
       </Dialog.Actions>
     </>
   );

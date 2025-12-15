@@ -12,7 +12,6 @@ import {
   berachainBepolia,
   blastSepolia,
   bscTestnet,
-  celoAlfajores,
   fantomTestnet,
   filecoinCalibration,
   flowTestnet,
@@ -23,6 +22,7 @@ import {
   lineaSepolia,
   lineaTestnet,
   mantleTestnet,
+  monadTestnet,
   moonbaseAlpha,
   optimismSepolia,
   plumeSepolia,
@@ -32,6 +32,7 @@ import {
   sepolia,
 } from "viem/chains";
 
+import { celoSepolia } from "./custom/celo";
 import { centrifugeTestnet } from "./custom/centrifuge";
 import { hyperliquidTestnet } from "./custom/hyperliquid";
 
@@ -47,6 +48,7 @@ export const TESTNET_CHAINS = {
   "filecoin-2": filecoinCalibration,
   "linea-sepolia": lineaSepolia,
   "mantle-sepolia": mantleTestnet,
+  monad: monadTestnet,
   "optimism-sepolia": optimismSepolia,
   immutable: immutableZkEvmTestnet,
   linea: lineaTestnet,
@@ -58,7 +60,6 @@ export const TESTNET_CHAINS = {
   avalanche: avalancheFuji,
   "blast-sepolia": blastSepolia,
   "centrifuge-2": centrifugeTestnet,
-  celo: celoAlfajores,
   kava: kavaTestnet,
   scroll: scrollSepolia,
   fraxtal: fraxtalTestnet,
@@ -67,6 +68,7 @@ export const TESTNET_CHAINS = {
   plume: plumeSepolia,
   berachain: berachainBepolia,
   hyperliquid: hyperliquidTestnet,
+  celo: celoSepolia,
 } as const;
 
 export type SupportedTestnetChain = keyof typeof TESTNET_CHAINS;

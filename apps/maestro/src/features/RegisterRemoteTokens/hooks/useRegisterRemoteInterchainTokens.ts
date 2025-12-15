@@ -2,6 +2,11 @@ import { INTERCHAIN_TOKEN_FACTORY_ENCODERS } from "@axelarjs/evm";
 import { useMemo } from "react";
 
 import {
+  SOLANA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
+import {
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_EXECUTE_DATA,
   NEXT_PUBLIC_INTERCHAIN_DEPLOYMENT_GAS_LIMIT,
 } from "~/config/env";
@@ -10,18 +15,15 @@ import {
   useSimulateInterchainTokenFactoryMulticall,
   useWriteInterchainTokenFactoryMulticall,
 } from "~/lib/contracts/InterchainTokenFactory.hooks";
-import {
-  SOLANA_CHAIN_ID,
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useAccount,
-  useChainId,
-} from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
+import { scaleGasValue } from "~/lib/utils/gas";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useEstimateGasFeeMultipleChainsQuery } from "~/services/axelarjsSDK/hooks";
 import { useInterchainTokenDetailsQuery } from "~/services/interchainToken/hooks";
 import { useRegisterRemoteInterchainTokenOnStellar } from "./useRegisterRemoteInterchainTokenOnStellar";
 import { useRegisterRemoteInterchainTokenOnSui } from "./useRegisterRemoteInterchainTokenOnSui";
+
+const SIMULATION_DISABLED_CHAIN_IDS = [SUI_CHAIN_ID, STELLAR_CHAIN_ID];
 
 export type RegisterRemoteInterchainTokensInput = {
   chainIds: number[];
@@ -73,24 +75,27 @@ export default function useRegisterRemoteInterchainTokens(
     )
       return [];
 
-    return destinationChainIds.map((chainId, i) =>
+    return destinationChainIds.map((destinationChain, i) =>
       INTERCHAIN_TOKEN_FACTORY_ENCODERS.deployRemoteInterchainToken.data({
         salt: tokenDeployment.salt,
-        destinationChain: chainId,
-        gasValue: gasFeesData.gasFees[i].fee,
+        destinationChain,
+        gasValue: scaleGasValue(chainId, gasFeesData.gasFees[i].fee),
       })
     );
   }, [destinationChainIds, gasFeesData, tokenDeployment, chainId]);
 
   const totalGasFee = gasFeesData?.totalGasFee ?? 0n;
 
-  const { data: config } = useSimulateInterchainTokenFactoryMulticall({
-    value: totalGasFee,
-    args: [multicallArgs],
-    query: {
-      enabled: chainId !== SUI_CHAIN_ID && multicallArgs.length > 0,
-    },
-  });
+  const { data: config, error: simulationError } =
+    useSimulateInterchainTokenFactoryMulticall({
+      value: totalGasFee,
+      args: [multicallArgs],
+      query: {
+        enabled:
+          !SIMULATION_DISABLED_CHAIN_IDS.includes(chainId) &&
+          multicallArgs.length > 0,
+      },
+    });
 
   const mutation = useWriteInterchainTokenFactoryMulticall();
 
@@ -104,7 +109,13 @@ export default function useRegisterRemoteInterchainTokens(
   const { deployRemoteInterchainToken } = useDeployRemoteInterchainToken();
   const { address: deployerAddress } = useAccount();
 
-  if (!tokenDeployment) return;
+  if (!tokenDeployment)
+    return {
+      ...mutation,
+      writeContract: undefined,
+      writeContractAsync: undefined,
+      simulationError: undefined,
+    };
 
   const suiInput = {
     axelarChainIds: destinationChainIds,
@@ -123,42 +134,41 @@ export default function useRegisterRemoteInterchainTokens(
     gasValues: gasFeesData?.gasFees?.map((x) => x.fee) ?? [],
   };
 
-  return {
-    ...mutation,
-    writeContract: () => {
-      if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnSui(suiInput);
-      }
-
-      if (chainId === STELLAR_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnStellar(stellarInput);
-      }
-
-      if (chainId === SOLANA_CHAIN_ID) {
-        if (!tokenDeployment) return;
-        return deployRemoteInterchainToken({
+  let writeContract = undefined;
+  switch (chainId) {
+    case SUI_CHAIN_ID:
+      writeContract = () => registerRemoteInterchainTokenOnSui(suiInput);
+      break;
+    case STELLAR_CHAIN_ID:
+      writeContract = () =>
+        registerRemoteInterchainTokenOnStellar(stellarInput);
+      break;
+    case SOLANA_CHAIN_ID:
+      writeContract = () =>
+        deployRemoteInterchainToken({
           caller: String(deployerAddress ?? ""),
           salt: tokenDeployment.salt,
           destinationChain: destinationChainIds,
           gasValue: destinationChainIds.map(() => "0"),
         }).then((r) => r.signature);
+      break;
+    default:
+      if (config) {
+        writeContract = () => mutation.writeContract(config.request);
       }
+  }
 
-      if (!config) return;
-
-      return mutation.writeContract(config.request);
-    },
-    writeContractAsync: async () => {
-      if (chainId === SUI_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnSui(suiInput);
-      }
-
-      if (chainId === STELLAR_CHAIN_ID) {
-        return registerRemoteInterchainTokenOnStellar(stellarInput);
-      }
-
-      if (chainId === SOLANA_CHAIN_ID) {
-        if (!tokenDeployment) return;
+  let writeContractAsync = undefined;
+  switch (chainId) {
+    case SUI_CHAIN_ID:
+      writeContractAsync = () => registerRemoteInterchainTokenOnSui(suiInput);
+      break;
+    case STELLAR_CHAIN_ID:
+      writeContractAsync = () =>
+        registerRemoteInterchainTokenOnStellar(stellarInput);
+      break;
+    case SOLANA_CHAIN_ID:
+      writeContractAsync = async () => {
         const r = await deployRemoteInterchainToken({
           caller: String(deployerAddress ?? ""),
           salt: tokenDeployment.salt,
@@ -166,11 +176,18 @@ export default function useRegisterRemoteInterchainTokens(
           gasValue: destinationChainIds.map(() => "0"),
         });
         return r.signature;
+      };
+      break;
+    default:
+      if (config) {
+        writeContractAsync = () => mutation.writeContractAsync(config.request);
       }
+  }
 
-      if (!config) return;
-
-      return await mutation.writeContractAsync(config.request);
-    },
+  return {
+    ...mutation,
+    simulationError,
+    writeContract,
+    writeContractAsync,
   };
 }

@@ -12,7 +12,12 @@ import { z } from "zod";
 
 import { solanaChainConfig } from "~/config/chains";
 import { suiClient as client } from "~/lib/clients/suiClient";
-import { isValidStellarTokenAddress } from "~/lib/utils/validation";
+import { isTokenAddressIncompatibleWithOwner } from "~/lib/utils/addressCompatibility";
+import {
+  isValidStellarTokenAddress,
+  isXRPLTokenAddressFormat,
+  isXRPLWalletAddressFormat,
+} from "~/lib/utils/validation";
 import { queryCoinMetadata } from "~/server/routers/sui/graphql";
 import { publicProcedure } from "~/server/trpc";
 import { getSolanaChainConfig } from "../solana/utils/utils";
@@ -20,6 +25,7 @@ import { getStellarChainConfig } from "../stellar/utils";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
 import { simulateCall } from "../stellar/utils/transactions";
 import { getCoinInfoByCoinType, getSuiChainConfig } from "../sui/utils/utils";
+import { getXRPLAccountBalance } from "~/lib/utils/xrpl";
 
 // Helper function to call Stellar contract methods and handle errors
 async function callStellarContractMethod<T>({
@@ -72,25 +78,28 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
     })
   )
   .query(async ({ input, ctx }) => {
-    const normalizedTokenAddress = input.tokenAddress?.includes(":")
-      ? input.tokenAddress.split(":")[0] // use only the first part of the address for sui
-      : input.tokenAddress;
+    const emptyObject = {
+      decimals: 0,
+      isTokenOwner: false,
+      isTokenMinter: false,
+      tokenBalance: "0",
+      isTokenPendingOwner: false,
+      hasPendingOwner: false,
+      hasMinterRole: false,
+      hasOperatorRole: false,
+      hasFlowLimiterRole: false,
+    };
     // A user can have a token on a different chain, but the if address is the same as for all EVM chains, they can check their balance
     // To check sui for example, they need to connect with a sui wallet
-    const isIncompatibleChain =
-      normalizedTokenAddress?.length !== input.owner?.length;
+    let isIncompatibleChain = isTokenAddressIncompatibleWithOwner(
+      input.tokenAddress,
+      input.owner
+    );
+    if (isXRPLWalletAddressFormat(input.owner)) { // xrpl address
+      isIncompatibleChain = !isXRPLTokenAddressFormat(input.tokenAddress);
+    }
     if (isIncompatibleChain) {
-      return {
-        isTokenOwner: false,
-        isTokenMinter: false,
-        tokenBalance: "0",
-        decimals: 0,
-        isTokenPendingOwner: false,
-        hasPendingOwner: false,
-        hasMinterRole: false,
-        hasOperatorRole: false,
-        hasFlowLimiterRole: false,
-      };
+      return emptyObject;
     }
     // Sui coin type is in the format of packageId::module::MODULE
     if (input.tokenAddress?.includes(":")) {
@@ -115,14 +124,12 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         InterchainTokenServiceV0
       );
 
-      let decimals = coinInfo?.decimals;
+      let decimals = coinInfo?.decimals ?? 0;
       // Get the coin metadata
 
       await queryCoinMetadata(input.tokenAddress)
-        .then((metadata) => (decimals = metadata?.decimals))
-        .catch((e) => {
-          console.log("error in queryCoinMetadata", e);
-        });
+        .then((metadata) => (decimals = metadata?.decimals ?? decimals))
+        .catch(() => undefined);
 
       const isOperator = input.owner === coinInfo?.operator;
       const isDistributor = input.owner === coinInfo?.distributor;
@@ -262,19 +269,26 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
           `[Stellar] Error in token balance retrieval for ${input.tokenAddress}:`,
           error
         );
-        return {
-          decimals: 0,
-          isTokenOwner: false,
-          isTokenMinter: false,
-          tokenBalance: "0",
-          isTokenPendingOwner: false,
-          hasPendingOwner: false,
-          hasMinterRole: false,
-          hasOperatorRole: false,
-          hasFlowLimiterRole: false,
-        };
+        return emptyObject;
       }
     }
+
+    if (isXRPLTokenAddressFormat(input.tokenAddress)) {
+      try {
+        return await getXRPLAccountBalance(input.owner, input.tokenAddress);
+      }
+      catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        if (errorMsg.includes("Account not found")) {
+          return emptyObject; // an account that is not activated does not have a balance
+        }
+        throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: errorMsg,
+        });
+      }
+    }
+
     // This is for ERC20 tokens
     const balanceOwner = input.owner as `0x${string}`;
     const tokenAddress = input.tokenAddress as `0x${string}`;
@@ -309,10 +323,10 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
       );
 
       const [
-        isTokenMinter,
-        hasMinterRole,
-        hasOperatorRole,
-        hasFlowLimiterRole,
+        isTokenMinterRead,
+        hasMinterRoleRead,
+        hasOperatorRoleRead,
+        hasFlowLimiterRoleRead,
       ] = await Promise.all(
         [
           itClient.reads.isMinter({
@@ -333,7 +347,36 @@ export const getInterchainTokenBalanceForOwner = publicProcedure
         ].map((p) => p.catch(always(false)))
       );
 
-      const isTokenOwner = owner === balanceOwner;
+      let isTokenOwner = owner === balanceOwner;
+      let isTokenMinter = isTokenMinterRead;
+      let hasMinterRole = hasMinterRoleRead;
+      let hasOperatorRole = hasOperatorRoleRead;
+      const hasFlowLimiterRole = hasFlowLimiterRoleRead;
+
+      // Hedera fallback: owner/minter interfaces may not be available on HTS wrappers.
+      // Use DB-recorded deployer/minter to infer roles when on Hedera.
+      if (chainConfig.axelarChainId === "hedera") {
+        try {
+          const tokenRecord =
+            await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
+              "hedera",
+              tokenAddress
+            );
+          const dbIsOwner =
+            tokenRecord?.deployerAddress?.toLowerCase() ===
+            balanceOwner.toLowerCase();
+          const dbIsMinter =
+            tokenRecord?.originalMinterAddress?.toLowerCase() ===
+            balanceOwner.toLowerCase();
+
+          isTokenOwner = isTokenOwner || Boolean(dbIsOwner);
+          isTokenMinter = isTokenMinter || Boolean(dbIsMinter);
+          hasMinterRole = hasMinterRole || Boolean(dbIsMinter);
+          hasOperatorRole = hasOperatorRole || Boolean(dbIsOwner);
+        } catch {
+          // noop: best-effort fallback
+        }
+      }
 
       return {
         isTokenOwner,

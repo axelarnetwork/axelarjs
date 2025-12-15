@@ -3,12 +3,14 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
+  SOLANA_CHAIN_ID,
   solanaChainConfig,
+  STELLAR_CHAIN_ID,
   stellarChainConfig,
+  SUI_CHAIN_ID,
   suiChainConfig,
 } from "~/config/chains";
 import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
-import { SOLANA_CHAIN_ID, STELLAR_CHAIN_ID, SUI_CHAIN_ID } from "~/lib/hooks";
 import { hex0xLiteral, hex64Literal } from "~/lib/utils/validation";
 import { publicProcedure } from "~/server/trpc";
 import { STELLAR_NETWORK_PASSPHRASE } from "../stellar/utils/config";
@@ -91,7 +93,6 @@ export const getInterchainTokenDetails = publicProcedure
 
     // For Stellar tokens, we need to handle both symbol-issuer and contract address formats
     let tokenRecord = null;
-
     tokenRecord =
       await ctx.persistence.postgres.getInterchainTokenByChainIdAndTokenAddress(
         axelarChainId,
@@ -172,6 +173,5 @@ export const getInterchainTokenDetails = publicProcedure
         message: `Interchain token ${input.tokenAddress} not found on chain ${input.chainId}`,
       });
     }
-
     return tokenRecord;
   });

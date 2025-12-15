@@ -8,13 +8,16 @@ import { useMutation } from "@tanstack/react-query";
 import { parseUnits, TransactionExecutionError } from "viem";
 
 import { useSendStellarToken } from "~/features/stellarHooks";
+import { useXRPLInterchainTransfer } from "~/features/xrplHooks/useXRPLInterchainTransfer";
 import { suiClient as client } from "~/lib/clients/suiClient";
 import { useWriteInterchainTokenInterchainTransfer } from "~/lib/contracts/InterchainToken.hooks";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { isXRPLChainName } from "~/lib/utils/xrpl";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
+import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -43,6 +46,7 @@ export function useInterchainTransferMutation(
   const { sendToken: sendStellarToken } = useSendStellarToken();
   const { connection } = useConnection();
   const { sendTransaction } = useWallet();
+  const xrplInterchainTransfer = useXRPLInterchainTransfer();
 
   const { writeContractAsync: transferAsync } =
     useWriteInterchainTokenInterchainTransfer();
@@ -89,6 +93,8 @@ export function useInterchainTransferMutation(
         // Encode the recipient address for Stellar since it's a base64 string
         if (config.destinationChainName.toLowerCase().includes("stellar")) {
           encodedRecipient = stellarEncodedRecipient(destinationAddress);
+        } else if (isXRPLChainName(config.destinationChainName)) {
+          encodedRecipient = xrplEncodedRecipient(destinationAddress);
         } else {
           encodedRecipient = destinationAddress as `0x${string}`;
         }
@@ -106,6 +112,17 @@ export function useInterchainTransferMutation(
             transaction: sendTokenTxJSON,
           });
           txHash = receipt.digest;
+        } else if (isXRPLChainName(config.sourceChainName)) {
+          const result = await xrplInterchainTransfer({
+            caller: address,
+            tokenId: tokenId,
+            tokenAddress: config.tokenAddress,
+            destinationChain: config.destinationChainName,
+            destinationAddress: encodedRecipient,
+            amount: bnAmount.toString(),
+            gasValue: config.gas.toString() ?? "0",
+          });
+          txHash = result.txHash;
         } else if (config.sourceChainName.toLowerCase().includes("stellar")) {
           const result = await sendStellarToken.mutateAsync({
             caller: address,

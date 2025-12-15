@@ -8,30 +8,51 @@ import { uniq, without } from "rambda";
 import { z } from "zod";
 
 import {
+  SOLANA_CHAIN_ID,
+  STELLAR_CHAIN_ID,
+  SUI_CHAIN_ID,
+} from "~/config/chains";
+import {
   solanaChainConfig,
   stellarChainConfig,
   suiChainConfig,
 } from "~/config/chains/vm-chains";
-import {
-  SOLANA_CHAIN_ID,
-  STELLAR_CHAIN_ID,
-  SUI_CHAIN_ID,
-  useAccount,
-  useChainId,
-} from "~/lib/hooks";
+import { useAccount, useChainId } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
-import { hex64Literal, numericString } from "~/lib/utils/validation";
+import { numericString } from "~/lib/utils/validation";
 import { DeployTokenResult } from "../suiHooks/useDeployToken";
 
-const TOKEN_DETAILS_FORM_SCHEMA = z.object({
-  tokenName: z.string().min(1).max(32),
-  tokenSymbol: z.string().min(1).max(11),
-  tokenDecimals: z.coerce.number().min(0).max(18),
-  initialSupply: numericString(),
-  isMintable: z.boolean(),
-  minter: z.string().optional(),
-  salt: hex64Literal(),
-});
+const TOKEN_DETAILS_FORM_SCHEMA = z
+  .object({
+    tokenName: z.string().min(1, { message: "Token name is required" }).max(32),
+    tokenSymbol: z
+      .string()
+      .min(1, { message: "Token symbol is required" })
+      .max(11),
+    tokenDecimals: z.coerce
+      .number({
+        invalid_type_error: "Token decimals is required",
+        required_error: "Token decimals is required",
+      })
+      .min(0)
+      .max(18),
+    initialSupply: numericString(),
+    isMintable: z.boolean(),
+    minter: z.string().optional(),
+    salt: z
+      .string()
+      .regex(/^0x[0-9a-fA-F]{64}$/u, {
+        message: "Invalid salt. Expected a 0x-prefixed 64-character hex string",
+      })
+      .transform((x) => x as `0x${string}`),
+  })
+  .refine(
+    ({ isMintable, initialSupply }) => isMintable || Number(initialSupply) > 0,
+    {
+      path: ["initialSupply"],
+      message: "Fixed supply token requires an initial balance",
+    }
+  );
 
 export type TokenDetailsFormState = z.infer<typeof TOKEN_DETAILS_FORM_SCHEMA>;
 
@@ -62,7 +83,7 @@ export const INITIAL_STATE = {
     tokenSymbol: "",
     tokenDecimals: 18,
     tokenAddress: undefined as string | undefined,
-    initialSupply: "0",
+    initialSupply: "1000000000",
     isMintable: false,
     minter: "" as string | undefined,
     salt: undefined as `0x${string}` | undefined,
@@ -93,6 +114,8 @@ function useInterchainTokenDeploymentState(
 
   const tokenDetailsForm = useForm<TokenDetailsFormState>({
     resolver: zodResolver(TOKEN_DETAILS_FORM_SCHEMA),
+    mode: "onChange",
+    reValidateMode: "onChange",
     defaultValues: state.tokenDetails,
   });
 
@@ -108,19 +131,25 @@ function useInterchainTokenDeploymentState(
     () => {
       const salt = generateRandomHash();
 
-      tokenDetailsForm.setValue("salt", salt);
+      tokenDetailsForm.setValue("salt", salt, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
 
       if (chainId === SUI_CHAIN_ID) {
         tokenDetailsForm.setValue(
           "tokenDecimals",
-          suiChainConfig.nativeCurrency.decimals
+          suiChainConfig.nativeCurrency.decimals,
+          { shouldValidate: true }
         );
       }
 
       if (chainId === STELLAR_CHAIN_ID) {
         tokenDetailsForm.setValue(
           "tokenDecimals",
-          stellarChainConfig.nativeCurrency.decimals
+          stellarChainConfig.nativeCurrency.decimals,
+          { shouldValidate: true }
         );
       }
 
@@ -183,14 +212,16 @@ function useInterchainTokenDeploymentState(
           if (chainId === SUI_CHAIN_ID) {
             tokenDetailsForm.setValue(
               "tokenDecimals",
-              suiChainConfig.nativeCurrency.decimals
+              suiChainConfig.nativeCurrency.decimals,
+              { shouldValidate: true }
             );
           }
 
           if (chainId === STELLAR_CHAIN_ID) {
             tokenDetailsForm.setValue(
               "tokenDecimals",
-              stellarChainConfig.nativeCurrency.decimals
+              stellarChainConfig.nativeCurrency.decimals,
+              { shouldValidate: true }
             );
           }
 
@@ -201,7 +232,11 @@ function useInterchainTokenDeploymentState(
             );
           }
 
-          tokenDetailsForm.setValue("salt", generateRandomHash());
+          tokenDetailsForm.setValue("salt", generateRandomHash(), {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
           // tokenDetailsForm.setValue("minter", address);
         });
       },
@@ -255,25 +290,41 @@ function useInterchainTokenDeploymentState(
         setState((draft) => {
           const salt = generateRandomHash();
           draft.tokenDetails.salt = salt;
-          tokenDetailsForm.setValue("salt", salt);
+          tokenDetailsForm.setValue("salt", salt, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
         });
       },
       setCurrentAddressAsMinter: () => {
         setState((draft) => {
           draft.tokenDetails.minter = address;
-          tokenDetailsForm.setValue("minter", address);
+          tokenDetailsForm.setValue("minter", address, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
         });
       },
       resetIsMintable: () => {
         setState((draft) => {
           draft.tokenDetails.isMintable = false;
-          tokenDetailsForm.setValue("isMintable", false);
+          tokenDetailsForm.setValue("isMintable", false, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
         });
       },
       resetMinter: () => {
         setState((draft) => {
           draft.tokenDetails.minter = "" as string;
-          tokenDetailsForm.setValue("minter", "" as string);
+          tokenDetailsForm.setValue("minter", "" as string, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
         });
       },
     },

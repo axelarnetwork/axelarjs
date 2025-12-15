@@ -21,7 +21,7 @@ import { useWriteInterchainTokenTransferMintership } from "~/lib/contracts/Inter
 import { useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
-import { useManageInterchainTokenContainer } from "../../ManageInterchaintoken.state";
+import { useManageInterchainTokenContainer } from "../../ManageInterchainToken.state";
 
 type FormState = {
   recipientAddress: `0x${string}`;

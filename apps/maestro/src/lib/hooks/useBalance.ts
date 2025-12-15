@@ -5,6 +5,7 @@ import {
   useConnection,
   useWallet as useSolanaWallet,
 } from "@solana/wallet-adapter-react";
+import { useWallet as useXRPLWallet } from "@xrpl-wallet-standard/react";
 import { Horizon } from "stellar-sdk";
 import { formatUnits } from "viem";
 import {
@@ -16,8 +17,10 @@ import {
   solanaChainConfig,
   stellarChainConfig,
   suiChainConfig,
+  xrplChainConfig,
 } from "~/config/chains/vm-chains";
 import { STELLAR_HORIZON_URL } from "~/server/routers/stellar/utils/config";
+import { fetchXRPLBalance } from "../utils/xrpl";
 import { useAccount } from "./useAccount";
 
 // Define a type for the balance result
@@ -36,6 +39,8 @@ export function useBalance(): BalanceResult | undefined {
   const { connection: solanaConnection } = useConnection();
   const { publicKey: solanaPublicKey } = useSolanaWallet();
   const [solanaLamports, setSolanaLamports] = useState<number | null>(null);
+  const { wallet: xrplWallet } = useXRPLWallet();
+  const [XRPLDrops, setXRPLDrops] = useState<string | null>(null);
 
   // Wagmi balance hook
   const { data: wagmiBalance } = useWagmiBalance({
@@ -86,6 +91,26 @@ export function useBalance(): BalanceResult | undefined {
     }
   }, [chainName, address, solanaConnection, solanaPublicKey]);
 
+  useEffect(() => {
+    if (
+      chainName === xrplChainConfig?.name &&
+      address &&
+      xrplWallet?.accounts.length
+    ) {
+      // TODO: fix XRPL connection check
+      void (async () => {
+        let drops = "0";
+        try {
+          drops = await fetchXRPLBalance(address);
+        } catch (error) {
+          // ignore
+        } finally {
+          setXRPLDrops(drops);
+        }
+      })();
+    }
+  }, [chainName, address, xrplWallet?.accounts.length]);
+
   const balance = useMemo(() => {
     if (wagmiBalance) {
       return wagmiBalance;
@@ -124,8 +149,18 @@ export function useBalance(): BalanceResult | undefined {
         decimals,
       };
     }
+    if (XRPLDrops) {
+      const value = BigInt(XRPLDrops);
+      const { decimals, symbol } = xrplChainConfig.nativeCurrency;
+      return {
+        value,
+        formatted: formatUnits(value, decimals),
+        symbol,
+        decimals,
+      };
+    }
     return undefined;
-  }, [wagmiBalance, suiBalance, solanaLamports, stellarBalance]);
+  }, [wagmiBalance, suiBalance, solanaLamports, stellarBalance, XRPLDrops]);
 
   return balance;
 }

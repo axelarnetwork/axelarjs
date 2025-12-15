@@ -7,7 +7,7 @@ import { createContext } from "~/server/context";
 import { appRouter } from "~/server/routers/_app";
 
 export const config: NextConfig = {
-  maxDuration: 20,
+  maxDuration: 25,
 };
 
 export default trpcNext.createNextApiHandler({

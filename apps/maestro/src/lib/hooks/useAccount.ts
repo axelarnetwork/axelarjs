@@ -7,6 +7,7 @@ import {
 } from "@solana/wallet-adapter-react";
 import { clusterApiUrl } from "@solana/web3.js";
 import { getAddress, getNetwork, isConnected } from "@stellar/freighter-api";
+import { useAccount as useXRPLAccount } from "@xrpl-wallet-standard/react";
 import type { Chain } from "viem";
 import { useAccount as useWagmiAccount } from "wagmi";
 
@@ -14,6 +15,7 @@ import {
   solanaChainConfig,
   stellarChainConfig,
   suiChainConfig,
+  xrplChainConfig,
 } from "~/config/chains/vm-chains";
 import { NEXT_PUBLIC_NETWORK_ENV } from "~/config/env";
 import {
@@ -43,6 +45,7 @@ export function useAccount(): CombinedAccountInfo {
   const mystenAccount = useMystenAccount();
   const solanaWallet = useSolanaWallet();
   const { connection: solanaConnection } = useConnection();
+  const xrplAccount = useXRPLAccount();
   const [stellarAccount, setStellarAccount] = useState<string | null>(null);
   const [stellarNetwork, setStellarNetwork] = useState<string | null>(null);
   const [isLoadingStellar, setIsLoadingStellar] = useState(true);
@@ -107,6 +110,7 @@ export function useAccount(): CombinedAccountInfo {
   const isMystenConnected = !!mystenAccount;
   const isSolanaConnected = !!solanaWallet.publicKey;
   const isStellarConnected = !!stellarAccount;
+  const isXRPLConnected = !!xrplAccount?.address;
 
   const evmChain = useMemo(
     () => evmChains?.find?.((x) => x.chain_id === wagmiAccount?.chain?.id),
@@ -118,22 +122,26 @@ export function useAccount(): CombinedAccountInfo {
       wagmiAccount.address ||
       (mystenAccount?.address as `0x${string}`) ||
       (solanaWallet.publicKey?.toBase58() as unknown as `0x${string}`) ||
-      (stellarAccount as string),
+      (stellarAccount as string) ||
+      (xrplAccount?.address as string),
     isConnected:
       isWagmiConnected ||
       isMystenConnected ||
       isSolanaConnected ||
-      isStellarConnected,
+      isStellarConnected ||
+      isXRPLConnected,
     isDisconnected:
       !isWagmiConnected &&
       !isMystenConnected &&
       !isSolanaConnected &&
-      !isStellarConnected,
+      !isStellarConnected &&
+      !isXRPLConnected,
     chain:
       wagmiAccount.chain ||
       (isMystenConnected && suiChainConfig) ||
       (isSolanaConnected && solanaChainConfig) ||
       (isStellarConnected && stellarChainConfig) ||
+      (isXRPLConnected && xrplChainConfig) ||
       undefined,
     isEvmChain: !!evmChain,
     chainName:
@@ -141,6 +149,7 @@ export function useAccount(): CombinedAccountInfo {
       (isMystenConnected && "Sui") ||
       (isSolanaConnected && solanaChainConfig.name) ||
       (isStellarConnected && "Stellar") ||
+      (isXRPLConnected && xrplChainConfig.name) ||
       undefined,
     isWrongSuiNetwork:
       isMystenConnected && mystenAccount?.chains[0] !== APP_SUI_NETWORK,

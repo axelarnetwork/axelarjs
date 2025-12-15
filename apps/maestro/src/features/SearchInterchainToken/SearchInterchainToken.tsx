@@ -17,6 +17,7 @@ import {
   isValidSolanaAddress,
   isValidStellarTokenAddress,
   isValidSuiTokenAddress,
+  isXRPLTokenAddressFormat,
 } from "~/lib/utils/validation";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
 import { useInterchainTokensQuery } from "~/services/gmp/hooks";
@@ -56,6 +57,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
   const isValidSuiAddress = isValidSuiTokenAddress(search);
   const isValidStellar = isValidStellarTokenAddress(search);
   const isValidSolana = isValidSolanaAddress(search);
+  const isValidXRPL = isXRPLTokenAddressFormat(search);
 
   const chainId = connectedChain?.id ?? selectedChainId;
   const chainName = connectedChain?.name ?? defaultChain?.name;
@@ -112,6 +114,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
       !isValidSuiAddress &&
       !isValidStellar &&
       !isValidSolana &&
+      !isValidXRPL &&
       search.length >= 10);
 
   return (
@@ -142,13 +145,14 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        <div className="btn join-item bg-base-300">
+        <div className="btn join-item relative z-10 bg-base-300 p-0">
           {isLoading && isAddress(search) ? (
-            <SpinnerIcon className="h-6 w-6 animate-spin text-primary" />
+            <SpinnerIcon className="h-6 w-6 animate-spin px-4 text-primary" />
           ) : (
             <ChainsDropdown
               triggerClassName="btn btn-sm btn-circle"
-              contentClassName="translate-x-4 translate-y-2 sm:w-96 md:w-[448px]"
+              contentClassName="sm:w-96 md:w-[448px]"
+              containerClassName="h-full"
               compact
               hideLabel
               renderTrigger={() => (
@@ -157,6 +161,7 @@ const SearchInterchainToken: FC<SearchInterchainTokenProps> = (props) => {
                   role="button"
                   aria-label="Select Chain"
                   tabIndex={-1}
+                  className="h-full px-4"
                 >
                   <div className="flex items-center gap-2">
                     <span className="hidden text-gray-700 dark:text-white md:block">

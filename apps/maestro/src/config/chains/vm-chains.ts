@@ -3,7 +3,23 @@ import { STELLAR_RPC_URLS, SUI_RPC_URLS } from "@axelarjs/core";
 import { clusterApiUrl } from "@solana/web3.js";
 
 import { NEXT_PUBLIC_NETWORK_ENV } from "../env";
-import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./evm-chains";
+import { createRpcUrlConfig, ExtendedWagmiChainConfig } from "./utils";
+
+export const SUI_CHAIN_ID = NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 101 : 103;
+export const STELLAR_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet" ? 109 : 110;
+export const SOLANA_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+    ? 111
+    : NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier"
+      ? 113
+      : 112;
+export const XRPL_CHAIN_ID =
+  NEXT_PUBLIC_NETWORK_ENV === "mainnet"
+    ? 114
+    : NEXT_PUBLIC_NETWORK_ENV === "devnet-amplifier"
+      ? 116
+      : 115;
 
 const ENVIRONMENTS = {
   mainnet: "mainnet",
@@ -150,6 +166,65 @@ const solanaDevnet = {
   },
 };
 
+export const xrpl = {
+  id: 114,
+  axelarChainId: "xrpl",
+  axelarChainName: "XRPL",
+  environment: ENVIRONMENTS.mainnet,
+  name: "XRPL",
+  nativeCurrency: {
+    name: "XRP",
+    symbol: "XRP",
+    decimals: 6,
+  },
+  rpcUrls: createRpcUrlConfig("xrpl", ENVIRONMENTS.mainnet, [
+    "wss://xrplcluster.com",
+  ]),
+  blockExplorers: {
+    default: {
+      name: "XRPL Explorer",
+      url: "https://livenet.xrpl.org",
+    },
+  },
+  supportWagmi: false,
+  xrplNetwork: "xrpl:mainnet",
+};
+
+const xrplTestnet = {
+  ...xrpl,
+  id: 115,
+  rpcUrls: createRpcUrlConfig("xrpl", ENVIRONMENTS.testnet, [
+    "wss://s.altnet.rippletest.net:51233/",
+  ]),
+  blockExplorers: {
+    default: {
+      name: "XRPL Explorer",
+      url: "https://testnet.xrpl.org",
+    },
+  },
+  environment: ENVIRONMENTS.testnet,
+  name: "XRPL Testnet",
+  xrplNetwork: "xrpl:testnet",
+};
+
+const xrplDevnet = {
+  ...xrplTestnet,
+  id: 116,
+  axelarChainId: "xrpl-dev",
+  environment: ENVIRONMENTS.devnet,
+  rpcUrls: createRpcUrlConfig("xrpl", ENVIRONMENTS.testnet, [
+    "wss://s.devnet.rippletest.net:51233/",
+  ]),
+  blockExplorers: {
+    default: {
+      name: "XRPL Explorer",
+      url: "https://devnet.xrpl.org/",
+    },
+  },
+  name: "XRPL Devnet",
+  xrplNetwork: "xrpl:devnet",
+};
+
 export const VM_CHAINS: ExtendedWagmiChainConfig[] = [
   sui,
   suiTestnet,
@@ -160,6 +235,9 @@ export const VM_CHAINS: ExtendedWagmiChainConfig[] = [
   solana,
   solanaTestnet,
   solanaDevnet,
+  xrpl,
+  xrplTestnet,
+  xrplDevnet,
 ] as const;
 
 export const VM_CHAIN_CONFIGS = VM_CHAINS.filter(
@@ -181,3 +259,10 @@ export const stellarChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
 export const solanaChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
   chain.axelarChainId.includes("solana")
 ) as ExtendedWagmiChainConfig;
+
+export const xrplChainConfig = VM_CHAIN_CONFIGS.find((chain) =>
+  chain.axelarChainId.includes("xrpl")
+) as ExtendedWagmiChainConfig;
+
+// cannot deploy on these chains
+export const CHAINS_WITHOUT_DEPLOYMENT = [XRPL_CHAIN_ID];
