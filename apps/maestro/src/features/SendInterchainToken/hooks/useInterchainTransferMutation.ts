@@ -13,9 +13,10 @@ import { useAccount, useChainId } from "~/lib/hooks";
 import { useTransactionState } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { trackTokenTransfer } from "~/lib/utils/analytics";
+import { isXRPLChainName } from "~/lib/utils/xrpl";
 import { stellarEncodedRecipient } from "~/server/routers/stellar/utils";
 import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
-import { isXRPLChainName } from "~/lib/utils/xrpl";
 
 export type UseSendInterchainTokenConfig = {
   tokenAddress: string;
@@ -140,6 +141,14 @@ export function useInterchainTransferMutation(
           });
         }
         if (txHash) {
+          // Track analytics event
+          trackTokenTransfer(
+            config.sourceChainName,
+            config.destinationChainName,
+            config.tokenAddress,
+            amount
+          );
+
           setTxState({
             status: "submitted",
             hash: txHash,

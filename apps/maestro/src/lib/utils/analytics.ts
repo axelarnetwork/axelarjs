@@ -44,3 +44,24 @@ export function trackRemoteTokenEvents(
     trackTokenEvent(deploymentKind, "created", remoteToken.axelarChainId, true);
   });
 }
+
+/**
+ * Tracks token transfer events in Vercel Analytics
+ * @param originChain - The chain where the transfer originates
+ * @param destinationChain - The destination chain for the transfer
+ * @param tokenAddress - The address of the token being transferred
+ * @param amount - The amount being transferred (as string)
+ */
+export function trackTokenTransfer(
+  originChain: string,
+  destinationChain: string,
+  tokenAddress: string,
+  amount: string
+) {
+  track("token_transfer", {
+    originChain,
+    destinationChain,
+    tokenAddress,
+    amount,
+  });
+}
