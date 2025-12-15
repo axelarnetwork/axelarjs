@@ -24,7 +24,10 @@ import {
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
-import { trackRemoteTokenEvents, trackTokenEvent } from "~/lib/utils/analytics";
+import {
+  trackRemoteTokenDeployments,
+  trackTokenDeployment,
+} from "~/lib/utils/analytics";
 import { scaleGasValue } from "~/lib/utils/gas";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import { RecordInterchainTokenDeploymentInput } from "~/server/routers/interchainToken/recordInterchainTokenDeployment";
@@ -208,14 +211,14 @@ export function useDeployAndRegisterRemoteCanonicalTokenMutation(
 
           // Track analytics events
           // Track main canonical token registration
-          trackTokenEvent(
+          trackTokenDeployment(
             "canonical",
             "registered",
             recordDeploymentArgs.axelarChainId
           );
 
           // Track remote canonical token creation for each destination chain
-          trackRemoteTokenEvents(
+          trackRemoteTokenDeployments(
             "canonical",
             recordDeploymentArgs.destinationAxelarChainIds.map((chainId) => ({
               axelarChainId: chainId,

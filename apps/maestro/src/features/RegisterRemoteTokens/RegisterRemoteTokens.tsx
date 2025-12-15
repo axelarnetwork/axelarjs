@@ -14,7 +14,7 @@ import {
 } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
-import { trackRemoteTokenEvents } from "~/lib/utils/analytics";
+import { trackRemoteTokenDeployments } from "~/lib/utils/analytics";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { findGatewayEventIndex } from "~/server/routers/sui/utils/utils";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -67,7 +67,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       });
 
       // Track analytics events for remote tokens
-      trackRemoteTokenEvents(props.deploymentKind, remoteTokens);
+      trackRemoteTokenDeployments(props.deploymentKind, remoteTokens);
 
       setTxState({
         status: "confirmed",

@@ -14,7 +14,7 @@ export interface RemoteToken {
  * @param chain - The chain where the token was created/registered
  * @param isRemote - Whether this is a remote token (default: false)
  */
-export function trackTokenEvent(
+export function trackTokenDeployment(
   kind: "canonical" | "interchain" | "custom",
   action: "created" | "registered",
   chain: string,
@@ -34,14 +34,19 @@ export function trackTokenEvent(
  * @param deploymentKind - The type of token deployment (canonical, interchain, or custom)
  * @param remoteTokens - Array of remote tokens with axelarChainId property
  */
-export function trackRemoteTokenEvents(
+export function trackRemoteTokenDeployments(
   deploymentKind: DeploymentKind,
   remoteTokens: RemoteToken[]
 ) {
   remoteTokens.forEach((remoteToken) => {
     if (!remoteToken.axelarChainId) return;
 
-    trackTokenEvent(deploymentKind, "created", remoteToken.axelarChainId, true);
+    trackTokenDeployment(
+      deploymentKind,
+      "created",
+      remoteToken.axelarChainId,
+      true
+    );
   });
 }
 
