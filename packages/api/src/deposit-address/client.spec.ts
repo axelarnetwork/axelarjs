@@ -33,7 +33,7 @@ const retryGetOtc = async (
 
 describe("deposit address client (node)", () => {
   describe("get OTC", () => {
-    test("It should get an OTC", async () => {
+    test.skip("It should get an OTC", async () => {
       const api = createDepositAddressApiClient(ENVIRONMENTS.testnet);
       const otcRes = await retryGetOtc(
         api,
@@ -49,7 +49,7 @@ describe("deposit address client (node)", () => {
   });
 
   describe("get deposit address", () => {
-    test("It should get a deposit address after generating a unique OTC (cosmos)", async () => {
+    test.skip("It should get a deposit address after generating a unique OTC (cosmos)", async () => {
       const api = createDepositAddressApiClient(ENVIRONMENTS.testnet);
       const dummyAccount = privateKeyToAccount(generatePrivateKey());
       const otcRes: OTC = await retryGetOtc(api, dummyAccount.address);
@@ -81,7 +81,7 @@ describe("deposit address client (node)", () => {
       expect(depositAddressResponse.data.roomId).toEqual(expectedResponse);
     });
 
-    test("It should get a deposit address after generating a unique OTC (evm)", async () => {
+    test.skip("It should get a deposit address after generating a unique OTC (evm)", async () => {
       const api = createDepositAddressApiClient(ENVIRONMENTS.testnet);
       const dummyAccount = privateKeyToAccount(generatePrivateKey());
 

@@ -14,6 +14,7 @@ import {
 } from "~/lib/hooks/useTransactionState";
 import { logger } from "~/lib/logger";
 import { trpc } from "~/lib/trpc";
+import { trackRemoteTokenDeployments } from "~/lib/utils/analytics";
 import { ITSChainConfig } from "~/server/chainConfig";
 import { findGatewayEventIndex } from "~/server/routers/sui/utils/utils";
 import { useAllChainConfigsQuery } from "~/services/axelarConfigs/hooks";
@@ -65,6 +66,9 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
         remoteTokens,
       });
 
+      // Track analytics events for remote tokens
+      trackRemoteTokenDeployments(props.deploymentKind, remoteTokens);
+
       setTxState({
         status: "confirmed",
         receipt,
@@ -74,6 +78,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       baseRemoteTokens,
       props.originChainId,
       props.tokenAddress,
+      props.deploymentKind,
       recordRemoteTokenDeployment,
       setTxState,
     ]
@@ -107,6 +112,10 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       deploymentMessageId: `${digest}-${txIndex}`,
       remoteTokens,
     });
+
+    // Track analytics events for remote tokens
+    trackRemoteTokenDeployments(props.deploymentKind, remoteTokens);
+
     setTxState({
       status: "confirmed",
       hash: digest,
@@ -116,6 +125,7 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
     baseRemoteTokens,
     props.originChainId,
     props.tokenAddress,
+    props.deploymentKind,
     recordRemoteTokenDeployment,
     setTxState,
     txState,
@@ -137,11 +147,16 @@ export const RegisterRemoteTokens: FC<RegisterRemoteTokensProps> = (props) => {
       deploymentMessageId: txState.hash,
       remoteTokens,
     });
+
+    // Track analytics events for remote tokens
+    trackRemoteTokenDeployments(props.deploymentKind, remoteTokens);
+
     setTxState({ status: "confirmed", hash: txState.hash });
   }, [
     baseRemoteTokens,
     props.originChainId,
     props.tokenAddress,
+    props.deploymentKind,
     recordRemoteTokenDeployment,
     setTxState,
     txState,

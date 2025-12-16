@@ -19,10 +19,11 @@ import {
 import { useWriteInterchainTokenServiceInterchainTransfer } from "~/lib/contracts/InterchainTokenService.hooks";
 import { useAccount, useChainId, useTransactionState } from "~/lib/hooks";
 import { logger } from "~/lib/logger";
+import { trackTokenTransfer } from "~/lib/utils/analytics";
 import { scaleGasValue } from "~/lib/utils/gas";
 import { encodeStellarAddressAsBytes } from "~/lib/utils/stellar";
-import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
 import { isXRPLChainName } from "~/lib/utils/xrpl";
+import { xrplEncodedRecipient } from "~/server/routers/xrpl/utils/utils";
 
 const CHAINS_SCALED_GAS = [HEDERA_CHAIN_ID];
 
@@ -91,14 +92,16 @@ export function useInterchainTokenServiceTransferMutation(
         let encodedRecipient: `0x${string}`;
         if (!destinationAddress) {
           encodedRecipient = address;
-        } else if (config.destinationChainName.toLowerCase().includes("stellar")) {
+        } else if (
+          config.destinationChainName.toLowerCase().includes("stellar")
+        ) {
           // Encode the recipient address for Stellar since it's a base64 string
           encodedRecipient = encodeStellarAddressAsBytes(destinationAddress);
         } else if (isXRPLChainName(config.destinationChainName)) {
           // Encode the recipient address for XRPL
           encodedRecipient = xrplEncodedRecipient(destinationAddress);
         } else {
-          encodedRecipient = ((destinationAddress as `0x${string}`) ?? address);
+          encodedRecipient = (destinationAddress as `0x${string}`) ?? address;
         }
 
         const txHash = await interchainTransferAsync({
@@ -116,6 +119,13 @@ export function useInterchainTokenServiceTransferMutation(
         });
 
         if (txHash) {
+          // Track analytics event
+          trackTokenTransfer(
+            config.sourceChainName,
+            config.destinationChainName,
+            config.tokenAddress
+          );
+
           setTxState({
             status: "submitted",
             hash: txHash,
@@ -155,6 +165,8 @@ export function useInterchainTokenServiceTransferMutation(
       config.destinationChainName,
       config.gas,
       config.tokenId,
+      config.sourceChainName,
+      config.tokenAddress,
       interchainTransferAsync,
       setTxState,
       shouldScaleGas,
