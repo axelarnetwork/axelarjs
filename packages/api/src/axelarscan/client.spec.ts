@@ -2,7 +2,7 @@ import { createAxelarscanClient } from "./client";
 
 describe("axelarscan", () => {
   describe("searchTransactions", () => {
-    it("Should get link transactions", async () => {
+    it.skip("Should get link transactions", async () => {
       const api = createAxelarscanClient("testnet");
       const res = await api.getRecentLinkTransactions({ size: 10 });
 

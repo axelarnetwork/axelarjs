@@ -32,6 +32,10 @@ import { TOKEN_MANAGER_TYPES } from "~/lib/drizzle/schema/common";
 import { useAccount, useChainId } from "~/lib/hooks";
 import { useStellarKit } from "~/lib/providers/StellarWalletKitProvider";
 import { trpc } from "~/lib/trpc";
+import {
+  trackRemoteTokenDeployments,
+  trackTokenDeployment,
+} from "~/lib/utils/analytics";
 import { scaleGasValue } from "~/lib/utils/gas";
 import { isValidEVMAddress } from "~/lib/utils/validation";
 import type { EstimateGasFeeMultipleChainsOutput } from "~/server/routers/axelarjsSDK";
@@ -512,6 +516,23 @@ const useRecordDeployment = ({
           const tx = decodeDeploymentMessageId(
             recordDeploymentArgs.deploymentMessageId as DeploymentMessageId
           );
+
+          // Track analytics events
+          // Track main interchain token creation
+          trackTokenDeployment(
+            "interchain",
+            "created",
+            recordDeploymentArgs.axelarChainId
+          );
+
+          // Track remote interchain token creation for each destination chain
+          trackRemoteTokenDeployments(
+            "interchain",
+            recordDeploymentArgs.destinationAxelarChainIds.map((chainId) => ({
+              axelarChainId: chainId,
+            }))
+          );
+
           onStatusUpdate({
             type: "deployed",
             tokenAddress: recordDeploymentArgs.tokenAddress as `0x${string}`,
