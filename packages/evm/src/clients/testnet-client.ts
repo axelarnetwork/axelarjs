@@ -48,7 +48,7 @@ export const TESTNET_CHAINS = {
   "filecoin-2": filecoinCalibration,
   "linea-sepolia": lineaSepolia,
   "mantle-sepolia": mantleTestnet,
-  monad: monadTestnet,
+  "monad-3": monadTestnet,
   "optimism-sepolia": optimismSepolia,
   immutable: immutableZkEvmTestnet,
   linea: lineaTestnet,

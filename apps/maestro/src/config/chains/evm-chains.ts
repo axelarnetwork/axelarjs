@@ -616,10 +616,10 @@ export const EVM_CHAINS: ExtendedWagmiChainConfig[] = [
       monadTestnet,
       ENVIRONMENTS.testnet,
       [],
-      "monad"
+      "monad-3"
     ),
-    axelarChainId: "monad",
-    axelarChainName: "monad",
+    axelarChainId: "monad-3",
+    axelarChainName: "monad-3",
     supportWagmi: true,
     environment: ENVIRONMENTS.testnet,
   },
