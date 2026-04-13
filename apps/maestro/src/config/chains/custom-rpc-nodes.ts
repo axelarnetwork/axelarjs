@@ -7,7 +7,7 @@ export const CUSTOM_RPC_NODES: Record<
     aurora: ["https://aurora.drpc.org"], // Aurora Mainnet
     avalanche: ["https://avalanche-c-chain-rpc.publicnode.com"], // Avalanche Mainnet (was: https://avalanche.drpc.org)
     base: ["https://developer-access-mainnet.base.org"], // Base Mainnet (was: https://base.drpc.org)
-    binance: ["https://api.zan.top/bsc-mainnet"], // BSC Mainnet (was: https://bsc.drpc.org)
+    binance: ["https://bsc-dataseed.bnbchain.org"], // BSC Mainnet (was: https://bsc.drpc.org, and after that: https://api.zan.top/bsc-mainnet)
     blast: ["https://rpc.blast.io"], // Blast Mainnet (was: https://blast.drpc.org)
     celo: ["https://forno.celo.org"], // Celo Mainnet (was: https://celo.drpc.org)
     ethereum: ["https://eth1.lava.build"], // Ethereum Mainnet (was: https://eth.drpc.org)
