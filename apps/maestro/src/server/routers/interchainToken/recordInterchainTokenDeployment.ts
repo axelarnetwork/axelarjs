@@ -1,4 +1,5 @@
 import { invariant, Maybe } from "@axelarjs/utils";
+import { TRPCError } from "@trpc/server";
 
 import { always } from "rambda";
 import { z } from "zod";
@@ -23,6 +24,16 @@ export const recordInterchainTokenDeployment = protectedProcedure
   .input(recordInterchainTokenDeploymentInput)
   .mutation(async ({ ctx, input }) => {
     invariant(ctx.session?.address, "ctx.session.address is required");
+
+    // Object-level authorization: the caller may only record a deployment
+    // attributed to their own address, not to an arbitrary deployer.
+    if (input.deployerAddress.toLowerCase() !== ctx.session.address.toLowerCase()) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Only the deployer of the token can record its deployment",
+      });
+    }
+
     let tokenManagerAddress;
     let tokenManagerType;
     const chains = await ctx.configs.chains();

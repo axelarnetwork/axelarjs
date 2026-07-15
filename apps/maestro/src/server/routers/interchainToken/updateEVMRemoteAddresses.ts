@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { protectedProcedure } from "~/server/trpc";
+import { assertTokenOwnership } from "./assertTokenOwnership";
 
 /**
  * Updates the remote token address for EVM chains (like Hedera) by querying the
@@ -23,6 +24,8 @@ export const updateEVMRemoteTokenAddress = protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
+    await assertTokenOwnership(ctx, input.tokenId);
+
     const chains = await ctx.configs.evmChains();
 
     const chainConfig = chains[input.axelarChainId];

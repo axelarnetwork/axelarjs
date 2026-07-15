@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { protectedProcedure } from "~/server/trpc";
+import { assertTokenOwnership } from "./assertTokenOwnership";
 import { getStellarTokenRegistrationDetails } from "./searchInterchainToken";
 
 export const updateStellarRemoteTokenAddresses = protectedProcedure
@@ -11,6 +12,8 @@ export const updateStellarRemoteTokenAddresses = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     const { tokenId } = input;
+
+    await assertTokenOwnership(ctx, tokenId);
 
     // Get the token registration details by querying the Stellar contract
     const response = await getStellarTokenRegistrationDetails(tokenId, ctx);
