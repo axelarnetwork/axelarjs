@@ -2,10 +2,10 @@ import { partition } from "rambda";
 import { z } from "zod";
 
 import { hex40Literal, hex64Literal } from "~/lib/utils/validation";
-import { protectedProcedure } from "~/server/trpc";
+import { disabledProcedure } from "~/server/trpc";
 import { scanInterchainTokenOnChainByTokenId } from "./findInterchainTokenByTokenId";
 
-export const recoverCanonicalTokenByTokenId = protectedProcedure
+export const recoverCanonicalTokenByTokenId = disabledProcedure
   .input(
     z.object({
       tokenId: hex64Literal(),

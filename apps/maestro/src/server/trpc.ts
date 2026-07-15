@@ -67,6 +67,21 @@ export const protectedProcedure = publicProcedure.use(({ ctx, next }) => {
 });
 
 /**
+ * A procedure that is permanently disabled and always rejects.
+ *
+ * Used to switch off the admin-panel write endpoints, which were only gated by
+ * client-side route protection (no server-side enforcement) and are no longer
+ * used. Kept wired into the routers so the client still type-checks and simply
+ * receives a clean error.
+ **/
+export const disabledProcedure = publicProcedure.use(() => {
+  throw new TRPCError({
+    code: "FORBIDDEN",
+    message: "This endpoint is disabled",
+  });
+});
+
+/**
  * @see https://trpc.io/docs/v10/middlewares
  */
 export const middleware = t.middleware;
