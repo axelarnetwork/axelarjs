@@ -4,6 +4,7 @@ import { z } from "zod";
 import { hex64Literal } from "~/lib/utils/validation";
 import type { Context } from "~/server/context";
 import { protectedProcedure } from "~/server/trpc";
+import { assertTokenOwnership } from "./assertTokenOwnership";
 
 export const setInterchainTokenIconUrl = protectedProcedure
   .input(
@@ -14,6 +15,8 @@ export const setInterchainTokenIconUrl = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
+      await assertTokenOwnership(ctx, input.tokenId);
+
       const { url: sanitizedUrl, extention } = sanitizeUrl(input.iconUrl);
 
       // assuming vector graphics are safe since it can't be validated with OpenAI's API
