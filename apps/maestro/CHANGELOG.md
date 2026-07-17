@@ -1,5 +1,36 @@
 # @axelarjs/maestro
 
+## 0.5.0
+
+### Minor Changes
+
+- [#542](https://github.com/axelarnetwork/axelarjs/pull/542) [`3964a14a4fbfbd0c389ba1511acc76461e53f2ea`](https://github.com/axelarnetwork/axelarjs/commit/3964a14a4fbfbd0c389ba1511acc76461e53f2ea) Thanks [@SGiaccobasso](https://github.com/SGiaccobasso)! - Added support for non-evm chains
+
+  Full support for sui chain
+
+  - Sui wallet integration
+  - Deploy and manage interchain tokens to and from sui
+
+  Partial support for stellar chain
+
+  - Use stellar as a remote chain for interchain deployments and transfers
+
+  Added support for devnet-amplifier environment
+
+  Bug fixes and improvements
+
+### Patch Changes
+
+- [#664](https://github.com/axelarnetwork/axelarjs/pull/664) [`6a51fb4e2666dd7e2c232ccfc9c747681115211b`](https://github.com/axelarnetwork/axelarjs/commit/6a51fb4e2666dd7e2c232ccfc9c747681115211b) Thanks [@themetalfleece](https://github.com/themetalfleece)! - fix: improve chains dropdown visuals
+
+  - Fixed dropdown hitbox issues
+  - Enabled vertical scrolling for dropdown
+  - Fixed z-index of SearchInterchainToken
+
+- Updated dependencies [[`dd036a5c4dbd67c7e78b9493849cccc4b2010001`](https://github.com/axelarnetwork/axelarjs/commit/dd036a5c4dbd67c7e78b9493849cccc4b2010001)]:
+  - @axelarjs/core@0.2.13
+  - @axelarjs/api@0.4.8
+
 ## 0.4.1
 
 ### Patch Changes
