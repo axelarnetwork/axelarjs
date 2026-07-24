@@ -64,7 +64,7 @@ class Logger {
       }
 
       if (frequency === "default") {
-        // Only log in dev enviroment
+        // Only log in dev environment
         if (!this.isDevEnviroment) return;
       }
 
