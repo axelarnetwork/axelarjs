@@ -12,10 +12,9 @@ runs:
 
   steps:
     - name: Install pnpm
-      uses: pnpm/action-setup@v2
+      uses: pnpm/action-setup@v4
       id: pnpm-install
       with:
-        version: 8
         run_install: false
 
     - name: Get pnpm store directory
@@ -34,10 +33,10 @@ runs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
-    - name: Setup Node.js 20
-      uses: actions/setup-node@v3
+    - name: Setup Node.js 24
+      uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 24
         cache: pnpm
 
     - name: Install dependencies
